@@ -1,0 +1,1918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRISOCMD Shop</title>
+<style>
+  :root {
+    --bg: #050508;
+    --bg2: #08080e;
+    --bg3: #0d0d16;
+    --bg4: #12121f;
+    --border: rgba(0,240,255,0.08);
+    --border2: rgba(0,240,255,0.2);
+    --text: #e8eaf6;
+    --text2: #7986a8;
+    --text3: #3d4560;
+    --accent: #00f0ff;
+    --accent2: #ff2d6b;
+    --accent-glow: rgba(0,240,255,0.12);
+    --green: #00ff88;
+    --red: #ff2d6b;
+    --amber: #ffcc00;
+    --radius: 4px;
+    --radius-sm: 3px;
+    --radius-lg: 6px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif; min-height:100vh; overflow-x:hidden; }
+  
+  /* ─── SCREENS ─── */
+  .screen { display:none; min-height:100vh; }
+  .screen.active { display:flex; flex-direction:column; }
+
+  /* ─── LANGUAGE SCREEN ─── */
+  #lang-screen {
+    align-items:center; justify-content:center;
+    background:var(--bg);
+    animation: fadeIn 0.6s ease;
+  }
+  .lang-wrap { text-align:center; max-width:480px; width:100%; padding:2rem; }
+  .lang-logo { font-size:13px; letter-spacing:0.3em; color:var(--text3); text-transform:uppercase; margin-bottom:3rem; }
+  .lang-title { font-size:28px; font-weight:300; color:var(--text); margin-bottom:0.5rem; letter-spacing:-0.02em; }
+  .lang-sub { font-size:14px; color:var(--text2); margin-bottom:2.5rem; }
+  .lang-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .lang-btn {
+    background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-sm);
+    padding:14px 16px; cursor:pointer; transition:all 0.2s;
+    display:flex; align-items:center; gap:10px; text-align:left;
+  }
+  .lang-btn:hover { border-color:var(--accent); background:var(--bg4); }
+  .lang-flag { font-size:22px; }
+  .lang-name { font-size:14px; color:var(--text); font-weight:400; }
+  .lang-native { font-size:12px; color:var(--text3); }
+
+  /* ─── NAV ─── */
+  nav {
+    position:sticky; top:0; z-index:100;
+    background:rgba(8,8,8,0.85); backdrop-filter:blur(20px);
+    border-bottom:1px solid var(--border);
+    padding:0 2rem; height:60px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .nav-logo { font-size:15px; font-weight:600; letter-spacing:0.05em; color:var(--text); cursor:pointer; }
+  .nav-logo span { color:var(--accent); }
+  .nav-right { display:flex; align-items:center; gap:16px; }
+  .nav-lang { font-size:13px; color:var(--text2); cursor:pointer; background:none; border:none; display:flex; align-items:center; gap:6px; }
+  .nav-lang:hover { color:var(--text); }
+  .nav-trust { font-size:13px; color:var(--text2); cursor:pointer; background:none; border:1px solid var(--border); padding:6px 14px; border-radius:999px; transition:all 0.2s; }
+  .nav-trust:hover { border-color:var(--border2); color:var(--text); }
+
+  /* ─── STORE ─── */
+  #store-screen { background:var(--bg); }
+  .store-hero { padding:5rem 2rem 3rem; max-width:900px; margin:0 auto; text-align:center; }
+  .store-hero-label { font-size:11px; letter-spacing:0.2em; color:var(--accent); text-transform:uppercase; margin-bottom:1rem; }
+  .store-hero-title { font-size:clamp(32px,5vw,52px); font-weight:300; letter-spacing:-0.03em; color:var(--text); line-height:1.1; }
+  
+  .product-section { max-width:1100px; margin:0 auto; padding:2rem; }
+  .product-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; }
+  
+  .product-card {
+    background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-lg);
+    overflow:hidden; cursor:pointer; transition:all 0.25s;
+    position:relative;
+  }
+  .product-card:hover { border-color:var(--border2); transform:translateY(-2px); }
+  .product-card.sold { opacity:0.5; }
+  .product-card.sold .product-buy-btn { pointer-events:none; display:none; }
+  .product-img {
+    width:100%; height:200px; object-fit:cover;
+    background:var(--bg4);
+    display:flex; align-items:center; justify-content:center; font-size:48px;
+  }
+  .product-img img { width:100%; height:100%; object-fit:cover; }
+  .product-img-placeholder { width:100%; height:200px; background:var(--bg4); display:flex; align-items:center; justify-content:center; font-size:48px; }
+  .product-body { padding:1.25rem; }
+  .product-badge {
+    position:absolute; top:12px; right:12px;
+    font-size:10px; letter-spacing:0.1em; text-transform:uppercase; font-weight:600;
+    padding:4px 10px; border-radius:999px;
+  }
+  .badge-available { background:rgba(34,197,94,0.15); color:var(--green); border:1px solid rgba(34,197,94,0.3); }
+  .badge-sold { background:rgba(239,68,68,0.1); color:var(--red); border:1px solid rgba(239,68,68,0.2); }
+  .product-title { font-size:16px; font-weight:500; color:var(--text); margin-bottom:6px; }
+  .product-desc { font-size:13px; color:var(--text2); margin-bottom:1rem; line-height:1.5; }
+  .product-footer { display:flex; align-items:center; justify-content:space-between; }
+  .product-price { font-size:20px; font-weight:600; color:var(--text); }
+  .product-price span { font-size:13px; color:var(--text2); font-weight:400; }
+  .product-buy-btn {
+    background:var(--accent); color:#fff; border:none; padding:8px 18px;
+    border-radius:var(--radius-sm); font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s;
+  }
+  .product-buy-btn:hover { background:#8b5cf6; }
+
+  /* ─── PRODUCT DETAIL ─── */
+  #detail-screen { background:var(--bg); }
+  .detail-wrap { max-width:900px; margin:0 auto; padding:3rem 2rem; display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:start; }
+  @media(max-width:640px) { .detail-wrap { grid-template-columns:1fr; } }
+  .detail-img { border-radius:var(--radius-lg); overflow:hidden; background:var(--bg3); height:340px; display:flex; align-items:center; justify-content:center; font-size:80px; }
+  .detail-img img { width:100%; height:100%; object-fit:cover; }
+  .detail-info { padding-top:0.5rem; }
+  .detail-badge { display:inline-block; margin-bottom:1rem; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; padding:4px 12px; border-radius:999px; }
+  .detail-title { font-size:28px; font-weight:500; letter-spacing:-0.02em; margin-bottom:0.75rem; }
+  .detail-desc { font-size:15px; color:var(--text2); line-height:1.7; margin-bottom:2rem; }
+  .detail-price-row { display:flex; align-items:baseline; gap:8px; margin-bottom:2rem; }
+  .detail-price { font-size:36px; font-weight:600; }
+  .detail-price-usd { font-size:15px; color:var(--text2); }
+  .detail-buy { width:100%; padding:16px; background:var(--accent); color:#fff; border:none; border-radius:var(--radius); font-size:16px; font-weight:500; cursor:pointer; transition:all 0.2s; }
+  .detail-buy:hover { background:#8b5cf6; }
+  .back-btn { background:none; border:none; color:var(--text2); font-size:14px; cursor:pointer; display:flex; align-items:center; gap:6px; padding:1.5rem 2rem 0; }
+  .back-btn:hover { color:var(--text); }
+
+  /* ─── CHECKOUT ─── */
+  #checkout-screen { background:var(--bg); align-items:center; justify-content:center; min-height:100vh; }
+  .checkout-wrap { max-width:460px; width:100%; padding:2rem; margin:2rem auto; }
+  .checkout-card { background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-lg); padding:2rem; }
+  .checkout-title { font-size:22px; font-weight:500; margin-bottom:0.25rem; }
+  .checkout-sub { font-size:13px; color:var(--text2); margin-bottom:2rem; }
+  .checkout-divider { height:1px; background:var(--border); margin:1.5rem 0; }
+  .checkout-label { font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--text3); margin-bottom:8px; }
+  .checkout-wallet { font-family:monospace; font-size:13px; color:var(--text); background:var(--bg4); padding:12px 14px; border-radius:var(--radius-sm); word-break:break-all; border:1px solid var(--border); position:relative; }
+  .copy-btn { position:absolute; right:10px; top:50%; transform:translateY(-50%); background:var(--bg3); border:1px solid var(--border); color:var(--text2); font-size:11px; padding:4px 10px; border-radius:6px; cursor:pointer; transition:all 0.2s; }
+  .copy-btn:hover { color:var(--text); }
+  .qr-box { background:var(--bg4); border:1px solid var(--border); border-radius:var(--radius-sm); padding:1.5rem; display:flex; align-items:center; justify-content:center; margin:1rem 0; }
+  .qr-box svg { width:140px; height:140px; }
+  .checkout-amounts { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:1rem 0; }
+  .amt-card { background:var(--bg4); border:1px solid var(--border); border-radius:var(--radius-sm); padding:1rem; }
+  .amt-label { font-size:11px; color:var(--text3); margin-bottom:4px; }
+  .amt-value { font-size:18px; font-weight:600; color:var(--text); }
+  .paid-btn { width:100%; padding:15px; background:var(--green); color:#fff; border:none; border-radius:var(--radius); font-size:15px; font-weight:500; cursor:pointer; margin-top:1.5rem; transition:all 0.2s; }
+  .paid-btn:hover { background:#16a34a; }
+
+  /* ─── TRUST / REVIEWS ─── */
+  #trust-screen { background:var(--bg); }
+  .trust-wrap { max-width:700px; margin:0 auto; padding:3rem 2rem; }
+  .trust-title { font-size:28px; font-weight:300; margin-bottom:0.5rem; letter-spacing:-0.02em; }
+  .trust-sub { font-size:14px; color:var(--text2); margin-bottom:3rem; }
+  .review-card { background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem; margin-bottom:12px; }
+  .review-header { display:flex; align-items:center; gap:10px; margin-bottom:1rem; }
+  .review-avatar { width:36px; height:36px; border-radius:50%; background:var(--accent2); display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:600; color:#fff; flex-shrink:0; }
+  .review-name { font-size:14px; font-weight:500; }
+  .review-date { font-size:12px; color:var(--text3); }
+  .review-stars { display:flex; gap:2px; margin-bottom:8px; }
+  .star { color:var(--amber); font-size:14px; }
+  .review-text { font-size:14px; color:var(--text2); line-height:1.6; }
+  .review-img { margin-top:12px; border-radius:var(--radius-sm); overflow:hidden; max-height:200px; }
+  .review-img img { width:100%; max-height:200px; object-fit:cover; }
+
+  /* ─── ADMIN ─── */
+  #admin-login-screen {
+    align-items:center; justify-content:center; background:var(--bg);
+  }
+  .admin-login-card { background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-lg); padding:2.5rem; max-width:380px; width:100%; }
+  .admin-login-title { font-size:20px; font-weight:500; margin-bottom:0.25rem; }
+  .admin-login-sub { font-size:13px; color:var(--text2); margin-bottom:2rem; }
+  .form-group { margin-bottom:1rem; }
+  .form-label { font-size:12px; color:var(--text2); margin-bottom:6px; display:block; }
+  .form-input { width:100%; background:var(--bg4); border:1px solid var(--border); border-radius:var(--radius-sm); padding:11px 14px; color:var(--text); font-size:14px; outline:none; transition:border-color 0.2s; }
+  .form-input:focus { border-color:var(--accent); }
+  .form-btn { width:100%; padding:12px; background:var(--accent); color:#fff; border:none; border-radius:var(--radius-sm); font-size:14px; font-weight:500; cursor:pointer; margin-top:0.5rem; transition:all 0.2s; }
+  .form-btn:hover { background:#8b5cf6; }
+  .form-err { font-size:13px; color:var(--red); margin-top:0.5rem; display:none; }
+
+  /* ─── ADMIN PANEL ─── */
+  #admin-screen { flex-direction:row; background:var(--bg); min-height:100vh; }
+  .admin-sidebar {
+    width:220px; flex-shrink:0; background:var(--bg2); border-right:1px solid var(--border);
+    display:flex; flex-direction:column; padding:1.5rem 1rem; position:sticky; top:0; height:100vh;
+  }
+  .sidebar-logo { font-size:13px; font-weight:600; letter-spacing:0.05em; color:var(--text); margin-bottom:2rem; padding:0 0.5rem; }
+  .sidebar-logo span { color:var(--accent); }
+  .sidebar-nav { display:flex; flex-direction:column; gap:4px; flex:1; }
+  .sidebar-item {
+    display:flex; align-items:center; gap:10px;
+    padding:9px 12px; border-radius:var(--radius-sm); cursor:pointer;
+    font-size:13px; color:var(--text2); transition:all 0.15s;
+    background:none; border:none; text-align:left; width:100%;
+  }
+  .sidebar-item:hover { background:var(--bg4); color:var(--text); }
+  .sidebar-item.active { background:rgba(167,139,250,0.12); color:var(--accent); }
+  .sidebar-icon { font-size:16px; width:18px; }
+  .sidebar-bottom { padding-top:1rem; border-top:1px solid var(--border); }
+  
+  .admin-main { flex:1; overflow-y:auto; padding:2rem; }
+  .admin-panel { display:none; }
+  .admin-panel.active { display:block; }
+  
+  .admin-header { margin-bottom:2rem; }
+  .admin-header h1 { font-size:22px; font-weight:500; letter-spacing:-0.02em; }
+  .admin-header p { font-size:13px; color:var(--text2); margin-top:4px; }
+  
+  .stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:2rem; }
+  .stat-card { background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; }
+  .stat-label { font-size:11px; color:var(--text3); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px; }
+  .stat-value { font-size:26px; font-weight:600; }
+  .stat-sub { font-size:12px; color:var(--text3); margin-top:4px; }
+  
+  .card-section { background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem; margin-bottom:1.5rem; }
+  .card-section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem; }
+  .card-section-title { font-size:15px; font-weight:500; }
+  .action-btn { background:var(--accent); color:#fff; border:none; padding:8px 16px; border-radius:var(--radius-sm); font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; }
+  .action-btn:hover { background:#8b5cf6; }
+  .danger-btn { background:rgba(239,68,68,0.15); color:var(--red); border:1px solid rgba(239,68,68,0.2); padding:6px 12px; border-radius:var(--radius-sm); font-size:12px; cursor:pointer; transition:all 0.2s; }
+  .danger-btn:hover { background:rgba(239,68,68,0.25); }
+  .secondary-btn { background:var(--bg4); color:var(--text2); border:1px solid var(--border); padding:6px 12px; border-radius:var(--radius-sm); font-size:12px; cursor:pointer; transition:all 0.2s; }
+  .secondary-btn:hover { color:var(--text); border-color:var(--border2); }
+  
+  .product-table { width:100%; border-collapse:collapse; }
+  .product-table th { text-align:left; font-size:11px; color:var(--text3); text-transform:uppercase; letter-spacing:0.1em; padding:0 12px 12px; font-weight:500; }
+  .product-table td { padding:12px; border-top:1px solid var(--border); font-size:13px; vertical-align:middle; }
+  .product-table tr:hover td { background:rgba(255,255,255,0.02); }
+  .table-img { width:40px; height:40px; border-radius:6px; background:var(--bg4); display:flex; align-items:center; justify-content:center; font-size:20px; overflow:hidden; }
+  .table-img img { width:100%; height:100%; object-fit:cover; }
+  .table-actions { display:flex; gap:6px; }
+  
+  .toggle-wrap { display:flex; align-items:center; gap:8px; }
+  .toggle { width:36px; height:20px; border-radius:999px; background:var(--bg4); border:1px solid var(--border2); cursor:pointer; position:relative; transition:all 0.2s; }
+  .toggle.on { background:var(--green); border-color:var(--green); }
+  .toggle::after { content:''; position:absolute; top:2px; left:2px; width:14px; height:14px; border-radius:50%; background:#fff; transition:all 0.2s; }
+  .toggle.on::after { left:18px; }
+  
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
+  .form-row.single { grid-template-columns:1fr; }
+  .form-group-admin { display:flex; flex-direction:column; gap:6px; }
+  .form-group-admin label { font-size:12px; color:var(--text2); }
+  .form-group-admin input, .form-group-admin textarea, .form-group-admin select {
+    background:var(--bg4); border:1px solid var(--border); border-radius:var(--radius-sm);
+    padding:10px 12px; color:var(--text); font-size:13px; outline:none; transition:border-color 0.2s;
+  }
+  .form-group-admin input:focus, .form-group-admin textarea:focus { border-color:var(--accent); }
+  .form-group-admin textarea { resize:vertical; min-height:80px; font-family:inherit; }
+  .save-btn { background:var(--accent); color:#fff; border:none; padding:10px 24px; border-radius:var(--radius-sm); font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; }
+  .save-btn:hover { background:#8b5cf6; }
+  
+  .upload-zone { border:1px dashed var(--border2); border-radius:var(--radius-sm); padding:1.5rem; text-align:center; cursor:pointer; transition:all 0.2s; background:var(--bg4); }
+  .upload-zone:hover { border-color:var(--accent); background:rgba(167,139,250,0.05); }
+  .upload-zone p { font-size:13px; color:var(--text2); }
+  .upload-zone span { font-size:12px; color:var(--text3); }
+  
+  .review-admin-card { background:var(--bg4); border:1px solid var(--border); border-radius:var(--radius-sm); padding:1rem; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .review-admin-info { flex:1; }
+  .review-admin-name { font-size:13px; font-weight:500; }
+  .review-admin-text { font-size:12px; color:var(--text2); margin-top:2px; }
+  
+  /* ─── MODAL ─── */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px); display:none; align-items:center; justify-content:center; z-index:1000; padding:1rem; }
+  .modal-overlay.open { display:flex; animation:fadeIn 0.2s ease; }
+  .modal { background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-lg); padding:2rem; max-width:500px; width:100%; max-height:90vh; overflow-y:auto; }
+  .modal-title { font-size:18px; font-weight:500; margin-bottom:1.5rem; }
+  .modal-footer { display:flex; gap:10px; justify-content:flex-end; margin-top:1.5rem; }
+
+  /* ─── TOAST ─── */
+  .toast { position:fixed; bottom:2rem; right:2rem; background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-sm); padding:12px 20px; font-size:14px; z-index:9999; transform:translateY(20px); opacity:0; transition:all 0.3s; pointer-events:none; }
+  .toast.show { transform:translateY(0); opacity:1; }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+  .animate-in { animation:fadeIn 0.4s ease; }
+
+  /* ─── EMPTY STATE ─── */
+  .empty { text-align:center; padding:4rem 2rem; color:var(--text3); }
+  .empty p { font-size:14px; margin-top:0.5rem; }
+
+  /* ─── RTL ─── */
+  [dir="rtl"] { text-align:right; }
+  [dir="rtl"] .nav-right { flex-direction:row-reverse; }
+
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap');
+  body { font-family:'Rajdhani','Inter',sans-serif; background:#050508; }
+  body::before {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,240,255,0.015) 2px,rgba(0,240,255,0.015) 4px);
+  }
+  .screen { position:relative; z-index:1; }
+  nav { border-bottom:1px solid rgba(0,240,255,0.15); }
+  .nav-logo { font-family:'Rajdhani',sans-serif; font-size:18px; font-weight:700; letter-spacing:0.15em; color:var(--accent); text-shadow:0 0 20px rgba(0,240,255,0.5); }
+  .nav-logo span { color:#ff2d6b; text-shadow:0 0 20px rgba(255,45,107,0.5); }
+  .store-hero-label { color:var(--accent); font-family:'Share Tech Mono',monospace; font-size:12px; letter-spacing:0.25em; }
+  .store-hero-title { font-family:'Rajdhani',sans-serif; font-weight:700; letter-spacing:0.05em; background:linear-gradient(135deg,#e8eaf6 0%,#00f0ff 50%,#ff2d6b 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .product-card { border-radius:4px; border:1px solid rgba(0,240,255,0.1); clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%); }
+  .product-card::before { content:''; position:absolute; top:0; right:16px; width:1px; height:16px; background:var(--accent); transform:rotate(45deg) translate(8px,-8px); }
+  .product-card:hover { border-color:rgba(0,240,255,0.4); box-shadow:0 0 30px rgba(0,240,255,0.08),inset 0 0 30px rgba(0,240,255,0.02); }
+  .product-title { font-family:'Rajdhani',sans-serif; font-weight:600; font-size:17px; letter-spacing:0.05em; }
+  .product-price { font-family:'Share Tech Mono',monospace; font-size:18px; color:var(--accent); }
+  .product-price span { color:var(--text3); font-size:11px; }
+  .product-buy-btn { background:transparent; color:var(--accent); border:1px solid var(--accent); border-radius:2px; font-family:'Rajdhani',sans-serif; font-weight:600; letter-spacing:0.08em; font-size:12px; padding:7px 16px; text-transform:uppercase; position:relative; overflow:hidden; }
+  .product-buy-btn::before { content:''; position:absolute; inset:0; background:var(--accent); transform:scaleX(0); transform-origin:left; transition:transform 0.2s; }
+  .product-buy-btn:hover { color:#050508; background:transparent; }
+  .product-buy-btn:hover::before { transform:scaleX(1); }
+  .product-buy-btn span, .product-buy-btn { position:relative; z-index:1; }
+  .badge-available { background:rgba(0,255,136,0.1); color:var(--green); border:1px solid rgba(0,255,136,0.3); border-radius:2px; font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:0.15em; }
+  .badge-sold { background:rgba(255,45,107,0.1); color:var(--red); border:1px solid rgba(255,45,107,0.2); border-radius:2px; font-family:'Share Tech Mono',monospace; font-size:9px; }
+  .nav-trust { border-radius:2px; font-family:'Rajdhani',sans-serif; font-weight:600; letter-spacing:0.08em; font-size:12px; text-transform:uppercase; }
+  .checkout-card { border-left:2px solid var(--accent); clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,0 100%); }
+  .checkout-title { font-family:'Rajdhani',sans-serif; font-weight:700; font-size:24px; letter-spacing:0.05em; color:var(--accent); }
+  .checkout-wallet { font-family:'Share Tech Mono',monospace; border-left:2px solid var(--accent); border-radius:0; }
+  .amt-value { font-family:'Share Tech Mono',monospace; color:var(--accent); }
+  .paid-btn { background:linear-gradient(90deg,#00f0ff,#ff2d6b); border:none; border-radius:2px; font-family:'Rajdhani',sans-serif; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; font-size:16px; }
+  .paid-btn:hover { opacity:0.85; background:linear-gradient(90deg,#00f0ff,#ff2d6b); }
+  .detail-title { font-family:'Rajdhani',sans-serif; font-weight:700; letter-spacing:0.05em; }
+  .detail-price { font-family:'Share Tech Mono',monospace; color:var(--accent); }
+  .detail-buy { background:transparent; border:1px solid var(--accent); color:var(--accent); border-radius:2px; font-family:'Rajdhani',sans-serif; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; transition:all 0.2s; }
+  .detail-buy:hover { background:var(--accent); color:#050508; }
+  .lang-title { font-family:'Rajdhani',sans-serif; font-weight:700; letter-spacing:0.05em; color:var(--accent); }
+  .lang-btn { border-radius:2px; border:1px solid rgba(0,240,255,0.1); }
+  .lang-btn:hover { border-color:var(--accent); background:rgba(0,240,255,0.05); }
+  .lang-logo { font-family:'Share Tech Mono',monospace; color:var(--accent); text-shadow:0 0 15px rgba(0,240,255,0.4); }
+  .trust-title { font-family:'Rajdhani',sans-serif; font-weight:700; color:var(--accent); }
+  .review-card { border-radius:2px; border-left:2px solid rgba(0,240,255,0.3); }
+  .review-avatar { background:linear-gradient(135deg,#00f0ff22,#ff2d6b22); border:1px solid rgba(0,240,255,0.3); color:var(--accent); }
+  .star { color:var(--amber); }
+  .admin-login-title { font-family:'Rajdhani',sans-serif; font-weight:700; color:var(--accent); }
+  .sidebar-logo { font-family:'Rajdhani',sans-serif; font-weight:700; font-size:16px; color:var(--accent); letter-spacing:0.1em; }
+  .sidebar-logo span { color:#ff2d6b; }
+  .admin-header h1 { font-family:'Rajdhani',sans-serif; font-weight:700; color:var(--accent); letter-spacing:0.05em; }
+  .action-btn { background:var(--accent); color:#050508; border-radius:2px; font-family:'Rajdhani',sans-serif; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; }
+  .action-btn:hover { background:#00c8d4; }
+  .save-btn { background:transparent; border:1px solid var(--accent); color:var(--accent); border-radius:2px; font-family:'Rajdhani',sans-serif; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; transition:all 0.2s; }
+  .save-btn:hover { background:var(--accent); color:#050508; }
+  @keyframes scanline { 0%{transform:translateY(-100%)} 100%{transform:translateY(100vh)} }
+  .lang-wrap::after { content:''; position:fixed; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,rgba(0,240,255,0.4),transparent); animation:scanline 4s linear infinite; pointer-events:none; }
+
+</style>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root{
+  --bg:#050505;
+  --bg2:#0a0a0a;
+  --bg3:rgba(255,255,255,.05);
+  --bg4:rgba(255,255,255,.03);
+  --text:#ffffff;
+  --text2:#bdbdbd;
+  --text3:#7a7a7a;
+  --accent:#ffffff;
+  --accent2:#d0d0d0;
+  --border:rgba(255,255,255,.08);
+  --border2:rgba(255,255,255,.18);
+}
+
+body{
+  font-family:'Inter',sans-serif !important;
+  background:#050505 !important;
+}
+
+body::before,
+.lang-wrap::after{
+  display:none !important;
+}
+
+nav,
+.product-card,
+.checkout-card,
+.review-card,
+.card-section,
+.admin-login-card,
+.modal{
+  background:rgba(255,255,255,.05) !important;
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.12) !important;
+  box-shadow:0 8px 32px rgba(0,0,0,.35);
+}
+
+.product-card,
+.checkout-card{
+  clip-path:none !important;
+}
+
+.nav-logo,
+.store-hero-title,
+.detail-title,
+.trust-title,
+.admin-header h1{
+  font-family:'Inter',sans-serif !important;
+  color:#fff !important;
+  text-shadow:none !important;
+  background:none !important;
+  -webkit-text-fill-color:#fff !important;
+}
+
+.product-buy-btn,
+.detail-buy,
+.action-btn,
+.save-btn,
+.form-btn{
+  background:#fff !important;
+  color:#000 !important;
+  border:none !important;
+  border-radius:12px !important;
+  font-family:'Inter',sans-serif !important;
+}
+</style>
+
+
+<style id="ultra-glass-upgrade">
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap');
+
+:root{
+ --bg:#0b0b0c;
+ --bg2:#111112;
+ --text:#ffffff;
+ --text2:rgba(255,255,255,.72);
+ --text3:rgba(255,255,255,.45);
+}
+
+body{
+ font-family:'Manrope',sans-serif !important;
+ background:
+ radial-gradient(circle at 15% 20%, rgba(255,255,255,.08), transparent 35%),
+ radial-gradient(circle at 85% 10%, rgba(255,255,255,.05), transparent 30%),
+ radial-gradient(circle at 50% 100%, rgba(255,255,255,.04), transparent 40%),
+ #090909 !important;
+}
+
+.store-hero-title{
+ font-size:clamp(48px,7vw,90px) !important;
+ font-weight:800 !important;
+ letter-spacing:-0.06em !important;
+ line-height:.95 !important;
+}
+
+.store-hero{
+ padding-top:7rem !important;
+}
+
+nav{
+ background:rgba(255,255,255,.05) !important;
+ backdrop-filter:blur(30px) saturate(180%) !important;
+ border:1px solid rgba(255,255,255,.08) !important;
+ border-radius:22px !important;
+ width:calc(100% - 32px);
+ margin:16px auto;
+ position:sticky;
+ top:12px;
+}
+
+.product-card,
+.checkout-card,
+.review-card,
+.card-section,
+.admin-login-card,
+.modal,
+.lang-btn{
+ background:rgba(255,255,255,.06) !important;
+ backdrop-filter:blur(32px) saturate(180%) !important;
+ -webkit-backdrop-filter:blur(32px) saturate(180%) !important;
+ border:1px solid rgba(255,255,255,.12) !important;
+ border-radius:28px !important;
+ box-shadow:
+ 0 10px 40px rgba(0,0,0,.25),
+ inset 0 1px 0 rgba(255,255,255,.15);
+ overflow:hidden;
+}
+
+.product-card::after,
+.checkout-card::after,
+.review-card::after{
+ content:'';
+ position:absolute;
+ inset:0;
+ background:linear-gradient(
+   135deg,
+   rgba(255,255,255,.14),
+   transparent 30%,
+   transparent 70%,
+   rgba(255,255,255,.05)
+ );
+ pointer-events:none;
+}
+
+.product-card:hover{
+ transform:translateY(-8px) scale(1.02) !important;
+ box-shadow:
+ 0 20px 60px rgba(0,0,0,.35),
+ inset 0 1px 0 rgba(255,255,255,.2);
+}
+
+.product-img,
+.detail-img{
+ border-radius:22px !important;
+ margin:12px;
+}
+
+.product-buy-btn,
+.detail-buy,
+.action-btn,
+.save-btn,
+.form-btn{
+ background:rgba(255,255,255,.92) !important;
+ color:#000 !important;
+ border-radius:16px !important;
+ font-weight:700 !important;
+ padding:12px 22px !important;
+ box-shadow:0 6px 20px rgba(255,255,255,.15);
+}
+
+.product-title,
+.detail-title,
+.trust-title,
+.checkout-title,
+.lang-title,
+.admin-header h1{
+ font-family:'Manrope',sans-serif !important;
+ font-weight:800 !important;
+ letter-spacing:-0.04em !important;
+}
+
+.product-body,
+.checkout-card,
+.card-section{
+ padding:1.5rem !important;
+}
+
+.form-input,
+.form-group-admin input,
+.form-group-admin textarea,
+.form-group-admin select{
+ border-radius:16px !important;
+ background:rgba(255,255,255,.05) !important;
+ border:1px solid rgba(255,255,255,.08) !important;
+}
+
+::-webkit-scrollbar{
+ width:10px;
+}
+::-webkit-scrollbar-thumb{
+ background:rgba(255,255,255,.15);
+ border-radius:99px;
+}
+</style>
+
+
+<style id="snowflake-upgrade">
+/* Snowflake background */
+body::after{
+ content:'';
+ position:fixed;
+ inset:0;
+ pointer-events:none;
+ z-index:0;
+ background-image:url('pngfind.com-silver-snowflake-png-1926620.png');
+ background-repeat:no-repeat;
+ background-position:right bottom;
+ background-size:min(45vw,500px);
+ opacity:.18;
+ filter:blur(.3px) drop-shadow(0 0 30px rgba(255,255,255,.15));
+}
+
+.screen{position:relative;z-index:1;}
+
+/* Better typography */
+.store-hero{
+ max-width:1200px!important;
+ text-align:left!important;
+}
+
+.store-hero-title{
+ max-width:700px;
+ font-size:clamp(42px,8vw,92px)!important;
+ line-height:.92!important;
+ letter-spacing:-.07em!important;
+}
+
+.store-hero-label,
+.product-desc,
+.detail-desc{
+ max-width:600px;
+}
+
+/* Mobile perfection */
+@media (max-width:768px){
+
+ .store-hero{
+   padding:5rem 1.2rem 2rem!important;
+   text-align:center!important;
+ }
+
+ .store-hero-title{
+   font-size:clamp(38px,12vw,64px)!important;
+   line-height:1!important;
+   text-align:center!important;
+ }
+
+ .store-hero-title br{
+   display:none;
+ }
+
+ .store-hero-title::after{
+   content:'';
+   display:block;
+ }
+
+ .product-grid{
+   grid-template-columns:1fr!important;
+   gap:18px!important;
+ }
+
+ .detail-wrap{
+   grid-template-columns:1fr!important;
+ }
+
+ .nav-right{
+   gap:8px!important;
+ }
+
+ .nav-trust,
+ .nav-lang{
+   font-size:12px!important;
+ }
+
+ body::after{
+   background-size:70vw;
+   opacity:.12;
+ }
+}
+
+/* Extra glass feel */
+.product-card,
+.review-card,
+.checkout-card{
+ backdrop-filter:blur(40px) saturate(200%)!important;
+}
+
+.product-card:hover{
+ transform:translateY(-10px)!important;
+}
+</style>
+
+
+<style>
+/* Fixed snowflakes */
+body::before{
+content:'' !important;
+position:fixed;
+left:-120px;
+bottom:-120px;
+width:420px;
+height:420px;
+background:url('./snowflake.png') no-repeat center/contain;
+opacity:.18;
+pointer-events:none;
+z-index:0;
+display:block !important;
+}
+body::after{
+content:'' !important;
+position:fixed;
+right:-120px;
+bottom:-120px;
+width:520px;
+height:520px;
+background:url('./snowflake.png') no-repeat center/contain;
+opacity:.14;
+pointer-events:none;
+z-index:0;
+display:block !important;
+}
+</style>
+
+
+<style id="live-snow-effect">
+.snowflake{
+ position:fixed;
+ top:-40px;
+ color:rgba(255,255,255,.9);
+ user-select:none;
+ pointer-events:none;
+ z-index:2;
+ animation-name:snowFall;
+ animation-timing-function:linear;
+ animation-iteration-count:infinite;
+ filter:drop-shadow(0 0 8px rgba(255,255,255,.5));
+}
+@keyframes snowFall{
+ from{transform:translateY(-50px) rotate(0deg);}
+ to{transform:translateY(calc(100vh + 60px)) rotate(360deg);}
+}
+</style>
+
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ════ LANGUAGE SCREEN ════ -->
+<div class="screen active" id="lang-screen">
+  <div class="lang-wrap animate-in">
+    <div class="lang-logo" style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:3rem;">
+      <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
+        <polygon points="16,2 30,10 30,22 16,30 2,22 2,10" fill="none" stroke="#00f0ff" stroke-width="1.5"/>
+        <polygon points="16,7 25,12 25,20 16,25 7,20 7,12" fill="rgba(0,240,255,0.08)" stroke="#ff2d6b" stroke-width="1"/>
+        <text x="16" y="20" text-anchor="middle" fill="#00f0ff" font-size="9" font-weight="700" font-family="Rajdhani,sans-serif" letter-spacing="1">TC</text>
+      </svg>
+      <span style="font-family:Rajdhani,sans-serif;font-size:18px;font-weight:700;letter-spacing:0.2em;color:#00f0ff;text-shadow:0 0 20px rgba(0,240,255,0.4);">TRISOCMD</span>
+    </div>
+    <h1 class="lang-title" id="lang-heading">Select your language</h1>
+    <p class="lang-sub" id="lang-hint">Choose to continue</p>
+    <div class="lang-grid">
+      <button class="lang-btn" onclick="setLang('en','ltr')">
+        <span class="lang-flag">🇺🇸</span>
+        <div><div class="lang-name">English</div><div class="lang-native">English</div></div>
+      </button>
+      <button class="lang-btn" onclick="setLang('fa','rtl')">
+        <span class="lang-flag">🇮🇷</span>
+        <div><div class="lang-name">Persian</div><div class="lang-native">فارسی</div></div>
+      </button>
+      <button class="lang-btn" onclick="setLang('ar','rtl')">
+        <span class="lang-flag">🇸🇦</span>
+        <div><div class="lang-name">Arabic</div><div class="lang-native">العربية</div></div>
+      </button>
+      <button class="lang-btn" onclick="setLang('fr','ltr')">
+        <span class="lang-flag">🇫🇷</span>
+        <div><div class="lang-name">French</div><div class="lang-native">Français</div></div>
+      </button>
+      <button class="lang-btn" onclick="setLang('de','ltr')">
+        <span class="lang-flag">🇩🇪</span>
+        <div><div class="lang-name">German</div><div class="lang-native">Deutsch</div></div>
+      </button>
+      <button class="lang-btn" onclick="setLang('ru','ltr')">
+        <span class="lang-flag">🇷🇺</span>
+        <div><div class="lang-name">Russian</div><div class="lang-native">Русский</div></div>
+      </button>
+      <button class="lang-btn" onclick="setLang('ro','ltr')">
+        <span class="lang-flag">🇷🇴</span>
+        <div><div class="lang-name">Romanian</div><div class="lang-native">Română</div></div>
+      </button>
+      <button class="lang-btn" onclick="setLang('es','ltr')">
+        <span class="lang-flag">🇲🇽</span>
+        <div><div class="lang-name">Spanish</div><div class="lang-native">Español (MX)</div></div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ STORE SCREEN ════ -->
+<div class="screen" id="store-screen">
+  <nav>
+    <div class="nav-logo" onclick="showScreen('store-screen')" style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="16,2 30,10 30,22 16,30 2,22 2,10" fill="none" stroke="#00f0ff" stroke-width="1.5"/>
+        <polygon points="16,7 25,12 25,20 16,25 7,20 7,12" fill="rgba(0,240,255,0.08)" stroke="#ff2d6b" stroke-width="1"/>
+        <text x="16" y="20" text-anchor="middle" fill="#00f0ff" font-size="9" font-weight="700" font-family="Rajdhani,sans-serif" letter-spacing="1">TC</text>
+      </svg>
+      <span style="font-family:Rajdhani,sans-serif;font-size:17px;font-weight:700;letter-spacing:0.12em;color:#00f0ff;text-shadow:0 0 20px rgba(0,240,255,0.4);">TRISO<span style="color:#ff2d6b;">CMD</span></span>
+    </div>
+    <div class="nav-right">
+      <button class="nav-trust" onclick="window.open('https://t.me/triso_angel','_blank')" id="btn-reviews">Reviews</button>
+      <button class="nav-trust" onclick="window.open('https://t.me/trisouhq','_blank')" style="border-color:rgba(0,240,255,0.3);">Quality Channel</button>
+      <button class="nav-lang" onclick="showScreen('lang-screen')">🌐 <span id="nav-lang-label">EN</span></button>
+    </div>
+  </nav>
+  <div class="store-hero animate-in">
+    <div class="store-hero-label" id="hero-label">Premium Digital Products</div>
+    <h1 class="store-hero-title" id="hero-title">The marketplace<br>for serious buyers.</h1>
+  </div>
+  <div class="product-section">
+    <div class="product-grid" id="product-grid"></div>
+    <div class="empty" id="store-empty" style="display:none;">
+      <p id="store-empty-text">No products available yet.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════ PRODUCT DETAIL ════ -->
+<div class="screen" id="detail-screen">
+  <nav>
+    <div class="nav-logo" onclick="showScreen('store-screen')" style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="16,2 30,10 30,22 16,30 2,22 2,10" fill="none" stroke="#00f0ff" stroke-width="1.5"/>
+        <polygon points="16,7 25,12 25,20 16,25 7,20 7,12" fill="rgba(0,240,255,0.08)" stroke="#ff2d6b" stroke-width="1"/>
+        <text x="16" y="20" text-anchor="middle" fill="#00f0ff" font-size="9" font-weight="700" font-family="Rajdhani,sans-serif" letter-spacing="1">TC</text>
+      </svg>
+      <span style="font-family:Rajdhani,sans-serif;font-size:17px;font-weight:700;letter-spacing:0.12em;color:#00f0ff;text-shadow:0 0 20px rgba(0,240,255,0.4);">TRISO<span style="color:#ff2d6b;">CMD</span></span>
+    </div>
+    <div class="nav-right">
+      <button class="nav-lang" onclick="showScreen('lang-screen')">🌐 <span>EN</span></button>
+    </div>
+  </nav>
+  <button class="back-btn" onclick="showScreen('store-screen')">← <span id="btn-back-label">Back</span></button>
+  <div class="detail-wrap animate-in">
+    <div class="detail-img" id="detail-img">📦</div>
+    <div class="detail-info">
+      <span class="detail-badge badge-available" id="detail-badge">Available</span>
+      <h1 class="detail-title" id="detail-title"></h1>
+      <p class="detail-desc" id="detail-desc"></p>
+      <div class="detail-price-row">
+        <span class="detail-price" id="detail-price"></span>
+        <span class="detail-price-usd" id="detail-price-usd"></span>
+      </div>
+      <button class="detail-buy" id="detail-buy-btn" onclick="startCheckout()" style="cursor:pointer;">Buy Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ CHECKOUT SCREEN ════ -->
+<div class="screen" id="checkout-screen">
+  <nav>
+    <div class="nav-logo" style="display:flex;align-items:center;gap:10px;">
+      <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="16,2 30,10 30,22 16,30 2,22 2,10" fill="none" stroke="#00f0ff" stroke-width="1.5"/>
+        <polygon points="16,7 25,12 25,20 16,25 7,20 7,12" fill="rgba(0,240,255,0.08)" stroke="#ff2d6b" stroke-width="1"/>
+        <text x="16" y="20" text-anchor="middle" fill="#00f0ff" font-size="9" font-weight="700" font-family="Rajdhani,sans-serif" letter-spacing="1">TC</text>
+      </svg>
+      <span style="font-family:Rajdhani,sans-serif;font-size:17px;font-weight:700;letter-spacing:0.12em;color:#00f0ff;">TRISO<span style="color:#ff2d6b;">CMD</span></span>
+    </div>
+    <div class="nav-right">
+      <button class="back-btn" onclick="showScreen('detail-screen')" style="padding:0;">← <span id="back-to-detail">Back</span></button>
+    </div>
+  </nav>
+  <div class="checkout-wrap animate-in">
+    <div class="checkout-card">
+      <div class="checkout-title" id="co-title">Complete your order</div>
+      <div class="checkout-sub" id="co-sub">Send the exact amount in Litecoin</div>
+      <div id="live-price-badge" style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:2px;padding:4px 10px;margin-bottom:1rem;font-size:11px;font-family:Share Tech Mono,monospace;">
+        <span style="width:6px;height:6px;background:#00ff88;border-radius:50%;display:inline-block;animation:pulse 2s infinite;"></span>
+        <span style="color:#00ff88;" id="live-price-text">Fetching live price...</span>
+      </div>
+      <div class="checkout-divider"></div>
+      
+      <div class="checkout-amounts">
+        <div class="amt-card">
+          <div class="amt-label" id="co-usd-label">Total (USD)</div>
+          <div class="amt-value" id="co-usd-val">$0</div>
+        </div>
+        <div class="amt-card">
+          <div class="amt-label">Total (LTC)</div>
+          <div class="amt-value" id="co-ltc-val">0 LTC</div>
+        </div>
+      </div>
+
+      <div class="amt-card" style="grid-column:1/-1">
+          <div class="amt-label">Total (BTC)</div>
+          <div class="amt-value" id="co-btc-val">0 BTC</div>
+        </div>
+      <div class="checkout-divider"></div>
+      <div class="checkout-label" id="co-wallet-label">Send to wallet (LTC)</div>
+      <div class="checkout-wallet" style="position:relative;margin-bottom:10px;">
+        <span id="wallet-text">ltc1qepdv8xfffd8yf5kw5q6vhsqr9fyh9a403xge00</span>
+        <button class="copy-btn" onclick="copyWalletLTC()" id="copy-btn-label">Copy</button>
+      </div>
+      <div class="checkout-label" style="margin-top:12px;">Send to wallet (BTC)</div>
+      <div class="checkout-wallet" style="position:relative;">
+        <span id="wallet-btc-text">bc1qp2v6xm44m8my38m9ffvu75mkhzfrf6ex03vkvt</span>
+        <button class="copy-btn" onclick="copyWalletBTC()">Copy</button>
+      </div>
+
+      <div class="qr-box">
+        <svg id="qr-svg" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+
+      <div class="checkout-label" id="co-inst-label">Instructions</div>
+      <p style="font-size:13px; color:var(--text2); line-height:1.6; margin-bottom:1rem;" id="co-inst-text">
+        Send the exact LTC amount to the wallet above. After payment, click the button below to notify us on Telegram.
+      </p>
+
+      <button class="paid-btn" onclick="showPaidSuccess()" id="co-paid-btn">I have paid → Telegram</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ TRUST SCREEN ════ -->
+<div class="screen" id="trust-screen">
+  <nav>
+    <div class="nav-logo" onclick="showScreen('store-screen')" style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="16,2 30,10 30,22 16,30 2,22 2,10" fill="none" stroke="#00f0ff" stroke-width="1.5"/>
+        <polygon points="16,7 25,12 25,20 16,25 7,20 7,12" fill="rgba(0,240,255,0.08)" stroke="#ff2d6b" stroke-width="1"/>
+        <text x="16" y="20" text-anchor="middle" fill="#00f0ff" font-size="9" font-weight="700" font-family="Rajdhani,sans-serif" letter-spacing="1">TC</text>
+      </svg>
+      <span style="font-family:Rajdhani,sans-serif;font-size:17px;font-weight:700;letter-spacing:0.12em;color:#00f0ff;text-shadow:0 0 20px rgba(0,240,255,0.4);">TRISO<span style="color:#ff2d6b;">CMD</span></span>
+    </div>
+    <div class="nav-right">
+      <button class="nav-trust" onclick="showScreen('store-screen')" id="btn-shop">فروشگاه</button>
+    </div>
+  </nav>
+  <div class="trust-wrap animate-in">
+    <h1 class="trust-title" id="trust-heading">Verified buyers</h1>
+    <p class="trust-sub" id="trust-subheading">Real reviews from our Telegram community</p>
+    <div id="reviews-list"></div>
+    <div class="empty" id="trust-empty" style="display:none;"><p id="trust-empty-text">No reviews yet.</p></div>
+  </div>
+</div>
+
+<!-- ════ ADMIN LOGIN ════ -->
+<div class="screen" id="admin-login-screen">
+  <div style="flex:1; display:flex; align-items:center; justify-content:center;">
+    <div class="admin-login-card animate-in">
+      <div class="admin-login-title">Admin Access</div>
+      <div class="admin-login-sub">TRISOCMD Dashboard</div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-input" id="admin-pw" placeholder="Enter password" onkeydown="if(event.key==='Enter')adminLogin()">
+        <div class="form-err" id="admin-err">Incorrect password</div>
+      </div>
+      <button class="form-btn" onclick="adminLogin()">Sign in</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ ADMIN PANEL ════ -->
+<div class="screen" id="admin-screen">
+  <aside class="admin-sidebar">
+    <div class="sidebar-logo">TRISO<span>CMD</span></div>
+    <div class="sidebar-nav">
+      <button class="sidebar-item active" onclick="switchTab('overview')">
+        <span class="sidebar-icon">📊</span> Overview
+      </button>
+      <button class="sidebar-item" onclick="switchTab('products')">
+        <span class="sidebar-icon">📦</span> Products
+      </button>
+      <button class="sidebar-item" onclick="switchTab('settings')">
+        <span class="sidebar-icon">⚙️</span> Settings
+      </button>
+      <button class="sidebar-item" onclick="switchTab('reviews')">
+        <span class="sidebar-icon">⭐</span> Reviews
+      </button>
+    </div>
+    <div class="sidebar-bottom">
+      <button class="sidebar-item" onclick="showScreen('store-screen')">
+        <span class="sidebar-icon">🏪</span> View Store
+      </button>
+      <button class="sidebar-item" onclick="adminLogout()">
+        <span class="sidebar-icon">↩</span> Sign out
+      </button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <!-- OVERVIEW -->
+    <div class="admin-panel active" id="tab-overview">
+      <div class="admin-header">
+        <h1>Overview</h1>
+        <p>Update your stats manually below</p>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Revenue</div>
+          <div class="stat-value" id="stat-rev">$0</div>
+          <div class="stat-sub">Manual entry</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Orders</div>
+          <div class="stat-value" id="stat-orders">0</div>
+          <div class="stat-sub">Manual entry</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Products</div>
+          <div class="stat-value" id="stat-prods">0</div>
+          <div class="stat-sub">Active listings</div>
+        </div>
+      </div>
+      <div class="card-section">
+        <div class="card-section-header">
+          <div class="card-section-title">Update Stats</div>
+        </div>
+        <div class="form-row">
+          <div class="form-group-admin">
+            <label>Revenue (e.g. $1,240)</label>
+            <input type="text" id="inp-rev" placeholder="$0">
+          </div>
+          <div class="form-group-admin">
+            <label>Orders count</label>
+            <input type="number" id="inp-orders" placeholder="0">
+          </div>
+        </div>
+        <button class="save-btn" onclick="saveStats()">Save Stats</button>
+      </div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div class="admin-panel" id="tab-products">
+      <div class="admin-header">
+        <h1>Products</h1>
+        <p>Manage your store listings</p>
+      </div>
+      <div class="card-section">
+        <div class="card-section-header">
+          <div class="card-section-title">All Products</div>
+          <button class="action-btn" onclick="openProductModal()">+ Add Product</button>
+        </div>
+        <table class="product-table" id="admin-product-table">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Title</th>
+              <th>Price</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-product-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="admin-panel" id="tab-settings">
+      <div class="admin-header">
+        <h1>Settings</h1>
+        <p>Configure your store</p>
+      </div>
+      <div class="card-section">
+        <div class="card-section-header">
+          <div class="card-section-title">Store Identity</div>
+        </div>
+        <div class="form-row">
+          <div class="form-group-admin">
+            <label>Shop Name</label>
+            <input type="text" id="set-shopname" placeholder="TRISOCMD Shop">
+          </div>
+          <div class="form-group-admin">
+            <label>Telegram Link</label>
+            <input type="text" id="set-telegram" placeholder="https://t.me/trisocmd">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group-admin">
+            <label>LTC Wallet Address</label>
+            <input type="text" id="set-wallet" placeholder="ltc1q...">
+          </div>
+          <div class="form-group-admin">
+            <label>BTC Wallet Address</label>
+            <input type="text" id="set-btc-wallet" placeholder="bc1q...">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group-admin">
+            <label>Review Channel (Telegram)</label>
+            <input type="text" id="set-review-channel" placeholder="https://t.me/triso_angel">
+          </div>
+          <div class="form-group-admin">
+            <label>Quality Channel (Telegram)</label>
+            <input type="text" id="set-quality-channel" placeholder="https://t.me/trisouhq">
+          </div>
+        </div>
+        <div class="form-row single">
+          <div class="form-group-admin">
+            <label>Admin Password</label>
+            <input type="password" id="set-password" placeholder="New password">
+          </div>
+        </div>
+        <button class="save-btn" onclick="saveSettings()">Save Settings</button>
+      </div>
+      <div class="card-section">
+        <div class="card-section-header">
+          <div class="card-section-title">LTC Exchange Rate</div>
+        </div>
+        <div class="form-row">
+          <div class="form-group-admin">
+            <label>LTC price in USD (manual)</label>
+            <input type="number" id="set-ltc-rate" placeholder="42">
+          </div>
+        </div>
+        <button class="save-btn" onclick="saveLtcRate()">Save Rate</button>
+      </div>
+    </div>
+
+    <!-- REVIEWS -->
+    <div class="admin-panel" id="tab-reviews">
+      <div class="admin-header">
+        <h1>Reviews</h1>
+        <p>Manage Telegram testimonials</p>
+      </div>
+      <div class="card-section">
+        <div class="card-section-header">
+          <div class="card-section-title">Add Review</div>
+        </div>
+        <div class="form-row">
+          <div class="form-group-admin">
+            <label>Username</label>
+            <input type="text" id="rev-name" placeholder="@username">
+          </div>
+          <div class="form-group-admin">
+            <label>Stars (1–5)</label>
+            <input type="number" id="rev-stars" min="1" max="5" value="5">
+          </div>
+        </div>
+        <div class="form-row single">
+          <div class="form-group-admin">
+            <label>Review text</label>
+            <textarea id="rev-text" placeholder="Great service, fast delivery..."></textarea>
+          </div>
+        </div>
+        <div class="form-row single">
+          <div class="form-group-admin">
+            <label>Screenshot URL (optional)</label>
+            <input type="text" id="rev-img" placeholder="https://...">
+          </div>
+        </div>
+        <button class="save-btn" onclick="addReview()">Add Review</button>
+      </div>
+      <div class="card-section">
+        <div class="card-section-header">
+          <div class="card-section-title">All Reviews</div>
+        </div>
+        <div id="admin-reviews-list"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="product-modal">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Add Product</div>
+    <input type="hidden" id="editing-id">
+    <div class="form-row">
+      <div class="form-group-admin">
+        <label>Title</label>
+        <input type="text" id="p-title" placeholder="Product name">
+      </div>
+      <div class="form-group-admin">
+        <label>Price (USD)</label>
+        <input type="number" id="p-price" placeholder="49">
+      </div>
+    </div>
+    <div class="form-row single">
+      <div class="form-group-admin">
+        <label>Description (English / Default)</label>
+        <textarea id="p-desc" placeholder="Short description in English..."></textarea>
+      </div>
+    </div>
+    <div class="form-row single">
+      <div class="form-group-admin">
+        <label>توضیحات (فارسی)</label>
+        <textarea id="p-desc-fa" placeholder="توضیحات به فارسی..." dir="rtl"></textarea>
+      </div>
+    </div>
+    <div class="form-row single">
+      <div class="form-group-admin">
+        <label>الوصف (عربي)</label>
+        <textarea id="p-desc-ar" placeholder="وصف باللغة العربية..." dir="rtl"></textarea>
+      </div>
+    </div>
+    <div class="form-row single">
+      <div class="form-group-admin">
+        <label>Product Image</label>
+        <div class="upload-zone" id="p-img-dropzone" onclick="document.getElementById('p-img-file').click()">
+          <div id="p-img-preview-wrap" style="display:none;margin-bottom:10px;">
+            <img id="p-img-preview" src="" style="max-width:100%;max-height:140px;border-radius:4px;object-fit:cover;">
+          </div>
+          <p id="p-img-upload-text">📷 Click to upload an image</p>
+          <span>PNG, JPG or WEBP — or leave empty to use an emoji</span>
+        </div>
+        <input type="file" id="p-img-file" accept="image/*" style="display:none" onchange="handleProductImageUpload(event)">
+        <div style="display:flex;align-items:center;gap:8px;margin-top:10px;">
+          <input type="text" id="p-img" placeholder="Or type an emoji, e.g. 🚀" style="flex:1;">
+          <button type="button" class="secondary-btn" id="p-img-remove" style="display:none;white-space:nowrap;" onclick="removeProductImage()">Remove Image</button>
+        </div>
+      </div>
+    </div>
+    <div class="form-row single">
+      <div class="form-group-admin">
+        <label>Status</label>
+        <select id="p-status">
+          <option value="available">Available</option>
+          <option value="sold">Sold</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="secondary-btn" onclick="closeProductModal()">Cancel</button>
+      <button class="action-btn" onclick="saveProduct()">Save Product</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+let state = loadState();
+let currentProduct = null;
+let currentLang = 'en';
+let currentDir = 'ltr';
+
+function loadState() {
+  try {
+    const s = localStorage.getItem('trisocmd_state');
+    if (s) return JSON.parse(s);
+  } catch(e) {}
+  return {
+    lang: 'en', dir: 'ltr',
+    shopName: 'TRISOCMD Shop',
+    telegram: 'https://t.me/triso_angel',
+    reviewChannel: 'https://t.me/triso_angel',
+    qualityChannel: 'https://t.me/trisouhq',
+    walletLTC: 'ltc1qepdv8xfffd8yf5kw5q6vhsqr9fyh9a403xge00',
+    walletBTC: 'bc1qp2v6xm44m8my38m9ffvu75mkhzfrf6ex03vkvt',
+    wallet: 'ltc1qepdv8xfffd8yf5kw5q6vhsqr9fyh9a403xge00',
+    passwordHash: '369cd3d4a9a41c5db6cac6226aa0b0334f2550f68e9781f590e901d984a074ae',
+    ltcRate: 42,
+    stats: { revenue: '$0', orders: 0 },
+    products: [
+      { id: 1, title: 'Premium RDP Access', price: 49, desc: 'Full admin RDP access. Windows Server 2022. High-speed connection.', img: '🖥️', status: 'available' },
+      { id: 2, title: 'VPN Service 3 Months', price: 29, desc: 'Ultra-secure VPN. 50+ servers. No logs policy.', img: '🔒', status: 'available' },
+      { id: 3, title: 'SMTP Server Setup', price: 89, desc: 'Configured SMTP ready to send. Inbox guaranteed.', img: '📧', status: 'sold' },
+    ],
+    reviews: [
+      { id: 1, name: '@alex_buyer', stars: 5, text: 'Super fast delivery. Great quality. Highly recommend.', img: '', visible: true },
+      { id: 2, name: '@buyer_ru', stars: 5, text: 'Отличный сервис, всё работает идеально. Рекомендую!', img: '', visible: true },
+    ]
+  };
+}
+
+function saveState() {
+  try { localStorage.setItem('trisocmd_state', JSON.stringify(state)); } catch(e) {}
+}
+
+// ═══════════════════════════════════════════
+//  TRANSLATIONS
+// ═══════════════════════════════════════════
+const T = {
+  en: { hero_label:'Hit Marketplace — Best Quality Products', hero_title:'Hit Market.<br>Best Quality. Always.', btn_reviews:'Reviews', btn_shop:'فروشگاه', btn_back:'Back', trust_heading:'Verified buyers', trust_sub:'Real reviews from our Telegram community', co_title:'Complete your order', co_sub:'Send the exact amount in Litecoin', co_usd:'Total (USD)', co_wallet:'Send to wallet', co_inst:'Send the exact LTC amount to the wallet above. After payment, click below to notify us on Telegram.', co_paid:'I have paid → Telegram', copy:'Copy', buy_now:'Buy Now', available:'Available', sold:'Sold Out', empty_store:'No products available yet.', empty_trust:'No reviews yet.' },
+  fa: { hero_label:'بهترین محصولات — کیفیت برتر', hero_title:'هیت مارکت.<br>بهترین کیفیت. همیشه.', btn_reviews:'Reviews', btn_shop:'فروشگاه', btn_back:'بازگشت', trust_heading:'خریداران تأییدشده', trust_sub:'نظرات واقعی از جامعه تلگرام ما', co_title:'سفارش خود را تکمیل کنید', co_sub:'مقدار دقیق را به لایت‌کوین ارسال کنید', co_usd:'مجموع (دلار)', co_wallet:'به کیف‌پول ارسال کنید', co_inst:'مقدار دقیق LTC را به کیف‌پول بالا ارسال کنید. پس از پرداخت، روی دکمه زیر کلیک کنید.', co_paid:'پرداخت کردم ← تلگرام', copy:'کپی', buy_now:'خرید', available:'موجود', sold:'فروخته شد', empty_store:'محصولی موجود نیست.', empty_trust:'نظری ثبت نشده.' },
+  ar: { hero_label:'أفضل المنتجات — جودة عالية', hero_title:'هيت ماركت.<br>أفضل جودة. دائماً.', btn_reviews:'Reviews', btn_shop:'فروشگاه', btn_back:'رجوع', trust_heading:'المشترون الموثوقون', trust_sub:'مراجعات حقيقية من مجتمعنا', co_title:'أكمل طلبك', co_sub:'أرسل المبلغ الدقيق بـ Litecoin', co_usd:'الإجمالي (دولار)', co_wallet:'أرسل إلى المحفظة', co_inst:'أرسل مبلغ LTC إلى المحفظة أعلاه. بعد الدفع اضغط على الزر أدناه.', co_paid:'لقد دفعت ← تيليجرام', copy:'نسخ', buy_now:'اشتري الآن', available:'متاح', sold:'مباع', empty_store:'لا توجد منتجات.', empty_trust:'لا توجد مراجعات.' },
+  fr: { hero_label:'Meilleurs Produits — Qualité Supérieure', hero_title:'Hit Market.<br>Meilleure qualité. Toujours.', btn_reviews:'Reviews', btn_shop:'فروشگاه', btn_back:'Retour', trust_heading:'Acheteurs vérifiés', trust_sub:'Vrais avis de notre communauté Telegram', co_title:'Finaliser votre commande', co_sub:'Envoyez le montant exact en Litecoin', co_usd:'Total (USD)', co_wallet:'Envoyer au portefeuille', co_inst:'Envoyez le montant LTC exact au portefeuille ci-dessus. Après paiement, cliquez ci-dessous.', co_paid:'J\'ai payé → Telegram', copy:'Copier', buy_now:'Acheter', available:'Disponible', sold:'Vendu', empty_store:'Aucun produit disponible.', empty_trust:'Aucun avis.' },
+  de: { hero_label:'Beste Produkte — Top Qualität', hero_title:'Hit Market.<br>Beste Qualität. Immer.', btn_reviews:'Reviews', btn_shop:'فروشگاه', btn_back:'Zurück', trust_heading:'Verifizierte Käufer', trust_sub:'Echte Bewertungen aus unserer Telegram-Community', co_title:'Bestellung abschließen', co_sub:'Senden Sie den genauen Betrag in Litecoin', co_usd:'Gesamt (USD)', co_wallet:'An Wallet senden', co_inst:'Senden Sie den genauen LTC-Betrag an die obige Wallet. Klicken Sie nach der Zahlung unten.', co_paid:'Ich habe bezahlt → Telegram', copy:'Kopieren', buy_now:'Kaufen', available:'Verfügbar', sold:'Verkauft', empty_store:'Keine Produkte verfügbar.', empty_trust:'Keine Bewertungen.' },
+  ru: { hero_label:'Лучшие Продукты — Высокое Качество', hero_title:'Hit Market.<br>Лучшее качество. Всегда.', btn_reviews:'Reviews', btn_shop:'فروشگاه', btn_back:'Назад', trust_heading:'Проверенные покупатели', trust_sub:'Реальные отзывы из нашего Telegram', co_title:'Завершить заказ', co_sub:'Отправьте точную сумму в Litecoin', co_usd:'Итого (USD)', co_wallet:'Отправить на кошелёк', co_inst:'Отправьте точную сумму LTC на кошелёк выше. После оплаты нажмите кнопку ниже.', co_paid:'Я оплатил → Telegram', copy:'Копировать', buy_now:'Купить', available:'Доступно', sold:'Продано', empty_store:'Нет продуктов.', empty_trust:'Нет отзывов.' },
+  ro: { hero_label:'Cele Mai Bune Produse — Calitate Top', hero_title:'Hit Market.<br>Cea mai bună calitate. Mereu.', btn_reviews:'Reviews', btn_shop:'فروشگاه', btn_back:'Înapoi', trust_heading:'Cumpărători verificați', trust_sub:'Recenzii reale din comunitatea noastră Telegram', co_title:'Finalizați comanda', co_sub:'Trimiteți suma exactă în Litecoin', co_usd:'Total (USD)', co_wallet:'Trimiteți la portofel', co_inst:'Trimiteți suma LTC exactă la portofelul de mai sus. După plată, faceți clic mai jos.', co_paid:'Am plătit → Telegram', copy:'Copiați', buy_now:'Cumpără', available:'Disponibil', sold:'Vândut', empty_store:'Niciun produs disponibil.', empty_trust:'Nicio recenzie.' },
+  es: { hero_label:'Mejores Productos — Calidad Premium', hero_title:'Hit Market.<br>La mejor calidad. Siempre.', btn_reviews:'Reviews', btn_shop:'فروشگاه', btn_back:'Volver', trust_heading:'Compradores verificados', trust_sub:'Reseñas reales de nuestra comunidad de Telegram', co_title:'Completar pedido', co_sub:'Envía el monto exacto en Litecoin', co_usd:'Total (USD)', co_wallet:'Enviar a wallet', co_inst:'Envía el monto LTC exacto a la wallet arriba. Después del pago, haz clic abajo.', co_paid:'He pagado → Telegram', copy:'Copiar', buy_now:'Comprar', available:'Disponible', sold:'Vendido', empty_store:'Sin productos disponibles.', empty_trust:'Sin reseñas.' },
+};
+
+function t(key) { return (T[currentLang] || T['en'])[key] || key; }
+
+// ═══════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active'); s.style.display='none'; });
+  const target = document.getElementById(id);
+  target.classList.add('active');
+  target.style.display='flex';
+  target.style.flexDirection='column';
+  if (id === 'store-screen') renderStore();
+  if (id === 'trust-screen') renderTrust();
+  if (id === 'admin-screen') renderAdmin();
+}
+
+// ═══════════════════════════════════════════
+//  LANGUAGE
+// ═══════════════════════════════════════════
+function setLang(lang, dir) {
+  currentLang = lang; currentDir = dir;
+  state.lang = lang; state.dir = dir;
+  saveState();
+  document.documentElement.lang = lang;
+  document.documentElement.dir = dir;
+  document.getElementById('nav-lang-label').textContent = lang.toUpperCase();
+  applyTranslations();
+  showScreen('store-screen');
+}
+
+function applyTranslations() {
+  const l = t;
+  const set = (id, val, prop='textContent') => { const el=document.getElementById(id); if(el) el[prop]=val; };
+  set('hero-label', l('hero_label'));
+  set('hero-title', l('hero_title'), 'innerHTML');
+  set('btn-reviews', l('btn_reviews'));
+  set('btn-shop', l('btn_shop'));
+  set('btn-back-label', l('btn_back'));
+  set('trust-heading', l('trust_heading'));
+  set('trust-subheading', l('trust_sub'));
+  set('co-title', l('co_title'));
+  set('co-sub', l('co_sub'));
+  set('co-usd-label', l('co_usd'));
+  set('co-wallet-label', l('co_wallet'));
+  set('co-inst-text', l('co_inst'));
+  set('co-paid-btn', l('co_paid'));
+  set('copy-btn-label', l('copy'));
+}
+
+// ═══════════════════════════════════════════
+//  STORE
+// ═══════════════════════════════════════════
+function renderStore() {
+  const grid = document.getElementById('product-grid');
+  const empty = document.getElementById('store-empty');
+  const et=document.getElementById('store-empty-text'); if(et) et.textContent=t('empty_store');
+  const prods = state.products;
+  if (!prods.length) { grid.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  grid.innerHTML = prods.map(p => `
+    <div class="product-card ${p.status==='sold'?'sold':''}" onclick="openProduct(${p.id})">
+      <div class="product-badge ${p.status==='available'?'badge-available':'badge-sold'}">${p.status==='available'?t('available'):t('sold')}</div>
+      ${renderProductImg(p, '200px')}
+      <div class="product-body">
+        <div class="product-title">${p.title}</div>
+        <div class="product-desc">${getDesc(p)}</div>
+        <div class="product-footer">
+          <div class="product-price">$${p.price} <span>USD</span></div>
+          ${p.status==='available'?`<button class="product-buy-btn" onclick="event.stopPropagation();openProduct(${p.id})">${t('buy_now')}</button>`:''}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderProductImg(p, h) {
+  if (p.img && (p.img.startsWith('http') || p.img.startsWith('data:image'))) {
+    return `<div style="width:100%;height:${h};overflow:hidden;"><img src="${p.img}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentNode.innerHTML='<div style=height:${h};display:flex;align-items:center;justify-content:center;font-size:48px>📦</div>'"></div>`;
+  }
+  return `<div style="width:100%;height:${h};display:flex;align-items:center;justify-content:center;font-size:48px;background:var(--bg4);">${p.img||'📦'}</div>`;
+}
+
+function getDesc(p) {
+  if (currentLang === 'fa' && p.desc_fa) return p.desc_fa;
+  if (currentLang === 'ar' && p.desc_ar) return p.desc_ar;
+  return p.desc;
+}
+
+function openProduct(id) {
+  const p = state.products.find(x=>x.id==id);
+  if (!p) return;
+  currentProduct = p;
+  const ltc = (p.price / state.ltcRate).toFixed(4);
+  
+  const imgEl = document.getElementById('detail-img');
+  if (p.img && (p.img.startsWith('http') || p.img.startsWith('data:image'))) {
+    imgEl.innerHTML = `<img src="${p.img}" style="width:100%;height:100%;object-fit:cover;">`;
+  } else {
+    imgEl.innerHTML = p.img || '📦';
+    imgEl.style.fontSize = '80px';
+  }
+  
+  const badge = document.getElementById('detail-badge');
+  badge.textContent = p.status==='available' ? t('available') : t('sold');
+  badge.className = `detail-badge ${p.status==='available'?'badge-available':'badge-sold'}`;
+  
+  document.getElementById('detail-title').textContent = p.title;
+  document.getElementById('detail-desc').textContent = getDesc(p);
+  document.getElementById('detail-price').textContent = `$${p.price}`;
+  document.getElementById('detail-price-usd').textContent = `≈ ${ltc} LTC`;
+  document.getElementById('detail-buy-btn').textContent = t('buy_now');
+  showScreen('detail-screen');
+}
+
+async function startCheckout() {
+  if (!currentProduct) return;
+  const p = currentProduct;
+  const orderId = 'TC-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substr(2,4).toUpperCase();
+  window._currentOrderId = orderId;
+  // Show loading state
+  showScreen('checkout-screen');
+  const coUsd = document.getElementById('co-usd-val');
+  const coLtc = document.getElementById('co-ltc-val');
+  const coBtc = document.getElementById('co-btc-val');
+  if(coLtc) coLtc.textContent = 'Loading...';
+  if(coBtc) coBtc.textContent = 'Loading...';
+  // Fetch live prices from CoinGecko
+  try {
+    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=litecoin,bitcoin&vs_currencies=usd');
+    const data = await res.json();
+    if(data.litecoin && data.litecoin.usd) state.ltcRate = data.litecoin.usd;
+    if(data.bitcoin && data.bitcoin.usd) state.btcRate = data.bitcoin.usd;
+  } catch(e) { console.log('Price fetch failed, using fallback rate'); }
+  const ltc = (p.price / state.ltcRate).toFixed(4);
+  document.getElementById('co-usd-val').textContent = `$${p.price}`;
+  const btcRate = state.btcRate || 95000;
+  const btc = (p.price / btcRate).toFixed(6);
+  document.getElementById('co-ltc-val').textContent = `${ltc} LTC`;
+  const oid=document.getElementById('order-id-display'); if(oid) oid.textContent=window._currentOrderId;
+  const lpt=document.getElementById('live-price-text');
+  if(lpt) lpt.textContent=`Live: 1 LTC = $${state.ltcRate.toFixed(2)} · 1 BTC = $${(state.btcRate||95000).toLocaleString()}`;
+  const bv=document.getElementById('co-btc-val'); if(bv) bv.textContent=`${btc} BTC`;
+  document.getElementById('wallet-text').textContent = state.walletLTC || state.wallet;
+  const wb=document.getElementById('wallet-btc-text'); if(wb) wb.textContent=state.walletBTC||'';
+  generateQR(state.walletLTC || state.wallet);
+  showScreen('checkout-screen');
+}
+
+function copyOrderId() {
+  navigator.clipboard.writeText(window._currentOrderId || '').then(() => toast('Order ID copied!')).catch(()=>{});
+}
+function copyWalletLTC() {
+  navigator.clipboard.writeText(state.walletLTC || state.wallet).then(() => toast('LTC wallet copied!')).catch(()=>{});
+}
+function copyWalletBTC() {
+  navigator.clipboard.writeText(state.walletBTC || '').then(() => toast('BTC wallet copied!')).catch(()=>{});
+}
+function copyWallet() {
+  navigator.clipboard.writeText(state.walletLTC || state.wallet).then(() => toast('Wallet copied!')).catch(()=>{});
+}
+
+function openTelegram() {
+  window.open(state.reviewChannel || state.telegram, '_blank');
+}
+function openQualityChannel() {
+  window.open(state.qualityChannel || 'https://t.me/trisouhq', '_blank');
+}
+
+// ═══════════════════════════════════════════
+//  QR CODE (simple matrix)
+// ═══════════════════════════════════════════
+function generateQR(text) {
+  const svg = document.getElementById('qr-svg');
+  // Simple visual QR placeholder (pixel art style)
+  const size = 13;
+  const cell = Math.floor(140/size);
+  // Deterministic pattern from text hash
+  let hash = 0;
+  for (let i=0; i<text.length; i++) hash = ((hash<<5)-hash+text.charCodeAt(i))|0;
+  
+  let d = '';
+  // Fixed corner markers
+  const fixed = new Set();
+  for(let r=0;r<7;r++) for(let c=0;c<7;c++) { fixed.add(`${r},${c}`); fixed.add(`${r},${size-1-c}`); fixed.add(`${size-1-r},${c}`); }
+  const fixedFill = (r,c) => {
+    if(r<7&&c<7) return (r===0||r===6||c===0||c===6||( r>=2&&r<=4&&c>=2&&c<=4 ));
+    if(r<7&&c>=size-7) { let cc=c-(size-7); return (r===0||r===6||cc===0||cc===6||(r>=2&&r<=4&&cc>=2&&cc<=4)); }
+    if(r>=size-7&&c<7) { let rr=r-(size-7); return (rr===0||rr===6||c===0||c===6||(rr>=2&&rr<=4&&c>=2&&c<=4)); }
+    return null;
+  };
+
+  for(let r=0;r<size;r++) {
+    for(let c=0;c<size;c++) {
+      const fv = fixedFill(r,c);
+      let on;
+      if(fv!==null) on=fv;
+      else { let h2=hash^(r*31+c*17); on = (((h2>>((r+c)%30))&1)^((r*c)%3===0?1:0))===1; }
+      if(on) d += `<rect x="${c*cell+3}" y="${r*cell+3}" width="${cell-1}" height="${cell-1}" rx="1" fill="var(--text)"/>`;
+    }
+  }
+  svg.innerHTML = d;
+}
+
+// ═══════════════════════════════════════════
+//  TRUST / REVIEWS
+// ═══════════════════════════════════════════
+function renderTrust() {
+  const list = document.getElementById('reviews-list');
+  const empty = document.getElementById('trust-empty');
+  const visible = state.reviews.filter(r=>r.visible);
+  const tet=document.getElementById('trust-empty-text'); if(tet) tet.textContent=t('empty_trust');
+  if (!visible.length) { list.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  list.innerHTML = visible.map(r => `
+    <div class="review-card">
+      <div class="review-header">
+        <div class="review-avatar">${r.name[0].toUpperCase()}</div>
+        <div>
+          <div class="review-name">${r.name}</div>
+          <div class="review-date">Telegram</div>
+        </div>
+      </div>
+      <div class="review-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div>
+      <div class="review-text">${r.text}</div>
+      ${r.img ? `<div class="review-img"><img src="${r.img}" alt="screenshot"></div>` : ''}
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════
+//  ADMIN
+// ═══════════════════════════════════════════
+async function adminLogin() {
+  const pw = document.getElementById('admin-pw').value;
+  const msgBuffer = new TextEncoder().encode(pw);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2,'0')).join('');
+  const stored = state.passwordHash || '369cd3d4a9a41c5db6cac6226aa0b0334f2550f68e9781f590e901d984a074ae';
+  if (hashHex === stored) {
+    document.getElementById('admin-err').style.display='none';
+    document.getElementById('admin-pw').value='';
+    // Force show admin screen
+    document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active'); s.style.display='none'; });
+    const adminEl = document.getElementById('admin-screen');
+    adminEl.classList.add('active');
+    adminEl.style.display='flex';
+    adminEl.style.flexDirection='row';
+    adminEl.style.minHeight='100vh';
+    renderAdmin();
+    switchTabById('overview');
+  } else {
+    document.getElementById('admin-err').style.display='block';
+  }
+}
+
+function switchTabById(tab) {
+  document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(b=>b.classList.remove('active'));
+  const panel = document.getElementById('tab-'+tab);
+  if(panel) panel.classList.add('active');
+  const btns = document.querySelectorAll('.sidebar-item');
+  btns.forEach(b => { if(b.textContent.toLowerCase().includes(tab)) b.classList.add('active'); });
+}
+
+function adminLogout() { showScreen('lang-screen'); }
+
+function renderAdmin() {
+  // Stats
+  document.getElementById('stat-rev').textContent = state.stats.revenue;
+  document.getElementById('stat-orders').textContent = state.stats.orders;
+  document.getElementById('stat-prods').textContent = state.products.filter(p=>p.status==='available').length;
+  document.getElementById('inp-rev').value = state.stats.revenue;
+  document.getElementById('inp-orders').value = state.stats.orders;
+  // Settings
+  document.getElementById('set-shopname').value = state.shopName;
+  document.getElementById('set-telegram').value = state.telegram;
+  document.getElementById('set-wallet').value = state.walletLTC || state.wallet;
+  const bw = document.getElementById('set-btc-wallet'); if(bw) bw.value = state.walletBTC || '';
+  const rc = document.getElementById('set-review-channel'); if(rc) rc.value = state.reviewChannel || '';
+  const qc = document.getElementById('set-quality-channel'); if(qc) qc.value = state.qualityChannel || '';
+  document.getElementById('set-ltc-rate').value = state.ltcRate;
+  // Products table
+  renderAdminProducts();
+  // Reviews
+  renderAdminReviews();
+}
+
+function renderAdminProducts() {
+  const tbody = document.getElementById('admin-product-tbody');
+  tbody.innerHTML = state.products.map(p => `
+    <tr>
+      <td><div class="table-img">${p.img && (p.img.startsWith('http') || p.img.startsWith('data:image'))?`<img src="${p.img}">`:(p.img||'📦')}</div></td>
+      <td><span style="font-weight:500;">${p.title}</span><br><span style="color:var(--text3);font-size:12px;">${p.desc.substring(0,40)}...</span></td>
+      <td>$${p.price}</td>
+      <td>
+        <div class="toggle-wrap">
+          <div class="toggle ${p.status==='available'?'on':''}" onclick="toggleProduct(${p.id})"></div>
+          <span style="font-size:12px;color:var(--text2);">${p.status==='available'?'Live':'Hidden'}</span>
+        </div>
+      </td>
+      <td>
+        <div class="table-actions">
+          <button class="secondary-btn" onclick="openProductModal(${p.id})">Edit</button>
+          <button class="danger-btn" onclick="deleteProduct(${p.id})">Delete</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderAdminReviews() {
+  const el = document.getElementById('admin-reviews-list');
+  if (!state.reviews.length) { el.innerHTML='<p style="color:var(--text3);font-size:13px;">No reviews yet.</p>'; return; }
+  el.innerHTML = state.reviews.map(r => `
+    <div class="review-admin-card">
+      <div class="review-admin-info">
+        <div class="review-admin-name">${r.name} — ${'★'.repeat(r.stars)}</div>
+        <div class="review-admin-text">${r.text.substring(0,60)}...</div>
+      </div>
+      <div class="table-actions">
+        <div class="toggle ${r.visible?'on':''}" onclick="toggleReview(${r.id})"></div>
+        <button class="danger-btn" onclick="deleteReview(${r.id})">Del</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(b=>b.classList.remove('active'));
+  const panel = document.getElementById('tab-'+tab);
+  if(panel) panel.classList.add('active');
+  if(event && event.currentTarget) event.currentTarget.classList.add('active');
+}
+
+// Product CRUD
+// ═══════════════════════════════════════════
+//  PRODUCT IMAGE UPLOAD (from device gallery/files)
+// ═══════════════════════════════════════════
+let pendingProductImage = null; // base64 data URL of newly uploaded image, or null
+
+function handleProductImageUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { toast('Please select an image file'); return; }
+  if (file.size > 3 * 1024 * 1024) { toast('Image too large (max 3MB)'); return; }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    pendingProductImage = e.target.result;
+    showProductImagePreview(pendingProductImage);
+  };
+  reader.readAsDataURL(file);
+}
+
+function showProductImagePreview(src) {
+  const wrap = document.getElementById('p-img-preview-wrap');
+  const img = document.getElementById('p-img-preview');
+  const uploadText = document.getElementById('p-img-upload-text');
+  const removeBtn = document.getElementById('p-img-remove');
+  img.src = src;
+  wrap.style.display = 'block';
+  uploadText.textContent = '📷 Click to change image';
+  removeBtn.style.display = 'inline-block';
+}
+
+function removeProductImage(e) {
+  if (e) e.stopPropagation();
+  pendingProductImage = null;
+  document.getElementById('p-img-file').value = '';
+  document.getElementById('p-img-preview-wrap').style.display = 'none';
+  document.getElementById('p-img-upload-text').textContent = '📷 Click to upload an image';
+  document.getElementById('p-img-remove').style.display = 'none';
+}
+
+function resetProductImageUpload() {
+  pendingProductImage = null;
+  const fileInput = document.getElementById('p-img-file');
+  if (fileInput) fileInput.value = '';
+  const wrap = document.getElementById('p-img-preview-wrap');
+  if (wrap) wrap.style.display = 'none';
+  const uploadText = document.getElementById('p-img-upload-text');
+  if (uploadText) uploadText.textContent = '📷 Click to upload an image';
+  const removeBtn = document.getElementById('p-img-remove');
+  if (removeBtn) removeBtn.style.display = 'none';
+}
+
+
+function openProductModal(id) {
+  resetProductImageUpload();
+  const modal = document.getElementById('product-modal');
+  if (id) {
+    const p = state.products.find(x=>x.id===id);
+    document.getElementById('modal-title').textContent = 'Edit Product';
+    document.getElementById('editing-id').value = id;
+    document.getElementById('p-title').value = p.title;
+    document.getElementById('p-price').value = p.price;
+    document.getElementById('p-desc').value = p.desc;
+    document.getElementById('p-desc-fa').value = p.desc_fa || '';
+    document.getElementById('p-desc-ar').value = p.desc_ar || '';
+    document.getElementById('p-status').value = p.status;
+    if (p.img && (p.img.startsWith('http') || p.img.startsWith('data:image'))) {
+      document.getElementById('p-img').value = '';
+      pendingProductImage = p.img;
+      showProductImagePreview(p.img);
+    } else {
+      document.getElementById('p-img').value = p.img || '';
+    }
+  } else {
+    document.getElementById('modal-title').textContent = 'Add Product';
+    document.getElementById('editing-id').value = '';
+    document.getElementById('p-title').value=''; document.getElementById('p-price').value='';
+    document.getElementById('p-desc').value=''; document.getElementById('p-desc-fa').value='';
+    document.getElementById('p-desc-ar').value=''; document.getElementById('p-img').value=''; document.getElementById('p-status').value='available';
+  }
+  modal.classList.add('open');
+}
+
+function closeProductModal() { document.getElementById('product-modal').classList.remove('open'); }
+
+function saveProduct() {
+  const id = document.getElementById('editing-id').value;
+  const data = {
+    title: document.getElementById('p-title').value,
+    price: parseFloat(document.getElementById('p-price').value)||0,
+    desc: document.getElementById('p-desc').value,
+    desc_fa: document.getElementById('p-desc-fa').value,
+    desc_ar: document.getElementById('p-desc-ar').value,
+    img: pendingProductImage || document.getElementById('p-img').value || '📦',
+    status: document.getElementById('p-status').value
+  };
+  if (!data.title) { toast('Please enter a title'); return; }
+  if (id) {
+    const idx = state.products.findIndex(x=>x.id==id);
+    state.products[idx] = {...state.products[idx], ...data};
+  } else {
+    data.id = Date.now();
+    state.products.push(data);
+  }
+  saveState(); closeProductModal(); renderAdminProducts();
+  document.getElementById('stat-prods').textContent = state.products.filter(p=>p.status==='available').length;
+  toast('Product saved!');
+}
+
+function deleteProduct(id) {
+  state.products = state.products.filter(p=>p.id!==id);
+  saveState(); renderAdminProducts(); toast('Deleted');
+}
+
+function toggleProduct(id) {
+  const p = state.products.find(x=>x.id===id);
+  p.status = p.status==='available'?'sold':'available';
+  saveState(); renderAdminProducts();
+}
+
+// Stats
+function saveStats() {
+  state.stats.revenue = document.getElementById('inp-rev').value || '$0';
+  state.stats.orders = parseInt(document.getElementById('inp-orders').value)||0;
+  saveState();
+  document.getElementById('stat-rev').textContent = state.stats.revenue;
+  document.getElementById('stat-orders').textContent = state.stats.orders;
+  toast('Stats updated!');
+}
+
+// Settings
+function saveSettings() {
+  state.shopName = document.getElementById('set-shopname').value || 'TRISOCMD Shop';
+  state.telegram = document.getElementById('set-telegram').value || 'https://t.me/trisocmd';
+  state.walletLTC = document.getElementById('set-wallet').value || state.walletLTC;
+  state.wallet = state.walletLTC;
+  const bwv = document.getElementById('set-btc-wallet'); if(bwv) state.walletBTC = bwv.value;
+  const rcv = document.getElementById('set-review-channel'); if(rcv) state.reviewChannel = rcv.value;
+  const qcv = document.getElementById('set-quality-channel'); if(qcv) state.qualityChannel = qcv.value;
+  const newpw = document.getElementById('set-password').value;
+  if (newpw) {
+    const msgBuffer = new TextEncoder().encode(newpw);
+    crypto.subtle.digest('SHA-256', msgBuffer).then(hashBuffer => {
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      state.passwordHash = hashArray.map(b => b.toString(16).padStart(2,'0')).join('');
+      delete state.password;
+      saveState();
+    });
+  }
+  saveState(); toast('Settings saved!');
+}
+
+function saveLtcRate() {
+  state.ltcRate = parseFloat(document.getElementById('set-ltc-rate').value)||85;
+  saveState(); toast('Rate updated!');
+}
+
+// Reviews
+function addReview() {
+  const name = document.getElementById('rev-name').value;
+  const text = document.getElementById('rev-text').value;
+  if (!name || !text) { toast('Name and text required'); return; }
+  state.reviews.unshift({
+    id: Date.now(),
+    name, stars: parseInt(document.getElementById('rev-stars').value)||5,
+    text, img: document.getElementById('rev-img').value, visible: true
+  });
+  saveState(); renderAdminReviews();
+  document.getElementById('rev-name').value=''; document.getElementById('rev-text').value=''; document.getElementById('rev-img').value='';
+  toast('Review added!');
+}
+
+function toggleReview(id) {
+  const r = state.reviews.find(x=>x.id===id);
+  r.visible = !r.visible;
+  saveState(); renderAdminReviews();
+}
+
+function deleteReview(id) {
+  state.reviews = state.reviews.filter(r=>r.id!==id);
+  saveState(); renderAdminReviews(); toast('Deleted');
+}
+
+// ═══════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 2500);
+}
+
+// ═══════════════════════════════════════════
+//  HIDDEN ADMIN ROUTE
+// ═══════════════════════════════════════════
+function checkRoute() {
+  if (window.location.hash === '#admin' || window.location.search.includes('admin=1')) {
+    showScreen('admin-login-screen');
+    return true;
+  }
+  return false;
+}
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+(function init() {
+  // Close modal on backdrop click
+  document.getElementById('product-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeProductModal();
+  });
+
+  if (checkRoute()) return;
+
+  // Restore lang
+  if (state.lang && state.lang !== 'en') {
+    currentLang = state.lang;
+    currentDir = state.dir;
+    document.documentElement.lang = currentLang;
+    document.documentElement.dir = currentDir;
+    applyTranslations();
+  }
+
+  // Show lang screen (always first)
+  showScreen('lang-screen');
+})();
+</script>
+
+<!-- SUCCESS SCREEN -->
+<div id="paid-overlay" style="display:none;position:fixed;inset:0;background:rgba(5,5,8,0.97);z-index:9999;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:2rem;">
+  
+  <!-- Spinner -->
+  <svg width="80" height="80" viewBox="0 0 80 80" fill="none" style="margin-bottom:2rem;">
+    <polygon points="40,4 76,24 76,56 40,76 4,56 4,24" fill="none" stroke="rgba(0,240,255,0.2)" stroke-width="1.5"/>
+    <polygon points="40,14 66,28 66,52 40,66 14,52 14,28" fill="rgba(0,240,255,0.05)" stroke="rgba(0,240,255,0.3)" stroke-width="1"/>
+    <circle cx="40" cy="40" r="14" fill="none" stroke="#00f0ff" stroke-width="2" stroke-dasharray="22 66" stroke-linecap="round">
+      <animateTransform attributeName="transform" type="rotate" from="0 40 40" to="360 40 40" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="40" cy="40" r="6" fill="rgba(0,240,255,0.3)"/>
+  </svg>
+
+  <h1 style="font-family:Rajdhani,sans-serif;font-size:28px;font-weight:700;color:#00f0ff;letter-spacing:0.08em;margin-bottom:0.5rem;">AWAITING CONFIRMATION</h1>
+  <p style="font-size:14px;color:#7986a8;margin-bottom:1.5rem;font-family:Rajdhani,sans-serif;letter-spacing:0.03em;">Your payment is being verified by admin</p>
+
+  <!-- Order ID box -->
+  <div style="background:rgba(0,240,255,0.05);border:1px solid rgba(0,240,255,0.25);border-left:3px solid #00f0ff;border-radius:3px;padding:14px 24px;margin-bottom:1.5rem;min-width:280px;">
+    <div style="font-size:10px;color:#3d4560;font-family:Share Tech Mono,monospace;letter-spacing:0.15em;margin-bottom:6px;">YOUR ORDER ID</div>
+    <div id="success-order-id" style="font-family:Share Tech Mono,monospace;font-size:20px;color:#00f0ff;font-weight:700;letter-spacing:0.12em;">TC-XXXXXX</div>
+    <button onclick="copySuccessOrderId()" style="margin-top:10px;background:transparent;border:1px solid rgba(0,240,255,0.3);color:#00f0ff;font-size:11px;padding:5px 16px;border-radius:2px;cursor:pointer;font-family:Rajdhani,sans-serif;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">Copy ID</button>
+  </div>
+
+  <!-- Steps -->
+  <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:3px;padding:1.25rem;margin-bottom:2rem;max-width:340px;text-align:left;">
+    <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;">
+      <span style="color:#00ff88;font-family:Share Tech Mono,monospace;font-size:13px;min-width:20px;">01</span>
+      <span style="font-size:13px;color:#7986a8;font-family:Rajdhani,sans-serif;line-height:1.4;">Copy your Order ID above</span>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;">
+      <span style="color:#00ff88;font-family:Share Tech Mono,monospace;font-size:13px;min-width:20px;">02</span>
+      <span style="font-size:13px;color:#7986a8;font-family:Rajdhani,sans-serif;line-height:1.4;">Open Telegram and send your Order ID to admin</span>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:12px;">
+      <span style="color:#00ff88;font-family:Share Tech Mono,monospace;font-size:13px;min-width:20px;">03</span>
+      <span style="font-size:13px;color:#7986a8;font-family:Rajdhani,sans-serif;line-height:1.4;">Admin confirms payment and sends your item</span>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+    <button onclick="goTelegram()" style="background:linear-gradient(90deg,#00f0ff,#ff2d6b);color:#050508;border:none;padding:14px 32px;border-radius:2px;font-size:15px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;font-family:Rajdhani,sans-serif;">Open Telegram</button>
+    <button onclick="closePaidSuccess()" style="background:transparent;color:#7986a8;border:1px solid rgba(255,255,255,0.08);padding:14px 24px;border-radius:2px;font-size:13px;cursor:pointer;font-family:Rajdhani,sans-serif;">Back to Store</button>
+  </div>
+
+  <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden;">
+    <div id="particles-wrap"></div>
+  </div>
+</div>
+
+<script>
+function showPaidSuccess() {
+  const el = document.getElementById('paid-overlay');
+  el.style.display = 'flex';
+  const sid = document.getElementById('success-order-id');
+  if(sid) sid.textContent = window._currentOrderId || 'TC-XXXXXX';
+  spawnParticles();
+  // No auto-redirect - user clicks manually
+}
+function copySuccessOrderId() {
+  navigator.clipboard.writeText(window._currentOrderId || '').then(() => toast('Order ID copied!')).catch(()=>{});
+}
+function goTelegram() {
+  window.open(state.reviewChannel || state.telegram, '_blank');
+}
+function closePaidSuccess() {
+  document.getElementById('paid-overlay').style.display = 'none';
+  showScreen('store-screen');
+}
+function spawnParticles() {
+  const wrap = document.getElementById('particles-wrap');
+  wrap.innerHTML = '';
+  for(let i=0;i<30;i++) {
+    const p = document.createElement('div');
+    const colors = ['#00f0ff','#ff2d6b','#00ff88','#ffcc00'];
+    const color = colors[Math.floor(Math.random()*colors.length)];
+    const size = Math.random()*4+2;
+    const x = Math.random()*100;
+    const delay = Math.random()*1.5;
+    const duration = Math.random()*2+1.5;
+    p.style.cssText = `position:absolute;left:${x}%;bottom:-10px;width:${size}px;height:${size}px;background:${color};border-radius:50%;animation:rise ${duration}s ${delay}s ease-out forwards;`;
+    wrap.appendChild(p);
+  }
+}
+</script>
+<style>
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  @keyframes rise { 0%{transform:translateY(0) scale(1);opacity:1;} 100%{transform:translateY(-110vh) scale(0);opacity:0;} }
+</style>
+
+
+<script>
+(function(){
+ const count = 80;
+ for(let i=0;i<count;i++){
+   const s=document.createElement('div');
+   s.className='snowflake';
+   s.innerHTML='❄';
+   s.style.left=Math.random()*100+'vw';
+   s.style.fontSize=(8+Math.random()*18)+'px';
+   s.style.opacity=(0.2+Math.random()*0.8);
+   s.style.animationDuration=(8+Math.random()*15)+'s';
+   s.style.animationDelay=(-Math.random()*20)+'s';
+   document.body.appendChild(s);
+ }
+})();
+</script>
+
+</body>
+</html>
