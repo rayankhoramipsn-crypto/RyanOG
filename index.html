@@ -1868,9 +1868,7 @@ function showPaidSuccess() {
 function copySuccessOrderId() {
   navigator.clipboard.writeText(window._currentOrderId || '').then(() => toast('Order ID copied!')).catch(()=>{});
 }
-function goTelegram() {
-  window.open(state.reviewChannel || state.telegram, '_blank');
-}
+function goTelegram() { window.open('https://t.me/trisocmd', '_blank'); }
 function closePaidSuccess() {
   document.getElementById('paid-overlay').style.display = 'none';
   showScreen('store-screen');
@@ -1914,5 +1912,6 @@ function spawnParticles() {
 })();
 </script>
 
+<footer style="text-align:center;padding:20px;color:#999;font-size:14px;">Site developed by <a href="https://t.me/wegotlorento" target="_blank">@wegotlorento</a></footer>
 </body>
 </html>
