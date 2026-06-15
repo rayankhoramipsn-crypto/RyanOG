@@ -127,6 +127,14 @@
   .detail-price-usd { font-size:15px; color:var(--text2); }
   .detail-buy { width:100%; padding:16px; background:var(--accent); color:#fff; border:none; border-radius:var(--radius); font-size:16px; font-weight:500; cursor:pointer; transition:all 0.2s; }
   .detail-buy:hover { background:#8b5cf6; }
+  .qty-row { display:flex; align-items:center; gap:14px; margin-bottom:1.5rem; }
+  .qty-label { font-size:13px; color:var(--text2); font-weight:500; }
+  .qty-control { display:flex; align-items:center; gap:0; border:1px solid var(--border2); border-radius:var(--radius-sm); overflow:hidden; }
+  .qty-btn { background:var(--bg4); border:none; color:var(--text); width:40px; height:40px; font-size:18px; cursor:pointer; transition:background 0.2s; display:flex; align-items:center; justify-content:center; }
+  .qty-btn:hover { background:var(--accent); color:#fff; }
+  .qty-btn:disabled { opacity:0.3; cursor:not-allowed; }
+  .qty-val { width:48px; text-align:center; font-size:15px; font-weight:600; }
+  .qty-stock-note { font-size:12px; color:var(--text3); }
   .back-btn { background:none; border:none; color:var(--text2); font-size:14px; cursor:pointer; display:flex; align-items:center; gap:6px; padding:1.5rem 2rem 0; }
   .back-btn:hover { color:var(--text); }
 
@@ -241,6 +249,7 @@
   
   .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
   .form-row.single { grid-template-columns:1fr; }
+  .bulk-hint { font-size:12px; color:var(--text3); margin-top:6px; line-height:1.5; }
   .form-group-admin { display:flex; flex-direction:column; gap:6px; }
   .form-group-admin label { font-size:12px; color:var(--text2); }
   .form-group-admin input, .form-group-admin textarea, .form-group-admin select {
@@ -472,6 +481,12 @@ nav{
  0 10px 40px rgba(0,0,0,.25),
  inset 0 1px 0 rgba(255,255,255,.15);
  overflow:hidden;
+}
+
+/* Modal needs internal scrolling — override the overflow:hidden above */
+.modal {
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
 }
 
 .product-card::after,
@@ -810,6 +825,15 @@ display:block !important;
         <span class="detail-price" id="detail-price"></span>
         <span class="detail-price-usd" id="detail-price-usd"></span>
       </div>
+      <div class="qty-row" id="qty-row">
+        <span class="qty-label" id="qty-label">Quantity</span>
+        <div class="qty-control">
+          <button class="qty-btn" id="qty-minus" onclick="changeQty(-1)">−</button>
+          <span class="qty-val" id="qty-val">1</span>
+          <button class="qty-btn" id="qty-plus" onclick="changeQty(1)">+</button>
+        </div>
+        <span class="qty-stock-note" id="qty-stock-note"></span>
+      </div>
       <button class="detail-buy" id="detail-buy-btn" onclick="startCheckout()" style="cursor:pointer;">Buy Now</button>
     </div>
   </div>
@@ -1007,6 +1031,7 @@ display:block !important;
               <th>Image</th>
               <th>Title</th>
               <th>Price</th>
+              <th>Stock</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
@@ -1127,6 +1152,7 @@ display:block !important;
   <div class="modal">
     <div class="modal-title" id="modal-title">Add Product</div>
     <input type="hidden" id="editing-id">
+
     <div class="form-row">
       <div class="form-group-admin">
         <label>Title</label>
@@ -1137,22 +1163,43 @@ display:block !important;
         <input type="number" id="p-price" placeholder="49">
       </div>
     </div>
-    <div class="form-row single">
+    <div class="form-row">
       <div class="form-group-admin">
-        <label>Description (English / Default)</label>
-        <textarea id="p-desc" placeholder="Short description in English..."></textarea>
+        <label>Stock Quantity</label>
+        <input type="number" id="p-stock" placeholder="e.g. 100" min="0" value="1">
+        <div class="bulk-hint">Number of units available. Set to 0 to mark as Sold Out.</div>
+      </div>
+      <div class="form-group-admin">
+        <label>Status</label>
+        <select id="p-status">
+          <option value="available">Available</option>
+          <option value="sold">Sold</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row" style="background:rgba(0,240,255,0.03);border:1px solid rgba(0,240,255,0.1);border-radius:4px;padding:12px;margin-bottom:8px;">
+      <div class="form-group-admin">
+        <label>⬇ Minimum Buy Quantity</label>
+        <input type="number" id="p-minqty" placeholder="1" min="1" value="1">
+        <div class="bulk-hint">Min items customer must buy. Default: 1</div>
+      </div>
+      <div class="form-group-admin">
+        <label>⬆ Maximum Buy Quantity <span style="color:var(--text3);font-size:10px;">(0=unlimited)</span></label>
+        <input type="number" id="p-maxqty" placeholder="0" min="0" value="0">
+        <div class="bulk-hint">Max items per order. 0 = no limit.</div>
       </div>
     </div>
     <div class="form-row single">
       <div class="form-group-admin">
-        <label>توضیحات (فارسی)</label>
-        <textarea id="p-desc-fa" placeholder="توضیحات به فارسی..." dir="rtl"></textarea>
+        <label>Description (All Languages — Default)</label>
+        <textarea id="p-desc" placeholder="Short description. Shown for all languages except Arabic (unless no Arabic version is provided)."></textarea>
       </div>
     </div>
     <div class="form-row single">
       <div class="form-group-admin">
-        <label>الوصف (عربي)</label>
-        <textarea id="p-desc-ar" placeholder="وصف باللغة العربية..." dir="rtl"></textarea>
+        <label>الوصف (عربي) — Arabic Only</label>
+        <textarea id="p-desc-ar" placeholder="وصف باللغة العربية... (يظهر فقط عند اختيار اللغة العربية)" dir="rtl"></textarea>
+        <div class="bulk-hint">Optional. If filled, Arabic-language visitors see this instead of the default description above. Leave empty to use the default for Arabic too.</div>
       </div>
     </div>
     <div class="form-row single">
@@ -1172,15 +1219,6 @@ display:block !important;
         </div>
       </div>
     </div>
-    <div class="form-row single">
-      <div class="form-group-admin">
-        <label>Status</label>
-        <select id="p-status">
-          <option value="available">Available</option>
-          <option value="sold">Sold</option>
-        </select>
-      </div>
-    </div>
     <div class="modal-footer">
       <button class="secondary-btn" onclick="closeProductModal()">Cancel</button>
       <button class="action-btn" onclick="saveProduct()">Save Product</button>
@@ -1194,6 +1232,7 @@ display:block !important;
 // ═══════════════════════════════════════════
 let state = loadState();
 let currentProduct = null;
+let selectedQty = 1;
 let currentLang = 'en';
 let currentDir = 'ltr';
 
@@ -1205,8 +1244,8 @@ function loadState() {
   return {
     lang: 'en', dir: 'ltr',
     shopName: 'TRISOCMD Shop',
-    telegram: 'https://t.me/triso_angel',
-    reviewChannel: 'https://t.me/triso_angel',
+    telegram: 'https://t.me/trisocmd',
+    reviewChannel: 'https://t.me/trisocmd',
     qualityChannel: 'https://t.me/trisouhq',
     walletLTC: 'ltc1qepdv8xfffd8yf5kw5q6vhsqr9fyh9a403xge00',
     walletBTC: 'bc1qp2v6xm44m8my38m9ffvu75mkhzfrf6ex03vkvt',
@@ -1215,9 +1254,9 @@ function loadState() {
     ltcRate: 42,
     stats: { revenue: '$0', orders: 0 },
     products: [
-      { id: 1, title: 'Premium RDP Access', price: 49, desc: 'Full admin RDP access. Windows Server 2022. High-speed connection.', img: '🖥️', status: 'available' },
-      { id: 2, title: 'VPN Service 3 Months', price: 29, desc: 'Ultra-secure VPN. 50+ servers. No logs policy.', img: '🔒', status: 'available' },
-      { id: 3, title: 'SMTP Server Setup', price: 89, desc: 'Configured SMTP ready to send. Inbox guaranteed.', img: '📧', status: 'sold' },
+      { id: 1, title: 'Premium RDP Access', price: 49, desc: 'Full admin RDP access. Windows Server 2022. High-speed connection.', img: '🖥️', status: 'available', stock: 10 },
+      { id: 2, title: 'VPN Service 3 Months', price: 29, desc: 'Ultra-secure VPN. 50+ servers. No logs policy.', img: '🔒', status: 'available', stock: 25 },
+      { id: 3, title: 'SMTP Server Setup', price: 89, desc: 'Configured SMTP ready to send. Inbox guaranteed.', img: '📧', status: 'sold', stock: 0 },
     ],
     reviews: [
       { id: 1, name: '@alex_buyer', stars: 5, text: 'Super fast delivery. Great quality. Highly recommend.', img: '', visible: true },
@@ -1234,14 +1273,14 @@ function saveState() {
 //  TRANSLATIONS
 // ═══════════════════════════════════════════
 const T = {
-  en: { hero_label:'Hit Marketplace — Best Quality Products', hero_title:'Hit Market.<br>Best Quality. Always.', btn_reviews:'Reviews', btn_shop:'فروشگاه', btn_back:'Back', trust_heading:'Verified buyers', trust_sub:'Real reviews from our Telegram community', co_title:'Complete your order', co_sub:'Send the exact amount in Litecoin', co_usd:'Total (USD)', co_wallet:'Send to wallet', co_inst:'Send the exact LTC amount to the wallet above. After payment, click below to notify us on Telegram.', co_paid:'I have paid → Telegram', copy:'Copy', buy_now:'Buy Now', available:'Available', sold:'Sold Out', empty_store:'No products available yet.', empty_trust:'No reviews yet.' },
-  fa: { hero_label:'بهترین محصولات — کیفیت برتر', hero_title:'هیت مارکت.<br>بهترین کیفیت. همیشه.', btn_reviews:'Reviews', btn_shop:'فروشگاه', btn_back:'بازگشت', trust_heading:'خریداران تأییدشده', trust_sub:'نظرات واقعی از جامعه تلگرام ما', co_title:'سفارش خود را تکمیل کنید', co_sub:'مقدار دقیق را به لایت‌کوین ارسال کنید', co_usd:'مجموع (دلار)', co_wallet:'به کیف‌پول ارسال کنید', co_inst:'مقدار دقیق LTC را به کیف‌پول بالا ارسال کنید. پس از پرداخت، روی دکمه زیر کلیک کنید.', co_paid:'پرداخت کردم ← تلگرام', copy:'کپی', buy_now:'خرید', available:'موجود', sold:'فروخته شد', empty_store:'محصولی موجود نیست.', empty_trust:'نظری ثبت نشده.' },
-  ar: { hero_label:'أفضل المنتجات — جودة عالية', hero_title:'هيت ماركت.<br>أفضل جودة. دائماً.', btn_reviews:'Reviews', btn_shop:'فروشگاه', btn_back:'رجوع', trust_heading:'المشترون الموثوقون', trust_sub:'مراجعات حقيقية من مجتمعنا', co_title:'أكمل طلبك', co_sub:'أرسل المبلغ الدقيق بـ Litecoin', co_usd:'الإجمالي (دولار)', co_wallet:'أرسل إلى المحفظة', co_inst:'أرسل مبلغ LTC إلى المحفظة أعلاه. بعد الدفع اضغط على الزر أدناه.', co_paid:'لقد دفعت ← تيليجرام', copy:'نسخ', buy_now:'اشتري الآن', available:'متاح', sold:'مباع', empty_store:'لا توجد منتجات.', empty_trust:'لا توجد مراجعات.' },
-  fr: { hero_label:'Meilleurs Produits — Qualité Supérieure', hero_title:'Hit Market.<br>Meilleure qualité. Toujours.', btn_reviews:'Reviews', btn_shop:'فروشگاه', btn_back:'Retour', trust_heading:'Acheteurs vérifiés', trust_sub:'Vrais avis de notre communauté Telegram', co_title:'Finaliser votre commande', co_sub:'Envoyez le montant exact en Litecoin', co_usd:'Total (USD)', co_wallet:'Envoyer au portefeuille', co_inst:'Envoyez le montant LTC exact au portefeuille ci-dessus. Après paiement, cliquez ci-dessous.', co_paid:'J\'ai payé → Telegram', copy:'Copier', buy_now:'Acheter', available:'Disponible', sold:'Vendu', empty_store:'Aucun produit disponible.', empty_trust:'Aucun avis.' },
-  de: { hero_label:'Beste Produkte — Top Qualität', hero_title:'Hit Market.<br>Beste Qualität. Immer.', btn_reviews:'Reviews', btn_shop:'فروشگاه', btn_back:'Zurück', trust_heading:'Verifizierte Käufer', trust_sub:'Echte Bewertungen aus unserer Telegram-Community', co_title:'Bestellung abschließen', co_sub:'Senden Sie den genauen Betrag in Litecoin', co_usd:'Gesamt (USD)', co_wallet:'An Wallet senden', co_inst:'Senden Sie den genauen LTC-Betrag an die obige Wallet. Klicken Sie nach der Zahlung unten.', co_paid:'Ich habe bezahlt → Telegram', copy:'Kopieren', buy_now:'Kaufen', available:'Verfügbar', sold:'Verkauft', empty_store:'Keine Produkte verfügbar.', empty_trust:'Keine Bewertungen.' },
-  ru: { hero_label:'Лучшие Продукты — Высокое Качество', hero_title:'Hit Market.<br>Лучшее качество. Всегда.', btn_reviews:'Reviews', btn_shop:'فروشگاه', btn_back:'Назад', trust_heading:'Проверенные покупатели', trust_sub:'Реальные отзывы из нашего Telegram', co_title:'Завершить заказ', co_sub:'Отправьте точную сумму в Litecoin', co_usd:'Итого (USD)', co_wallet:'Отправить на кошелёк', co_inst:'Отправьте точную сумму LTC на кошелёк выше. После оплаты нажмите кнопку ниже.', co_paid:'Я оплатил → Telegram', copy:'Копировать', buy_now:'Купить', available:'Доступно', sold:'Продано', empty_store:'Нет продуктов.', empty_trust:'Нет отзывов.' },
-  ro: { hero_label:'Cele Mai Bune Produse — Calitate Top', hero_title:'Hit Market.<br>Cea mai bună calitate. Mereu.', btn_reviews:'Reviews', btn_shop:'فروشگاه', btn_back:'Înapoi', trust_heading:'Cumpărători verificați', trust_sub:'Recenzii reale din comunitatea noastră Telegram', co_title:'Finalizați comanda', co_sub:'Trimiteți suma exactă în Litecoin', co_usd:'Total (USD)', co_wallet:'Trimiteți la portofel', co_inst:'Trimiteți suma LTC exactă la portofelul de mai sus. După plată, faceți clic mai jos.', co_paid:'Am plătit → Telegram', copy:'Copiați', buy_now:'Cumpără', available:'Disponibil', sold:'Vândut', empty_store:'Niciun produs disponibil.', empty_trust:'Nicio recenzie.' },
-  es: { hero_label:'Mejores Productos — Calidad Premium', hero_title:'Hit Market.<br>La mejor calidad. Siempre.', btn_reviews:'Reviews', btn_shop:'فروشگاه', btn_back:'Volver', trust_heading:'Compradores verificados', trust_sub:'Reseñas reales de nuestra comunidad de Telegram', co_title:'Completar pedido', co_sub:'Envía el monto exacto en Litecoin', co_usd:'Total (USD)', co_wallet:'Enviar a wallet', co_inst:'Envía el monto LTC exacto a la wallet arriba. Después del pago, haz clic abajo.', co_paid:'He pagado → Telegram', copy:'Copiar', buy_now:'Comprar', available:'Disponible', sold:'Vendido', empty_store:'Sin productos disponibles.', empty_trust:'Sin reseñas.' },
+  en: { qty_label:'Quantity', in_stock:'in stock', success_title:'AWAITING CONFIRMATION', success_subtitle:'Your payment is being verified by admin', success_order_label:'YOUR ORDER ID', success_copy:'Copy ID', success_step1:'Copy your Order ID above', success_step2:'Open Telegram and send your Order ID to admin', success_step3:'Admin confirms payment and sends your item', success_tg_btn:'Open Telegram', success_back_btn:'Back to Store', hero_label:'Hit Marketplace — Best Quality Products', hero_title:'Hit Market.<br>Best Quality. Always.', btn_reviews:'Reviews', btn_shop:'فروشگاه', btn_back:'Back', trust_heading:'Verified buyers', trust_sub:'Real reviews from our Telegram community', co_title:'Complete your order', co_sub:'Send the exact amount in Litecoin', co_usd:'Total (USD)', co_wallet:'Send to wallet', co_inst:'Send the exact LTC amount to the wallet above. After payment, click below to notify us on Telegram.', co_paid:'I have paid → Telegram', copy:'Copy', buy_now:'Buy Now', available:'Available', sold:'Sold Out', empty_store:'No products available yet.', empty_trust:'No reviews yet.' },
+  fa: { qty_label:'تعداد', in_stock:'موجود', success_title:'در انتظار تأیید', success_subtitle:'پرداخت شما توسط ادمین بررسی می‌شود', success_order_label:'شناسه سفارش شما', success_copy:'کپی شناسه', success_step1:'شناسه سفارش بالا را کپی کنید', success_step2:'تلگرام را باز کرده و شناسه سفارش را برای ادمین ارسال کنید', success_step3:'ادمین پرداخت را تأیید و محصول را ارسال می‌کند', success_tg_btn:'باز کردن تلگرام', success_back_btn:'بازگشت به فروشگاه', hero_label:'بهترین محصولات — کیفیت برتر', hero_title:'هیت مارکت.<br>بهترین کیفیت. همیشه.', btn_reviews:'Reviews', btn_shop:'فروشگاه', btn_back:'بازگشت', trust_heading:'خریداران تأییدشده', trust_sub:'نظرات واقعی از جامعه تلگرام ما', co_title:'سفارش خود را تکمیل کنید', co_sub:'مقدار دقیق را به لایت‌کوین ارسال کنید', co_usd:'مجموع (دلار)', co_wallet:'به کیف‌پول ارسال کنید', co_inst:'مقدار دقیق LTC را به کیف‌پول بالا ارسال کنید. پس از پرداخت، روی دکمه زیر کلیک کنید.', co_paid:'پرداخت کردم ← تلگرام', copy:'کپی', buy_now:'خرید', available:'موجود', sold:'فروخته شد', empty_store:'محصولی موجود نیست.', empty_trust:'نظری ثبت نشده.' },
+  ar: { qty_label:'الكمية', in_stock:'متوفر', success_title:'في انتظار التأكيد', success_subtitle:'يقوم المسؤول بمراجعة دفعتك', success_order_label:'رقم طلبك', success_copy:'نسخ الرقم', success_step1:'انسخ رقم الطلب أعلاه', success_step2:'افتح تيليجرام وأرسل رقم الطلب إلى المسؤول', success_step3:'يؤكد المسؤول الدفع ويرسل لك المنتج', success_tg_btn:'فتح تيليجرام', success_back_btn:'العودة إلى المتجر', hero_label:'أفضل المنتجات — جودة عالية', hero_title:'هيت ماركت.<br>أفضل جودة. دائماً.', btn_reviews:'Reviews', btn_shop:'فروشگاه', btn_back:'رجوع', trust_heading:'المشترون الموثوقون', trust_sub:'مراجعات حقيقية من مجتمعنا', co_title:'أكمل طلبك', co_sub:'أرسل المبلغ الدقيق بـ Litecoin', co_usd:'الإجمالي (دولار)', co_wallet:'أرسل إلى المحفظة', co_inst:'أرسل مبلغ LTC إلى المحفظة أعلاه. بعد الدفع اضغط على الزر أدناه.', co_paid:'لقد دفعت ← تيليجرام', copy:'نسخ', buy_now:'اشتري الآن', available:'متاح', sold:'مباع', empty_store:'لا توجد منتجات.', empty_trust:'لا توجد مراجعات.' },
+  fr: { qty_label:'Quantité', in_stock:'en stock', success_title:'EN ATTENTE DE CONFIRMATION', success_subtitle:'Votre paiement est en cours de vérification par l\'administrateur', success_order_label:'VOTRE NUMÉRO DE COMMANDE', success_copy:'Copier l\'ID', success_step1:'Copiez votre numéro de commande ci-dessus', success_step2:'Ouvrez Telegram et envoyez votre numéro de commande à l\'administrateur', success_step3:'L\'administrateur confirme le paiement et envoie votre article', success_tg_btn:'Ouvrir Telegram', success_back_btn:'Retour à la boutique', hero_label:'Meilleurs Produits — Qualité Supérieure', hero_title:'Hit Market.<br>Meilleure qualité. Toujours.', btn_reviews:'Reviews', btn_shop:'فروشگاه', btn_back:'Retour', trust_heading:'Acheteurs vérifiés', trust_sub:'Vrais avis de notre communauté Telegram', co_title:'Finaliser votre commande', co_sub:'Envoyez le montant exact en Litecoin', co_usd:'Total (USD)', co_wallet:'Envoyer au portefeuille', co_inst:'Envoyez le montant LTC exact au portefeuille ci-dessus. Après paiement, cliquez ci-dessous.', co_paid:'J\'ai payé → Telegram', copy:'Copier', buy_now:'Acheter', available:'Disponible', sold:'Vendu', empty_store:'Aucun produit disponible.', empty_trust:'Aucun avis.' },
+  de: { qty_label:'Menge', in_stock:'auf Lager', success_title:'WARTET AUF BESTÄTIGUNG', success_subtitle:'Ihre Zahlung wird vom Admin überprüft', success_order_label:'IHRE BESTELLNUMMER', success_copy:'ID kopieren', success_step1:'Kopieren Sie Ihre Bestellnummer oben', success_step2:'Öffnen Sie Telegram und senden Sie Ihre Bestellnummer an den Admin', success_step3:'Admin bestätigt die Zahlung und sendet Ihren Artikel', success_tg_btn:'Telegram öffnen', success_back_btn:'Zurück zum Shop', hero_label:'Beste Produkte — Top Qualität', hero_title:'Hit Market.<br>Beste Qualität. Immer.', btn_reviews:'Reviews', btn_shop:'فروشگاه', btn_back:'Zurück', trust_heading:'Verifizierte Käufer', trust_sub:'Echte Bewertungen aus unserer Telegram-Community', co_title:'Bestellung abschließen', co_sub:'Senden Sie den genauen Betrag in Litecoin', co_usd:'Gesamt (USD)', co_wallet:'An Wallet senden', co_inst:'Senden Sie den genauen LTC-Betrag an die obige Wallet. Klicken Sie nach der Zahlung unten.', co_paid:'Ich habe bezahlt → Telegram', copy:'Kopieren', buy_now:'Kaufen', available:'Verfügbar', sold:'Verkauft', empty_store:'Keine Produkte verfügbar.', empty_trust:'Keine Bewertungen.' },
+  ru: { qty_label:'Количество', in_stock:'в наличии', success_title:'ОЖИДАНИЕ ПОДТВЕРЖДЕНИЯ', success_subtitle:'Ваш платёж проверяется администратором', success_order_label:'НОМЕР ВАШЕГО ЗАКАЗА', success_copy:'Копировать ID', success_step1:'Скопируйте номер заказа выше', success_step2:'Откройте Telegram и отправьте номер заказа администратору', success_step3:'Администратор подтвердит оплату и отправит товар', success_tg_btn:'Открыть Telegram', success_back_btn:'Вернуться в магазин', hero_label:'Лучшие Продукты — Высокое Качество', hero_title:'Hit Market.<br>Лучшее качество. Всегда.', btn_reviews:'Reviews', btn_shop:'فروشگاه', btn_back:'Назад', trust_heading:'Проверенные покупатели', trust_sub:'Реальные отзывы из нашего Telegram', co_title:'Завершить заказ', co_sub:'Отправьте точную сумму в Litecoin', co_usd:'Итого (USD)', co_wallet:'Отправить на кошелёк', co_inst:'Отправьте точную сумму LTC на кошелёк выше. После оплаты нажмите кнопку ниже.', co_paid:'Я оплатил → Telegram', copy:'Копировать', buy_now:'Купить', available:'Доступно', sold:'Продано', empty_store:'Нет продуктов.', empty_trust:'Нет отзывов.' },
+  ro: { qty_label:'Cantitate', in_stock:'în stoc', success_title:'ÎN AȘTEPTAREA CONFIRMĂRII', success_subtitle:'Plata dvs. este verificată de administrator', success_order_label:'NUMĂRUL COMENZII DVS.', success_copy:'Copiază ID', success_step1:'Copiați numărul comenzii de mai sus', success_step2:'Deschideți Telegram și trimiteți numărul comenzii către admin', success_step3:'Adminul confirmă plata și trimite produsul', success_tg_btn:'Deschide Telegram', success_back_btn:'Înapoi la magazin', hero_label:'Cele Mai Bune Produse — Calitate Top', hero_title:'Hit Market.<br>Cea mai bună calitate. Mereu.', btn_reviews:'Reviews', btn_shop:'فروشگاه', btn_back:'Înapoi', trust_heading:'Cumpărători verificați', trust_sub:'Recenzii reale din comunitatea noastră Telegram', co_title:'Finalizați comanda', co_sub:'Trimiteți suma exactă în Litecoin', co_usd:'Total (USD)', co_wallet:'Trimiteți la portofel', co_inst:'Trimiteți suma LTC exactă la portofelul de mai sus. După plată, faceți clic mai jos.', co_paid:'Am plătit → Telegram', copy:'Copiați', buy_now:'Cumpără', available:'Disponibil', sold:'Vândut', empty_store:'Niciun produs disponibil.', empty_trust:'Nicio recenzie.' },
+  es: { qty_label:'Cantidad', in_stock:'en stock', success_title:'ESPERANDO CONFIRMACIÓN', success_subtitle:'Tu pago está siendo verificado por el administrador', success_order_label:'TU NÚMERO DE PEDIDO', success_copy:'Copiar ID', success_step1:'Copia tu número de pedido arriba', success_step2:'Abre Telegram y envía tu número de pedido al administrador', success_step3:'El administrador confirma el pago y envía tu artículo', success_tg_btn:'Abrir Telegram', success_back_btn:'Volver a la tienda', hero_label:'Mejores Productos — Calidad Premium', hero_title:'Hit Market.<br>La mejor calidad. Siempre.', btn_reviews:'Reviews', btn_shop:'فروشگاه', btn_back:'Volver', trust_heading:'Compradores verificados', trust_sub:'Reseñas reales de nuestra comunidad de Telegram', co_title:'Completar pedido', co_sub:'Envía el monto exacto en Litecoin', co_usd:'Total (USD)', co_wallet:'Enviar a wallet', co_inst:'Envía el monto LTC exacto a la wallet arriba. Después del pago, haz clic abajo.', co_paid:'He pagado → Telegram', copy:'Copiar', buy_now:'Comprar', available:'Disponible', sold:'Vendido', empty_store:'Sin productos disponibles.', empty_trust:'Sin reseñas.' },
 };
 
 function t(key) { return (T[currentLang] || T['en'])[key] || key; }
@@ -1257,7 +1296,16 @@ function showScreen(id) {
   target.style.flexDirection='column';
   if (id === 'store-screen') renderStore();
   if (id === 'trust-screen') renderTrust();
-  if (id === 'admin-screen') renderAdmin();
+  if (id === 'admin-screen') {
+    renderAdmin();
+    // Admin panel is always English / LTR, independent of storefront language
+    document.documentElement.dir = 'ltr';
+    document.documentElement.lang = 'en';
+  } else {
+    // Restore the storefront's chosen language/direction when leaving admin
+    document.documentElement.dir = currentDir;
+    document.documentElement.lang = currentLang;
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -1291,6 +1339,16 @@ function applyTranslations() {
   set('co-inst-text', l('co_inst'));
   set('co-paid-btn', l('co_paid'));
   set('copy-btn-label', l('copy'));
+  // Awaiting confirmation / success screen
+  set('success-title', l('success_title'));
+  set('success-subtitle', l('success_subtitle'));
+  set('success-order-label', l('success_order_label'));
+  set('success-copy-btn', l('success_copy'));
+  set('success-step1', l('success_step1'));
+  set('success-step2', l('success_step2'));
+  set('success-step3', l('success_step3'));
+  set('success-tg-btn', l('success_tg_btn'));
+  set('success-back-btn', l('success_back_btn'));
 }
 
 // ═══════════════════════════════════════════
@@ -1314,6 +1372,7 @@ function renderStore() {
           <div class="product-price">$${p.price} <span>USD</span></div>
           ${p.status==='available'?`<button class="product-buy-btn" onclick="event.stopPropagation();openProduct(${p.id})">${t('buy_now')}</button>`:''}
         </div>
+        ${p.status==='available' && p.stock!==undefined && p.stock!==null ? `<div style="font-size:11px;color:var(--text3);margin-top:6px;">${p.stock} in stock</div>` : ''}
       </div>
     </div>
   `).join('');
@@ -1327,7 +1386,6 @@ function renderProductImg(p, h) {
 }
 
 function getDesc(p) {
-  if (currentLang === 'fa' && p.desc_fa) return p.desc_fa;
   if (currentLang === 'ar' && p.desc_ar) return p.desc_ar;
   return p.desc;
 }
@@ -1355,12 +1413,59 @@ function openProduct(id) {
   document.getElementById('detail-price').textContent = `$${p.price}`;
   document.getElementById('detail-price-usd').textContent = `≈ ${ltc} LTC`;
   document.getElementById('detail-buy-btn').textContent = t('buy_now');
+  document.getElementById('qty-label').textContent = t('qty_label');
+
+  // Quantity selector
+  selectedQty = currentProduct.minQty || 1;
+  const maxStock = (p.stock !== undefined && p.stock !== null) ? p.stock : null;
+  const qtyRow = document.getElementById('qty-row');
+  const stockNote = document.getElementById('qty-stock-note');
+  if (p.status !== 'available' || maxStock === 0) {
+    qtyRow.style.display = 'none';
+    document.getElementById('detail-buy-btn').disabled = true;
+    document.getElementById('detail-buy-btn').style.opacity = '0.5';
+    document.getElementById('detail-buy-btn').style.cursor = 'not-allowed';
+  } else {
+    qtyRow.style.display = '';
+    document.getElementById('detail-buy-btn').disabled = false;
+    document.getElementById('detail-buy-btn').style.opacity = '1';
+    document.getElementById('detail-buy-btn').style.cursor = 'pointer';
+    stockNote.textContent = (maxStock !== null) ? `(${maxStock} ${t('in_stock')||'in stock'})` : '';
+  }
+  updateQtyUI(p);
   showScreen('detail-screen');
+}
+
+function changeQty(delta) {
+  if (!currentProduct) return;
+  const maxStock = (currentProduct.stock !== undefined && currentProduct.stock !== null) ? currentProduct.stock : Infinity;
+  const minQ = currentProduct.minQty || 1;
+  const maxQ = currentProduct.maxQty || 0;
+  let next = selectedQty + delta;
+  if (next < minQ) next = minQ;
+  if (next > maxStock) next = maxStock;
+  if (maxQ > 0 && next > maxQ) next = maxQ;
+  selectedQty = next;
+  updateQtyUI(currentProduct);
+}
+
+function updateQtyUI(p) {
+  const maxStock = (p.stock !== undefined && p.stock !== null) ? p.stock : Infinity;
+  document.getElementById('qty-val').textContent = selectedQty;
+  document.getElementById('qty-minus').disabled = (selectedQty <= 1);
+  document.getElementById('qty-plus').disabled = (selectedQty >= maxStock || selectedQty >= 99);
+  // Update displayed total price based on quantity
+  const total = (p.price * selectedQty);
+  const ltcTotal = (total / state.ltcRate).toFixed(4);
+  document.getElementById('detail-price').textContent = `$${total % 1 === 0 ? total : total.toFixed(2)}`;
+  document.getElementById('detail-price-usd').textContent = `≈ ${ltcTotal} LTC`;
 }
 
 async function startCheckout() {
   if (!currentProduct) return;
   const p = currentProduct;
+  const qty = selectedQty || 1;
+  const totalPrice = +(p.price * qty).toFixed(2);
   const orderId = 'TC-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substr(2,4).toUpperCase();
   window._currentOrderId = orderId;
   // Show loading state
@@ -1370,17 +1475,25 @@ async function startCheckout() {
   const coBtc = document.getElementById('co-btc-val');
   if(coLtc) coLtc.textContent = 'Loading...';
   if(coBtc) coBtc.textContent = 'Loading...';
-  // Fetch live prices from CoinGecko
-  try {
-    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=litecoin,bitcoin&vs_currencies=usd');
-    const data = await res.json();
-    if(data.litecoin && data.litecoin.usd) state.ltcRate = data.litecoin.usd;
-    if(data.bitcoin && data.bitcoin.usd) state.btcRate = data.bitcoin.usd;
-  } catch(e) { console.log('Price fetch failed, using fallback rate'); }
-  const ltc = (p.price / state.ltcRate).toFixed(4);
-  document.getElementById('co-usd-val').textContent = `$${p.price}`;
+  // Fetch live prices from CoinGecko — cached for 5 minutes, with a fast timeout
+  const now = Date.now();
+  const cacheAge = now - (state._rateFetchedAt || 0);
+  if (cacheAge > 5 * 60 * 1000) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2500); // give up after 2.5s
+      const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=litecoin,bitcoin&vs_currencies=usd', { signal: controller.signal });
+      clearTimeout(timeoutId);
+      const data = await res.json();
+      if(data.litecoin && data.litecoin.usd) state.ltcRate = data.litecoin.usd;
+      if(data.bitcoin && data.bitcoin.usd) state.btcRate = data.bitcoin.usd;
+      state._rateFetchedAt = now;
+    } catch(e) { console.log('Price fetch failed/timed out, using cached or fallback rate'); }
+  }
+  const ltc = (totalPrice / state.ltcRate).toFixed(4);
+  document.getElementById('co-usd-val').textContent = `$${totalPrice}` + (qty > 1 ? ` (${qty} × $${p.price})` : '');
   const btcRate = state.btcRate || 95000;
-  const btc = (p.price / btcRate).toFixed(6);
+  const btc = (totalPrice / btcRate).toFixed(6);
   document.getElementById('co-ltc-val').textContent = `${ltc} LTC`;
   const oid=document.getElementById('order-id-display'); if(oid) oid.textContent=window._currentOrderId;
   const lpt=document.getElementById('live-price-text');
@@ -1406,7 +1519,7 @@ function copyWallet() {
 }
 
 function openTelegram() {
-  window.open(state.reviewChannel || state.telegram, '_blank');
+  window.open('https://t.me/trisocmd', '_blank');
 }
 function openQualityChannel() {
   window.open(state.qualityChannel || 'https://t.me/trisouhq', '_blank');
@@ -1540,6 +1653,13 @@ function renderAdminProducts() {
       <td><span style="font-weight:500;">${p.title}</span><br><span style="color:var(--text3);font-size:12px;">${p.desc.substring(0,40)}...</span></td>
       <td>$${p.price}</td>
       <td>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <button class="secondary-btn" style="padding:2px 8px;min-width:auto;" onclick="adjustStock(${p.id},-1)">−</button>
+          <span style="min-width:24px;text-align:center;font-weight:600;">${p.stock!==undefined && p.stock!==null ? p.stock : '—'}</span>
+          <button class="secondary-btn" style="padding:2px 8px;min-width:auto;" onclick="adjustStock(${p.id},1)">+</button>
+        </div>
+      </td>
+      <td>
         <div class="toggle-wrap">
           <div class="toggle ${p.status==='available'?'on':''}" onclick="toggleProduct(${p.id})"></div>
           <span style="font-size:12px;color:var(--text2);">${p.status==='available'?'Live':'Hidden'}</span>
@@ -1642,9 +1762,11 @@ function openProductModal(id) {
     document.getElementById('p-title').value = p.title;
     document.getElementById('p-price').value = p.price;
     document.getElementById('p-desc').value = p.desc;
-    document.getElementById('p-desc-fa').value = p.desc_fa || '';
     document.getElementById('p-desc-ar').value = p.desc_ar || '';
     document.getElementById('p-status').value = p.status;
+    document.getElementById('p-stock').value = (p.stock !== undefined && p.stock !== null) ? p.stock : 1;
+    const pmn = document.getElementById('p-minqty'); if(pmn) pmn.value = p.minQty || 1;
+    const pmx = document.getElementById('p-maxqty'); if(pmx) pmx.value = p.maxQty || 0;
     if (p.img && (p.img.startsWith('http') || p.img.startsWith('data:image'))) {
       document.getElementById('p-img').value = '';
       pendingProductImage = p.img;
@@ -1656,8 +1778,9 @@ function openProductModal(id) {
     document.getElementById('modal-title').textContent = 'Add Product';
     document.getElementById('editing-id').value = '';
     document.getElementById('p-title').value=''; document.getElementById('p-price').value='';
-    document.getElementById('p-desc').value=''; document.getElementById('p-desc-fa').value='';
+    document.getElementById('p-desc').value='';
     document.getElementById('p-desc-ar').value=''; document.getElementById('p-img').value=''; document.getElementById('p-status').value='available';
+    document.getElementById('p-stock').value = '1';
   }
   modal.classList.add('open');
 }
@@ -1666,16 +1789,25 @@ function closeProductModal() { document.getElementById('product-modal').classLis
 
 function saveProduct() {
   const id = document.getElementById('editing-id').value;
+  let stock = parseInt(document.getElementById('p-stock').value);
+  if (isNaN(stock) || stock < 0) stock = 0;
+  let status = document.getElementById('p-status').value;
+  // If stock is 0, force status to 'sold' (sold out)
+  if (stock === 0) status = 'sold';
+
   const data = {
     title: document.getElementById('p-title').value,
     price: parseFloat(document.getElementById('p-price').value)||0,
     desc: document.getElementById('p-desc').value,
-    desc_fa: document.getElementById('p-desc-fa').value,
     desc_ar: document.getElementById('p-desc-ar').value,
     img: pendingProductImage || document.getElementById('p-img').value || '📦',
-    status: document.getElementById('p-status').value
+    status: status,
+    stock: stock,
+    minQty: parseInt(document.getElementById('p-minqty')?.value) || 1,
+    maxQty: parseInt(document.getElementById('p-maxqty')?.value) || 0
   };
   if (!data.title) { toast('Please enter a title'); return; }
+
   if (id) {
     const idx = state.products.findIndex(x=>x.id==id);
     state.products[idx] = {...state.products[idx], ...data};
@@ -1683,9 +1815,10 @@ function saveProduct() {
     data.id = Date.now();
     state.products.push(data);
   }
+  toast('Product saved!');
+
   saveState(); closeProductModal(); renderAdminProducts();
   document.getElementById('stat-prods').textContent = state.products.filter(p=>p.status==='available').length;
-  toast('Product saved!');
 }
 
 function deleteProduct(id) {
@@ -1696,7 +1829,20 @@ function deleteProduct(id) {
 function toggleProduct(id) {
   const p = state.products.find(x=>x.id===id);
   p.status = p.status==='available'?'sold':'available';
+  // If marking available but stock is 0, bump to 1 so it's not immediately sold out
+  if (p.status==='available' && (!p.stock || p.stock < 1)) p.stock = 1;
   saveState(); renderAdminProducts();
+  document.getElementById('stat-prods').textContent = state.products.filter(x=>x.status==='available').length;
+}
+
+function adjustStock(id, delta) {
+  const p = state.products.find(x=>x.id===id);
+  if (p.stock === undefined || p.stock === null) p.stock = 0;
+  p.stock = Math.max(0, p.stock + delta);
+  if (p.stock === 0) p.status = 'sold';
+  else if (p.status === 'sold') p.status = 'available';
+  saveState(); renderAdminProducts();
+  document.getElementById('stat-prods').textContent = state.products.filter(x=>x.status==='available').length;
 }
 
 // Stats
@@ -1804,7 +1950,24 @@ function checkRoute() {
 
   // Show lang screen (always first)
   showScreen('lang-screen');
+
+  // Pre-fetch exchange rates in the background so the first checkout is instant
+  prefetchRates();
 })();
+
+function prefetchRates() {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 3000);
+  fetch('https://api.coingecko.com/api/v3/simple/price?ids=litecoin,bitcoin&vs_currencies=usd', { signal: controller.signal })
+    .then(res => res.json())
+    .then(data => {
+      if (data.litecoin && data.litecoin.usd) state.ltcRate = data.litecoin.usd;
+      if (data.bitcoin && data.bitcoin.usd) state.btcRate = data.bitcoin.usd;
+      state._rateFetchedAt = Date.now();
+    })
+    .catch(() => { console.log('Background rate prefetch failed, will use fallback'); })
+    .finally(() => clearTimeout(timeoutId));
+}
 </script>
 
 <!-- SUCCESS SCREEN -->
@@ -1820,35 +1983,35 @@ function checkRoute() {
     <circle cx="40" cy="40" r="6" fill="rgba(0,240,255,0.3)"/>
   </svg>
 
-  <h1 style="font-family:Rajdhani,sans-serif;font-size:28px;font-weight:700;color:#00f0ff;letter-spacing:0.08em;margin-bottom:0.5rem;">AWAITING CONFIRMATION</h1>
-  <p style="font-size:14px;color:#7986a8;margin-bottom:1.5rem;font-family:Rajdhani,sans-serif;letter-spacing:0.03em;">Your payment is being verified by admin</p>
+  <h1 id="success-title" style="font-family:Rajdhani,sans-serif;font-size:28px;font-weight:700;color:#00f0ff;letter-spacing:0.08em;margin-bottom:0.5rem;">AWAITING CONFIRMATION</h1>
+  <p id="success-subtitle" style="font-size:14px;color:#7986a8;margin-bottom:1.5rem;font-family:Rajdhani,sans-serif;letter-spacing:0.03em;">Your payment is being verified by admin</p>
 
   <!-- Order ID box -->
   <div style="background:rgba(0,240,255,0.05);border:1px solid rgba(0,240,255,0.25);border-left:3px solid #00f0ff;border-radius:3px;padding:14px 24px;margin-bottom:1.5rem;min-width:280px;">
-    <div style="font-size:10px;color:#3d4560;font-family:Share Tech Mono,monospace;letter-spacing:0.15em;margin-bottom:6px;">YOUR ORDER ID</div>
+    <div id="success-order-label" style="font-size:10px;color:#3d4560;font-family:Share Tech Mono,monospace;letter-spacing:0.15em;margin-bottom:6px;">YOUR ORDER ID</div>
     <div id="success-order-id" style="font-family:Share Tech Mono,monospace;font-size:20px;color:#00f0ff;font-weight:700;letter-spacing:0.12em;">TC-XXXXXX</div>
-    <button onclick="copySuccessOrderId()" style="margin-top:10px;background:transparent;border:1px solid rgba(0,240,255,0.3);color:#00f0ff;font-size:11px;padding:5px 16px;border-radius:2px;cursor:pointer;font-family:Rajdhani,sans-serif;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">Copy ID</button>
+    <button onclick="copySuccessOrderId()" id="success-copy-btn" style="margin-top:10px;background:transparent;border:1px solid rgba(0,240,255,0.3);color:#00f0ff;font-size:11px;padding:5px 16px;border-radius:2px;cursor:pointer;font-family:Rajdhani,sans-serif;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">Copy ID</button>
   </div>
 
   <!-- Steps -->
   <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:3px;padding:1.25rem;margin-bottom:2rem;max-width:340px;text-align:left;">
     <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;">
       <span style="color:#00ff88;font-family:Share Tech Mono,monospace;font-size:13px;min-width:20px;">01</span>
-      <span style="font-size:13px;color:#7986a8;font-family:Rajdhani,sans-serif;line-height:1.4;">Copy your Order ID above</span>
+      <span id="success-step1" style="font-size:13px;color:#7986a8;font-family:Rajdhani,sans-serif;line-height:1.4;">Copy your Order ID above</span>
     </div>
     <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;">
       <span style="color:#00ff88;font-family:Share Tech Mono,monospace;font-size:13px;min-width:20px;">02</span>
-      <span style="font-size:13px;color:#7986a8;font-family:Rajdhani,sans-serif;line-height:1.4;">Open Telegram and send your Order ID to admin</span>
+      <span id="success-step2" style="font-size:13px;color:#7986a8;font-family:Rajdhani,sans-serif;line-height:1.4;">Open Telegram and send your Order ID to admin</span>
     </div>
     <div style="display:flex;align-items:flex-start;gap:12px;">
       <span style="color:#00ff88;font-family:Share Tech Mono,monospace;font-size:13px;min-width:20px;">03</span>
-      <span style="font-size:13px;color:#7986a8;font-family:Rajdhani,sans-serif;line-height:1.4;">Admin confirms payment and sends your item</span>
+      <span id="success-step3" style="font-size:13px;color:#7986a8;font-family:Rajdhani,sans-serif;line-height:1.4;">Admin confirms payment and sends your item</span>
     </div>
   </div>
 
   <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
-    <button onclick="goTelegram()" style="background:linear-gradient(90deg,#00f0ff,#ff2d6b);color:#050508;border:none;padding:14px 32px;border-radius:2px;font-size:15px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;font-family:Rajdhani,sans-serif;">Open Telegram</button>
-    <button onclick="closePaidSuccess()" style="background:transparent;color:#7986a8;border:1px solid rgba(255,255,255,0.08);padding:14px 24px;border-radius:2px;font-size:13px;cursor:pointer;font-family:Rajdhani,sans-serif;">Back to Store</button>
+    <button onclick="goTelegram()" id="success-tg-btn" style="background:linear-gradient(90deg,#00f0ff,#ff2d6b);color:#050508;border:none;padding:14px 32px;border-radius:2px;font-size:15px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;font-family:Rajdhani,sans-serif;">Open Telegram</button>
+    <button onclick="closePaidSuccess()" id="success-back-btn" style="background:transparent;color:#7986a8;border:1px solid rgba(255,255,255,0.08);padding:14px 24px;border-radius:2px;font-size:13px;cursor:pointer;font-family:Rajdhani,sans-serif;">Back to Store</button>
   </div>
 
   <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden;">
@@ -1868,7 +2031,9 @@ function showPaidSuccess() {
 function copySuccessOrderId() {
   navigator.clipboard.writeText(window._currentOrderId || '').then(() => toast('Order ID copied!')).catch(()=>{});
 }
-function goTelegram() { window.open('https://t.me/trisocmd', '_blank'); }
+function goTelegram() {
+  window.open('https://t.me/trisocmd', '_blank');
+}
 function closePaidSuccess() {
   document.getElementById('paid-overlay').style.display = 'none';
   showScreen('store-screen');
@@ -1912,6 +2077,5 @@ function spawnParticles() {
 })();
 </script>
 
-<footer style="text-align:center;padding:20px;color:#999;font-size:14px;">Site developed by <a href="https://t.me/wegotlorento" target="_blank">@wegotlorento</a></footer>
 </body>
 </html>
