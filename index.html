@@ -1226,6 +1226,115 @@ display:block !important;
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════
+     SUPABASE — product storage layer
+     All other state (settings, reviews, stats)
+     stays in localStorage unchanged.
+════════════════════════════════════════════ -->
+<script>
+const SUPA_URL = 'https://zrolxgzndinktsjsthfw.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpyb2x4Z3puZGlua3RzanN0aGZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1NTUyNDcsImV4cCI6MjA5NzEzMTI0N30.-7Xpq1EcYJYW-4QGCmbVkTu9K8wknfcavtwyEdoLAk4';
+
+async function supaFetch(path, opts = {}) {
+  const res = await fetch(SUPA_URL + path, {
+    ...opts,
+    headers: {
+      'apikey': SUPA_KEY,
+      'Authorization': 'Bearer ' + SUPA_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': opts.prefer || '',
+      ...(opts.headers || {})
+    }
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error('Supabase error ' + res.status + ': ' + err);
+  }
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
+// Ensure the products table exists (runs once silently on load)
+async function supaEnsureTable() {
+  try {
+    // Try a lightweight read — if the table doesn't exist this will error
+    await supaFetch('/rest/v1/products?limit=1');
+  } catch(e) {
+    // Table missing → create it via the Supabase SQL API
+    // NOTE: Supabase REST can't CREATE TABLE, so we use the pg endpoint
+    // which requires the service role key. Instead we'll catch the 404/42P01
+    // and surface a clear message so the admin knows to create the table.
+    console.warn('⚠ Supabase "products" table not found. Please create it — see console.');
+    console.info(`Run this in Supabase SQL Editor:
+CREATE TABLE products (
+  id         bigint PRIMARY KEY,
+  title      text NOT NULL,
+  price      numeric NOT NULL DEFAULT 0,
+  desc       text DEFAULT '',
+  desc_ar    text DEFAULT '',
+  img        text DEFAULT '📦',
+  status     text DEFAULT 'available',
+  stock      integer DEFAULT 1,
+  "minQty"   integer DEFAULT 1,
+  "maxQty"   integer DEFAULT 0,
+  created_at timestamptz DEFAULT now()
+);
+ALTER TABLE products ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "public read" ON products FOR SELECT USING (true);
+CREATE POLICY "anon write" ON products FOR ALL USING (true) WITH CHECK (true);`);
+  }
+}
+
+async function supaLoadProducts() {
+  try {
+    const rows = await supaFetch('/rest/v1/products?order=id.asc&select=*');
+    if (!Array.isArray(rows)) return [];
+    return rows.map(r => ({
+      id:       r.id,
+      title:    r.title,
+      price:    r.price,
+      desc:     r.description || '',
+      desc_ar:  r.description_ar || '',
+      img:      r.image_url || '📦',
+      status:   r.status || 'available',
+      stock:    r.stock != null ? r.stock : 1,
+      category: r.category || '',
+      minQty:   r.min_qty || 1,
+      maxQty:   r.max_qty || 0
+    }));
+  } catch(e) {
+    console.error('Failed to load products from Supabase:', e);
+    return null;
+  }
+}
+
+async function supaUpsertProduct(p) {
+  const row = {
+    id:             p.id,
+    title:          p.title,
+    price:          p.price,
+    description:    p.desc || '',
+    description_ar: p.desc_ar || '',
+    image_url:      (p.img && (p.img.startsWith('http') || p.img.startsWith('data:'))) ? p.img : null,
+    status:         p.status,
+    stock:          p.stock != null ? p.stock : 1,
+    category:       p.category || null,
+    min_qty:        p.minQty || 1,
+    max_qty:        p.maxQty || 0
+  };
+  await supaFetch('/rest/v1/products', {
+    method: 'POST',
+    prefer: 'return=minimal,resolution=merge-duplicates',
+    headers: { 'Prefer': 'return=minimal,resolution=merge-duplicates' },
+    body: JSON.stringify(row)
+  });
+}
+
+async function supaDeleteProduct(id) {
+  await supaFetch('/rest/v1/products?id=eq.' + id, { method: 'DELETE' });
+}
+</script>
+
 <script>
 // ═══════════════════════════════════════════
 //  STATE
@@ -1819,11 +1928,17 @@ function saveProduct() {
 
   saveState(); closeProductModal(); renderAdminProducts();
   document.getElementById('stat-prods').textContent = state.products.filter(p=>p.status==='available').length;
+
+  // Sync to Supabase (fire and forget — localStorage already saved above)
+  const saved = id ? state.products.find(x=>x.id==id) : state.products[state.products.length-1];
+  supaUpsertProduct(saved).catch(e => { console.error('Supabase upsert failed:', e); toast('⚠ Cloud sync failed — saved locally only'); });
 }
 
 function deleteProduct(id) {
   state.products = state.products.filter(p=>p.id!==id);
   saveState(); renderAdminProducts(); toast('Deleted');
+  // Sync delete to Supabase
+  supaDeleteProduct(id).catch(e => { console.error('Supabase delete failed:', e); });
 }
 
 function toggleProduct(id) {
@@ -1833,6 +1948,8 @@ function toggleProduct(id) {
   if (p.status==='available' && (!p.stock || p.stock < 1)) p.stock = 1;
   saveState(); renderAdminProducts();
   document.getElementById('stat-prods').textContent = state.products.filter(x=>x.status==='available').length;
+  // Sync to Supabase
+  supaUpsertProduct(p).catch(e => console.error('Supabase toggle sync failed:', e));
 }
 
 function adjustStock(id, delta) {
@@ -1843,6 +1960,8 @@ function adjustStock(id, delta) {
   else if (p.status === 'sold') p.status = 'available';
   saveState(); renderAdminProducts();
   document.getElementById('stat-prods').textContent = state.products.filter(x=>x.status==='available').length;
+  // Sync to Supabase
+  supaUpsertProduct(p).catch(e => console.error('Supabase stock sync failed:', e));
 }
 
 // Stats
@@ -1931,13 +2050,29 @@ function checkRoute() {
 // ═══════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════
-(function init() {
+(async function init() {
   // Close modal on backdrop click
   document.getElementById('product-modal').addEventListener('click', function(e) {
     if (e.target === this) closeProductModal();
   });
 
-  if (checkRoute()) return;
+  // Ensure Supabase table exists (logs SQL to console if missing)
+  supaEnsureTable();
+
+  // Load products from Supabase; fall back to localStorage defaults if offline
+  const supaProducts = await supaLoadProducts();
+  if (supaProducts !== null) {
+    state.products = supaProducts;
+    // Keep localStorage in sync so admin panel stats render immediately
+    saveState();
+  }
+  // If supaProducts is null (network error), state.products keeps the
+  // localStorage value loaded by loadState() — graceful degradation.
+
+  if (checkRoute()) {
+    renderAdmin();
+    return;
+  }
 
   // Restore lang
   if (state.lang && state.lang !== 'en') {
