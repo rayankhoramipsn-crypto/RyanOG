@@ -17,4 +17,7 @@ jobs:
         with:
           node-version: '22'
       - name: Check inline JavaScript syntax and public secrets
-        run: node scripts/qa-static.mjs
+        run: |
+          node scripts/qa-static.mjs
+          node --check preview/app.js
+          if grep -R -n 'zrolxgzndinktsjsthfw' preview; then echo 'Production project reference in preview'; exit 1; fi
