@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 const html=readFileSync('preview/index.html','utf8');
 const js=readFileSync('preview/app.js','utf8');
 const ids=[...js.matchAll(/\$\('([A-Za-z][A-Za-z0-9]*)'\)/g)].map(x=>x[1]);
-const missing=[...new Set(ids)].filter(id=>!new RegExp('id=["\\']'+id+'["\\']').test(html));
+const missing=[...new Set(ids)].filter(id=>!html.includes('id="'+id+'"'));
 assert.deepEqual(missing,[], 'Missing HTML element IDs used by preview JS');
 assert.match(html,/noindex,nofollow/);
 assert.match(html,/NO REAL PAYMENTS/);
