@@ -21,3 +21,10 @@ jobs:
           node scripts/qa-static.mjs
           node --check preview/app.js
           if grep -R -n 'zrolxgzndinktsjsthfw' preview; then echo 'Production project reference in preview'; exit 1; fi
+
+      - name: Package staging preview (no deployment)
+        uses: actions/upload-artifact@v4
+        with:
+          name: triso-staging-preview
+          path: preview/
+          if-no-files-found: error
