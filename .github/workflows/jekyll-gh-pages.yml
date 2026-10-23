@@ -20,14 +20,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Validate preview JavaScript
-        run: node --check preview/app.js
       - name: Assemble preview site
         run: |
           mkdir -p _site
-          cp preview/index.html preview/app.js _site/
+          cp preview/index.html snowflake.png _site/
           test -s _site/index.html
-          test -s _site/app.js
+          test -s _site/snowflake.png
+          grep -q 'TRISOCMD' _site/index.html
+          grep -q 'cxtytbjvdlngahytfilr.supabase.co' _site/index.html
+          ! grep -q 'zrolxgzndinktsjsthfw' _site/index.html
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload Pages artifact
