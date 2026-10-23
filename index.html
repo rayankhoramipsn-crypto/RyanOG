@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta name="robots" content="noindex,nofollow,noarchive">
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TRISOCMD Shop</title>
@@ -716,6 +718,8 @@ display:block !important;
 
 </head>
 <body>
+<div role="status" style="position:fixed;bottom:0;left:0;right:0;z-index:999999;background:#332100;color:#fff;font:600 13px system-ui;text-align:center;padding:8px">TRISOCMD STAGING — TEST ONLY · NO REAL PAYMENTS</div>
+
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
@@ -1232,8 +1236,8 @@ display:block !important;
      stays in localStorage unchanged.
 ════════════════════════════════════════════ -->
 <script>
-const SUPA_URL = 'https://zrolxgzndinktsjsthfw.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpyb2x4Z3puZGlua3RzanN0aGZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1NTUyNDcsImV4cCI6MjA5NzEzMTI0N30.-7Xpq1EcYJYW-4QGCmbVkTu9K8wknfcavtwyEdoLAk4';
+const SUPA_URL = 'https://cxtytbjvdlngahytfilr.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4dHl0Ymp2ZGxuZ2FoeXRmaWxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI3MDgxNTcsImV4cCI6MjEwODI4NDE1N30.60fpG7raWTl8ueU1ajC0ct3MuN5l9akEdkQcCxYBKH8';
 
 async function supaFetch(path, opts = {}) {
   const res = await fetch(SUPA_URL + path, {
@@ -1347,7 +1351,7 @@ let currentDir = 'ltr';
 
 function loadState() {
   try {
-    const s = localStorage.getItem('trisocmd_state');
+    const s = localStorage.getItem('trisocmd_test_state');
     if (s) return JSON.parse(s);
   } catch(e) {}
   return {
@@ -1375,7 +1379,7 @@ function loadState() {
 }
 
 function saveState() {
-  try { localStorage.setItem('trisocmd_state', JSON.stringify(state)); } catch(e) {}
+  try { localStorage.setItem('trisocmd_test_state', JSON.stringify(state)); } catch(e) {}
 }
 
 // ═══════════════════════════════════════════
