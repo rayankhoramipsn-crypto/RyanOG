@@ -3139,7 +3139,8 @@ count();
   if(!res.ok)throw Error(data.error||'Payment service unavailable ('+res.status+').');
   return data;
  }
- window.tc43CreateInvoice=async()=>{
+ window.tc43CreateInvoice=async()=>{status('Preview mode: cryptocurrency payments are disabled. Do not send funds.');return;
+
   if(busy)return;setBusy(true);status('Creating invoice securely…');
   try{
    const items=window.tc42OrderItems||[];
