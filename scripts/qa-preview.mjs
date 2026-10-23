@@ -1,0 +1,17 @@
+import {readFileSync} from 'node:fs';
+import assert from 'node:assert/strict';
+const html=readFileSync('preview/index.html','utf8');
+const js=readFileSync('preview/app.js','utf8');
+const ids=[...js.matchAll(/\$\('([A-Za-z][A-Za-z0-9]*)'\)/g)].map(x=>x[1]);
+const missing=[...new Set(ids)].filter(id=>!new RegExp('id=["\\']'+id+'["\\']').test(html));
+assert.deepEqual(missing,[], 'Missing HTML element IDs used by preview JS');
+assert.match(html,/noindex,nofollow/);
+assert.match(html,/NO REAL PAYMENTS/);
+assert.match(js,/cxtytbjvdlngahytfilr\.supabase\.co/);
+assert.doesNotMatch(js,/zrolxgzndinktsjsthfw/);
+assert.match(js,/tc42_create_order/);
+assert.match(js,/product_id:x\.id|id:x\.id/);
+assert.match(js,/qty:x\.qty/);
+assert.doesNotMatch(js,/innerHTML\s*=/);
+assert.doesNotMatch(js,/sb_secret_|service_role/);
+console.log('Staging preview smoke checks passed:',new Set(ids).size,'DOM IDs checked.');
