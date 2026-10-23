@@ -3139,7 +3139,7 @@ count();
   if(!res.ok)throw Error(data.error||'Payment service unavailable ('+res.status+').');
   return data;
  }
- window.tc43CreateInvoice=async()=>{status('Preview mode: cryptocurrency payments are disabled. Do not send funds.');return;
+ window.tc43CreateInvoice=async()=>{status('Preview mode: payments are disabled. Do not send funds.');return;
 
   if(busy)return;setBusy(true);status('Creating invoice securely…');
   try{
@@ -3167,7 +3167,8 @@ count();
    status((states[data.status]||'Verification status: '+data.status)+(data.confirmations!==undefined?' Confirmations: '+data.confirmations:''));
   }catch(e){status(e.message)}finally{setBusy(false)}
  };
- const old=window.tc41OpenCheckout;
+ const paymentButton=$('tc43-invoice-btn');if(paymentButton){paymentButton.disabled=true;paymentButton.textContent='PAYMENTS UNAVAILABLE IN PREVIEW';paymentButton.title='This is a test store. Do not send cryptocurrency.';}
+  const old=window.tc41OpenCheckout;
  if(typeof old==='function')window.tc41OpenCheckout=function(...args){invoice=null;$('tc43-invoice').style.display='none';$('tc43-txid').value='';status('Sign in to create a secure invoice. No payment is verified yet.');return old(...args)};
 })();
 </script>
