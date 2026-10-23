@@ -20,6 +20,7 @@ jobs:
         run: |
           node scripts/qa-static.mjs
           node --check preview/app.js
+          node scripts/qa-preview.mjs
           if grep -R -n 'zrolxgzndinktsjsthfw' preview; then echo 'Production project reference in preview'; exit 1; fi
 
       - name: Package staging preview (no deployment)
