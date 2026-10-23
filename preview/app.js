@@ -79,7 +79,7 @@ function renderCart(){
 async function checkout(){
  if(!state.session){tab('account');throw Error('Sign in before placing a test order')}
  if(!state.cart.length)return;
- const items=state.cart.map(x=>({product_id:x.id,quantity:x.qty}));
+ const items=state.cart.map(x=>({id:x.id,qty:x.qty}));
  const result=await api('/rest/v1/rpc/tc42_create_order',{method:'POST',auth:true,body:{p_items:items}});
  state.cart=[];renderCart();msg('Test order created: '+result);tab('orders');
 }
