@@ -57,3 +57,46 @@ body:has(#store-screen) .tc-art-core span{color:#e9e1ff!important;text-shadow:0 
 body:has(#store-screen) .tc-visual-halo,body:has(#store-screen) .tc-orbit{filter:hue-rotate(65deg) saturate(.7)}
 body:has(#store-screen) .tc37-art{background:linear-gradient(135deg,#242039,#11131f)!important}
 body:has(#store-screen) .tc37-primary{background:linear-gradient(130deg,#c9bfff,#a293ee)!important;color:#10101a!important}
+
+
+/* V3: reference-inspired premium commerce layout */
+body:has(#store-screen){background:#101019!important}
+body:has(#store-screen) #store-screen{background:linear-gradient(180deg,#111019,#090910 760px)!important}
+body:has(#store-screen) #store-screen>nav{height:auto!important;min-height:68px!important;margin:22px clamp(16px,4vw,65px) 0!important;padding:10px 24px!important;border:1px solid #484052!important;border-radius:17px!important;background:linear-gradient(115deg,#25232f,#1b1a26)!important;box-shadow:0 14px 35px #0005!important;position:relative!important;top:auto!important;z-index:100}
+body:has(#store-screen) .nav-logo>span{font-family:Inter,system-ui,sans-serif!important;font-size:20px!important;font-weight:900!important;color:#f4edff!important;text-shadow:none!important;letter-spacing:-.025em!important}
+body:has(#store-screen) .nav-logo>span span{color:#c248c4!important}
+body:has(#store-screen) .nav-logo svg{filter:hue-rotate(82deg) saturate(.85);width:38px;height:38px}
+body:has(#store-screen) .tc-nav-link{font-size:12px!important;letter-spacing:.015em!important;font-weight:600!important;color:#d6d1e0!important}
+body:has(#store-screen) .tc-nav-link:hover{color:#f2b5ff!important}
+body:has(#store-screen) .nav-right{gap:13px!important;flex-wrap:wrap}
+body:has(#store-screen) .nav-trust{background:#2c2938!important;border:1px solid #4a4257!important;border-radius:10px!important;color:#e2d9e9!important}
+body:has(#store-screen) .tc-ticker{margin:10px clamp(16px,4vw,65px) 0!important;border:0!important;background:transparent!important;color:#938ba1!important;font-size:10px!important}
+body:has(#store-screen) .store-hero{max-width:none!important;margin:8px clamp(16px,4vw,65px) 0!important;padding:60px clamp(25px,5vw,85px)!important;min-height:445px!important;display:grid!important;grid-template-columns:minmax(0,1fr) minmax(300px,.93fr)!important;align-items:center!important;text-align:left!important;gap:20px!important;background:radial-gradient(ellipse at 78% 53%,#54235eaa,#160f24 42%,#0a0911 78%)!important;border-radius:18px!important;border:1px solid #35273f!important;overflow:hidden!important}
+body:has(#store-screen) .store-hero::before{background:radial-gradient(circle at 76% 55%,#ae3eb32c,transparent 48%)!important}
+body:has(#store-screen) .store-hero-label{font:800 11px Inter,system-ui,sans-serif!important;letter-spacing:.18em!important;color:#ca86e6!important}
+body:has(#store-screen) .store-hero-title{font:850 clamp(43px,5.4vw,76px)/1.04 Inter,system-ui,sans-serif!important;letter-spacing:-.055em!important;text-transform:none!important;color:#fff!important}
+body:has(#store-screen) .store-hero-title em{font-style:normal!important;color:#e4b5f7!important;text-shadow:0 0 35px #c15bca3b!important}
+body:has(#store-screen) .tc-hero-desc{font-size:15px!important;color:#aaa1b5!important;max-width:460px!important}
+body:has(#store-screen) .tc-main-cta,body:has(#store-screen) .product-buy-btn{background:linear-gradient(105deg,#692cf0,#d83da2)!important;color:white!important;border:1px solid #b24ab2!important;border-radius:999px!important;box-shadow:0 10px 32px #8d288d44!important;font-weight:800!important}
+body:has(#store-screen) .tc-secondary-cta{border-radius:999px!important;border-color:#74527e!important;color:#e7cbed!important}
+body:has(#store-screen) .tc-market-hero-link{background:#21172b99!important;border:1px solid #694574!important;border-radius:13px!important}
+body:has(#store-screen) .tc-hero-art{width:100%!important;min-height:350px!important;position:relative!important;filter:none!important}
+body:has(#store-screen) .tc-visual-halo{background:radial-gradient(circle,#a535a14a,transparent 68%)!important;filter:none!important}
+body:has(#store-screen) .tc-orbit{border-color:#9e60af44!important;filter:none!important}
+body:has(#store-screen) .tc-art-core{width:min(290px,76%)!important;height:300px!important;border-radius:38px!important;clip-path:none!important;transform:rotate(-11deg)!important;background:linear-gradient(140deg,#433150,#1a1527 66%,#100d1a)!important;border:1px solid #9e78a7a8!important;box-shadow:25px 32px 65px #0008,0 0 95px #ad3d9a44!important}
+body:has(#store-screen) .tc-art-core span{font:900 clamp(72px,9vw,125px)/1 Inter,system-ui,sans-serif!important;color:#e9d7f5!important;text-shadow:0 0 35px #bc72d388!important}
+body:has(#store-screen) .tc-art-tag{color:#ca9fce!important}
+body:has(#store-screen) .tc-categories{padding-top:70px!important}
+body:has(#store-screen) .tc-section-top h2,body:has(#store-screen) .tc-shop-heading h2,body:has(#store-screen) .tc-editorial h2{font-family:Inter,system-ui,sans-serif!important;font-size:clamp(30px,3.5vw,52px)!important;font-weight:850!important;letter-spacing:-.055em!important;text-transform:none!important}
+body:has(#store-screen) .tc-category{background:linear-gradient(150deg,#262230,#181722)!important;border:1px solid #484052!important;border-radius:18px!important;box-shadow:0 12px 26px #0004!important}
+body:has(#store-screen) .tc-cat-one{background:radial-gradient(circle at 55% 45%,#5c2b6a,#1b1428 70%)!important}
+body:has(#store-screen) .tc-cat-two{background:radial-gradient(circle at 50% 40%,#44305f,#1a1827 70%)!important}
+body:has(#store-screen) .tc-cat-three{background:radial-gradient(circle at 50% 40%,#3b3155,#171823 70%)!important}
+body:has(#store-screen) .tc-cat-visual{color:#c36ed8!important;text-shadow:0 0 65px #b34db366!important}
+body:has(#store-screen) .product-card{background:linear-gradient(155deg,#282532,#1a1926)!important;border:1px solid #4a4056!important;border-radius:17px!important;box-shadow:0 12px 25px #0004!important}
+body:has(#store-screen) .product-img,body:has(#store-screen) .product-img-placeholder{background:radial-gradient(circle at 50% 50%,#38233f,#100e19 76%)!important}
+body:has(#store-screen) .product-price{color:#fff!important}
+body:has(#store-screen) .tc-section-kicker,body:has(#store-screen) .tc39-kicker,body:has(#store-screen) .tc-shop-kicker{color:#d290e4!important}
+body:has(#store-screen) .tc-section-top h2 i,body:has(#store-screen) .tc-shop-heading h2 i,body:has(#store-screen) .tc-editorial h2 i{color:#d294e5!important}
+@media(max-width:900px){body:has(#store-screen) #store-screen>nav{margin:12px 12px 0!important;padding:12px!important}body:has(#store-screen) .store-hero{margin:10px 12px 0!important;grid-template-columns:1fr!important;padding:40px 25px!important}body:has(#store-screen) .tc-hero-art{min-height:270px!important}body:has(#store-screen) .tc-art-core{height:240px!important}}
+@media(max-width:600px){body:has(#store-screen) .store-hero-title{font-size:clamp(39px,10vw,56px)!important}body:has(#store-screen) .tc-ticker{margin-left:15px!important;margin-right:15px!important}body:has(#store-screen) .tc-hero-art{min-height:220px!important}body:has(#store-screen) .tc-art-core{height:190px!important;width:190px!important}body:has(#store-screen) .tc-art-core span{font-size:80px!important}}
