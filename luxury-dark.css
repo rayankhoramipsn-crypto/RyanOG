@@ -154,3 +154,29 @@ body:has(#store-screen) .tc-editorial,body:has(#store-screen) .tc-feature,body:h
 @media(max-width:1100px){body:has(#store-screen) .nav-right{gap:4px!important}body:has(#store-screen) .tc-nav-link{font-size:10px!important;padding:8px!important}}
 @media(max-width:850px){body:has(#store-screen) .tc50-featured-rails{grid-template-columns:1fr 1fr!important}body:has(#store-screen) .tc50-rail:last-child{grid-column:span 2}body:has(#store-screen) .store-hero{padding:34px 25px!important}}
 @media(max-width:600px){body:has(#store-screen) .tc50-featured-rails{grid-template-columns:1fr!important;margin:15px 12px 0!important}body:has(#store-screen) .tc50-rail:last-child{grid-column:auto}body:has(#store-screen) .tc50-rail{min-height:125px;padding:18px 24px}body:has(#store-screen) .tc50-rail-icon{font-size:65px}body:has(#store-screen) .store-hero{margin:9px 12px!important;padding:27px 20px!important}body:has(#store-screen) .store-hero-title{font-size:clamp(37px,10vw,55px)!important}body:has(#store-screen) .nav-right{flex-wrap:wrap!important}body:has(#store-screen) .tc-priority-nav{display:none!important}}
+
+
+/* V6 — reference-inspired Explore and product card finishing */
+#store-screen .tc51-explore{display:flex;align-items:center;justify-content:space-between;gap:25px;margin:26px clamp(12px,2.4vw,40px) 0;padding:30px clamp(20px,3vw,40px);border:1px solid #78428c;border-radius:20px;background:radial-gradient(circle at 85% 50%,#51216755,transparent 50%),linear-gradient(115deg,#24132f,#100c1b);box-shadow:0 16px 42px #0007}
+#store-screen .tc51-copy{max-width:460px}
+#store-screen .tc51-copy>span{font:800 10px Inter,system-ui,sans-serif;letter-spacing:.18em;color:#cb84ec}
+#store-screen .tc51-copy h2{font:900 clamp(27px,3.2vw,45px)/1.08 Inter,system-ui,sans-serif;letter-spacing:-.06em;margin:11px 0;color:#fff}
+#store-screen .tc51-copy h2 em{font-style:normal;color:#d28bf5}
+#store-screen .tc51-copy p{font:400 12px/1.7 Inter,system-ui,sans-serif;color:#b5a9c5}
+#store-screen .tc51-buttons{display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end}
+#store-screen .tc51-btn{padding:13px 18px;border:1px solid #884ba7;border-radius:30px;background:linear-gradient(110deg,#28143f,#1c142a);font:800 11px Inter,system-ui,sans-serif;color:#f5e9ff!important;white-space:nowrap;box-shadow:0 7px 18px #0004;transition:transform .2s,filter .2s}
+#store-screen .tc51-btn:first-child{background:linear-gradient(110deg,#6025e8,#cf2ac0);border-color:#c75be1}
+#store-screen .tc51-btn:hover{transform:translateY(-3px);filter:brightness(1.15)}
+#store-screen .tc51-product{position:relative!important;overflow:hidden!important;border:1px solid #633a76!important;border-radius:19px!important;background:linear-gradient(145deg,#1e1429,#0e0b18)!important;box-shadow:0 15px 30px #0006!important;transition:transform .22s,box-shadow .22s,border-color .22s}
+#store-screen .tc51-product:hover{transform:translateY(-5px)!important;border-color:#b658dc!important;box-shadow:0 15px 42px #74249e44!important}
+#store-screen .tc51-product .product-body{padding:16px!important}
+#store-screen .tc51-product .product-title{font:750 15px/1.45 Inter,system-ui,sans-serif!important;color:#fff!important;letter-spacing:-.02em}
+#store-screen .tc51-product .tc34-product-meta{color:#ca8be9!important;font:750 10px Inter,system-ui,sans-serif!important;letter-spacing:.08em!important}
+#store-screen .tc51-product .product-price{font:850 23px Inter,system-ui,sans-serif!important;color:#fff!important}
+#store-screen .tc51-product .product-buy-btn{padding:12px 18px!important;border-radius:30px!important;border:1px solid #ad4bd4!important;background:linear-gradient(110deg,#5f26dc,#c72ebc)!important;box-shadow:0 7px 25px #8b27b048!important;color:#fff!important;font:800 11px Inter,system-ui,sans-serif!important}
+#store-screen .tc51-product .product-badge{border-radius:30px!important;border:1px solid #9c58bd!important;background:#241333!important;color:#f3d9ff!important}
+#store-screen .tc51-product .product-desc{color:#b3a8c3!important}
+#store-screen .tc51-product img{transition:transform .3s}
+#store-screen .tc51-product:hover img{transform:scale(1.045)}
+@media(max-width:1100px){#store-screen .tc51-explore{flex-direction:column;align-items:flex-start}#store-screen .tc51-buttons{justify-content:flex-start}}
+@media(max-width:600px){#store-screen .tc51-explore{margin:15px 12px 0;padding:24px 18px}#store-screen .tc51-btn{font-size:10px;padding:11px 12px}}
