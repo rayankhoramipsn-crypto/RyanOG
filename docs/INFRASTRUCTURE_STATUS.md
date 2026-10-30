@@ -35,3 +35,11 @@ Only admin can create/edit drafts; public users can read published posts after p
 4. Add accessible public article/product pages and SEO infrastructure.
 5. Build Modern Store design system and migrate screens progressively.
 6. Test responsive design, performance, accessibility, RTL and regressions.
+
+## Implemented staging frontend (feature branch)
+- `preview/blog/index.html`: public published-article list and article view, admin create/edit/draft/publish using Supabase REST and existing staging session. All article content rendered as text to avoid HTML injection. Staging noindex remains enabled.
+- `preview/product.html?id=<numeric-product-id>`: product details, ordered image gallery, YouTube-nocookie review embeds with strict video ID validation, admin add/remove media. Checkout intentionally disabled.
+- Applied migration `triso_staging_content_validation`: HTTPS URL constraints and lookup indexes.
+- These frontend changes are on the feature branch only. They are NOT deployed or browser-E2E-tested. Link integration with the existing storefront remains for Codex.
+- Current content pages use query-string routes and browser-fetched data. Production SEO requires crawlable/prerendered URLs and a generated sitemap, not just changing noindex.
+- Security review of `market_set_pro` confirmed an admin check; `tc42_create_order` validates product price/stock server-side. Further tests remain essential.
