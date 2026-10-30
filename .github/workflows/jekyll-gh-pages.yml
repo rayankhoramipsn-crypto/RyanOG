@@ -1,18 +1,17 @@
-name: Deploy TRISOCMD preview to GitHub Pages
+name: Build staging preview artifact
 
 on:
+  pull_request:
   push:
     branches: ["main"]
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: staging-preview-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -20,29 +19,23 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Check staging routes
+        run: python3 tests/test_staging_routes.py
       - name: Assemble preview site
         run: |
-          mkdir -p _site
-          cp preview/index.html preview/marketplace.html snowflake.png _site/
-          test -s _site/marketplace.html
-          test -s _site/index.html
+          mkdir -p _site/preview
+          cp -a preview/. _site/preview/
+          cp snowflake.png _site/
+          test -s _site/preview/marketplace.html
+          test -s _site/preview/index.html
           test -s _site/snowflake.png
-          grep -q 'TRISOCMD' _site/index.html
-          grep -q 'cxtytbjvdlngahytfilr.supabase.co' _site/index.html
-          ! grep -q 'zrolxgzndinktsjsthfw' _site/index.html
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+          test -s _site/preview/blog/index.html
+          test -s _site/preview/product.html
+          grep -q 'TRISOCMD' _site/preview/index.html
+          grep -q 'cxtytbjvdlngahytfilr.supabase.co' _site/preview/index.html
+          ! grep -q 'zrolxgzndinktsjsthfw' _site/preview/index.html
+      - name: Upload staging artifact for review
+        uses: actions/upload-artifact@v4
         with:
+          name: staging-preview
           path: ./_site
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy preview
-        id: deployment
-        uses: actions/deploy-pages@v5
