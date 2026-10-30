@@ -54,3 +54,31 @@ Security advisors still report the previously documented exposed SECURITY DEFINE
 - https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable
 - https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable
 - https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection
+
+## Connection and SQL safety recheck
+
+The connector again resolved `cxtytbjvdlngahytfilr` to TRISO TEST / ACTIVE_HEALTHY and returned the expected API URL. A fresh SQL query resolved the existing blog table successfully. This confirms connector/database access, not executor-to-Auth API access. The executor's fresh health request again failed connecting to its inherited proxy (curl exit 7, HTTP 000); no password or token was sent.
+
+The SQL suite was reviewed before resubmission. Reviewed SHA-256: `74206aa38db105afc0cca474b2932ceb37b5aea979c051b8a88a8269a2bd5769`.
+
+Safety review:
+- One BEGIN/ROLLBACK transaction; no COMMIT, permanent DDL, policy changes, RLS bypass changes, Auth configuration changes or external calls.
+- Temporary context/results tables and temporary grants only; timeouts limit statement execution and lock waiting.
+- Four own randomized-prefix article fixtures plus one own randomized UUID Auth FK parent. This parent has no password/identity/session and is not used as a real account.
+- Every UPDATE/DELETE targets only that randomized prefix or the newly returned article ID. Existing content is not a target.
+- Fresh catalog check found zero noninternal triggers on both auth.users and blog_posts. This inspection is a prerequisite to future runs as triggers could introduce other effects.
+- Any uncaught SQL failure aborts the transaction; ROLLBACK or disconnect is required to release an aborted transaction. Successful completion explicitly ROLLBACKs fixtures and temporary objects. This suite must be submitted as a single batch, not copied as individually committed statements.
+
+Despite the fresh request and user authorization, the connector again returned `status=expired`, “This confirmation expired after 2 minutes.” No 19-check results were returned. The suite remains **NOT EXECUTED / NOT PASSED**; there was no claimed automatic-approval rejection or database SQL assertion failure. A subsequent audit still found zero blog rows and RLS enabled. No persistent test rows or schema changes are reported.
+
+Separate read-only transactions actually executed:
+
+| Database role/claims (simulated) | Observed result | Limit |
+| --- | --- | --- |
+| anon | zero visible rows; INSERT/UPDATE/DELETE table grants all false | proves missing table grants, not an HTTP mutation test |
+| authenticated / app_metadata customer / user_metadata admin | zero visible rows; is_admin() false | no populated-row or signed-JWT test |
+| authenticated / app_metadata admin / user_metadata customer | zero visible rows; is_admin() true | no admin mutation or login test |
+
+The table is empty, so zero leaked rows must not be interpreted as full visibility coverage. Creating/editing/publishing/archiving/deleting real staging articles and real login/refresh remain untested. The earlier 9 Python / 46 fixture browser checks are previous results, not new real-account results.
+
+The environment still reports no credential/secret bindings. Existing Auth users were not inspected for credentials or reused. [BLOG_REAL_ACCOUNT_SETUP.md](BLOG_REAL_ACCOUNT_SETUP.md) now gives the exact safe provisioning, app_metadata assignment, staging-only network access, four runtime secret bindings, real-browser test procedure and own-fixture cleanup route. No passwords or tokens should be provided in chat.

@@ -35,3 +35,5 @@ Run `python3 -m http.server 8000 --bind 127.0.0.1` from the repository. Check th
 ## Staging validation continuation
 
 See [BLOG_STAGING_VALIDATION.md](BLOG_STAGING_VALIDATION.md) for the verified schema, grants and RLS inspection, confirmed editor-session fixes, 46 passing fixture browser checks, and explicit untested real-account flows. The prepared transaction-scoped SQL mutation suite did not execute successfully and is not counted as passed. No database, payment, deployment setting or existing content was changed.
+
+A further connector recheck succeeded, but resubmission of the reviewed SQL suite again returned expired confirmation, not test results. Fresh read-only role checks and the safe real-account setup path are recorded in BLOG_STAGING_VALIDATION.md and [BLOG_REAL_ACCOUNT_SETUP.md](BLOG_REAL_ACCOUNT_SETUP.md). Real-account flows remain untested.
