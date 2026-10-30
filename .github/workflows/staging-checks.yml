@@ -16,4 +16,6 @@ jobs:
         with:
           python-version: '3.12'
       - name: Check staging routes, noindex and media safety
-        run: python3 tests/test_staging_routes.py
+        run: |
+          python3 tests/test_staging_routes.py
+          python3 tests/test_site_artifacts.py
