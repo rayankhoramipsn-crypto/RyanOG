@@ -1,19 +1,23 @@
-name: Staging static checks
+name: Staging checks
 on:
   pull_request:
   push:
-    branches:
-      - main
-      - infra/trisocmd-content-foundation
+    branches: [main, feat/premium-gaming-commerce]
+permissions:
+  contents: read
 jobs:
   verify:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Check staging routes, noindex and media safety
-        run: python3 tests/test_staging_routes.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Route, security, script and browser checks
+        run: npm test
