@@ -51,3 +51,11 @@ Only admin can create/edit drafts; public users can read published posts after p
 - Added GitHub Actions workflow and Python stdlib staging route/security checks in `tests/test_staging_routes.py`. At least one workflow run passed on the branch; rerun on final head before merge.
 - Added read-only staging audit queries in `docs/staging_verification.sql`.
 - IMPORTANT: Do not claim browser E2E, admin CRUD, RLS with real JWTs, payment processing, video embed availability, or production SEO verified until tested.
+
+## Admin dashboard and security review (2026-10-30)
+- Added `preview/admin/index.html`: staging-only admin overview, listing moderation (approve/decline with reason), support ticket listing and read-only orders. Uses existing JWT session and RLS; no payment confirmation/fulfillment actions.
+- Verified marketplace database status constraint permits `pending`, `approved`, `declined`, `removed`; fixed UI to use `declined`.
+- Added admin route regression assertions to static CI test.
+- Reviewed existing policies: orders and order items are owner/admin read-only; support tickets are owner/admin read and owner insert; marketplace conversations/messages are participant/admin read. Seller profile writes are column-restricted (display_name update) in addition to RLS. These are policy/DDL inspections, NOT real JWT penetration tests.
+- Security advisor continues to warn about public/signed-in SECURITY DEFINER RPC exposure and disabled leaked-password protection. Existing `market_browse` returns only approved listings; RPCs still require end-to-end role tests. Supabase advisor reference: https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable
+- No production DB, DNS, payments or deploy changed.
