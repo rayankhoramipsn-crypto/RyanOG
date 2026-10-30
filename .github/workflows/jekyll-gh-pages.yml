@@ -23,7 +23,12 @@ jobs:
       - name: Assemble preview site
         run: |
           mkdir -p _site
-          cp preview/index.html preview/marketplace.html snowflake.png _site/
+          cp -R preview/. _site/
+          cp snowflake.png _site/
+          test -s _site/auth.js
+          test -s _site/auth.html
+          test -s _site/account.html
+          test -s _site/admin/index.html
           test -s _site/marketplace.html
           test -s _site/index.html
           test -s _site/snowflake.png

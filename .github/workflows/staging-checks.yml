@@ -17,3 +17,8 @@ jobs:
           python-version: '3.12'
       - name: Check staging routes, noindex and media safety
         run: python3 tests/test_staging_routes.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Check Auth session and route guards
+        run: node tests/test_auth.cjs
