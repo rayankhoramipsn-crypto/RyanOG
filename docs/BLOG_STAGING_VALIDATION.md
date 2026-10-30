@@ -82,3 +82,13 @@ Separate read-only transactions actually executed:
 The table is empty, so zero leaked rows must not be interpreted as full visibility coverage. Creating/editing/publishing/archiving/deleting real staging articles and real login/refresh remain untested. The earlier 9 Python / 46 fixture browser checks are previous results, not new real-account results.
 
 The environment still reports no credential/secret bindings. Existing Auth users were not inspected for credentials or reused. [BLOG_REAL_ACCOUNT_SETUP.md](BLOG_REAL_ACCOUNT_SETUP.md) now gives the exact safe provisioning, app_metadata assignment, staging-only network access, four runtime secret bindings, real-browser test procedure and own-fixture cleanup route. No passwords or tokens should be provided in chat.
+
+## Executable live runner added (2026-10-31 client date)
+
+`tests/browser/blog-live.cjs` now implements the real browser flow and directly consumes the four documented Secrets from process.env. It starts an allowlisted localhost server, logs in through the actual storefront form, uses real user JWTs, verifies distinct accounts/app_metadata through Auth, executes blog CRUD/RLS checks and actual refresh/save, and cleans up only its randomized article prefix. It never uses service_role or mocks API responses. The original fixture runner is unchanged.
+
+Actual runs this revision: the live command exited 2 with missing_secret_bindings and all 28 account checks NOT_RUN; the Chromium preflight exited 1 with network UNAVAILABLE, and a separate curl health probe again failed reaching the inherited proxy (exit 7 / HTTP 000). Runtime status again reports no Secrets/runtime bindings and no staging domain in the network allowlist. No real account case was passed or attempted with supplied credentials.
+
+Three executable local safety tests passed for missing-secret fail-closed behavior, browser-child secret isolation and mutation ownership guards. Nine Python regression tests passed again. These results must remain separate from real Supabase tests. The 19 SQL checks remain unexecuted; the live runner cannot and does not run that administrative SQL suite.
+
+See `tests/browser/BLOG_LIVE.md` for executable commands, exact consumed variable names, 28 result names, cleanup behavior and reporting limitations. After account and network prerequisites are provisioned, run the live command and record each actual result; do not infer them from the safety or fixture suite.
