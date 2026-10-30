@@ -1382,7 +1382,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElement
       <a class="tc-nav-link" href="#tc-shop-heading">SHOP</a><a class="tc-nav-link tc-priority-nav" href="#tc-discover">FORTNITE & GEAR</a><a class="tc-nav-link" href="blog/">JOURNAL</a><a class="tc-nav-link" href="videos/">VIDEOS</a><a class="tc-nav-link" href="help/">HELP</a><a class="tc-nav-link tc-market-nav" href="marketplace.html">MARKETPLACE ↗</a>
       <button class="nav-trust" onclick="showScreen('tc31-trust')" id="btn-reviews">Reviews / FAQ</button><button class="nav-trust" onclick="showScreen('tc31-panel')">Account</button>
       <button class="nav-trust" onclick="window.open('https://t.me/trisouhq','_blank')" style="border-color:rgba(0,240,255,0.3);">Quality Channel</button>
-      <button class="nav-lang tc50-language" aria-label="Change language" onclick="showScreen('lang-screen')">🌐 <span id="nav-lang-label">EN</span></button>
+      <button class="nav-lang tc50-language" aria-label="Change language" aria-expanded="false" onclick="tc52ToggleLanguage(event)">🌐 <span id="nav-lang-label">EN</span></button><div class="tc52-language-menu" id="tc52-language-menu" hidden><button type="button" data-lang="en" data-dir="ltr">🇬🇧 English</button><button type="button" data-lang="fa" data-dir="rtl">🇮🇷 فارسی</button><button type="button" data-lang="ar" data-dir="rtl">العربية</button><button type="button" data-lang="fr" data-dir="ltr">Français</button><button type="button" data-lang="de" data-dir="ltr">Deutsch</button><button type="button" data-lang="ru" data-dir="ltr">Русский</button><button type="button" data-lang="es" data-dir="ltr">Español</button></div>
     </div>
   </nav>
   <div class="tc-ticker"><span class="tc-dot"></span> TRISOCMD / FORTNITE ACCOUNTS & GAMING GEAR <span class="tc-ticker-right">FORTNITE FIRST. GAMING ALWAYS. ↗</span></div>
@@ -3428,5 +3428,8 @@ count();
 })();
 </script><div id="staging-warning" role="status" style="position:fixed;bottom:0;left:0;right:0;z-index:2147483647;background:#241c0b;color:#ffe3a3;text-align:center;padding:9px;font:600 12px system-ui;border-top:1px solid #c69b45">TRISO TEST — STAGING PREVIEW ONLY · No real purchases or payments</div>
 
-</body>
+<script>
+function tc52ToggleLanguage(e){if(e)e.stopPropagation();var m=document.getElementById('tc52-language-menu');if(m){m.hidden=!m.hidden;var b=document.querySelector('#store-screen .tc50-language');if(b)b.setAttribute('aria-expanded',String(!m.hidden))}}
+document.addEventListener('click',function(e){var m=document.getElementById('tc52-language-menu');if(e.target.closest('[data-lang]')){var b=e.target.closest('[data-lang]');if(m)m.hidden=true;if(typeof setLang==='function')setLang(b.dataset.lang,b.dataset.dir);return}if(m&&!e.target.closest('.tc52-language-menu')&&!e.target.closest('.tc50-language'))m.hidden=true;var tile=e.target.closest('.tc52-category-list [data-filter]');if(tile){var term=tile.dataset.filter;var select=document.getElementById('tc39-category'),input=document.getElementById('tc39-search');if(select)select.value='';if(input)input.value='';if(term){var opts=select?Array.from(select.options):[];var found=opts.find(function(o){return (o.textContent+' '+o.value).toLowerCase().includes(term)});if(found)select.value=found.value;else if(input)input.value=term}if(typeof tc39Filter==='function')tc39Filter()}});
+</script></body>
 </html>
