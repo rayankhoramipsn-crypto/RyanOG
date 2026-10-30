@@ -16,6 +16,7 @@ PAGES = {
     "videos/index.html",
     "help/index.html",
     "policies/index.html",
+    "admin/index.html",
 }
 
 class Links(HTMLParser):
@@ -72,6 +73,13 @@ class StagingRoutes(unittest.TestCase):
         self.assertIn("app_metadata?.role==='admin'", blog)
         self.assertIn("textContent=p.body", blog)
         self.assertIn("blog_posts", blog)
+
+    def test_admin_moderation_guardrails(self):
+        admin = (ROOT / "admin/index.html").read_text(encoding="utf-8")
+        self.assertIn("app_metadata?.role==='admin'", admin)
+        self.assertIn("status=eq.pending", admin)
+        self.assertIn("reviewed_by:session.user.id", admin)
+        self.assertIn("Payment confirmation and fulfillment are intentionally disabled", admin)
 
     def test_staging_checkout_not_enabled_on_new_product_page(self):
         product = (ROOT / "product.html").read_text(encoding="utf-8")
