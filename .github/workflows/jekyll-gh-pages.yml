@@ -1,48 +1,26 @@
-name: Deploy TRISOCMD preview to GitHub Pages
-
+name: Build staging preview artifact
 on:
-  push:
-    branches: ["main"]
+  pull_request:
   workflow_dispatch:
-
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: false
-
 jobs:
-  build:
+  preview:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Assemble preview site
+      - uses: actions/checkout@v4
+      - name: Assemble complete staging site
         run: |
-          mkdir -p _site
-          cp preview/index.html preview/marketplace.html snowflake.png _site/
-          test -s _site/marketplace.html
-          test -s _site/index.html
-          test -s _site/snowflake.png
-          grep -q 'TRISOCMD' _site/index.html
-          grep -q 'cxtytbjvdlngahytfilr.supabase.co' _site/index.html
-          ! grep -q 'zrolxgzndinktsjsthfw' _site/index.html
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+          mkdir -p _preview
+          cp -a preview/. _preview/
+          touch _preview/.nojekyll
+          test -s _preview/assets/commerce.css
+          test -s _preview/assets/commerce.js
+          test -s _preview/assets/marketplace.js
+          test -s _preview/product.html
+          test -s _preview/admin/index.html
+      - uses: actions/upload-artifact@v4
         with:
-          path: ./_site
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy preview
-        id: deployment
-        uses: actions/deploy-pages@v5
+          name: trisocmd-staging-preview
+          path: _preview/
+# No Pages deployment: staging artifacts must never compete with the production domain.

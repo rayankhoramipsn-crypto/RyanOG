@@ -12,6 +12,7 @@ PAGES = {
     "index.html",
     "marketplace.html",
     "product.html",
+    "seller.html",
     "blog/index.html",
     "videos/index.html",
     "help/index.html",
@@ -80,6 +81,45 @@ class StagingRoutes(unittest.TestCase):
         self.assertIn("status=eq.pending", admin)
         self.assertIn("reviewed_by:session.user.id", admin)
         self.assertIn("Payment confirmation and fulfillment are intentionally disabled", admin)
+
+    def test_publishable_root_mirrors_reviewed_preview(self):
+        for page in sorted(PAGES):
+            self.assertEqual((ROOT / page).read_bytes(), (ROOT.parent / page).read_bytes(), page)
+        for asset in (ROOT / "assets").iterdir():
+            self.assertEqual(asset.read_bytes(), (ROOT.parent / "assets" / asset.name).read_bytes(), asset.name)
+
+    def test_deployment_requires_manual_dispatch_and_verification(self):
+        workflow = (ROOT.parent / ".github/workflows/deploy-main-pages.yml").read_text()
+        self.assertIn("workflow_dispatch:", workflow)
+        self.assertNotRegex(workflow, r"(?m)^  push:")
+        self.assertIn("needs: verify", workflow)
+        self.assertIn("run: npm test", workflow)
+        self.assertIn("product.html seller.html assets admin", workflow)
+
+    def test_shared_local_assets_exist(self):
+        for page in sorted(PAGES):
+            source = (ROOT / page).read_text(encoding="utf-8")
+            for asset in re.findall(r'(?:src|href)="([^"?#]+\.(?:js|css|svg))"', source):
+                if not asset.startswith(("http:", "https:", "/")):
+                    self.assertTrue(((ROOT / page).parent / asset).is_file(), f"{page}: missing {asset}")
+
+    def test_gallery_migration_has_private_storage_and_owner_policies(self):
+        migration = next((ROOT.parent / "supabase/migrations").glob("*_marketplace_private_gallery.sql")).read_text()
+        self.assertIn("enable row level security", migration)
+        self.assertIn("between 0 and 5", migration)
+        self.assertIn("false,5242880", migration)
+        self.assertIn("l.status='pending'", migration)
+        self.assertIn("l.status='approved'", migration)
+        self.assertNotIn("security definer", migration.lower())
+
+    def test_public_sellers_are_opt_in_and_sales_refresh_preserves_rls(self):
+        migration = next((ROOT.parent / "supabase/migrations").glob("*_commerce_merchandising_and_public_sellers.sql")).read_text()
+        self.assertIn("is_public boolean not null default false", migration)
+        self.assertIn("l.status='approved'", migration)
+        self.assertIn("security invoker", migration)
+        self.assertIn("o.status in ('paid','fulfilled')", migration)
+        self.assertIn("from public,anon", migration)
+        self.assertIn("user_id=(select auth.uid())", migration)
 
     def test_staging_checkout_not_enabled_on_new_product_page(self):
         product = (ROOT / "product.html").read_text(encoding="utf-8")

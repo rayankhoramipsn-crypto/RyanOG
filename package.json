@@ -1,0 +1,14 @@
+{
+  "name": "trisocmd-storefront",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "test": "python3 tests/test_staging_routes.py && node tests/check_scripts.cjs && node tests/browser.cjs",
+    "test:static": "python3 tests/test_staging_routes.py && node tests/check_scripts.cjs",
+    "test:browser": "node tests/browser.cjs",
+    "sync:preview": "python3 scripts/sync_preview.py"
+  },
+  "devDependencies": {
+    "playwright": "1.56.1"
+  }
+}
