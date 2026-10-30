@@ -7,7 +7,40 @@ let token=session?.access_token,admin=false;
 let posts=[],allPosts=[],saving=false;
 function node(tag,text){const e=document.createElement(tag);if(text!=null)e.textContent=text;return e}
 function validImage(url){try{const u=new URL(url);return u.protocol==='https:'?u.href:null}catch{return null}}
-async function req(path,options={}){const r=await fetch(API_BASE+'/rest/v1/'+path,{...options,headers:{apikey:KEY,Authorization:'Bearer '+((options.method||options.admin)&&token?token:KEY),'Content-Type':'application/json',...(options.headers||{})}});if(!r.ok)throw Error('Request failed: '+r.status+' '+(await r.text()).slice(0,250));const t=await r.text();return t?JSON.parse(t):null}
+async function authRequest(path,body){
+ const response=await fetch(API_BASE+'/auth/v1/'+path,{method:body?'POST':'GET',headers:{apikey:KEY,'Content-Type':'application/json',...(!body&&token?{Authorization:'Bearer '+token}:{})},...(body?{body:JSON.stringify(body)}:{})});
+ if(!response.ok){const error=Error('Sign in again / دوباره وارد شوید.');error.status=response.status;throw error}return response.json();
+}
+let verifying=null;
+async function verifyAdmin(){
+ if(verifying)return verifying;
+ verifying=(async()=>{
+  const renew=async()=>{
+   if(!session?.refresh_token)throw Error('Sign in again / دوباره وارد شوید.');
+   const renewed=await authRequest('token?grant_type=refresh_token',{refresh_token:session.refresh_token});
+   if(!renewed.access_token||!renewed.refresh_token)throw Error('Invalid session response');
+   session={...renewed,expires_at:renewed.expires_at||Math.floor(Date.now()/1000)+(renewed.expires_in||3600)};token=session.access_token;
+   sessionStorage.setItem('tc35_auth_session',JSON.stringify(session));
+  };
+  try{
+   if(!token)throw Error('Admin session required.');
+   if(session.expires_at&&session.expires_at<Date.now()/1000+90)await renew();
+   let user;try{user=await authRequest('user')}catch(error){if(error.status!==401)throw error;await renew();user=await authRequest('user')}
+   session.user=user;admin=user.app_metadata?.role==='admin';
+   if(!admin)throw Error('Admin session required.');
+   sessionStorage.setItem('tc35_auth_session',JSON.stringify(session));return true;
+  }catch(error){
+   admin=false;allPosts=[];$('admin-list').replaceChildren();$('admin').classList.add('hidden');
+   if([400,401,403].includes(error.status)){sessionStorage.removeItem('tc35_auth_session');session=null;token=null}
+   throw error;
+  }
+ })().finally(()=>{verifying=null});return verifying;
+}
+async function req(path,options={}){
+ const privileged=!!(options.method||options.admin);if(privileged)await verifyAdmin();
+ const r=await fetch(API_BASE+'/rest/v1/'+path,{...options,headers:{apikey:KEY,Authorization:'Bearer '+(privileged?token:KEY),'Content-Type':'application/json',...(options.headers||{})}});
+ if(!r.ok)throw Error('Request failed: '+r.status+' '+(await r.text()).slice(0,250));const t=await r.text();return t?JSON.parse(t):null;
+}
 function slugify(t){return t.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,110)}
 function showArticle(p){$('listing').classList.add('hidden');$('article').classList.remove('hidden');$('article-title').textContent=p.title;$('article-meta').textContent=[p.category,p.published_at?new Date(p.published_at).toLocaleDateString():null].filter(Boolean).join(' · ');$('article-body').textContent=p.body;const lang=['en','fa','ar'].includes(p.language)?p.language:'en';$('article').lang=lang;$('article').dir=lang==='en'?'ltr':'rtl';$('filters').classList.add('hidden');const img=$('article-cover'),src=validImage(p.cover_image_url);img.classList.toggle('hidden',!src);if(src){img.src=src;img.alt=p.title;img.referrerPolicy='no-referrer';}else img.removeAttribute('src');document.title=(p.seo_title||p.title)+' | TRISOCMD Journal';document.querySelector('meta[name=description]').content=p.seo_description||p.excerpt||'TRISOCMD Journal';}
 function showList(){history.replaceState(null,'',location.pathname);$('article').classList.add('hidden');$('listing').classList.remove('hidden');document.title='TRISOCMD Journal — Staging';document.querySelector('meta[name=description]').content='Gaming guides, product insights and community news from TRISOCMD.';$('filters').classList.remove('hidden');notice('');}
@@ -46,15 +79,7 @@ $('editor').addEventListener('submit',async e=>{
  }catch(err){notice(err.message)}finally{saving=false;button.disabled=false}
 });
 async function initialize(){
- if(token){try{
-  if(session.expires_at&&session.expires_at<Date.now()/1000+90&&session.refresh_token){
-   const response=await fetch(API_BASE+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{apikey:KEY,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:session.refresh_token})});
-   if(!response.ok)throw Error('Session expired');session=await response.json();token=session.access_token;
-  }
-  const response=await fetch(API_BASE+'/auth/v1/user',{headers:{apikey:KEY,Authorization:'Bearer '+token}});
-  if(!response.ok)throw Error('Sign in again');session.user=await response.json();admin=session?.user?.app_metadata?.role==='admin';
-  sessionStorage.setItem('tc35_auth_session',JSON.stringify(session));
- }catch{token=null;admin=false}}
+ if(token){try{await verifyAdmin()}catch{}}
  $('admin').classList.toggle('hidden',!admin);await load();
 }
 initialize();

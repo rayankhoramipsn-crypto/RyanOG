@@ -31,3 +31,7 @@ Staging keeps noindex,nofollow. Articles still use client-fetched query-string r
 ## Manual review
 
 Run `python3 -m http.server 8000 --bind 127.0.0.1` from the repository. Check the root and preview journal, switch EN/FA/AR, search/filter articles, and review keyboard and mobile behavior. With a real staging admin session, create a draft, save twice, preview, publish, then archive it; confirm anonymous readers only see published articles. Download the staging CI artifact and serve its root to inspect `/preview/`. Review both artifact tests before merging workflow changes. Merging main can trigger the existing main deployment workflow; do not merge or deploy without approval.
+
+## Staging validation continuation
+
+See [BLOG_STAGING_VALIDATION.md](BLOG_STAGING_VALIDATION.md) for the verified schema, grants and RLS inspection, confirmed editor-session fixes, 46 passing fixture browser checks, and explicit untested real-account flows. The prepared transaction-scoped SQL mutation suite did not execute successfully and is not counted as passed. No database, payment, deployment setting or existing content was changed.
