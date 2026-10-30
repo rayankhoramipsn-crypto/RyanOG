@@ -100,3 +100,57 @@ body:has(#store-screen) .tc-section-kicker,body:has(#store-screen) .tc39-kicker,
 body:has(#store-screen) .tc-section-top h2 i,body:has(#store-screen) .tc-shop-heading h2 i,body:has(#store-screen) .tc-editorial h2 i{color:#d294e5!important}
 @media(max-width:900px){body:has(#store-screen) #store-screen>nav{margin:12px 12px 0!important;padding:12px!important}body:has(#store-screen) .store-hero{margin:10px 12px 0!important;grid-template-columns:1fr!important;padding:40px 25px!important}body:has(#store-screen) .tc-hero-art{min-height:270px!important}body:has(#store-screen) .tc-art-core{height:240px!important}}
 @media(max-width:600px){body:has(#store-screen) .store-hero-title{font-size:clamp(39px,10vw,56px)!important}body:has(#store-screen) .tc-ticker{margin-left:15px!important;margin-right:15px!important}body:has(#store-screen) .tc-hero-art{min-height:220px!important}body:has(#store-screen) .tc-art-core{height:190px!important;width:190px!important}body:has(#store-screen) .tc-art-core span{font-size:80px!important}}
+
+
+/* TRISOCMD V5 — Fortnite + gaming gear luxury storefront */
+:root{--lux-bg:#080712;--lux-surface:#14101f;--lux-surface2:#21182e;--lux-edge:#6c397a66;--lux-violet:#ac52ff;--lux-white:#f8f5ff;--lux-muted:#b7acc6;--accent:#a446f4;--accent2:#d12dc0;--border:rgba(151,79,186,.23);--border2:rgba(185,95,230,.45);--bg:#080712;--bg2:#100d1b;--bg3:#151023;--bg4:#1b1429;--text:#f7f2ff;--text2:#b4a8c7;--text3:#8d819f;--accent-glow:rgba(165,60,220,.18);--radius:12px;--radius-sm:9px;--radius-lg:18px}
+body:has(#store-screen){background:#080712!important;color:#f7f3ff!important}
+body:has(#store-screen) #store-screen{background:radial-gradient(ellipse 75% 440px at 50% 0,#2b134166,transparent 75%),#080712!important}
+body:has(#store-screen) #store-screen>nav{margin:14px clamp(12px,2.4vw,40px) 0!important;padding:12px 19px!important;background:linear-gradient(115deg,#1d1729,#110f1d)!important;border:1px solid #563269!important;border-radius:19px!important;box-shadow:0 14px 40px #0008!important}
+body:has(#store-screen) .nav-logo>span{font:900 23px/1.1 Inter,system-ui,sans-serif!important;letter-spacing:-.055em!important;color:#fff!important;text-shadow:none!important}
+body:has(#store-screen) .nav-logo>span span{color:#c846eb!important}
+body:has(#store-screen) .nav-logo svg{filter:hue-rotate(95deg) saturate(1.6)}
+body:has(#store-screen) .nav-right{gap:9px!important}
+body:has(#store-screen) .tc-nav-link{font:650 12px Inter,system-ui,sans-serif!important;color:#e1d9ec!important;letter-spacing:0!important;padding:10px 11px!important;border-radius:30px!important;transition:background .2s}
+body:has(#store-screen) .tc-nav-link:hover,body:has(#store-screen) .tc-priority-nav{background:linear-gradient(115deg,#5e23a8,#8d28b5)!important;color:white!important}
+body:has(#store-screen) .nav-trust,body:has(#store-screen) .nav-lang{background:#22192f!important;border:1px solid #694479!important;border-radius:22px!important;color:#f2e6fb!important;padding:9px 12px!important;font-size:11px!important}
+body:has(#store-screen) .tc50-language{background:linear-gradient(110deg,#2d1849,#24192f)!important;border-color:#a252d4!important}
+body:has(#store-screen) .tc-ticker{color:#b6a3c4!important;margin:11px clamp(12px,2.4vw,40px) 0!important;background:transparent!important;border:0!important;font-size:10px!important}
+body:has(#store-screen) .store-hero{margin:10px clamp(12px,2.4vw,40px) 0!important;padding:45px clamp(23px,4vw,70px)!important;min-height:440px!important;border:1px solid #75428c!important;border-radius:22px!important;background:radial-gradient(ellipse at 72% 55%,#68218b80,#1d102e 47%,#090812 85%)!important;box-shadow:0 16px 70px #0007!important}
+body:has(#store-screen) .store-hero-title{font:900 clamp(42px,5.2vw,77px)/1.02 Inter,system-ui,sans-serif!important;letter-spacing:-.065em!important;color:white!important}
+body:has(#store-screen) .store-hero-title em{font-style:normal!important;background:linear-gradient(95deg,#a8c5ff,#c274fb,#f0a7f4)!important;color:transparent!important;background-clip:text!important;text-shadow:none!important}
+body:has(#store-screen) .store-hero-label{font:800 11px Inter,system-ui,sans-serif!important;letter-spacing:.1em!important;color:#e6c7ff!important;background:#211236!important;border:1px solid #713c9b!important;border-radius:30px!important;padding:9px 14px!important;display:inline-flex!important}
+body:has(#store-screen) .tc-hero-desc{font:400 15px/1.65 Inter,system-ui,sans-serif!important;color:#c3b5cf!important}
+body:has(#store-screen) .tc-main-cta,body:has(#store-screen) .tc39-cart-button{background:linear-gradient(110deg,#6329f5,#d62ac3)!important;border:1px solid #b34fd8!important;border-radius:30px!important;color:white!important;box-shadow:0 10px 28px #7e28c055!important;font-weight:800!important}
+body:has(#store-screen) .tc-secondary-cta{border-radius:30px!important;background:#110c1bbb!important;border:1px solid #654477!important;color:#fff!important}
+body:has(#store-screen) .tc-market-hero-link{border:1px solid #694578!important;background:#1d132ca8!important;border-radius:15px!important}
+body:has(#store-screen) .tc-hero-foot{color:#d0b9e3!important}
+body:has(#store-screen) .tc-gaming-visual{background:radial-gradient(circle,#6c238488,#1a1026 65%)!important;box-shadow:0 0 110px #a92baf55!important}
+body:has(#store-screen) .tc-visual-halo{background:radial-gradient(circle,#c02be64d,transparent 70%)!important;filter:none!important}
+body:has(#store-screen) .tc50-featured-rails{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:24px clamp(12px,2.4vw,40px) 0}
+body:has(#store-screen) .tc50-rail{min-height:157px;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:24px 28px;border-radius:18px;border:1px solid #683984;background:radial-gradient(circle at 85% 50%,#5c2380,#160e27 65%);color:white!important;box-shadow:0 10px 28px #0004;transition:transform .2s,border-color .2s}
+body:has(#store-screen) .tc50-rail:hover{transform:translateY(-4px);border-color:#bf64ee}
+body:has(#store-screen) .tc50-rail.tc50-gear{background:radial-gradient(circle at 85% 50%,#382d85,#131128 67%);border-color:#46499a}
+body:has(#store-screen) .tc50-rail.tc50-market{background:radial-gradient(circle at 85% 50%,#3a265c,#141021 68%)}
+body:has(#store-screen) .tc50-eyebrow{font:800 10px Inter,system-ui,sans-serif;letter-spacing:.12em;color:#d7a7f0}
+body:has(#store-screen) .tc50-rail strong{font:900 clamp(19px,2.1vw,30px)/1.04 Inter,system-ui,sans-serif;letter-spacing:-.04em;margin:12px 0}
+body:has(#store-screen) .tc50-rail small{color:#bdb0cd;font:500 11px Inter,system-ui,sans-serif}
+body:has(#store-screen) .tc50-rail-icon{position:absolute;right:25px;top:40px;font:900 90px Inter,system-ui,sans-serif;color:#c464ed66;pointer-events:none}
+body:has(#store-screen) .tc-categories{padding-top:58px!important}
+body:has(#store-screen) .tc-section-top h2,body:has(#store-screen) .tc-shop-heading h2{font:900 clamp(30px,3.8vw,53px)/1.08 Inter,system-ui,sans-serif!important;letter-spacing:-.06em!important}
+body:has(#store-screen) .tc-section-top h2 i,body:has(#store-screen) .tc-shop-heading h2 i{color:#ce79f1!important}
+body:has(#store-screen) .tc-category{border:1px solid #533664!important;background:linear-gradient(145deg,#25182f,#12101d)!important;border-radius:18px!important;box-shadow:0 15px 30px #0005!important}
+body:has(#store-screen) .tc-cat-one{background:radial-gradient(circle at 60% 50%,#5c2373,#151024 72%)!important}
+body:has(#store-screen) .tc-cat-two{background:radial-gradient(circle at 60% 50%,#3e317c,#141224 72%)!important}
+body:has(#store-screen) .tc-cat-three{background:radial-gradient(circle at 60% 50%,#382454,#141120 72%)!important}
+body:has(#store-screen) .tc-cat-visual{color:#d585f1!important;text-shadow:0 0 45px #a639cc99!important}
+body:has(#store-screen) .product-card,body:has(#store-screen) .tc39-product-card{background:linear-gradient(160deg,#21172e,#100d1a)!important;border:1px solid #523368!important;border-radius:18px!important;box-shadow:0 12px 30px #0005!important}
+body:has(#store-screen) .product-card:hover{border-color:#a851e0!important;transform:translateY(-3px)}
+body:has(#store-screen) .product-img,body:has(#store-screen) .product-img-placeholder{background:radial-gradient(circle,#422054,#100c1a 72%)!important}
+body:has(#store-screen) .product-buy-btn{background:linear-gradient(110deg,#6126dd,#ca2bb9)!important;border-radius:30px!important;color:white!important}
+body:has(#store-screen) .tc39-toolbar{border:1px solid #4d3160!important;background:#171121!important;border-radius:17px!important}
+body:has(#store-screen) .tc39-toolbar input,body:has(#store-screen) .tc39-toolbar select{background:#0e0c19!important;border:1px solid #57356b!important;border-radius:12px!important;color:#f4eaff!important}
+body:has(#store-screen) .tc-editorial,body:has(#store-screen) .tc-feature,body:has(#store-screen) .tc49-quick-help{border-color:#4b305c!important;background:linear-gradient(140deg,#1a1227,#100d1b)!important;border-radius:22px!important}
+@media(max-width:1100px){body:has(#store-screen) .nav-right{gap:4px!important}body:has(#store-screen) .tc-nav-link{font-size:10px!important;padding:8px!important}}
+@media(max-width:850px){body:has(#store-screen) .tc50-featured-rails{grid-template-columns:1fr 1fr!important}body:has(#store-screen) .tc50-rail:last-child{grid-column:span 2}body:has(#store-screen) .store-hero{padding:34px 25px!important}}
+@media(max-width:600px){body:has(#store-screen) .tc50-featured-rails{grid-template-columns:1fr!important;margin:15px 12px 0!important}body:has(#store-screen) .tc50-rail:last-child{grid-column:auto}body:has(#store-screen) .tc50-rail{min-height:125px;padding:18px 24px}body:has(#store-screen) .tc50-rail-icon{font-size:65px}body:has(#store-screen) .store-hero{margin:9px 12px!important;padding:27px 20px!important}body:has(#store-screen) .store-hero-title{font-size:clamp(37px,10vw,55px)!important}body:has(#store-screen) .nav-right{flex-wrap:wrap!important}body:has(#store-screen) .tc-priority-nav{display:none!important}}
