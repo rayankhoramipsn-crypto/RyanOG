@@ -1,0 +1,59 @@
+/* TRISOCMD | Luxury Dark Gaming design system | 2026-10-31
+   Obsidian / graphite / muted violet. Presentation only: no checkout or auth changes. */
+:root{color-scheme:dark;--lux-bg:#08090e;--lux-surface:#11131d;--lux-surface2:#191b29;--lux-edge:rgba(191,187,228,.15);--lux-violet:#aa9af0;--lux-white:#f6f4ff;--lux-muted:#a6a4b7}
+html{scroll-behavior:smooth}
+body{color:var(--lux-white)!important;background:radial-gradient(ellipse 65% 450px at 85% -100px,rgba(106,87,176,.15),transparent 78%),radial-gradient(ellipse 40% 420px at 0 38%,rgba(60,54,111,.09),transparent 75%),var(--lux-bg)!important;-webkit-font-smoothing:antialiased}
+body,button,input,textarea,select{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+::selection{background:#7c6db7;color:white}
+:focus-visible{outline:2px solid #b6a8ff!important;outline-offset:3px}
+a{color:#c5baff;transition:color .18s ease}
+a:hover{color:#e3dcff}
+header{border-color:var(--lux-edge)!important}
+header a{text-decoration:none;font-weight:650}
+header>a:first-child{letter-spacing:.11em;color:#f7f5ff!important}
+header strong{letter-spacing:.06em}
+h1,h2,h3{color:var(--lux-white);letter-spacing:-.035em}
+h1{font-weight:800;line-height:1.08}
+h2{font-weight:750}
+p,li,.muted{color:var(--lux-muted)}
+section,.card,.panel,details,form,.stat-card,.card-section{background:linear-gradient(155deg,rgba(28,29,44,.94),rgba(17,18,29,.98))!important;border:1px solid var(--lux-edge)!important;border-radius:18px!important;box-shadow:0 10px 35px rgba(0,0,0,.13)}
+.card{transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease}
+.card:hover{transform:translateY(-3px);border-color:rgba(176,162,241,.43)!important;box-shadow:0 18px 48px rgba(0,0,0,.25)}
+.card img,.hero{border-radius:12px}
+.grid{gap:20px}
+button,.btnlink{background:linear-gradient(130deg,#b9abf8,#9383e4)!important;color:#11101a!important;border:1px solid rgba(223,215,255,.3)!important;border-radius:11px!important;font-weight:750!important;box-shadow:0 7px 22px rgba(108,87,180,.13);transition:transform .2s,filter .2s,box-shadow .2s}
+button:hover:not(:disabled),.btnlink:hover{transform:translateY(-1px);filter:brightness(1.08);box-shadow:0 10px 28px rgba(108,87,180,.2)}
+button:disabled{opacity:.5}
+input,textarea,select{background:#0d0f19!important;color:#f4f2ff!important;border:1px solid rgba(175,171,211,.27)!important;border-radius:10px!important}
+input:focus,textarea:focus,select:focus{border-color:#a899ee!important}
+.price{color:#d3c8ff!important}
+.pill{background:rgba(147,129,222,.15)!important;color:#d7ccff!important;border:1px solid rgba(171,153,237,.25)}
+table{border-collapse:collapse}
+th,td{border-color:var(--lux-edge)!important}
+th{color:#dcd5fa}
+#notice,#message,#status{color:#d5c9ff}
+.hidden{display:none!important}
+@media(max-width:700px){body{padding:16px!important}header{gap:14px}h1{font-size:clamp(32px,9vw,48px)!important}section,.card,.panel,form{padding:18px!important}.grid{grid-template-columns:1fr!important}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+/* Home page: retain original hero/layout, replace harsh neon with restrained premium materials. */
+body:has(#store-screen){--accent:#b6a8f5;--accent2:#9e91dc;--accent-glow:rgba(156,139,229,.12);--border:rgba(183,174,224,.13);--border2:rgba(177,161,236,.36);--bg:#08090e;--bg2:#0b0d15;--bg3:#141622;--bg4:#1b1d2a;--text:#f6f4ff;--text2:#aba8bd;--text3:#77748c;--radius:12px;--radius-sm:9px;--radius-lg:18px}
+body:has(#store-screen) nav,body:has(#store-screen) .tc-market-nav{background:rgba(10,11,17,.89)!important;border-color:var(--lux-edge)!important}
+body:has(#store-screen) .tc-main-cta,body:has(#store-screen) .product-buy-btn,body:has(#store-screen) .tc31-btn:not(.tc31-alt),body:has(#store-screen) .tc41-primary{background:linear-gradient(130deg,#c9bfff,#a293ee)!important;color:#10101a!important;border:1px solid #d9d0ff77!important;box-shadow:0 9px 32px #8872d42b}
+body:has(#store-screen) .store-hero::before{background:radial-gradient(ellipse at 48% 40%,rgba(128,106,200,.14),transparent 68%)!important}
+body:has(#store-screen) .tc-hero-desc{color:#b6b1c5!important}
+body:has(#store-screen) .tc-section-kicker,body:has(#store-screen) .tc39-kicker,body:has(#store-screen) .tc-shop-kicker{color:#c5b7ff!important}
+body:has(#store-screen) .tc-section-top h2 i,body:has(#store-screen) .tc-shop-heading h2 i,body:has(#store-screen) .tc-editorial h2 i{color:#b9aaf7!important}
+body:has(#store-screen) .tc-category{background:#171824!important;border-color:var(--lux-edge)!important}
+body:has(#store-screen) .tc-cat-one{background:radial-gradient(circle at 60% 38%,#393452,#171622 73%)!important}
+body:has(#store-screen) .tc-cat-two{background:radial-gradient(circle at 55% 38%,#39324c,#191724 72%)!important}
+body:has(#store-screen) .tc-cat-three{background:radial-gradient(circle at 55% 40%,#2d3043,#151823 72%)!important}
+body:has(#store-screen) .tc-cat-visual{color:#b9a9f4!important;text-shadow:0 0 80px #9d83dc55!important}
+body:has(#store-screen) .tc-category:hover{border-color:#a999e788!important}
+body:has(#store-screen) .product-card{background:linear-gradient(155deg,#1b1c2b,#11131d)!important;border-color:var(--lux-edge)!important}
+body:has(#store-screen) .product-card:hover{border-color:#ad9cf180!important}
+body:has(#store-screen) .product-img,body:has(#store-screen) .product-img-placeholder{background:linear-gradient(145deg,#26243a,#141520)!important}
+body:has(#store-screen) .tc-art-core{background:linear-gradient(145deg,#322b4e,#121420 78%)!important;border:1px solid #a798df80!important;box-shadow:0 24px 80px #6c559a35!important}
+body:has(#store-screen) .tc-art-core span{color:#e9e1ff!important;text-shadow:0 0 45px #a38cfb66!important}
+body:has(#store-screen) .tc-visual-halo,body:has(#store-screen) .tc-orbit{filter:hue-rotate(65deg) saturate(.7)}
+body:has(#store-screen) .tc37-art{background:linear-gradient(135deg,#242039,#11131f)!important}
+body:has(#store-screen) .tc37-primary{background:linear-gradient(130deg,#c9bfff,#a293ee)!important;color:#10101a!important}
