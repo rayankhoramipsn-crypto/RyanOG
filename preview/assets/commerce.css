@@ -1445,3 +1445,98 @@ body.storefront {
 #tc31-panel .tc31-signup-grid {
   gap: 20px;
 }
+.collection-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.collection-tabs button {
+  font-size: 12px;
+  background: #17141e;
+  color: var(--text2);
+  border: 1px solid var(--border2);
+  padding: 10px 16px;
+  border-radius: 9px;
+}
+.collection-tabs button[aria-pressed="true"] {
+  background: #38264e;
+  color: #e6d2ff;
+  border-color: #a47bdb66;
+}
+.collection-status {
+  font-size: 12px;
+  color: var(--text2);
+}
+.curation-badge {
+  position: absolute;
+  top: 12px;
+  inset-inline-start: 12px;
+  background: #372544;
+  color: #e7d4fb;
+  border: 1px solid #bb97df55;
+  border-radius: 20px;
+  padding: 5px 10px;
+  font-size: 10px;
+}
+.compare-price {
+  display: block;
+  font-size: 11px;
+  color: var(--text3);
+  font-weight: 400;
+  margin-top: 4px;
+}
+.seller-intro {
+  padding: 32px !important;
+  margin-top: 30px;
+}
+.seller-intro > img {
+  border-radius: 50%;
+  object-fit: cover;
+}
+#seller-listings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 18px;
+}
+#seller-listings .card {
+  padding: 22px;
+}
+#seller-listings a {
+  display: block;
+  margin-top: 18px;
+  font-size: 13px;
+}
+.seller-profile-link {
+  display: block;
+  font-size: 13px;
+  margin-block: 15px;
+  text-decoration: none;
+}
+.checkbox-label {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.checkbox-label input {
+  width: 20px !important;
+  min-height: 20px !important;
+  margin: 0 !important;
+}
+#operation-merchandising form {
+  display: grid;
+  gap: 14px;
+}
+#operation-merchandising label {
+  display: grid;
+  gap: 8px;
+  font-size: 13px;
+}
+#operation-merchandising input[type="checkbox"] {
+  width: 20px;
+  min-height: 20px;
+}
+#operation-merchandising select,
+#operation-merchandising input[type="number"] {
+  width: 100%;
+}

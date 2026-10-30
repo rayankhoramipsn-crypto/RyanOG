@@ -411,3 +411,309 @@ Object.assign(window.TrisoPhrases, {
   "Remove image": ["حذف تصویر", "إزالة الصورة"],
   "Image removed.": ["تصویر حذف شد.", "أُزيلت الصورة."],
 });
+Object.assign(window.TrisoPhrases, {
+  "Public seller profile": ["پروفایل عمومی فروشنده", "ملف البائع العام"],
+  "Publishing is optional. Only your chosen display name, biography and avatar are shown, after you have an approved listing. Your account email and private profile remain private.":
+    [
+      "انتشار اختیاری است. فقط نام نمایشی، معرفی و تصویر انتخابی شما پس از داشتن آگهی تأییدشده نمایش داده می‌شود. ایمیل و پروفایل خصوصی حساب منتشر نمی‌شوند.",
+      "النشر اختياري. يظهر اسم العرض والنبذة والصورة التي تختارها بعد اعتماد إعلان لك. يبقى بريد حسابك وملفك الخاص غير منشورين.",
+    ],
+  Biography: ["معرفی فروشنده", "النبذة"],
+  "Avatar HTTPS URL": [
+    "نشانی HTTPS تصویر پروفایل",
+    "رابط HTTPS للصورة الشخصية",
+  ],
+  "Publish my seller profile": [
+    "پروفایل فروشندگی من منتشر شود",
+    "انشر ملفي كبائع",
+  ],
+  "Save public profile": ["ذخیره پروفایل عمومی", "حفظ الملف العام"],
+  "View seller profile →": ["مشاهده پروفایل فروشنده ←", "عرض ملف البائع ←"],
+  "Public profile saved.": ["پروفایل عمومی ذخیره شد.", "حُفظ الملف العام."],
+  "Avatar must use HTTPS.": [
+    "تصویر پروفایل باید نشانی HTTPS داشته باشد.",
+    "يجب أن تستخدم الصورة الشخصية رابط HTTPS.",
+  ],
+  "Seller profile unavailable.": [
+    "پروفایل فروشنده در دسترس نیست.",
+    "ملف البائع غير متاح.",
+  ],
+  "This profile is private and visible only to its owner or administrators.": [
+    "این پروفایل خصوصی است و فقط مالک یا مدیران آن را می‌بینند.",
+    "هذا الملف خاص ولا يراه إلا صاحبه أو المسؤولون.",
+  ],
+  "Approved listings": ["آگهی‌های تأییدشده", "الإعلانات المعتمدة"],
+  "View listing →": ["مشاهده آگهی ←", "عرض الإعلان ←"],
+  "Featured products and offers": [
+    "محصولات ویژه و پیشنهادها",
+    "المنتجات المختارة والعروض",
+  ],
+  Product: ["محصول", "المنتج"],
+  "Featured product": ["محصول ویژه", "منتج مختار"],
+  "Original price (optional, USD)": [
+    "قیمت پیشین (اختیاری، دلار)",
+    "السعر السابق (اختياري، دولار)",
+  ],
+  "Save merchandising": ["ذخیره تنظیمات نمایش", "حفظ إعدادات العرض"],
+  "Original price must exceed the current product price.": [
+    "قیمت پیشین باید بیشتر از قیمت فعلی محصول باشد.",
+    "يجب أن يزيد السعر السابق على السعر الحالي.",
+  ],
+  "Merchandising saved.": ["تنظیمات نمایش ذخیره شد.", "حُفظت إعدادات العرض."],
+  "Refresh best sellers": ["به‌روزرسانی پرفروش‌ها", "تحديث الأكثر مبيعاً"],
+  "Sales statistics": ["آمار فروش", "إحصاءات المبيعات"],
+  "Best sellers count paid/fulfilled tc42_orders only. Refreshing statistics does not modify orders or activate payments.":
+    [
+      "آمار پرفروش‌ها فقط از سفارش‌های پرداخت‌شده یا تحویل‌شده سامانه فعلی محاسبه می‌شود. به‌روزرسانی آمار سفارش‌ها را تغییر نمی‌دهد و پرداخت را فعال نمی‌کند.",
+      "تُحسب الأكثر مبيعاً من الطلبات المدفوعة أو المنفّذة في النظام الحالي فقط. تحديث الإحصاءات لا يغيّر الطلبات ولا يفعّل الدفع.",
+    ],
+});
+Object.assign(window.TrisoPhrases, {
+  "/ ACCOUNT": ["/ حساب کاربری", "/ الحساب"],
+  "← Back to shop": ["بازگشت به فروشگاه ←", "العودة إلى المتجر ←"],
+  "PLAYER PORTAL / 001": ["پنل بازیکن / ۰۰۱", "بوابة اللاعب / ٠٠١"],
+  "YOUR SPACE.": ["فضای تو.", "مساحتك."],
+  "YOUR GAME.": ["بازی تو.", "لعبتك."],
+  "Secure account access, your profile and your orders.": [
+    "ورود امن به حساب، پروفایل و سفارش‌هایت.",
+    "وصول آمن إلى حسابك وملفك وطلباتك.",
+  ],
+  Password: ["رمز عبور", "كلمة المرور"],
+  "Create account ↗": ["ساخت حساب ↖", "إنشاء حساب ↖"],
+  "By creating an account you agree to the store's published policies.": [
+    "با ساخت حساب، شرایط منتشرشده فروشگاه را می‌پذیرید.",
+    "بإنشاء حساب، توافق على سياسات المتجر المنشورة.",
+  ],
+  "Forgot password?": ["رمز عبور را فراموش کرده‌اید؟", "نسيت كلمة المرور؟"],
+  "One-click access": ["ورود سریع", "دخول سريع"],
+  "Sign in using your Google account.": [
+    "با حساب گوگل خود وارد شوید.",
+    "سجّل الدخول بحسابك على Google.",
+  ],
+  "Continue with Google ↗": ["ادامه با گوگل ↖", "المتابعة عبر Google ↖"],
+  "Google sign-in requires provider setup in Supabase before use.": [
+    "پیش از استفاده، ارائه‌دهنده ورود گوگل باید در Supabase تنظیم شود.",
+    "يتطلب تسجيل الدخول عبر Google إعداد الموفّر في Supabase أولاً.",
+  ],
+  "SUPABASE AUTH": ["احراز هویت Supabase", "مصادقة Supabase"],
+  "Set a new password": ["رمز عبور جدید انتخاب کنید", "عيّن كلمة مرور جديدة"],
+  "New password": ["رمز عبور جدید", "كلمة المرور الجديدة"],
+  "Confirm new password": ["تکرار رمز عبور جدید", "تأكيد كلمة المرور الجديدة"],
+  "Update password": ["تغییر رمز عبور", "تحديث كلمة المرور"],
+  "← Back to sign in": ["بازگشت به ورود ←", "العودة لتسجيل الدخول ←"],
+  "TRISOCMD / JOIN THE COMMUNITY": [
+    "تریسو / به جمع بازیکن‌ها بپیوند",
+    "تريسو / انضم للمجتمع",
+  ],
+  "CREATE YOUR PLAYER PROFILE / 001": [
+    "پروفایل بازیکنی‌ات را بساز / ۰۰۱",
+    "أنشئ ملف اللاعب / ٠٠١",
+  ],
+  "YOUR ACCOUNT.": ["حساب تو.", "حسابك."],
+  "YOUR WORLD.": ["دنیای تو.", "عالمك."],
+  "One account for your orders, marketplace listings and conversations.": [
+    "یک حساب برای سفارش‌ها، آگهی‌ها و گفت‌وگوهایت.",
+    "حساب واحد لطلباتك وإعلاناتك ومحادثاتك.",
+  ],
+  "Email address": ["نشانی ایمیل", "عنوان البريد الإلكتروني"],
+  "Confirm password": ["تکرار رمز عبور", "تأكيد كلمة المرور"],
+  "Use a unique password. You may be asked to confirm your email before signing in.":
+    [
+      "از رمز عبور منحصربه‌فرد استفاده کنید. ممکن است پیش از ورود، تأیید ایمیل لازم باشد.",
+      "استخدم كلمة مرور فريدة. قد يُطلب تأكيد بريدك قبل تسجيل الدخول.",
+    ],
+  "CREATE ACCOUNT ↗": ["ساخت حساب ↖", "إنشاء حساب ↖"],
+  "By creating an account, you agree to the store's published policies.": [
+    "با ساخت حساب، شرایط منتشرشده فروشگاه را می‌پذیرید.",
+    "بإنشاء حساب، توافق على سياسات المتجر المنشورة.",
+  ],
+  OR: ["یا", "أو"],
+  "Already have an account?": ["از قبل حساب دارید؟", "لديك حساب بالفعل؟"],
+  "Sign in instead": ["ورود به حساب", "سجّل الدخول"],
+  "Checking account permissions…": [
+    "در حال بررسی دسترسی حساب…",
+    "جارٍ التحقق من صلاحيات الحساب…",
+  ],
+  "ADMIN ACCESS VERIFIED": ["دسترسی مدیر تأیید شد", "تأكّدت صلاحيات المسؤول"],
+  "Your account is recognized by Supabase. Manage products and fulfillment below. Changes require server-verified admin permissions.":
+    [
+      "حساب شما توسط Supabase تأیید شده است. دسترسی مدیریت محصولات و سفارش‌ها به تأیید سمت سرور نیاز دارد.",
+      "تعرّفت Supabase على حسابك. تتطلب إدارة المنتجات والطلبات صلاحيات مسؤول يتحقق منها الخادم.",
+    ],
+  "Refresh product overview": [
+    "به‌روزرسانی خلاصه محصولات",
+    "تحديث ملخص المنتجات",
+  ],
+  "STORE OPERATIONS / ADMIN 4.6": ["مدیریت فروشگاه", "إدارة المتجر"],
+  PRODUCTS: ["محصولات", "المنتجات"],
+  ORDERS: ["سفارش‌ها", "الطلبات"],
+  "AUDIT LOG": ["گزارش فعالیت‌ها", "سجل التدقيق"],
+  "Access verified by Supabase.": [
+    "دسترسی توسط Supabase تأیید شده است.",
+    "تحققت Supabase من الوصول.",
+  ],
+  "PRODUCT MANAGEMENT": ["مدیریت محصولات", "إدارة المنتجات"],
+  " + NEW PRODUCT": ["افزودن محصول", "إضافة منتج"],
+  "+ NEW PRODUCT": ["افزودن محصول", "إضافة منتج"],
+  "↻ REFRESH": ["به‌روزرسانی ↻", "تحديث ↻"],
+  "PRODUCT EDITOR": ["ویرایشگر محصول", "محرر المنتج"],
+  "Price USD": ["قیمت به دلار", "السعر بالدولار"],
+  Stock: ["موجودی", "المخزون"],
+  Available: ["موجود", "متوفر"],
+  Unavailable: ["ناموجود", "غير متوفر"],
+  "Image HTTPS URL": ["نشانی HTTPS تصویر", "رابط HTTPS للصورة"],
+  "Min quantity": ["حداقل تعداد", "الحد الأدنى للكمية"],
+  "Max quantity (optional)": [
+    "حداکثر تعداد (اختیاری)",
+    "الحد الأقصى للكمية (اختياري)",
+  ],
+  Description: ["توضیحات", "الوصف"],
+  "Arabic description": ["توضیحات عربی", "الوصف بالعربية"],
+  "SAVE PRODUCT": ["ذخیره محصول", "حفظ المنتج"],
+  CANCEL: ["انصراف", "إلغاء"],
+  "ORDER MANAGEMENT": ["مدیریت سفارش‌ها", "إدارة الطلبات"],
+  "RECENT ADMIN ACTIONS": ["فعالیت‌های اخیر مدیر", "أنشطة المسؤول الأخيرة"],
+  "SUPPORT INBOX / LIVE SUPPORT 4.7": ["صندوق پشتیبانی", "صندوق الدعم"],
+  "Messages are saved in Supabase. Refresh the inbox to see new conversations. Telegram notifications require server setup.":
+    [
+      "پیام‌ها در Supabase ذخیره می‌شوند. برای دیدن گفت‌وگوهای جدید صندوق را به‌روز کنید. اعلان تلگرام به تنظیم سمت سرور نیاز دارد.",
+      "تُحفظ الرسائل في Supabase. حدّث الصندوق لرؤية المحادثات الجديدة. تتطلب إشعارات تيليجرام إعداداً على الخادم.",
+    ],
+  "↻ REFRESH CONVERSATIONS": ["به‌روزرسانی گفت‌وگوها ↻", "تحديث المحادثات ↻"],
+  "Refresh customer threads": [
+    "به‌روزرسانی گفت‌وگوی مشتریان",
+    "تحديث محادثات العملاء",
+  ],
+  "SIGNED IN": ["وارد شده‌اید", "تم تسجيل الدخول"],
+  Player: ["بازیکن", "لاعب"],
+  "Account overview": ["خلاصه حساب", "ملخص الحساب"],
+  "Signed in with Supabase Auth. Orders are not yet linked to this account.": [
+    "با احراز هویت Supabase وارد شده‌اید. سفارش‌های قدیمی ممکن است به این حساب متصل نباشند.",
+    "تم الدخول عبر Supabase Auth. قد لا تكون الطلبات القديمة مرتبطة بهذا الحساب.",
+  ],
+  "My orders": ["سفارش‌های من", "طلباتي"],
+  "Checking your orders…": ["در حال دریافت سفارش‌ها…", "جارٍ تحميل طلباتك…"],
+  "Open order tracking ↗": ["پیگیری سفارش‌ها ↖", "تتبع الطلبات ↖"],
+  "Refresh orders": ["به‌روزرسانی سفارش‌ها", "تحديث الطلبات"],
+  "Only new orders associated with your signed-in account will appear. Existing manual checkout orders are not migrated.":
+    [
+      "فقط سفارش‌های متصل به حساب واردشده نمایش داده می‌شوند. سفارش‌های دستی قدیمی منتقل نشده‌اند.",
+      "تظهر فقط الطلبات المرتبطة بحسابك المسجّل. لم تُنقل الطلبات اليدوية القديمة.",
+    ],
+  "No linked orders yet. Existing manual orders are not automatically imported.":
+    [
+      "هنوز سفارشی به حساب متصل نیست. سفارش‌های دستی قدیمی خودکار منتقل نمی‌شوند.",
+      "لا توجد طلبات مرتبطة بعد. لا تُستورد الطلبات اليدوية القديمة تلقائياً.",
+    ],
+  "Sign in to view orders.": [
+    "برای دیدن سفارش‌ها وارد شوید.",
+    "سجّل الدخول لعرض الطلبات.",
+  ],
+  "Sign in again to manage the store.": [
+    "برای مدیریت فروشگاه دوباره وارد شوید.",
+    "سجّل الدخول مجدداً لإدارة المتجر.",
+  ],
+  "Please sign in again.": ["دوباره وارد حساب شوید.", "سجّل الدخول مجدداً."],
+  "Session expired. Please sign in again.": [
+    "نشست منقضی شده است. دوباره وارد شوید.",
+    "انتهت الجلسة. سجّل الدخول مجدداً.",
+  ],
+  "Administrator access required.": [
+    "دسترسی مدیر لازم است.",
+    "يلزم وصول المسؤول.",
+  ],
+  "Sign in to upload images.": [
+    "برای آپلود تصویر وارد شوید.",
+    "سجّل الدخول لرفع الصور.",
+  ],
+  "Choose up to six images.": [
+    "حداکثر شش تصویر انتخاب کنید.",
+    "اختر ست صور كحد أقصى.",
+  ],
+  "Use JPEG, PNG or WebP images up to 5 MB.": [
+    "تصویر JPEG، PNG یا WebP تا پنج مگابایت انتخاب کنید.",
+    "استخدم صور JPEG أو PNG أو WebP بحد أقصى ٥ ميغابايت.",
+  ],
+  "A listing can have at most six gallery images.": [
+    "هر آگهی حداکثر شش تصویر گالری دارد.",
+    "يمكن لكل إعلان امتلاك ست صور كحد أقصى.",
+  ],
+  "Gallery saved. Images will be reviewed with the listing.": [
+    "گالری ذخیره شد. تصاویر همراه آگهی بررسی می‌شوند.",
+    "حُفظ المعرض. ستُراجع الصور مع الإعلان.",
+  ],
+  "Choose a quantity within the stock and product limits.": [
+    "تعداد را در محدوده موجودی و محدودیت محصول انتخاب کنید.",
+    "اختر كمية ضمن المخزون وحدود المنتج.",
+  ],
+  "Quantity exceeds available stock or the product limit.": [
+    "تعداد از موجودی یا محدودیت محصول بیشتر است.",
+    "تتجاوز الكمية المخزون أو حد المنتج.",
+  ],
+  "The bag could not be saved on this device.": [
+    "ذخیره سبد روی این دستگاه ممکن نشد.",
+    "تعذّر حفظ السلة على هذا الجهاز.",
+  ],
+  "Enlarge product image": ["بزرگ‌نمایی تصویر محصول", "تكبير صورة المنتج"],
+  Remove: ["حذف", "إزالة"],
+  "Seller avatar": ["تصویر فروشنده", "صورة البائع"],
+  Enlarge: ["بزرگ‌نمایی", "تكبير"],
+});
+Object.assign(window.TrisoPhrases, {
+  EDIT: ["ویرایش", "تعديل"],
+  DELETE: ["حذف", "حذف"],
+  "MEDIA / SPECS": ["رسانه و مشخصات", "الوسائط والمواصفات"],
+  "Invalid login credentials": [
+    "ایمیل یا رمز عبور نادرست است.",
+    "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
+  ],
+  "Email not confirmed": [
+    "ابتدا ایمیل خود را تأیید کنید.",
+    "أكّد بريدك الإلكتروني أولاً.",
+  ],
+  "User already registered": [
+    "این کاربر از قبل ثبت‌نام کرده است.",
+    "هذا المستخدم مسجّل بالفعل.",
+  ],
+  "Daily free listing limit reached": [
+    "به سقف روزانه آگهی رایگان رسیده‌اید.",
+    "بلغت الحد اليومي للإعلانات المجانية.",
+  ],
+  "Sign in first": ["ابتدا وارد حساب شوید.", "سجّل الدخول أولاً."],
+  "Invalid listing": ["اطلاعات آگهی معتبر نیست.", "بيانات الإعلان غير صالحة."],
+});
+window.TrisoDynamicPhrase = function (text, language) {
+  const fa = language === "fa";
+  let m;
+  if ((m = text.match(/^Sales snapshot refreshed for (\d+) products\.$/)))
+    return language === "en"
+      ? text
+      : fa
+        ? "آمار فروش برای " + m[1] + " محصول به‌روزرسانی شد."
+        : "حُدّثت إحصاءات البيع لـ " + m[1] + " منتجات.";
+  if ((m = text.match(/^(\d+) submissions · (\d+) approved · (\d+) pending$/)))
+    return language === "en"
+      ? text
+      : fa
+        ? m[1] + " آگهی · " + m[2] + " تأییدشده · " + m[3] + " در انتظار بررسی"
+        : m[1] + " إعلانات · " + m[2] + " معتمدة · " + m[3] + " قيد المراجعة";
+  if ((m = text.match(/^Uploading image (\d+) \/ (\d+)…$/)))
+    return language === "en"
+      ? text
+      : fa
+        ? "در حال آپلود تصویر " + m[1] + " از " + m[2] + "…"
+        : "جارٍ رفع الصورة " + m[1] + " من " + m[2] + "…";
+  if ((m = text.match(/^Signed in as (.+)$/)))
+    return language === "en"
+      ? text
+      : (fa ? "واردشده با حساب " : "تم الدخول باسم ") + m[1];
+  if ((m = text.match(/^In stock: (\d+)$/)))
+    return language === "en" ? text : (fa ? "موجودی: " : "المخزون: ") + m[1];
+  if ((m = text.match(/^(\d+) videos? available\.$/)))
+    return language === "en"
+      ? text
+      : fa
+        ? m[1] + " ویدیو در دسترس است."
+        : m[1] + " فيديوهات متاحة.";
+  return null;
+};

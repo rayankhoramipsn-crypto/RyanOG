@@ -652,7 +652,7 @@ async function supaEnsureTable() {
 
 async function supaLoadProducts() {
   try {
-    const rows = await supaFetch('/rest/v1/products?status=eq.available&order=id.desc&select=id,title,price,description,description_ar,image_url,status,stock,category,min_qty,max_qty');
+    const rows = await supaFetch('/rest/v1/products?status=eq.available&order=id.desc&select=id,title,price,description,description_ar,image_url,status,stock,category,min_qty,max_qty,created_at');
     if (!Array.isArray(rows)) return [];
     return rows.map(r => ({
       id:       r.id,
@@ -664,6 +664,7 @@ async function supaLoadProducts() {
       status:   r.status || 'available',
       stock:    Math.max(0, Number(r.stock) || 0),
       category: r.category || '',
+      createdAt:r.created_at,
       minQty:   r.min_qty || 1,
       maxQty:   r.max_qty || 0
     }));
@@ -2076,6 +2077,7 @@ count();
    for(const p of products){
     const c=card(p.title||'Untitled','ID '+p.id+' · $'+Number(p.price).toFixed(2)+' · Stock '+p.stock+' · '+p.status);
     action(c.actions,'EDIT',()=>tc46EditProduct(p.id));
+    action(c.actions,'MEDIA / SPECS',()=>{location.href='product.html?id='+encodeURIComponent(p.id)});
     action(c.actions,'DELETE',()=>tc46DeleteProduct(p.id),true);
     root.append(c.el);
    }
@@ -2142,5 +2144,5 @@ count();
 })();
 </script><div id="staging-warning" class="staging-banner" role="status" data-copy="staging">Staging preview · Purchases and payments are disabled</div>
 
-<script src="assets/locales.js"></script><script src="assets/commerce.js"></script></body>
+<script src="assets/locales.js"></script><script src="assets/commerce.js"></script><script src="assets/collections.js"></script></body>
 </html>

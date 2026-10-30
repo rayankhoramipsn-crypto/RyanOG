@@ -8,7 +8,7 @@ import shutil
 
 ROOT = Path(__file__).resolve().parents[1]
 PREVIEW = ROOT / "preview"
-for name in ("index.html", "product.html", "marketplace.html"):
+for name in ("index.html", "product.html", "marketplace.html", "seller.html"):
     shutil.copyfile(ROOT / name, PREVIEW / name)
 for name in ("assets", "admin", "blog", "videos", "help", "policies"):
     shutil.copytree(ROOT / name, PREVIEW / name, dirs_exist_ok=True)

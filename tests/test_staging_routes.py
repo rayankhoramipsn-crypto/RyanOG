@@ -12,6 +12,7 @@ PAGES = {
     "index.html",
     "marketplace.html",
     "product.html",
+    "seller.html",
     "blog/index.html",
     "videos/index.html",
     "help/index.html",
@@ -93,7 +94,7 @@ class StagingRoutes(unittest.TestCase):
         self.assertNotRegex(workflow, r"(?m)^  push:")
         self.assertIn("needs: verify", workflow)
         self.assertIn("run: npm test", workflow)
-        self.assertIn("product.html assets admin", workflow)
+        self.assertIn("product.html seller.html assets admin", workflow)
 
     def test_shared_local_assets_exist(self):
         for page in sorted(PAGES):
@@ -110,6 +111,15 @@ class StagingRoutes(unittest.TestCase):
         self.assertIn("l.status='pending'", migration)
         self.assertIn("l.status='approved'", migration)
         self.assertNotIn("security definer", migration.lower())
+
+    def test_public_sellers_are_opt_in_and_sales_refresh_preserves_rls(self):
+        migration = next((ROOT.parent / "supabase/migrations").glob("*_commerce_merchandising_and_public_sellers.sql")).read_text()
+        self.assertIn("is_public boolean not null default false", migration)
+        self.assertIn("l.status='approved'", migration)
+        self.assertIn("security invoker", migration)
+        self.assertIn("o.status in ('paid','fulfilled')", migration)
+        self.assertIn("from public,anon", migration)
+        self.assertIn("user_id=(select auth.uid())", migration)
 
     def test_staging_checkout_not_enabled_on_new_product_page(self):
         product = (ROOT / "product.html").read_text(encoding="utf-8")

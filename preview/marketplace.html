@@ -13,4 +13,4 @@ $('message-form').onsubmit=async e=>{e.preventDefault();if(!activeChat)return;le
 async function init(){try{session=JSON.parse(sessionStorage.getItem('tc35_auth_session')||'null');if(session?.refresh_token){let d=await api('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:JSON.stringify({refresh_token:session.refresh_token})});session=d;sessionStorage.setItem('tc35_auth_session',JSON.stringify(d))}}catch{session=null;sessionStorage.removeItem('tc35_auth_session')}await publicListings();await refresh()}init()})();
 
 })();
-</script><script src="assets/marketplace.js"></script><script src="assets/locales.js"></script><script src="assets/commerce.js"></script></body></html>
+</script><script src="assets/marketplace.js"></script><script src="assets/public-sellers.js"></script><script src="assets/locales.js"></script><script src="assets/commerce.js"></script></body></html>

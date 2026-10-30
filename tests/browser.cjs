@@ -34,6 +34,8 @@ const products = [
     max_qty: 5,
   },
 ];
+for (const p of products)
+  p.created_at = new Date(Date.now() - 86400000).toISOString();
 const articles = [
   {
     id: "a",
@@ -124,7 +126,10 @@ const server = http.createServer((req, res) => {
 });
 (async () => {
   await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
-  const base = "http://127.0.0.1:" + server.address().port + (process.env.TRISO_TEST_ROOT ? "/" : "/preview/");
+  const base =
+    "http://127.0.0.1:" +
+    server.address().port +
+    (process.env.TRISO_TEST_ROOT ? "/" : "/preview/");
   const browser = await chromium.launch({
     ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE
       ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE }
@@ -181,7 +186,28 @@ const server = http.createServer((req, res) => {
             : id?.startsWith("neq.")
               ? products.filter((p) => String(p.id) !== id.slice(4))
               : products;
-        } else if (p === "/rest/v1/product_media")
+        } else if (p === "/rest/v1/product_merchandising")
+          data =
+            method === "GET"
+              ? [{ product_id: 2, featured: true, compare_at_price: 99 }]
+              : [];
+        else if (p === "/rest/v1/product_sales_snapshots")
+          data = [{ product_id: 1, units_sold: 7 }];
+        else if (p === "/rest/v1/rpc/refresh_product_sales_snapshots") data = 2;
+        else if (p === "/rest/v1/market_seller_public_profiles")
+          data =
+            method === "GET"
+              ? [
+                  {
+                    user_id: user.id,
+                    display_name: "Fixture public seller",
+                    bio: "Public biography fixture",
+                    is_public: true,
+                    avatar_url: null,
+                  },
+                ]
+              : [];
+        else if (p === "/rest/v1/product_media")
           data = [
             {
               id: 1,
@@ -224,22 +250,28 @@ const server = http.createServer((req, res) => {
               : [];
         else if (p === "/rest/v1/market_listings")
           data =
-            method === "PATCH"
-              ? [{ id: 12, status: "approved" }]
-              : (url.searchParams.get("seller_id") && submitted) || adminRole
-                ? [
-                    {
-                      id: 12,
-                      title: "Fixture listing",
-                      platform: "PC",
-                      description:
-                        "Owned fixture item for automated regression.",
-                      price: 12,
-                      status: "pending",
-                      seller_id: user.id,
-                    },
-                  ]
-                : [];
+            url.searchParams.get("status") === "eq.approved" && method === "GET"
+              ? listings.map((p) => ({
+                  ...p,
+                  seller_id: user.id,
+                  status: "approved",
+                }))
+              : method === "PATCH"
+                ? [{ id: 12, status: "approved" }]
+                : (url.searchParams.get("seller_id") && submitted) || adminRole
+                  ? [
+                      {
+                        id: 12,
+                        title: "Fixture listing",
+                        platform: "PC",
+                        description:
+                          "Owned fixture item for automated regression.",
+                        price: 12,
+                        status: "pending",
+                        seller_id: user.id,
+                      },
+                    ]
+                  : [];
         else if (p === "/rest/v1/market_listing_media") {
           if (method === "POST") {
             media.push(JSON.parse(req.postData()));
@@ -303,6 +335,50 @@ const server = http.createServer((req, res) => {
         1,
       );
       await page.locator("#tc39-category").selectOption("");
+    });
+    await test("curation, new arrivals, offers and best sellers use backend data", async () => {
+      await page
+        .locator(".collection-tabs button")
+        .filter({ hasText: "Featured" })
+        .click();
+      await page.locator("#product-grid .curation-badge").waitFor();
+      assert.equal(
+        await page.locator("#product-grid .product-card").count(),
+        1,
+      );
+      assert.match(
+        await page.locator("#product-grid").textContent(),
+        /keyboard/,
+      );
+      await page
+        .locator(".collection-tabs button")
+        .filter({ hasText: "Special offers" })
+        .click();
+      assert.match(await page.locator(".compare-price").textContent(), /99.00/);
+      await page
+        .locator(".collection-tabs button")
+        .filter({ hasText: "Best sellers" })
+        .click();
+      assert.equal(
+        await page.locator("#product-grid .product-card").count(),
+        1,
+      );
+      assert.match(
+        await page.locator("#product-grid").textContent(),
+        /gift card/,
+      );
+      await page
+        .locator(".collection-tabs button")
+        .filter({ hasText: "New arrivals" })
+        .click();
+      assert.equal(
+        await page.locator("#product-grid .product-card").count(),
+        2,
+      );
+      await page
+        .locator(".collection-tabs button")
+        .filter({ hasText: "All products" })
+        .click();
     });
     await test("mobile menu and three language directions", async () => {
       for (const width of [1440, 1024, 768, 390, 360]) {
@@ -473,9 +549,46 @@ const server = http.createServer((req, res) => {
       assert.equal(media[0].listing_id, 12);
       await page.locator("#mine .listing-gallery").waitFor();
       assert.equal(await page.locator("#mine .listing-gallery").count(), 1);
+      await page.locator("#public-seller-name").fill("Fixture public seller");
+      await page.locator("#public-seller-bio").fill("Public biography fixture");
+      await page.locator("#public-seller-visible").check();
+      await page.locator("#public-seller-form button").click();
+      await page
+        .locator("#public-seller-status")
+        .filter({ hasText: "Public profile saved" })
+        .waitFor();
+      assert.equal(
+        writes.some(
+          (w) =>
+            w.path === "/rest/v1/market_seller_public_profiles" &&
+            JSON.parse(w.body).is_public === true,
+        ),
+        true,
+      );
       await page.locator("#signout").click();
       await page.locator("#signed").waitFor({ state: "hidden" });
       assert.equal(await page.locator("#signed").isVisible(), false);
+    });
+    await test("public seller profile has approved listings and no account email", async () => {
+      await page.goto(base + "seller.html?id=" + user.id);
+      await page
+        .locator("#seller-name")
+        .filter({ hasText: "Fixture public seller" })
+        .waitFor();
+      assert.match(
+        await page.locator("#seller-bio").textContent(),
+        /biography/,
+      );
+      await page.locator("#seller-listings .card").first().waitFor();
+      assert.equal(await page.locator("#seller-listings .card").count(), 2);
+      assert.doesNotMatch(
+        await page.locator("body").textContent(),
+        /fixture@example.invalid/,
+      );
+      assert.match(
+        await page.locator("#seller-listings a").first().getAttribute("href"),
+        /marketplace.html\?listing=/,
+      );
     });
     await test("forged admin storage claims do not unlock content management", async () => {
       await page.evaluate(
@@ -539,6 +652,29 @@ const server = http.createServer((req, res) => {
         ),
         true,
       );
+      await page.locator("#merch-product").selectOption("2");
+      await page.locator("#merch-featured").check();
+      await page.locator("#merch-compare").fill("130");
+      await page.locator("#operation-merchandising form button").click();
+      await page
+        .locator("#operation-merchandising p[role=status]")
+        .filter({ hasText: "Merchandising saved" })
+        .waitFor();
+      assert.equal(
+        writes.some(
+          (w) =>
+            w.path === "/rest/v1/product_merchandising" &&
+            JSON.parse(w.body).compare_at_price === 130,
+        ),
+        true,
+      );
+      await page
+        .getByRole("button", { name: "Refresh best sellers", exact: true })
+        .click();
+      await page
+        .locator("#operation-merchandising p[role=status]")
+        .filter({ hasText: "snapshot refreshed" })
+        .waitFor();
       adminRole = false;
       await page.evaluate(() => sessionStorage.clear());
     });
@@ -577,6 +713,7 @@ const server = http.createServer((req, res) => {
       for (const route of [
         "product.html?id=2",
         "marketplace.html",
+        "seller.html?id=" + user.id,
         "blog/",
         "help/",
         "policies/",

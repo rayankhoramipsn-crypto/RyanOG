@@ -504,14 +504,16 @@
         ),
       );
       card.append(photo, body);
+      card.dataset.productId = String(p.id);
       grid.append(card);
     }
+    document.dispatchEvent(new Event("triso:catalog-rendered"));
   }
   // Exact phrase translations only touch UI text, never user content or product/article bodies.
   const phrases = window.TrisoPhrases;
   const originals = new WeakMap();
   function translateStatic() {
-    const scope = isStore ? $("tc39-cart") : document.body;
+    const scope = document.body;
     if (!scope) return;
     const walker = document.createTreeWalker(scope, NodeFilter.SHOW_TEXT);
     const list = [];
@@ -519,15 +521,21 @@
     for (const n of list) {
       if (
         n.parentElement.closest(
-          "script,style,[data-copy],[data-user-content],#article-body,#description,#title,#specs,#messages,#admin-list,#related-products,.listing h2,.listing h3,.listing .price,.listing .pill,.listing>p:not(.muted)",
+          "script,style,[data-copy],[data-user-content],.product-title,.product-desc,.category-label,.product-price,.tc41-bubble,.tc46-card strong,.review-text,#article-body,#description,#title,#specs,#messages,#admin-list,#related-products,.listing h2,.listing h3,.listing .price,.listing .pill,.listing>p:not(.muted)",
         )
       )
         continue;
       const text = n.textContent.trim();
       if (!text) continue;
-      if (phrases[text]) originals.set(n, text);
+      if (phrases[text] || window.TrisoDynamicPhrase?.(text, "en"))
+        originals.set(n, text);
       const original = originals.get(n) || text,
         entry = phrases[original];
+      if (!entry) {
+        const translated = window.TrisoDynamicPhrase?.(original, locale);
+        if (translated && n.textContent !== translated)
+          n.textContent = translated;
+      }
       if (entry) {
         const value =
           locale === "en" ? original : entry[locale === "fa" ? 0 : 1];
@@ -543,8 +551,10 @@
       if (phrases[value])
         n.placeholder =
           locale === "en" ? value : phrases[value][locale === "fa" ? 0 : 1];
-      if (!n.getAttribute("aria-label"))
+      if (!n.getAttribute("aria-label") || n.dataset.autoAria) {
         n.setAttribute("aria-label", n.placeholder);
+        n.dataset.autoAria = "1";
+      }
     }
   }
   function dialogAccess() {
@@ -730,6 +740,9 @@
       const categoriesLink = el("a", "Categories");
       categoriesLink.href = "#operation-categories";
       nav.append(categoriesLink);
+      const merchandisingLink = el("a", "Featured products and offers");
+      merchandisingLink.href = "#operation-merchandising";
+      nav.append(merchandisingLink);
       $("dashboard").before(nav);
       const sync = () => {
         nav.hidden = $("dashboard").classList.contains("hidden");

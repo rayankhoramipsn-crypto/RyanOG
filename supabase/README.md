@@ -23,3 +23,24 @@ are operational follow-ups before production.
 Run the rolled-back role test `tests/staging_gallery_rls.sql` only on staging.
 It simulates JWT claims at the SQL role boundary, not a real HTTP login/Storage
 upload. Never store database passwords or privileged keys in this repository.
+
+## Merchandising, best sellers and optional public profiles
+
+`20261030201414_commerce_merchandising_and_public_sellers.sql` was also applied
+only to staging. It adds `product_merchandising`, `product_sales_snapshots`, and
+`market_seller_public_profiles`, all with RLS and least-privilege grants.
+
+Featured products and original/offer prices start empty and are managed by an
+administrator. The admin-only `refresh_product_sales_snapshots()` RPC uses
+SECURITY INVOKER and existing order RLS. It counts positive item quantities from
+paid/fulfilled `tc42_orders`; it does not count awaiting-payment orders, combine
+legacy order systems, mark orders paid, or activate payments. Public snapshots
+contain only product IDs, units sold and update time. Refreshes upsert all current
+products (including zero sales) so cancelled/refunded sales cannot remain stale
+after a refresh. The storefront displays only positive-sales best sellers.
+
+Public seller profiles default to unpublished, contain no email/account secrets,
+and are separate from private seller profiles. Public SELECT requires both an
+opt-in and an approved listing. Only owners can create/update their public profile;
+admins may read/remove it for moderation. Run `tests/staging_commerce_rls.sql`
+only on staging; its fixtures and snapshot changes are rolled back.

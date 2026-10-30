@@ -36,7 +36,7 @@ jobs:
       - name: Prepare reviewed site
         run: |
           mkdir -p _site
-          cp -a index.html marketplace.html product.html assets admin blog videos help policies _site/
+          cp -a index.html marketplace.html product.html seller.html assets admin blog videos help policies _site/
           touch _site/.nojekyll
           test -s _site/assets/commerce.css
           test -s _site/assets/commerce.js
