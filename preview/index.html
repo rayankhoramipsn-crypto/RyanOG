@@ -1295,7 +1295,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElement
       <span style="font-family:Rajdhani,sans-serif;font-size:17px;font-weight:700;letter-spacing:0.12em;color:#00f0ff;text-shadow:0 0 20px rgba(0,240,255,0.4);">TRISO<span style="color:#ff2d6b;">CMD</span></span>
     </div>
     <div class="nav-right">
-      <a class="tc-nav-link" href="#tc-shop-heading">SHOP</a><a class="tc-nav-link" href="blog/">JOURNAL</a><a class="tc-nav-link" href="videos/">VIDEOS</a><a class="tc-nav-link" href="help/">HELP</a><a class="tc-nav-link tc-market-nav" href="/marketplace.html">MARKETPLACE ↗</a>
+      <a class="tc-nav-link" href="#tc-shop-heading">SHOP</a><a class="tc-nav-link" href="blog/">JOURNAL</a><a class="tc-nav-link" href="videos/">VIDEOS</a><a class="tc-nav-link" href="help/">HELP</a><a class="tc-nav-link tc-market-nav" href="marketplace.html">MARKETPLACE ↗</a>
       <button class="nav-trust" onclick="showScreen('tc31-trust')" id="btn-reviews">Reviews / FAQ</button><button class="nav-trust" onclick="showScreen('tc31-panel')">Account</button>
       <button class="nav-trust" onclick="window.open('https://t.me/trisouhq','_blank')" style="border-color:rgba(0,240,255,0.3);">Quality Channel</button>
       <button class="nav-lang" onclick="showScreen('lang-screen')">🌐 <span id="nav-lang-label">EN</span></button>
@@ -1308,7 +1308,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElement
       <h1 class="store-hero-title" id="hero-title">THE GAME<br><em>STARTS HERE.</em></h1>
       <p class="tc-hero-desc">Your home for Fortnite drops, digital essentials, and the gaming setups worth talking about.</p>
       <div class="tc-hero-actions"><button onclick="document.getElementById('tc-shop-heading').scrollIntoView({behavior:'smooth'})" class="tc-main-cta">EXPLORE THE STORE <span>↗</span></button><a class="tc-secondary-cta" href="#tc-discover">DISCOVER TRISOCMD <span>↗</span></a></div>
-      <a class="tc-market-hero-link" href="/marketplace.html"><span><b>SELLER MARKETPLACE</b><small>LIST YOUR GAMING ITEMS · CHAT WITH BUYERS</small></span><strong>EXPLORE MARKET ↗</strong></a><div class="tc-hero-foot"><span><b>01 /</b> FORTNITE</span><span><b>02 /</b> GAMING GEAR</span><span><b>03 /</b> CULTURE</span></div>
+      <a class="tc-market-hero-link" href="marketplace.html"><span><b>SELLER MARKETPLACE</b><small>LIST YOUR GAMING ITEMS · CHAT WITH BUYERS</small></span><strong>EXPLORE MARKET ↗</strong></a><div class="tc-hero-foot"><span><b>01 /</b> FORTNITE</span><span><b>02 /</b> GAMING GEAR</span><span><b>03 /</b> CULTURE</span></div>
     </div>
     <div class="tc-hero-art" aria-hidden="true"><div class="tc-visual-halo"></div><div class="tc-visual-crosshair">+</div><div class="tc-orbit tc-orbit-one"></div><div class="tc-orbit tc-orbit-two"></div><div class="tc-art-core"><span>TC</span><small>EST. FOR PLAYERS</small></div><div class="tc-art-tag tc-tag-one">TRISOCMD®</div><div class="tc-art-tag tc-tag-two">LEVEL UP / 002</div><div class="tc-art-corner">[ YOUR WORLD. YOUR LOADOUT. ]</div></div>
   </div>
@@ -2051,6 +2051,16 @@ function openProduct(id) {
   }
   updateQtyUI(p);
   showScreen('detail-screen');
+  // Staging: link the existing detail view to the new media-rich product page.
+  let detailMediaLink=document.getElementById('tc-product-media-link');
+  if(!detailMediaLink){
+    detailMediaLink=document.createElement('a');
+    detailMediaLink.id='tc-product-media-link';
+    detailMediaLink.textContent='View gallery, reviews & unboxing videos ↗';
+    detailMediaLink.style.cssText='display:inline-block;margin:16px 0;padding:11px 16px;border:1px solid #8d7bdb;border-radius:9px;color:#d6caff;text-decoration:none';
+    document.getElementById('detail-title').insertAdjacentElement('afterend',detailMediaLink);
+  }
+  detailMediaLink.href='product.html?id='+encodeURIComponent(String(p.id));
   tc39Related(p);
   const add=document.getElementById('tc39-add-btn');if(add)add.disabled=p.status!=='available'||p.stock===0;
 }
