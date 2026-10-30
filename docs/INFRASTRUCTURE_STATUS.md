@@ -43,3 +43,11 @@ Only admin can create/edit drafts; public users can read published posts after p
 - These frontend changes are on the feature branch only. They are NOT deployed or browser-E2E-tested. Link integration with the existing storefront remains for Codex.
 - Current content pages use query-string routes and browser-fetched data. Production SEO requires crawlable/prerendered URLs and a generated sitemap, not just changing noindex.
 - Security review of `market_set_pro` confirmed an admin check; `tc42_create_order` validates product price/stock server-side. Further tests remain essential.
+
+## Additional staging implementation (same feature branch)
+- Added Help Center, draft Policies, and Videos hub under `preview/help/`, `preview/policies/`, `preview/videos/`. All staging pages are noindex and link to published support; policy text explicitly remains draft.
+- Fixed marketplace links to be relative under `preview/`; existing product details link to the media-rich product page.
+- Added `public.product_specs` with admin-only writes, RLS and a product detail technical specification editor. Migration: `triso_staging_product_specifications`.
+- Added GitHub Actions workflow and Python stdlib staging route/security checks in `tests/test_staging_routes.py`. At least one workflow run passed on the branch; rerun on final head before merge.
+- Added read-only staging audit queries in `docs/staging_verification.sql`.
+- IMPORTANT: Do not claim browser E2E, admin CRUD, RLS with real JWTs, payment processing, video embed availability, or production SEO verified until tested.
