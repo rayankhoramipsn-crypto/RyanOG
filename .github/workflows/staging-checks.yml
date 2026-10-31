@@ -19,3 +19,5 @@ jobs:
         run: python3 tests/test_staging_routes.py
       - name: Verify main-page layout, assets and JavaScript syntax
         run: python3 tests/test_main_ui.py
+      - name: Verify persistent login and marketplace moderation
+        run: python3 tests/test_marketplace_auth_admin.py

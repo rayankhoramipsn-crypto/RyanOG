@@ -1401,6 +1401,14 @@ body,#store-screen{background:radial-gradient(ellipse 75% 22% at 50% 0%,#271338 
 @media(max-width:580px){#store-screen .tc52-hero-promos{grid-template-columns:1fr!important;grid-template-rows:auto!important}#store-screen .tc52-hero-promos .tc52-promo{min-height:150px!important}#lang-screen .lang-wrap{margin:16px!important;padding:26px 16px!important}#lang-screen .lang-grid{gap:8px!important}#lang-screen .lang-btn{padding:12px 9px!important}}
 </style><link rel="stylesheet" href="assets/trisocmd-native-v13.css?v=13">
 <link rel="stylesheet" href="assets/trisocmd-lower-v14.css?v=14">
+<style id="triso-remember-admin-style">
+.tc31-remember{display:flex;align-items:center;gap:9px;padding:10px 0 14px;color:#c9c2d7;font-size:13px}
+.tc31-remember input{width:17px;height:17px;accent-color:#a681f4}
+.tc-market-admin-queue{margin:20px 0;padding:22px;border:1px solid rgba(170,133,255,.34);border-radius:20px;background:linear-gradient(140deg,rgba(80,48,121,.22),rgba(18,15,31,.8))}
+.tc-market-admin-queue h3{font-size:20px;color:#f0e6ff;margin:0 0 10px}.tc-market-note{font-size:12px;color:#b9adc8}
+.tc-market-list{display:grid;gap:15px;margin:12px 0}.tc-market-entry{border:1px solid rgba(155,116,218,.35);background:rgba(21,18,34,.8);padding:16px;border-radius:15px}.tc-market-entry-header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}.tc-market-entry-header strong{overflow-wrap:anywhere;color:#faf5ff}.tc-market-desc{white-space:pre-wrap;overflow-wrap:anywhere;color:#bfb7ce;font-size:13px;margin:10px 0}.tc-market-photos{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap}.tc-market-photos img{object-fit:cover;width:105px;height:75px;cursor:zoom-in;border:1px solid #705c90;border-radius:9px}.tc-market-warning{color:#ffbaba;font-size:12px}.tc-market-actions{display:flex;flex-wrap:wrap;gap:8px}.tc-market-actions button:disabled{opacity:.45;cursor:not-allowed}
+</style>
+<script defer src="assets/triso-market-admin.js?v=2"></script>
 </head>
 <body><div id="tc50-staging-banner" role="status" style="position:relative;z-index:99999;background:#122330;border-bottom:1px solid #467487;color:#c2eaff;padding:10px 18px;text-align:center;font:600 12px/1.5 system-ui,sans-serif">STAGING PREVIEW · Payments, order processing, and support notifications are not live. Do not send funds.</div>
 <a class="tc49-skip" href="#tc-shop-heading">SKIP TO PRODUCTS</a>
@@ -1715,10 +1723,18 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElement
 
 
 <section class="screen" id="tc31-panel"><div class="tc31-wrap"><div class="tc31-nav"><strong>TRISO<span style="color:#67d9ff">CMD.</span> / ACCOUNT</strong><button onclick="showScreen('store-screen')">← Back to shop</button></div><div class="tc31-kicker">PLAYER PORTAL / 001</div><h1 class="tc31-heading">YOUR SPACE.<br>YOUR GAME.</h1><p class="tc31-muted">Secure account access, your profile and your orders.</p>
-<div id="tc31-guest" class="tc31-grid"><div class="tc31-card"><h3>Sign in</h3><label>Email</label><input id="tc31-email" type="email" class="tc31-input" autocomplete="email" placeholder="player@example.com"><label>Password</label><input id="tc31-password" type="password" class="tc31-input" autocomplete="current-password" placeholder="At least 8 characters"><div class="tc31-row"><button class="tc31-btn" onclick="tc31Email('login')">Sign in</button><button class="tc31-btn tc31-alt" onclick="tc31ShowSignup()">Create account ↗</button></div><p class="tc31-small">By creating an account you agree to the store's published policies.</p><button class="tc31-btn tc31-alt" onclick="tc31Reset()">Forgot password?</button></div><div class="tc31-card"><h3>One-click access</h3><p class="tc31-muted">Sign in using your Google account.</p><button class="tc31-btn tc31-alt" onclick="tc31Google()">Continue with Google ↗</button><p class="tc31-small">Google sign-in requires provider setup in Supabase before use.</p><div class="tc31-pill">SUPABASE AUTH</div></div></div>
+<div id="tc31-guest" class="tc31-grid"><div class="tc31-card"><h3>Sign in</h3><label>Email</label><input id="tc31-email" type="email" class="tc31-input" autocomplete="email" placeholder="player@example.com"><label>Password</label><input id="tc31-password" type="password" class="tc31-input" autocomplete="current-password" placeholder="At least 8 characters"><label class="tc31-remember"><input id="tc31-remember" type="checkbox" checked> Remember me on this device</label>
+<div class="tc31-row"><button class="tc31-btn" onclick="tc31Email('login')">Sign in</button><button class="tc31-btn tc31-alt" onclick="tc31ShowSignup()">Create account ↗</button></div><p class="tc31-small">By creating an account you agree to the store's published policies.</p><button class="tc31-btn tc31-alt" onclick="tc31Reset()">Forgot password?</button></div><div class="tc31-card"><h3>One-click access</h3><p class="tc31-muted">Sign in using your Google account.</p><button class="tc31-btn tc31-alt" onclick="tc31Google()">Continue with Google ↗</button><p class="tc31-small">Google sign-in requires provider setup in Supabase before use.</p><div class="tc31-pill">SUPABASE AUTH</div></div></div>
 <div class="tc31-card" id="tc31-recovery-shell" hidden style="margin:20px 0"><h3>Set a new password</h3><div id="tc31-recovery-form" hidden style="margin-top:16px"><label>New password</label><input id="tc31-new-password" type="password" class="tc31-input" autocomplete="new-password" placeholder="At least 8 characters"><label>Confirm new password</label><input id="tc31-confirm-new-password" type="password" class="tc31-input" autocomplete="new-password" placeholder="Repeat new password"><button class="tc31-btn" onclick="tc31UpdatePassword()">Update password</button></div></div>
 <div id="tc31-signup-view" style="display:none" class="tc31-signup-shell"><div class="tc31-signup-top"><button type="button" class="tc31-btn tc31-alt" onclick="tc31HideSignup()">← Back to sign in</button><span>TRISOCMD / JOIN THE COMMUNITY</span></div><div class="tc31-card tc31-signup-card"><div class="tc31-signup-kicker">CREATE YOUR PLAYER PROFILE / 001</div><h2>YOUR ACCOUNT.<br><em>YOUR WORLD.</em></h2><p class="tc31-muted">One account for your orders, marketplace listings and conversations.</p><form id="tc31-signup-form" onsubmit="event.preventDefault();tc31Register()"><label for="tc31-signup-name">Display name</label><input id="tc31-signup-name" class="tc31-input" type="text" minlength="2" maxlength="40" autocomplete="nickname" placeholder="What should we call you?" required><label for="tc31-signup-email">Email address</label><input id="tc31-signup-email" class="tc31-input" type="email" autocomplete="email" placeholder="you@example.com" required><label for="tc31-signup-password">Password</label><input id="tc31-signup-password" class="tc31-input" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters" required><label for="tc31-signup-confirm">Confirm password</label><input id="tc31-signup-confirm" class="tc31-input" type="password" autocomplete="new-password" minlength="8" placeholder="Repeat your password" required><p class="tc31-small">Use a unique password. You may be asked to confirm your email before signing in.</p><button type="submit" class="tc31-btn tc31-signup-submit">CREATE ACCOUNT ↗</button><p class="tc31-small">By creating an account, you agree to the store's published policies.</p></form><div class="tc31-signup-divider">OR</div><button type="button" class="tc31-btn tc31-alt tc31-google-wide" onclick="tc31Google()">Continue with Google ↗</button><p class="tc31-small">Already have an account? <button type="button" class="tc31-signup-inline" onclick="tc31HideSignup()">Sign in instead</button></p></div></div>
-<div id="tc31-user" class="tc31-card" style="display:none"><div id="tc40-admin-status" class="tc40-admin-status" role="status">Checking account permissions…</div><div id="tc40-admin-preview" hidden><div class="tc40-admin-title">ADMIN ACCESS VERIFIED</div><p class="tc31-muted">Your account is recognized by Supabase. Manage products and fulfillment below. Changes require server-verified admin permissions.</p><button class="tc31-btn tc31-alt" onclick="tc40RefreshProducts()">Refresh product overview</button><div id="tc40-inventory" class="tc40-inventory"></div><section class="tc46-admin">
+<div id="tc31-user" class="tc31-card" style="display:none"><div id="tc40-admin-status" class="tc40-admin-status" role="status">Checking account permissions…</div><div id="tc40-admin-preview" hidden><div class="tc40-admin-title">ADMIN ACCESS VERIFIED</div><p class="tc31-muted">Your account is recognized by Supabase. Manage products and fulfillment below. Changes require server-verified admin permissions.</p><button class="tc31-btn tc31-alt" onclick="tc40RefreshProducts()">Refresh product overview</button><div id="tc40-inventory" class="tc40-inventory"></div>
+<section class="tc-market-admin-queue" id="tc-market-admin" hidden aria-label="Marketplace approval queue">
+<h3>MARKETPLACE APPROVALS <span id="tc-market-count" style="color:#c6aaff">0</span></h3>
+<p class="tc-market-note">Listings posted by other accounts appear here until you approve or decline. Review uploaded item photos before approving.</p>
+<div class="tc-market-actions"><button type="button" class="tc31-btn tc31-alt" onclick="tcMarketAdminRefresh()">Refresh pending listings</button><a class="tc31-btn tc31-alt" href="admin/" style="text-decoration:none">Full moderation dashboard ↗</a></div>
+<div id="tc-market-status" class="tc-market-note" role="status" aria-live="polite">Checking new submissions…</div>
+<div id="tc-market-pending" class="tc-market-list"></div>
+</section><section class="tc46-admin">
  <h3>STORE OPERATIONS / ADMIN 4.6</h3>
  <div class="tc46-tabs"><button onclick="tc46Tab('products')">PRODUCTS</button><button onclick="tc46Tab('orders')">ORDERS</button><button onclick="tc46Tab('audit')">AUDIT LOG</button></div>
  <div id="tc46-admin-msg" role="status" class="tc46-msg">Access verified by Supabase.</div>
@@ -3070,6 +3086,7 @@ function spawnParticles() {
 </script>
 
 
+<script src="assets/triso-auth-storage.js?v=2"></script>
 <script id="tc31-auth">
 (function(){
 'use strict';
@@ -3083,17 +3100,29 @@ async function api(path,body,token){
  const d=await res.json().catch(()=>({}));if(!res.ok)throw Error(d.error_description||d.msg||d.message||d.error||'Authentication failed');return d;
 }
 function update(){const u=session?.user;const guest=$('tc31-guest'),user=$('tc31-user');if(guest)guest.style.display=u?'none':($('tc31-signup-view')?.style.display==='block'?'none':'grid');if(u&&$('tc31-signup-view'))$('tc31-signup-view').style.display='none';if(user)user.style.display=u?'block':'none';if(u){$('tc31-user-email').textContent=u.email||'Player';window.tc36LoadOrders?.();window.tc40CheckAdmin?.(session.access_token)}else{window.tc40ResetAdmin?.();const el=$('tc36-orders');if(el)el.textContent='Sign in to view orders.';}}
-function save(d){if(d?.access_token&&d?.refresh_token){session=d;sessionStorage.setItem(storeKey,JSON.stringify({access_token:d.access_token,refresh_token:d.refresh_token,expires_at:Math.floor(Date.now()/1000)+(d.expires_in||3600),user:d.user}));}update();}
-async function refresh(){if(!session?.refresh_token)return false;try{save(await api('token?grant_type=refresh_token',{refresh_token:session.refresh_token}));return true}catch(e){clear();return false}}
-function clear(){session=null;sessionStorage.removeItem(storeKey);update()}
-async function restore(){try{session=JSON.parse(sessionStorage.getItem(storeKey)||'null');if(session?.refresh_token){if(!session.expires_at||session.expires_at<Math.floor(Date.now()/1000)+90)await refresh();else{const res=await fetch(url+'/auth/v1/user',{headers:{apikey:anon,Authorization:'Bearer '+session.access_token}});if(res.ok){session.user=await res.json();update()}else await refresh()}}}catch(e){clear()}update()}
-
+function save(d){if(d?.access_token&&d?.refresh_token){window.TrisoAuth.write(d);session=window.TrisoAuth.read()||d;}update();}
+async function refresh(){if(!session?.refresh_token)return false;try{save(await api('token?grant_type=refresh_token',{refresh_token:session.refresh_token}));return true}catch(e){const t=(e.message||'').toLowerCase();if(/invalid.refresh|refresh.token.not.found|already.used|invalid.grant/.test(t))clear();else status('Connection interrupted. Your remembered login is saved; retry when online.');return false}}
+function clear(){session=null;window.TrisoAuth.clear();update()}
+async function restore(){
+ session=window.TrisoAuth.read();
+ if(!session?.refresh_token){update();return}
+ try{
+   if(!session.expires_at||session.expires_at<Math.floor(Date.now()/1000)+120){await refresh()}
+   else {
+     const res=await fetch(url+'/auth/v1/user',{headers:{apikey:anon,Authorization:'Bearer '+session.access_token}});
+     if(res.ok){session.user=await res.json();update()}
+     else if(res.status===401||res.status===403)await refresh();
+     else status('You appear offline. Your login remains remembered.');
+   }
+ }catch(e){status('Network unavailable; remembered login will be retried.')}
+ update();
+}
 
 window.tc40ResetAdmin=()=>{
  const e=$('tc40-admin-status'),panel=$('tc40-admin-preview');
  if(e)e.textContent='Sign in to check account permissions.';
  if(panel)panel.hidden=true;
- window.tc46AdminReset?.();
+ window.tc46AdminReset?.();window.tcMarketAdminReset?.();
 };
 window.tc40CheckAdmin=async token=>{
  const e=$('tc40-admin-status'),panel=$('tc40-admin-preview');
@@ -3103,7 +3132,7 @@ window.tc40CheckAdmin=async token=>{
   const r=await fetch(url+'/rest/v1/rpc/is_admin',{method:'POST',headers:{apikey:anon,Authorization:'Bearer '+token,'Content-Type':'application/json'},body:'{}'});
   if(!r.ok)throw Error('Admin verification unavailable ('+r.status+').');
   const result=await r.json();
-  if(result===true){e.textContent='✓ Signed in · Admin role confirmed';panel.hidden=false;window.tc40RefreshProducts();window.tc42AdminInbox?.();window.tc46AdminReady?.()}
+  if(result===true){e.textContent='✓ Signed in · Admin role confirmed';panel.hidden=false;window.tc40RefreshProducts();window.tc42AdminInbox?.();window.tc46AdminReady?.();window.tcMarketAdminLoad?.()}
   else e.textContent='Signed in · Customer account';
  }catch(err){e.textContent=err.message+' — check function permissions in Supabase.'}
 };
@@ -3149,8 +3178,19 @@ window.tc31Google=()=>{if(location.protocol==='file:'){status('Google sign-in ne
 window.tc31Reset=async()=>{try{const email=$('tc31-email').value.trim();if(!email)throw Error('Enter your email first.');const redirect_to=location.protocol==='file:'?undefined:location.origin+location.pathname;await api('recover',{email,...(redirect_to?{redirect_to}:{})});status('If this email is registered, a recovery link will be sent.')}catch(e){status(e.message)}};
 window.tc31UpdatePassword=async()=>{try{if(!session?.access_token)throw Error('Recovery session missing. Request a new password reset link.');const password=$('tc31-new-password').value,confirm=$('tc31-confirm-new-password').value;if(password.length<8)throw Error('Use at least 8 characters.');if(password!==confirm)throw Error('Passwords do not match.');status('Updating password…');const res=await fetch(url+'/auth/v1/user',{method:'PUT',headers:{apikey:anon,Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:JSON.stringify({password})});const data=await res.json().catch(()=>({}));if(!res.ok)throw Error(data.msg||data.message||data.error_description||'Password update failed');$('tc31-new-password').value='';$('tc31-confirm-new-password').value='';$('tc31-recovery-form').hidden=true;$('tc31-recovery-shell').hidden=true;status('Password updated successfully. You are signed in.');update()}catch(e){status(e.message)}};
 window.tc31Logout=async()=>{const token=session?.access_token;clear();try{if(token)await api('logout',{},token)}catch(e){}status('Signed out.')};
-async function init(){const h=new URLSearchParams(location.hash.slice(1));if(h.has('access_token')){const access_token=h.get('access_token'),refresh_token=h.get('refresh_token');history.replaceState(null,'',location.pathname+location.search);try{const res=await fetch(url+'/auth/v1/user',{headers:{apikey:anon,Authorization:'Bearer '+access_token}});if(!res.ok)throw Error('Google sign-in could not be verified.');const user=await res.json();save({access_token,refresh_token,expires_in:Number(h.get('expires_in'))||3600,user});showScreen('tc31-panel');if(h.get('type')==='recovery'){$('tc31-recovery-shell').hidden=false;$('tc31-recovery-form').hidden=false;status('Set a new password below.')}else status('Signed in successfully.')}catch(e){status(e.message)}}else await restore();}
+async function init(){
+ const keep=$('tc31-remember');
+ if(keep){keep.checked=window.TrisoAuth.remembered();keep.addEventListener('change',()=>window.TrisoAuth.setRemember(keep.checked))}
+ const h=new URLSearchParams(location.hash.slice(1));if(h.has('access_token')){const access_token=h.get('access_token'),refresh_token=h.get('refresh_token');history.replaceState(null,'',location.pathname+location.search);try{const res=await fetch(url+'/auth/v1/user',{headers:{apikey:anon,Authorization:'Bearer '+access_token}});if(!res.ok)throw Error('Google sign-in could not be verified.');const user=await res.json();save({access_token,refresh_token,expires_in:Number(h.get('expires_in'))||3600,user});showScreen('tc31-panel');if(h.get('type')==='recovery'){$('tc31-recovery-shell').hidden=false;$('tc31-recovery-form').hidden=false;status('Set a new password below.')}else status('Signed in successfully.')}catch(e){status(e.message)}}else await restore();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+window.addEventListener('storage',event=>{
+ if(event.key===storeKey||event.key==='tc35_remember_me'){
+   const next=window.TrisoAuth.read();
+   if((next?.access_token||null)!==(session?.access_token||null)){session=next;update()}
+ }
+});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&session?.refresh_token&&(!session.expires_at||session.expires_at<Math.floor(Date.now()/1000)+120))refresh()});
+setInterval(()=>{if(session?.refresh_token&&(!session.expires_at||session.expires_at<Math.floor(Date.now()/1000)+120))refresh()},60000);
 })();
 </script>
 
