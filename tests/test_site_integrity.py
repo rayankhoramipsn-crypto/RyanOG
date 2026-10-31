@@ -85,7 +85,7 @@ class SiteIntegrity(unittest.TestCase):
   for page in pages:
    with self.subTest(page=page):
     text=(ROOT/page).read_text(encoding="utf-8")
-    icons=re.findall(r'<link\\s+rel="icon"\\s+type="image/svg\\+xml"\\s+href="([^"]+)"',text)
+    icons=re.findall(r'<link\s+rel="icon"\s+type="image/svg\+xml"\s+href="([^"]+)"',text)
     self.assertEqual(len(icons),1,"Expected exactly one SVG favicon: "+page)
     path=(ROOT/page).parent/icons[0]
     self.assertTrue(path.is_file(),f"{page}: missing {path}")
@@ -114,7 +114,7 @@ class SiteIntegrity(unittest.TestCase):
   ]:
    with self.subTest(image=name):
     data=(ROOT/"assets"/name).read_bytes()
-    self.assertEqual(data[:8],b"\\x89PNG\\r\\n\\x1a\\n")
+    self.assertEqual(data[:8],b"\x89PNG\r\n\x1a\n")
     self.assertEqual(struct.unpack(">II",data[16:24]),(w,h))
     off=8
     parts=[]
