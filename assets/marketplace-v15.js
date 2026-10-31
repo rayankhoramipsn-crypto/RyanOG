@@ -3,7 +3,7 @@
 const API='https://cxtytbjvdlngahytfilr.supabase.co';
 const KEY='sb_publishable_AqZWjpgyZ_h6-EKwOySyGQ_0LE8bcRm';
 const $=id=>document.getElementById(id);
-const S={session:null,admin:false,items:[],photos:new Map(),signed:new Map(),category:'all',sort:'new',query:'',selected:null,threads:[],active:null,lastKey:'',timer:null,lang:'en'};
+const S={session:null,admin:false,items:[],photos:new Map(),signed:new Map(),category:'all',sort:'new',query:'',selected:null,threads:[],active:null,lastKey:'',timer:null,rt:null,channel:null,lang:'en'};
 const i18n={en:{all:'All listings',fortnite:'Fortnite',roblox:'Roblox',steam:'Steam',gear:'Gaming gear',other:'Other',browse:'Explore listings',sell:'Sell an item',messages:'Messages',rules:'Marketplace rules',noresults:'No approved listings match your search.',details:'View details',contact:'Chat with seller',login:'Sign in',logout:'Sign out'},
 fa:{all:'تمام آگهی‌ها',fortnite:'فورتنایت',roblox:'روبلاکس',steam:'استیم',gear:'تجهیزات گیمینگ',other:'سایر',browse:'آگهی‌های مارکت‌پلیس',sell:'ثبت آگهی',messages:'پیام‌ها',rules:'قوانین بازار',noresults:'آگهی تأییدشده‌ای پیدا نشد.',details:'مشاهده جزئیات',contact:'چت با فروشنده',login:'ورود',logout:'خروج'},
 ar:{all:'كل الإعلانات',fortnite:'فورتنايت',roblox:'روبلوكس',steam:'ستيم',gear:'معدات الألعاب',other:'أخرى',browse:'تصفح السوق',sell:'نشر إعلان',messages:'الرسائل',rules:'قواعد السوق',noresults:'لا توجد إعلانات مطابقة.',details:'عرض التفاصيل',contact:'مراسلة البائع',login:'تسجيل الدخول',logout:'تسجيل الخروج'}};
@@ -48,8 +48,22 @@ function renderThreads(){const root=$('thread-list');empty(root);root.append(mak
 async function showChats(id){if(!S.session?.user){dialog('auth-dialog');return}await threads();dialog('chat-dialog');const selected=S.threads.find(c=>+c.id===+id)||S.threads[0];if(selected)await selectThread(selected);else{$('chat-topic').textContent='No conversations';empty($('bubbles'));$('chat-form').classList.add('hidden')}}
 async function selectThread(row){S.active=row.id;S.lastKey='';renderThreads();const p=S.items.find(x=>+x.id===+row.listing_id);$('chat-topic').textContent=p?.title||'Listing #'+row.listing_id;$('chat-sub').textContent=(row.seller_id===S.session.user.id?'Buyer inquiry':'Seller inquiry')+' · Admin may review for safety';$('chat-form').classList.remove('hidden');await messages(true);startPolling()}
 async function messages(force=false){if(!S.active||!S.session?.user||!$('chat-dialog').open)return;const id=S.active;try{const rows=await req('/rest/v1/market_messages?select=id,sender_id,body,created_at&conversation_id=eq.'+id+'&order=created_at.asc&limit=200');if(S.active!==id)return;const last=rows.at(-1),key=rows.length+':'+(last?.id||0);if(!force&&key===S.lastKey)return;S.lastKey=key;const box=$('bubbles'),nearBottom=box.scrollHeight-box.scrollTop-box.clientHeight<90;empty(box);if(!rows.length)box.append(make('p','Start a conversation about this listing.','fine'));for(const r of rows){const b=make('div',r.body,'bubble'+(r.sender_id===S.session.user.id?' mine':''));b.append(make('small',date(r.created_at)));box.append(b)}if(nearBottom||force)box.scrollTop=box.scrollHeight}catch(e){$('chat-state').textContent='Chat offline: '+errorText(e)}}
-function stopPolling(){if(S.timer){clearInterval(S.timer);S.timer=null}}
-function startPolling(){stopPolling();S.timer=setInterval(()=>{if(!document.hidden&&$('chat-dialog').open)messages()},3000);$('chat-state').textContent='Live refresh · every 3 seconds'}
+function stopPolling(){
+ if(S.timer){clearInterval(S.timer);S.timer=null}
+ if(S.rt&&S.channel){S.rt.removeChannel(S.channel).catch(()=>{});S.channel=null}
+}
+function realtimeSubscribe(){
+ if(!S.session?.access_token||!S.active||!window.supabase?.createClient)return;
+ try{
+  if(!S.rt)S.rt=window.supabase.createClient(API,KEY,{auth:{persistSession:false,autoRefreshToken:false}});
+  S.rt.realtime.setAuth(S.session.access_token);
+  const room=S.active;
+  S.channel=S.rt.channel('triso-market-chat-'+room)
+   .on('postgres_changes',{event:'INSERT',schema:'public',table:'market_messages',filter:'conversation_id=eq.'+room},()=>{if(S.active===room)messages()})
+   .subscribe(state=>{$('chat-state').textContent=state==='SUBSCRIBED'?'Realtime connected · live messages':'Messages sync every 3 seconds'});
+ }catch(e){console.warn('Realtime fallback enabled',e)}
+}
+function startPolling(){stopPolling();S.timer=setInterval(()=>{if(!document.hidden&&$('chat-dialog').open)messages()},3000);$('chat-state').textContent='Messages sync every 3 seconds';realtimeSubscribe()}
 async function send(e){e.preventDefault();if(!S.active)return;const txt=$('chat-body').value.trim();if(!txt)return;if(/password|recovery code|seed phrase|access token|one.time code/i.test(txt)){note('Do not share passwords, recovery codes or login tokens.');return}const btn=$('chat-send');btn.disabled=true;try{await rpc('market_send_message',{p_conversation:S.active,p_body:txt});$('chat-body').value='';await messages(true)}catch(e){note(errorText(e))}finally{btn.disabled=false}}
 async function init(){try{S.session=JSON.parse(sessionStorage.getItem('tc35_auth_session')||'null');await refresh()}catch{saveSession(null)}
 S.lang=['en','fa','ar'].includes(localStorage.getItem('tc_market_lang'))?localStorage.getItem('tc_market_lang'):'en';S.admin=await adminCheck();translate();await browse();if(S.session?.user)await Promise.allSettled([mine(),threads()]);
@@ -72,5 +86,6 @@ $('chat-seller').addEventListener('click',contact);
 $('chat-form').addEventListener('submit',send);
 $('chat-dialog').addEventListener('close',stopPolling);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){if(S.active)messages();browse()}});
+setInterval(async()=>{if(!S.session?.refresh_token)return;const expires=S.session.expires_at||0;if(expires && expires*1000>Date.now()+4*60*1000)return;await refresh();if(S.rt&&S.session?.access_token)S.rt.realtime.setAuth(S.session.access_token);sessionUI()},120000);
 init();
 })();
