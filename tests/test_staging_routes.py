@@ -114,7 +114,7 @@ class StagingRoutes(unittest.TestCase):
                 self.assertNotIn("service_role", market.lower())
         for critical in ("market_browse", "market_submit", "market_listing_media",
                          "market_start_chat", "market_send_message", "market_messages",
-                         "market_conversations", "market-gallery", "realtimeSubscribe",
+                         "market_conversations", "market-gallery", "startInbox", "market_inbox", "market_mark_read",
                          "setInterval", "checkFiles(files)", "p_image_url:null"):
             self.assertIn(critical, script)
         # Admin reviews seller photos; approval is blocked if gallery is empty.
