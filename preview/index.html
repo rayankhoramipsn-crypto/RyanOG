@@ -1500,7 +1500,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElement
  <div class="tc46-actions"><button type="submit">SAVE PRODUCT</button><button type="button" onclick="tc46CancelEdit()">CANCEL</button></div>
  </form></div>
  <div id="tc46-orders" class="tc46-pane" hidden><div class="tc46-bar"><strong>ORDER MANAGEMENT</strong><button onclick="tc46LoadOrders()">↻ REFRESH</button></div><div id="tc46-order-list"></div></div>
- <div id="tc46-audit" class="tc46-pane" hidden><div class="tc46-bar"><strong>RECENT ADMIN ACTIONS</strong><button onclick="tc46LoadAudit()">↻ REFRESH</button></div><div id="tc46-audit-list"></div></div>
+ <div id="tc46-audit" class="tc46-pane" hidden><div class="tc46-bar"><strong>RECORDED MARKETPLACE ACTIVITY</strong><button onclick="tc46LoadAudit()">↻ REFRESH</button></div><div id="tc46-audit-list"></div></div>
  </section><section class="tc42-admin"><h3>SUPPORT INBOX / LIVE SUPPORT 4.7</h3><p class="tc47-inbox-hint">Messages are saved in Supabase. Refresh the inbox to see new conversations. Telegram notifications require server setup.</p><button type="button" onclick="tc42AdminInbox()">↻ REFRESH CONVERSATIONS</button><button class="tc31-btn tc31-alt" onclick="tc42AdminInbox()">Refresh customer threads</button><div id="tc42-admin-inbox" role="status"></div></section></div><div class="tc31-kicker">SIGNED IN</div><h3 id="tc31-user-email">Player</h3><div class="tc31-grid"><div><h3>Account overview</h3><p class="tc31-muted">Signed in with Supabase Auth. Orders are not yet linked to this account.</p><button class="tc31-btn tc31-alt" onclick="tc31Logout()">Sign out</button></div><div><h3>My orders</h3><div class="tc31-order" id="tc36-orders" role="status">Checking your orders…</div><button class="tc31-btn tc31-alt" onclick="tc45OpenTracking()">Open order tracking ↗</button><button class="tc31-btn tc31-alt" onclick="tc36LoadOrders()">Refresh orders</button><p class="tc31-small">Only new orders associated with your signed-in account will appear. Existing manual checkout orders are not migrated.</p></div></div></div><p id="tc31-status" class="tc31-status" role="status"></p></div></section>
 <section class="screen" id="tc31-trust">
 <div class="tc33-trust-shell">
@@ -3417,21 +3417,40 @@ count();
    if(!rows.length)root.textContent='No orders yet.';
    for(const o of rows){
     const c=card('ORDER '+o.id.slice(0,8)+' · $'+Number(o.total_amount).toFixed(2),'Status: '+o.status+' · '+new Date(o.created_at).toLocaleString()+' · '+(Array.isArray(o.items)?o.items.map(i=>i.title+' × '+i.qty).join(', '):''));
-    if(o.status==='paid')action(c.actions,'MARK FULFILLED',()=>tc46SetOrderStatus(o.id,'fulfilled'));
-    if(o.status==='awaiting_payment')action(c.actions,'CANCEL',()=>tc46SetOrderStatus(o.id,'cancelled'),true);
+    /* No status buttons: the tc46_transition_order RPC is not installed, and
+       payment verification/fulfillment is intentionally disabled here. */
     root.append(c.el);
    }
-   say('Loaded '+rows.length+' orders. Paid status cannot be set manually.');
+   say('Loaded '+rows.length+' order records (read-only). Payment verification and fulfillment are not enabled.');
   }catch(e){root.textContent=e.message;say(e.message)}
  };
- window.tc46SetOrderStatus=async(id,next)=>{
-  if(!allowed)return say('Admin access required');
-  if(!confirm('Change order '+id.slice(0,8)+' to '+next+'?'))return;
-  try{await request('rpc/tc46_transition_order',{method:'POST',body:{p_order:id,p_next:next}});say('Order updated.');await tc46LoadOrders()}catch(e){say(e.message)}
- };
+ window.tc46SetOrderStatus=()=>say('Order status transitions are not configured. No payment has been verified or charged.');
  window.tc46LoadAudit=async()=>{
-  const root=$('tc46-audit-list');root.textContent='Loading audit log…';
-  try{if(!allowed)await verify();const rows=await request('tc46_admin_audit?select=id,action,target_id,created_at&order=created_at.desc&limit=100');root.replaceChildren();if(!rows.length)root.textContent='No logged actions yet.';for(const r of rows){const c=card(r.action,'Target '+r.target_id+' · '+new Date(r.created_at).toLocaleString());root.append(c.el)}}catch(e){root.textContent=e.message;say(e.message)}
+  const root=$('tc46-audit-list');root.textContent='Loading recorded marketplace activity…';
+  try{
+   if(!allowed)await verify();
+   // This is the activity table actually present in Supabase. A full product
+   // and payment audit trail is NOT set up: do not mislabel it as one.
+   const rows=await request('market_listing_activity?select=id,listing_id,actor_id,action,previous_status,created_at&order=created_at.desc&limit=100');
+   root.replaceChildren();
+   const explanation=document.createElement('p');
+   explanation.className='tc46-msg';
+   explanation.textContent='Recorded listing removals only. Product edits, payments and orders do not yet have a complete audit trail.';
+   root.append(explanation);
+   if(!rows.length){
+    const empty=document.createElement('p');empty.textContent='No recorded listing removals yet.';root.append(empty);
+   }
+   for(const row of rows){
+    const item=card(String(row.action||'Listing update').replaceAll('_',' ').toUpperCase(),
+      'Listing #'+row.listing_id+' · Previous status: '+(row.previous_status||'unknown')+
+      ' · '+new Date(row.created_at).toLocaleString());
+    root.append(item.el);
+   }
+   say('Marketplace activity loaded. Full admin audit logging is not configured.');
+  }catch(err){
+   root.textContent='Marketplace activity unavailable: '+err.message;
+   say('Could not load marketplace activity. '+err.message);
+  }
  };
 })();
 </script><div id="staging-warning" role="status" style="position:fixed;bottom:0;left:0;right:0;z-index:2147483647;background:#241c0b;color:#ffe3a3;text-align:center;padding:9px;font:600 12px system-ui;border-top:1px solid #c69b45">TRISO TEST — STAGING PREVIEW ONLY · No real purchases or payments</div>
