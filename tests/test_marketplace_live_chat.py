@@ -42,7 +42,7 @@ class LiveChatV17(unittest.TestCase):
             "startInbox()", "stopInbox()", "updateUnreadBadges(",
             "S.inboxTimer=setInterval", "messages(true)",
             "if(!selected){", "S.readMarks.set(id,key)",
-            "String(row.id)===String(id)", "box.value=''",
+            "String(c.id)===String(id)", "box.value=''",
             "chatFeedback('Message not sent.", "e.key==='Enter'&&!e.shiftKey",
         ]:
             self.assertIn(phrase,code,phrase)
