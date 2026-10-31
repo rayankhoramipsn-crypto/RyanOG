@@ -128,7 +128,7 @@ try{
 
  const missing=await open('/404.html');
  await missing.getByRole('heading',{name:'Looks like this page went offline.'}).waitFor();
- assert.equal(await missing.locator('a[href="/"]').count(),2,'404 needs home navigation');
+ assert.equal(await missing.locator('a[href="/"]').count(),3,'404 needs home navigation in logo, header and action');
  assert.equal(await missing.locator('a[href="/marketplace.html"]').count(),2,'404 needs marketplace navigation');
  assert.equal(await missing.locator('a[href="/help/"]').count(),2,'404 needs support navigation');
  assert.equal(await missing.locator('html').getAttribute('lang'),'en');
