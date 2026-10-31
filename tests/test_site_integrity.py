@@ -6,6 +6,10 @@ from html.parser import HTMLParser
 from pathlib import Path
 import subprocess
 import unittest
+import struct
+import zlib
+import re
+import xml.etree.ElementTree as ET
 
 ROOT=Path(__file__).resolve().parents[1]
 ROUTES=[
@@ -67,6 +71,66 @@ class SiteIntegrity(unittest.TestCase):
   self.assertIn('id="go-back"',page)
   self.assertIn("prefers-reduced-motion",page)
   self.assertNotIn("service_role",page)
+
+ def test_shared_site_favicon_and_open_graph_cards(self):
+  pages=[
+   "index.html","marketplace.html","product.html","blog/index.html",
+   "videos/index.html","help/index.html","policies/index.html",
+   "admin/index.html","404.html",
+   "preview/index.html","preview/marketplace.html","preview/admin/index.html",
+   "preview/blog/index.html","preview/product.html","preview/videos/index.html",
+   "preview/help/index.html","preview/policies/index.html"
+  ]
+  public_pages=set(pages[:7])
+  for page in pages:
+   with self.subTest(page=page):
+    text=(ROOT/page).read_text(encoding="utf-8")
+    icons=re.findall(r'<link\s+rel="icon"\s+type="image/svg\+xml"\s+href="([^"]+)"',text)
+    self.assertEqual(len(icons),1,"Expected exactly one SVG favicon: "+page)
+    path=(ROOT/page).parent/icons[0]
+    self.assertTrue(path.is_file(),f"{page}: missing {path}")
+    self.assertIn("trisocmd-icon-64.png",text)
+    self.assertIn("trisocmd-apple-touch.png",text)
+    if page in public_pages:
+     for meta in (
+      '<meta property="og:site_name" content="TRISOCMD">',
+      '<meta property="og:image:width" content="1200">',
+      '<meta property="og:image:height" content="630">',
+      '<meta property="og:image:type" content="image/png">',
+      '<meta name="twitter:card" content="summary_large_image">',
+      'https://trisocmd.shop/assets/trisocmd-social.png?v=19',
+      '<link rel="canonical" href="https://trisocmd.shop/',
+     ):
+      self.assertIn(meta,text,f"{page}: missing {meta}")
+     self.assertEqual(len(re.findall(r'property="og:title"',text)),1)
+     self.assertEqual(len(re.findall(r'property="og:description"',text)),1)
+     self.assertEqual(len(re.findall(r'property="og:image"',text)),1)
+
+ def test_image_file_formats_and_dimensions(self):
+  for name,w,h in [
+   ("trisocmd-social.png",1200,630),
+   ("trisocmd-icon-64.png",64,64),
+   ("trisocmd-apple-touch.png",180,180)
+  ]:
+   with self.subTest(image=name):
+    data=(ROOT/"assets"/name).read_bytes()
+    self.assertEqual(data[:8],b"\x89PNG\r\n\x1a\n")
+    self.assertEqual(struct.unpack(">II",data[16:24]),(w,h))
+    off=8
+    parts=[]
+    while off<len(data):
+     size=struct.unpack(">I",data[off:off+4])[0]
+     kind=data[off+4:off+8]
+     chunk=data[off+8:off+8+size]
+     crc=struct.unpack(">I",data[off+8+size:off+12+size])[0]
+     self.assertEqual(zlib.crc32(kind+chunk)&0xffffffff,crc)
+     if kind==b"IDAT":parts.append(chunk)
+     off+=12+size
+     if kind==b"IEND":break
+    self.assertEqual(off,len(data))
+    self.assertEqual(len(zlib.decompress(b"".join(parts))),(w+1)*h)
+  icon=ET.parse(ROOT/"assets/trisocmd-icon.svg").getroot()
+  self.assertEqual(icon.tag,"{http://www.w3.org/2000/svg}svg")
 
  def test_core_javascript_parses(self):
   for path in [

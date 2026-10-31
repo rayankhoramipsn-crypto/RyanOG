@@ -53,6 +53,14 @@ jobs:
           test -s _site/assets/triso-native-digital.webp
           test -s _site/assets/triso-native-marketplace.webp
           test -s _site/assets/triso-native-hero.webp
+          # Social cards and branded favicon must ship with the public website.
+          test -s _site/assets/trisocmd-social.png
+          test -s _site/assets/trisocmd-icon.svg
+          test -s _site/assets/trisocmd-icon-64.png
+          test -s _site/assets/trisocmd-apple-touch.png
+          grep -q 'property="og:image" content="https://trisocmd.shop/assets/trisocmd-social.png' _site/index.html
+          grep -q 'name="twitter:card" content="summary_large_image"' _site/marketplace.html
+          grep -q 'rel="icon" type="image/svg+xml"' _site/404.html
           grep -q 'noindex,nofollow' _site/index.html
           grep -q 'STAGING PREVIEW ONLY' _site/index.html
           grep -q 'cxtytbjvdlngahytfilr.supabase.co' _site/preview/index.html
