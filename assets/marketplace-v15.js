@@ -61,10 +61,10 @@ function card(p){const c=make('article',null,'item-card');const main=make('div',
 function renderItems(){const root=$('cards');empty(root);const rows=filtered();$('count').textContent=rows.length+' listings';if(!rows.length)root.append(make('div',tr('noresults'),'empty'));else rows.forEach(p=>root.append(card(p)));document.querySelectorAll('[data-cat]').forEach(b=>b.classList.toggle('active',b.dataset.cat===S.category))}
 async function readPhotos(ids){if(!ids.length)return;const valid=ids.map(Number).filter(Number.isInteger);if(!valid.length)return;try{const data=await req('/rest/v1/market_listing_media?select=listing_id,object_path,sort_order&listing_id=in.('+valid.join(',')+')&order=sort_order.asc&limit=500');for(const id of valid)S.photos.set(String(id),data.filter(m=>+m.listing_id===id))}catch(e){console.warn('Gallery unavailable',errorText(e))}}
 async function browse(){try{S.items=await rpc('market_browse')||[];await readPhotos(S.items.map(p=>p.id));renderItems()}catch(e){empty($('cards'));$('cards').append(make('div','Listings unavailable: '+errorText(e),'empty'))}}
-function details(p){S.selected=p;$('detail-title').textContent=p.title;$('detail-platform').textContent=p.platform;$('detail-desc').textContent=p.description;$('detail-price').textContent=money(p.price);$('detail-date').textContent='Posted '+date(p.submitted_at);$('accept').checked=false;$('chat-seller').disabled=true;const cover=$('detail-cover'),thumbs=$('thumbs');cover.removeAttribute('src');cover.style.display='none';empty(thumbs);const images=S.photos.get(String(p.id))||[];$('detail-placeholder').classList.toggle('hidden',images.length>0);for(const [i,file] of images.entries()){signed(file.object_path).then(url=>{if(!url||S.selected?.id!==p.id)return;const img=make('img');img.src=url;img.alt='Photo '+(i+1);img.onclick=()=>{cover.src=url;cover.style.display='block'};thumbs.append(img);if(i===0){cover.src=url;cover.style.display='block'}})}dialog('detail-dialog')}
+function details(p){S.selected=p;$('purchase-status').textContent='';$('detail-title').textContent=p.title;$('detail-platform').textContent=p.platform;$('detail-desc').textContent=p.description;$('detail-price').textContent=money(p.price);$('detail-date').textContent='Posted '+date(p.submitted_at);$('accept').checked=false;$('chat-seller').disabled=true;$('request-purchase').disabled=true;const cover=$('detail-cover'),thumbs=$('thumbs');cover.removeAttribute('src');cover.style.display='none';empty(thumbs);const images=S.photos.get(String(p.id))||[];$('detail-placeholder').classList.toggle('hidden',images.length>0);for(const [i,file] of images.entries()){signed(file.object_path).then(url=>{if(!url||S.selected?.id!==p.id)return;const img=make('img');img.src=url;img.alt='Photo '+(i+1);img.onclick=()=>{cover.src=url;cover.style.display='block'};thumbs.append(img);if(i===0){cover.src=url;cover.style.display='block'}})}dialog('detail-dialog')}
 async function contact(){if(!S.selected||!$('accept').checked)return;if(!S.session?.user){close('detail-dialog');dialog('auth-dialog');note('Sign in to contact the seller.');return}const b=$('chat-seller');b.disabled=true;try{const id=await rpc('market_start_chat',{p_listing:S.selected.id});close('detail-dialog');await showChats(id)}catch(e){note(errorText(e))}finally{b.disabled=false}}
-async function login(signup){const email=$('auth-email').value.trim(),password=$('auth-password').value;if(!email||password.length<8){$('auth-note').textContent='Enter email and a password of at least 8 characters.';return}const btn=$('auth-signin');btn.disabled=true;try{const data=await req('/auth/v1/'+(signup?'signup':'token?grant_type=password'),{method:'POST',json:{email,password}});if(!data.access_token){$('auth-note').textContent='Account created. Confirm your email to sign in.';return}saveSession(data);S.admin=await adminCheck();close('auth-dialog');sessionUI();$('auth-note').textContent='';startInbox();await Promise.allSettled([mine(),threads()]);note('Signed in')}catch(e){$('auth-note').textContent=errorText(e)}finally{btn.disabled=false}}
-function logout(){stopPolling();stopInbox();saveSession(null);S.admin=false;S.active=null;S.threads=[];S.dailyCount=0;S.pro=false;close('chat-dialog');sessionUI();note('Signed out')}
+async function login(signup){const email=$('auth-email').value.trim(),password=$('auth-password').value;if(!email||password.length<8){$('auth-note').textContent='Enter email and a password of at least 8 characters.';return}const btn=$('auth-signin');btn.disabled=true;try{const data=await req('/auth/v1/'+(signup?'signup':'token?grant_type=password'),{method:'POST',json:{email,password}});if(!data.access_token){$('auth-note').textContent='Account created. Confirm your email to sign in.';return}saveSession(data);S.admin=await adminCheck();close('auth-dialog');sessionUI();$('auth-note').textContent='';startInbox();await Promise.allSettled([mine(),threads(),purchases()]);note('Signed in')}catch(e){$('auth-note').textContent=errorText(e)}finally{btn.disabled=false}}
+function logout(){stopPolling();stopInbox();saveSession(null);S.admin=false;S.active=null;S.threads=[];S.dailyCount=0;S.pro=false;close('chat-dialog');$('purchase-requests-wrap').classList.add('hidden');empty($('purchase-requests'));sessionUI();note('Signed out')}
 const mime={'image/jpeg':'jpg','image/png':'png','image/webp':'webp'};
 function checkFiles(files){if(!files.length)throw Error('At least one photo is required.');if(files.length>4)throw Error('Maximum four photos per listing.');for(const f of files)if(!mime[f.type]||f.size>5*1024*1024||f.size===0)throw Error('Use JPG, PNG or WebP photos under 5 MB each.')}
 async function uploadPhoto(id,file,pos){const path=S.session.user.id+'/'+id+'/'+crypto.randomUUID()+'.'+mime[file.type];const response=await fetch(API+'/storage/v1/object/market-gallery/'+path,{method:'POST',headers:{...headers(false),'Content-Type':file.type,'x-upsert':'false'},body:file});if(!response.ok){const data=await response.json().catch(()=>({}));throw Error(data.message||data.error||'Photo upload failed');}await req('/rest/v1/market_listing_media',{method:'POST',json:{listing_id:id,seller_id:S.session.user.id,object_path:path,alt_text:'Seller item photo',sort_order:pos},headers:{Prefer:'return=minimal'}})}
@@ -132,10 +132,56 @@ async function mine(){
       btn.onclick=()=>{S.retryId=p.id;$('retry-input').value='';$('retry-note').textContent='';dialog('retry-dialog')};
       row.append(btn);
     }
+    if(p.status!=='removed'){
+      const remove=make('button','Remove listing','btn small warn');
+      remove.type='button';remove.onclick=()=>removeMyListing(p);row.append(remove);
+    }
     if(p.decline_reason)row.append(make('span',p.decline_reason,'fine'));
     root.append(row);
   }
  }catch(e){root.textContent='My listings unavailable: '+errorText(e)}
+}
+async function removeMyListing(p){
+ if(!S.session?.user)return;
+ if(!confirm('Remove listing #'+p.id+'? It will disappear from public search, but existing messages and purchase requests will be retained.'))return;
+ try{
+  await rpc('market_remove_listing',{p_listing:Number(p.id)});
+  note('Listing #'+p.id+' removed from the marketplace.');
+  await Promise.allSettled([mine(),browse(),purchases()]);
+ }catch(e){note('Could not remove this listing: '+errorText(e));}
+}
+async function purchases(){
+ if(!S.session?.user){$('purchase-requests-wrap').classList.add('hidden');return}
+ const root=$('purchase-requests'),owner=S.session.user.id;
+ $('purchase-requests-wrap').classList.remove('hidden');
+ try{
+  const rows=await req('/rest/v1/market_purchase_requests?select=id,listing_id,listing_title,price_usd,payment_method,status,buyer_id,seller_id,created_at,admin_note&order=created_at.desc&limit=100');
+  if(S.session?.user?.id!==owner)return;
+  empty(root);
+  if(!rows.length)root.append(make('p','No purchase requests yet.','fine'));
+  for(const p of rows){
+   const card=make('article',null,'request-row');
+   const role=p.buyer_id===owner?'Buyer':'Seller';
+   card.append(make('strong',role+' · '+p.listing_title+' · '+money(p.price_usd)));
+   card.append(make('span','Status: '+p.status.replaceAll('_',' ')+' · Preferred: '+p.payment_method+' · '+date(p.created_at),'fine'));
+   if(p.admin_note)card.append(make('p','Administrator note: '+p.admin_note,'fine'));
+   root.append(card);
+  }
+ }catch(e){root.textContent='Purchase requests unavailable: '+errorText(e)}
+}
+async function requestPurchase(){
+ const p=S.selected;
+ if(!p||!$('accept').checked)return;
+ if(!S.session?.user){close('detail-dialog');dialog('auth-dialog');note('Sign in to request a purchase.');return}
+ if(!confirm('Create a purchase review request for '+p.title+' at '+money(p.price)+'? This does not send money or start escrow.'))return;
+ const btn=$('request-purchase');
+ btn.disabled=true;$('purchase-status').textContent='Submitting request…';
+ try{
+  const id=await rpc('market_request_purchase',{p_listing:Number(p.id),p_method:$('purchase-method').value,p_note:null});
+  $('purchase-status').textContent='Request '+id+' saved for administrator review. This is not a payment confirmation; do not send funds.';
+  await purchases();
+ }catch(e){$('purchase-status').textContent='Request failed: '+errorText(e)}
+ finally{btn.disabled=!$('accept').checked}
 }
 async function retry(){const files=Array.from($('retry-input').files||[]);try{checkFiles(files);const n=(S.photos.get(String(S.retryId))||[]).length;if(n+files.length>4)throw Error('Maximum four photos total.');$('retry-save').disabled=true;for(let i=0;i<files.length;i++)await uploadPhoto(S.retryId,files[i],n+i);close('retry-dialog');note('Photos saved, pending admin review.');await mine()}catch(e){$('retry-note').textContent=errorText(e)}finally{$('retry-save').disabled=false}}
 
@@ -397,7 +443,7 @@ async function init(){
  const checkbox=$('auth-remember');
  if(checkbox){checkbox.checked=window.TrisoAuth.remembered();checkbox.addEventListener('change',()=>window.TrisoAuth.setRemember(checkbox.checked))}
  if(S.session?.refresh_token&&(!S.session.expires_at||S.session.expires_at*1000<Date.now()+120000))await refresh();
-S.lang=['en','fa','ar'].includes(localStorage.getItem('tc_market_lang'))?localStorage.getItem('tc_market_lang'):'en';S.admin=await adminCheck();translate();await browse();if(S.session?.user){startInbox();await Promise.allSettled([mine(),threads()]);}
+S.lang=['en','fa','ar'].includes(localStorage.getItem('tc_market_lang'))?localStorage.getItem('tc_market_lang'):'en';S.admin=await adminCheck();translate();await browse();if(S.session?.user){startInbox();await Promise.allSettled([mine(),threads(),purchases()]);}
 const hash=Number(new URLSearchParams(location.search).get('listing'));if(hash){const found=S.items.find(x=>+x.id===hash);if(found)details(found)}}
 document.querySelectorAll('[data-cat]').forEach(b=>b.addEventListener('click',()=>{S.category=b.dataset.cat;renderItems();$('listing-section').scrollIntoView({block:'start'})}));
 $('search').addEventListener('input',e=>{S.query=e.target.value.trim().toLowerCase();renderItems()});
@@ -414,8 +460,10 @@ $('logout').addEventListener('click',logout);
 $('listing-form').addEventListener('submit',submit);
 $('photos').addEventListener('change',previewFiles);
 $('retry-save').addEventListener('click',retry);
-$('accept').addEventListener('change',e=>{$('chat-seller').disabled=!e.target.checked});
+$('accept').addEventListener('change',e=>{$('chat-seller').disabled=!e.target.checked;$('request-purchase').disabled=!e.target.checked});
 $('chat-seller').addEventListener('click',contact);
+$('request-purchase').addEventListener('click',requestPurchase);
+$('refresh-purchases').addEventListener('click',purchases);
 $('chat-form').addEventListener('submit',send);
 $('chat-body').addEventListener('keydown',e=>{
  if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){
@@ -426,7 +474,7 @@ $('chat-body').addEventListener('keydown',e=>{
 $('chat-dialog').addEventListener('close',stopPolling);
 document.addEventListener('visibilitychange',async()=>{if(!document.hidden){
  if(S.session?.refresh_token&&(!S.session.expires_at||S.session.expires_at*1000<Date.now()+120000))await refresh();
- if(S.active)messages();if(S.session?.user)threads().catch(()=>{});browse();sessionUI();
+ if(S.active)messages();if(S.session?.user){threads().catch(()=>{});purchases().catch(()=>{})}browse();sessionUI();
 }});
 window.addEventListener('storage',e=>{
  if(e.key===window.TrisoAuth.key){
@@ -434,7 +482,7 @@ window.addEventListener('storage',e=>{
   if((S.session?.access_token||null)!==(next?.access_token||null)){
    stopPolling();stopInbox();S.active=null;
    S.session=next;S.dailyCount=0;S.pro=false;S.threads=[];sessionUI();
-   if(next){startInbox();Promise.allSettled([mine(),threads()]);}
+   if(next){startInbox();Promise.allSettled([mine(),threads(),purchases()]);}else{$('purchase-requests-wrap').classList.add('hidden');empty($('purchase-requests'));}
   }
  }
 });
