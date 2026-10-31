@@ -72,12 +72,32 @@ async function open(route){
  const response=await page.goto(base+route,{waitUntil:'domcontentloaded',timeout:30000});
  assert(response&&response.status()===200,route+' did not return 200');
  assert(await page.locator('body').count()===1,route+' missing body');
+ assert.equal(await page.locator('link[rel="icon"][type="image/svg+xml"]').count(),1,route+' missing shared favicon');
  console.log('OK route '+route);
  return page;
 }
 try{
  const home=await open('/index.html');
  assert(await home.locator('#lang-screen').count()===1);
+ assert.equal(await home.locator('meta[name="twitter:card"]').getAttribute('content'),'summary_large_image');
+ assert.equal(await home.locator('meta[property="og:image:width"]').getAttribute('content'),'1200');
+ assert.equal(await home.locator('meta[property="og:image:height"]').getAttribute('content'),'630');
+ assert.match(await home.locator('meta[property="og:image"]').getAttribute('content'),/^https:\/\/trisocmd\.shop\/assets\/trisocmd-social\.png/);
+ const socialDimensions=await home.evaluate(async()=>{
+   const image=new Image();
+   image.src='/assets/trisocmd-social.png';
+   await image.decode();
+   return [image.naturalWidth,image.naturalHeight];
+ });
+ assert.deepEqual(socialDimensions,[1200,630],'social preview image is not a valid 1200×630 PNG');
+ const iconDimensions=await home.evaluate(async()=>{
+   const image=new Image();
+   image.src='/assets/trisocmd-icon-64.png';
+   await image.decode();
+   return [image.naturalWidth,image.naturalHeight];
+ });
+ assert.deepEqual(iconDimensions,[64,64],'favicon PNG failed to decode');
+ console.log('OK Open Graph and Twitter sharing metadata, favicon and image decoding');
  await home.evaluate(()=>{
   localStorage.setItem('tc35_auth_session',JSON.stringify({
    access_token:'smoke-token',refresh_token:'smoke-refresh',expires_at:Math.floor(Date.now()/1000)+3600,
