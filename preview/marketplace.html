@@ -139,6 +139,7 @@
   <div class="form-field"><label for="auth-email">Email</label><input id="auth-email" type="email" autocomplete="email" placeholder="you@example.com"></div>
   <div class="form-field" style="margin-top:14px"><label for="auth-password">Password</label><input id="auth-password" type="password" autocomplete="current-password" placeholder="At least 8 characters"></div>
   <p id="auth-note" class="notice" role="status"></p>
+  <label class="tc31-remember" style="display:flex;align-items:center;gap:9px;margin:16px 0;color:#d6cbe6"><input type="checkbox" id="auth-remember" checked style="width:18px;height:18px;accent-color:#a986ff"> Remember me on this device</label>
   <div class="hero-actions"><button id="auth-signin" class="btn primary" type="button">Sign in</button><button id="auth-signup" class="btn secondary" type="button">Create account</button></div>
  </div>
 </dialog>
@@ -177,6 +178,7 @@
   </section>
  </div>
 </dialog>
+<script src="../assets/triso-auth-storage.js?v=2"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="../assets/marketplace-v15.js?v=15"></script>
 </body>
