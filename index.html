@@ -3131,7 +3131,7 @@ async function api(path,body,token){
  const d=await res.json().catch(()=>({}));if(!res.ok)throw Error(d.error_description||d.msg||d.message||d.error||'Authentication failed');return d;
 }
 function update(){const u=session?.user;const guest=$('tc31-guest'),user=$('tc31-user');if(guest)guest.style.display=u?'none':($('tc31-signup-view')?.style.display==='block'?'none':'grid');if(u&&$('tc31-signup-view'))$('tc31-signup-view').style.display='none';if(user)user.style.display=u?'block':'none';if(u){$('tc31-user-email').textContent=u.email||'Player';window.tc36LoadOrders?.();window.tc40CheckAdmin?.(session.access_token)}else{window.tc40ResetAdmin?.();const el=$('tc36-orders');if(el)el.textContent='Sign in to view orders.';}}
-function save(d){if(d?.access_token&&d?.refresh_token){window.TrisoAuth.write(d);session=window.TrisoAuth.read()||d;}update();}
+function save(d){if(d?.access_token&&d?.refresh_token){window.TrisoAuth.write(d);session=window.TrisoAuth.read()||d;if(session?.user&&$('tc37-welcome')?.classList.contains('open'))tc37Close();}update();}
 async function refresh(){if(!session?.refresh_token)return false;try{save(await api('token?grant_type=refresh_token',{refresh_token:session.refresh_token}));return true}catch(e){const t=(e.message||'').toLowerCase();if(/invalid.refresh|refresh.token.not.found|already.used|invalid.grant/.test(t))clear();else status('Connection interrupted. Your remembered login is saved; retry when online.');return false}}
 function clear(){session=null;window.TrisoAuth.clear();update()}
 async function restore(){
