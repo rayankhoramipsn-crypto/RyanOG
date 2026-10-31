@@ -1,0 +1,29 @@
+name: TRISOCMD read-only browser smoke checks
+on:
+  pull_request:
+    paths:
+      - '**/*.html'
+      - 'assets/**'
+      - 'tests/browser-smoke.mjs'
+      - '.github/workflows/browser-smoke.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated headless browser
+        run: |
+          npm install --no-save --no-audit --no-fund playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Smoke-test local site and navigation (no database writes)
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/triso-http.log 2>&1 &
+          sleep 2
+          node tests/browser-smoke.mjs
