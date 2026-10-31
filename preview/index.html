@@ -1279,6 +1279,7 @@ const tc37Text={
  ar:['مساحتك الخاصة.','أنشئ حسابًا لحفظ ملفك والوصول إلى الطلبات المرتبطة عند توفرها. يمكنك تصفح المتجر دون تسجيل الدخول.','تسجيل الدخول / إنشاء حساب ↗','المتابعة مع Google','التصفح كضيف ←','تسجيل الدخول اختياري. نشاط الضيف لا يتزامن بين الأجهزة.']
 };
 function tc37ShowWelcome(){
+ if(window.TrisoAuth?.read()?.user)return;
  const a=tc37Text[typeof currentLang==='string'?currentLang:'en']||tc37Text.en;
  ['tc37-title','tc37-copy','tc37-login','tc37-google','tc37-skip','tc37-footnote'].forEach((id,i)=>{document.getElementById(id).textContent=a[i]});
  const m=document.getElementById('tc37-welcome');m.classList.add('open');document.body.style.overflow='hidden';
@@ -1998,7 +1999,7 @@ function setLang(lang, dir) {
   document.getElementById('nav-lang-label').textContent = lang.toUpperCase();
   applyTranslations();
   showScreen('store-screen');
-  tc37ShowWelcome();
+  if(!window.TrisoAuth?.read()?.user)tc37ShowWelcome();
 }
 
 function applyTranslations() {
@@ -2692,8 +2693,10 @@ function checkRoute() {
     applyTranslations();
   }
 
-  // Show lang screen (always first)
-  showScreen('lang-screen');
+  // Return authenticated customers directly to the storefront.
+  let returningMember=false;
+  try{const saved=localStorage.getItem('tc35_auth_session')||sessionStorage.getItem('tc35_auth_session');const auth=saved?JSON.parse(saved):null;returningMember=!!(auth?.user&&auth.access_token&&auth.refresh_token)}catch(e){}
+  showScreen(returningMember?'store-screen':'lang-screen');
 
   // Pre-fetch exchange rates in the background so the first checkout is instant
   prefetchRates();
@@ -2842,6 +2845,8 @@ function clear(){session=null;window.TrisoAuth.clear();update()}
 async function restore(){
  session=window.TrisoAuth.read();
  if(!session?.refresh_token){update();return}
+ if($('lang-screen')?.classList.contains('active'))showScreen('store-screen');
+ if($('tc37-welcome')?.classList.contains('open'))tc37Close();
  try{
    if(!session.expires_at||session.expires_at<Math.floor(Date.now()/1000)+120){await refresh()}
    else {
