@@ -16,11 +16,21 @@ const errorText=e=>e?.message||String(e||'Unknown error');
 function note(msg){$('notice').textContent=String(msg||'');if(msg)$('notice').scrollIntoView({block:'nearest'})}
 function dialog(id){const d=$(id);if(!d.open)d.showModal()}
 function close(id){if($(id).open)$(id).close()}
-function saveSession(session){S.session=session;try{if(session)sessionStorage.setItem('tc35_auth_session',JSON.stringify(session));else sessionStorage.removeItem('tc35_auth_session')}catch{}}
+function saveSession(session){if(session){window.TrisoAuth.write(session);S.session=window.TrisoAuth.read()||session;}else{window.TrisoAuth.clear();S.session=null}}
 function headers(json=true){const h={'apikey':KEY,Authorization:'Bearer '+(S.session?.access_token||KEY)};if(json)h['Content-Type']='application/json';return h}
 async function req(path,opts={}){const json=('json'in opts);const r=await fetch(API+path,{method:opts.method||'GET',headers:{...headers(json),...(opts.headers||{})},body:json?JSON.stringify(opts.json):opts.body});const data=await r.json().catch(()=>null);if(!r.ok)throw Error(data?.message||data?.error_description||data?.msg||data?.error||'Request failed ('+r.status+')');return data}
 const rpc=(name,json={})=>req('/rest/v1/rpc/'+name,{method:'POST',json});
-async function refresh(){if(!S.session?.refresh_token)return;try{const d=await req('/auth/v1/token?grant_type=refresh_token',{method:'POST',json:{refresh_token:S.session.refresh_token}});if(!d.access_token)throw Error('Session expired');saveSession(d)}catch{saveSession(null)}}
+async function refresh(){
+ if(!S.session?.refresh_token)return;
+ try{
+  const d=await req('/auth/v1/token?grant_type=refresh_token',{method:'POST',json:{refresh_token:S.session.refresh_token}});
+  if(!d.access_token)throw Error('Session expired');
+  saveSession(d);
+ }catch(e){
+  if(/invalid.refresh|refresh.token.not.found|already.used|invalid.grant/i.test(e.message||''))saveSession(null);
+  else console.warn('Session refresh delayed; saved login retained');
+ }
+}
 async function adminCheck(){if(!S.session?.user)return false;try{return (await rpc('is_admin'))===true}catch{return false}}
 function sessionUI(){const on=!!S.session?.user;$('nav-login').textContent=on?S.session.user.email.split('@')[0]:tr('login');$('seller-auth').classList.toggle('hidden',on);$('seller-panel').classList.toggle('hidden',!on);$('mine-wrap').classList.toggle('hidden',!on);$('logout').classList.toggle('hidden',!on);$('chat-guest').classList.toggle('hidden',on)}
 function translate(){document.documentElement.lang=S.lang;document.documentElement.dir=['fa','ar'].includes(S.lang)?'rtl':'ltr';$('language').value=S.lang;document.querySelectorAll('[data-t]').forEach(e=>{e.textContent=tr(e.dataset.t)});$('search').placeholder=S.lang==='fa'?'جست‌وجوی اکانت، تجهیزات و بازی...':S.lang==='ar'?'ابحث عن الحسابات والألعاب...':'Search accounts, games, gear...';sessionUI();renderItems()}
@@ -65,7 +75,11 @@ function realtimeSubscribe(){
 }
 function startPolling(){stopPolling();S.timer=setInterval(()=>{if(!document.hidden&&$('chat-dialog').open)messages()},3000);$('chat-state').textContent='Messages sync every 3 seconds';realtimeSubscribe()}
 async function send(e){e.preventDefault();if(!S.active)return;const txt=$('chat-body').value.trim();if(!txt)return;if(/password|recovery code|seed phrase|access token|one.time code/i.test(txt)){note('Do not share passwords, recovery codes or login tokens.');return}const btn=$('chat-send');btn.disabled=true;try{await rpc('market_send_message',{p_conversation:S.active,p_body:txt});$('chat-body').value='';await messages(true)}catch(e){note(errorText(e))}finally{btn.disabled=false}}
-async function init(){try{S.session=JSON.parse(sessionStorage.getItem('tc35_auth_session')||'null');await refresh()}catch{saveSession(null)}
+async function init(){
+ S.session=window.TrisoAuth.read();
+ const checkbox=$('auth-remember');
+ if(checkbox){checkbox.checked=window.TrisoAuth.remembered();checkbox.addEventListener('change',()=>window.TrisoAuth.setRemember(checkbox.checked))}
+ if(S.session?.refresh_token&&(!S.session.expires_at||S.session.expires_at*1000<Date.now()+120000))await refresh();
 S.lang=['en','fa','ar'].includes(localStorage.getItem('tc_market_lang'))?localStorage.getItem('tc_market_lang'):'en';S.admin=await adminCheck();translate();await browse();if(S.session?.user)await Promise.allSettled([mine(),threads()]);
 const hash=Number(new URLSearchParams(location.search).get('listing'));if(hash){const found=S.items.find(x=>+x.id===hash);if(found)details(found)}}
 document.querySelectorAll('[data-cat]').forEach(b=>b.addEventListener('click',()=>{S.category=b.dataset.cat;renderItems();$('listing-section').scrollIntoView({block:'start'})}));
@@ -85,7 +99,20 @@ $('accept').addEventListener('change',e=>{$('chat-seller').disabled=!e.target.ch
 $('chat-seller').addEventListener('click',contact);
 $('chat-form').addEventListener('submit',send);
 $('chat-dialog').addEventListener('close',stopPolling);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden){if(S.active)messages();browse()}});
+document.addEventListener('visibilitychange',async()=>{if(!document.hidden){
+ if(S.session?.refresh_token&&(!S.session.expires_at||S.session.expires_at*1000<Date.now()+120000))await refresh();
+ if(S.active)messages();browse();sessionUI();
+}});
+window.addEventListener('storage',e=>{
+ if(e.key===window.TrisoAuth.key){
+  const next=window.TrisoAuth.read();
+  if((S.session?.access_token||null)!==(next?.access_token||null)){
+   if(!next)stopPolling();
+   S.session=next;sessionUI();
+   if(next)Promise.allSettled([mine(),threads()]);
+  }
+ }
+});
 setInterval(async()=>{if(!S.session?.refresh_token)return;const expires=S.session.expires_at||0;if(expires && expires*1000>Date.now()+4*60*1000)return;await refresh();if(S.rt&&S.session?.access_token)S.rt.realtime.setAuth(S.session.access_token);sessionUI()},120000);
 init();
 })();
