@@ -94,7 +94,7 @@ class PersistentMarketAdmin(unittest.TestCase):
                 self.assertIn('id="sell-status"', source)
                 self.assertNotIn("Free: one listing per UTC day", source)
         script = (ROOT / "assets/marketplace-v15.js").read_text(encoding="utf-8")
-        for phrase in ("S.dailyCount>=3", "sellStatus(info)", "quotaDisplay()",
+        for phrase in ("3 free listings per UTC day", "sellStatus(info)", "quotaDisplay()",
                        "market_submit", "Your listing #", "await mine()",
                        "profiles?.[0]?.is_pro", "utcDay"):
             self.assertIn(phrase, script)
