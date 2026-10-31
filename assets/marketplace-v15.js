@@ -3,7 +3,7 @@
 const API='https://cxtytbjvdlngahytfilr.supabase.co';
 const KEY='sb_publishable_AqZWjpgyZ_h6-EKwOySyGQ_0LE8bcRm';
 const $=id=>document.getElementById(id);
-const S={session:null,admin:false,items:[],photos:new Map(),signed:new Map(),category:'all',sort:'new',query:'',selected:null,threads:[],active:null,lastKey:'',timer:null,rt:null,channel:null,lang:'en',dailyCount:0,pro:false};
+const S={session:null,admin:false,items:[],photos:new Map(),signed:new Map(),category:'all',sort:'new',query:'',selected:null,threads:[],active:null,lastKey:'',timer:null,rt:null,inboxChannel:null,inboxTimer:null,inboxOwner:null,inboxBusy:null,inboxInitialized:false,inboxConnected:false,readMarks:new Map(),lang:'en',dailyCount:0,pro:false};
 const i18n={en:{all:'All listings',fortnite:'Fortnite',roblox:'Roblox',steam:'Steam',gear:'Gaming gear',other:'Other',browse:'Explore listings',sell:'Sell an item',messages:'Messages',rules:'Marketplace rules',noresults:'No approved listings match your search.',details:'View details',contact:'Chat with seller',login:'Sign in',logout:'Sign out'},
 fa:{all:'تمام آگهی‌ها',fortnite:'فورتنایت',roblox:'روبلاکس',steam:'استیم',gear:'تجهیزات گیمینگ',other:'سایر',browse:'آگهی‌های مارکت‌پلیس',sell:'ثبت آگهی',messages:'پیام‌ها',rules:'قوانین بازار',noresults:'آگهی تأییدشده‌ای پیدا نشد.',details:'مشاهده جزئیات',contact:'چت با فروشنده',login:'ورود',logout:'خروج'},
 ar:{all:'كل الإعلانات',fortnite:'فورتنايت',roblox:'روبلوكس',steam:'ستيم',gear:'معدات الألعاب',other:'أخرى',browse:'تصفح السوق',sell:'نشر إعلان',messages:'الرسائل',rules:'قواعد السوق',noresults:'لا توجد إعلانات مطابقة.',details:'عرض التفاصيل',contact:'مراسلة البائع',login:'تسجيل الدخول',logout:'تسجيل الخروج'}};
@@ -40,7 +40,18 @@ async function refresh(){
  }
 }
 async function adminCheck(){if(!S.session?.user)return false;try{return (await rpc('is_admin'))===true}catch{return false}}
-function sessionUI(){const on=!!S.session?.user;const adminLink=$('nav-admin');if(adminLink)adminLink.classList.toggle('hidden',!on||!S.admin);$('nav-login').textContent=on?(S.session.user.email||'Account').split('@')[0]:tr('login');$('seller-auth').classList.toggle('hidden',on);$('seller-panel').classList.toggle('hidden',!on);$('mine-wrap').classList.toggle('hidden',!on);$('logout').classList.toggle('hidden',!on);$('chat-guest').classList.toggle('hidden',on);quotaDisplay()}
+function sessionUI(){
+ const on=!!S.session?.user;
+ const adminLink=$('nav-admin');
+ if(adminLink)adminLink.classList.toggle('hidden',!on||!S.admin);
+ $('nav-login').textContent=on?(S.session.user.email||'Account').split('@')[0]:tr('login');
+ $('seller-auth').classList.toggle('hidden',on);
+ $('seller-panel').classList.toggle('hidden',!on);
+ $('mine-wrap').classList.toggle('hidden',!on);
+ $('logout').classList.toggle('hidden',!on);
+ $('chat-guest').classList.toggle('hidden',on);
+ quotaDisplay();
+}
 function translate(){document.documentElement.lang=S.lang;document.documentElement.dir=['fa','ar'].includes(S.lang)?'rtl':'ltr';$('language').value=S.lang;document.querySelectorAll('[data-t]').forEach(e=>{e.textContent=tr(e.dataset.t)});$('search').placeholder=S.lang==='fa'?'جست‌وجوی اکانت، تجهیزات و بازی...':S.lang==='ar'?'ابحث عن الحسابات والألعاب...':'Search accounts, games, gear...';sessionUI();renderItems()}
 function categoryOf(p){const v=((p.platform||'')+' '+(p.title||'')).toLowerCase();if(/fortnite|فورتنایت/.test(v))return 'fortnite';if(/roblox|روبلاکس/.test(v))return 'roblox';if(/steam|استیم/.test(v))return 'steam';if(/gear|mouse|keyboard|headset|controller|monitor|کیبورد|هدست|موس|تجهیز/.test(v))return 'gear';return 'other'}
 function filtered(){let rows=S.items.filter(p=>(S.category==='all'||categoryOf(p)===S.category)&&[p.platform,p.title,p.description].join(' ').toLowerCase().includes(S.query));if(S.sort==='low')rows.sort((a,b)=>+a.price-+b.price);else if(S.sort==='high')rows.sort((a,b)=>+b.price-+a.price);else rows.sort((a,b)=>Number(b.is_pro)-Number(a.is_pro)||new Date(b.submitted_at)-new Date(a.submitted_at));return rows}
@@ -52,8 +63,8 @@ async function readPhotos(ids){if(!ids.length)return;const valid=ids.map(Number)
 async function browse(){try{S.items=await rpc('market_browse')||[];await readPhotos(S.items.map(p=>p.id));renderItems()}catch(e){empty($('cards'));$('cards').append(make('div','Listings unavailable: '+errorText(e),'empty'))}}
 function details(p){S.selected=p;$('detail-title').textContent=p.title;$('detail-platform').textContent=p.platform;$('detail-desc').textContent=p.description;$('detail-price').textContent=money(p.price);$('detail-date').textContent='Posted '+date(p.submitted_at);$('accept').checked=false;$('chat-seller').disabled=true;const cover=$('detail-cover'),thumbs=$('thumbs');cover.removeAttribute('src');cover.style.display='none';empty(thumbs);const images=S.photos.get(String(p.id))||[];$('detail-placeholder').classList.toggle('hidden',images.length>0);for(const [i,file] of images.entries()){signed(file.object_path).then(url=>{if(!url||S.selected?.id!==p.id)return;const img=make('img');img.src=url;img.alt='Photo '+(i+1);img.onclick=()=>{cover.src=url;cover.style.display='block'};thumbs.append(img);if(i===0){cover.src=url;cover.style.display='block'}})}dialog('detail-dialog')}
 async function contact(){if(!S.selected||!$('accept').checked)return;if(!S.session?.user){close('detail-dialog');dialog('auth-dialog');note('Sign in to contact the seller.');return}const b=$('chat-seller');b.disabled=true;try{const id=await rpc('market_start_chat',{p_listing:S.selected.id});close('detail-dialog');await showChats(id)}catch(e){note(errorText(e))}finally{b.disabled=false}}
-async function login(signup){const email=$('auth-email').value.trim(),password=$('auth-password').value;if(!email||password.length<8){$('auth-note').textContent='Enter email and a password of at least 8 characters.';return}const btn=$('auth-signin');btn.disabled=true;try{const data=await req('/auth/v1/'+(signup?'signup':'token?grant_type=password'),{method:'POST',json:{email,password}});if(!data.access_token){$('auth-note').textContent='Account created. Confirm your email to sign in.';return}saveSession(data);S.admin=await adminCheck();close('auth-dialog');sessionUI();$('auth-note').textContent='';await Promise.allSettled([mine(),threads()]);note('Signed in')}catch(e){$('auth-note').textContent=errorText(e)}finally{btn.disabled=false}}
-function logout(){stopPolling();saveSession(null);S.admin=false;S.active=null;S.threads=[];S.dailyCount=0;S.pro=false;close('chat-dialog');sessionUI();note('Signed out')}
+async function login(signup){const email=$('auth-email').value.trim(),password=$('auth-password').value;if(!email||password.length<8){$('auth-note').textContent='Enter email and a password of at least 8 characters.';return}const btn=$('auth-signin');btn.disabled=true;try{const data=await req('/auth/v1/'+(signup?'signup':'token?grant_type=password'),{method:'POST',json:{email,password}});if(!data.access_token){$('auth-note').textContent='Account created. Confirm your email to sign in.';return}saveSession(data);S.admin=await adminCheck();close('auth-dialog');sessionUI();$('auth-note').textContent='';startInbox();await Promise.allSettled([mine(),threads()]);note('Signed in')}catch(e){$('auth-note').textContent=errorText(e)}finally{btn.disabled=false}}
+function logout(){stopPolling();stopInbox();saveSession(null);S.admin=false;S.active=null;S.threads=[];S.dailyCount=0;S.pro=false;close('chat-dialog');sessionUI();note('Signed out')}
 const mime={'image/jpeg':'jpg','image/png':'png','image/webp':'webp'};
 function checkFiles(files){if(!files.length)throw Error('At least one photo is required.');if(files.length>4)throw Error('Maximum four photos per listing.');for(const f of files)if(!mime[f.type]||f.size>5*1024*1024||f.size===0)throw Error('Use JPG, PNG or WebP photos under 5 MB each.')}
 async function uploadPhoto(id,file,pos){const path=S.session.user.id+'/'+id+'/'+crypto.randomUUID()+'.'+mime[file.type];const response=await fetch(API+'/storage/v1/object/market-gallery/'+path,{method:'POST',headers:{...headers(false),'Content-Type':file.type,'x-upsert':'false'},body:file});if(!response.ok){const data=await response.json().catch(()=>({}));throw Error(data.message||data.error||'Photo upload failed');}await req('/rest/v1/market_listing_media',{method:'POST',json:{listing_id:id,seller_id:S.session.user.id,object_path:path,alt_text:'Seller item photo',sort_order:pos},headers:{Prefer:'return=minimal'}})}
@@ -127,34 +138,266 @@ async function mine(){
  }catch(e){root.textContent='My listings unavailable: '+errorText(e)}
 }
 async function retry(){const files=Array.from($('retry-input').files||[]);try{checkFiles(files);const n=(S.photos.get(String(S.retryId))||[]).length;if(n+files.length>4)throw Error('Maximum four photos total.');$('retry-save').disabled=true;for(let i=0;i<files.length;i++)await uploadPhoto(S.retryId,files[i],n+i);close('retry-dialog');note('Photos saved, pending admin review.');await mine()}catch(e){$('retry-note').textContent=errorText(e)}finally{$('retry-save').disabled=false}}
-async function threads(){if(!S.session?.user)return;try{S.threads=await req('/rest/v1/market_conversations?select=id,listing_id,buyer_id,seller_id,created_at&order=created_at.desc&limit=100')||[];renderThreads()}catch(e){$('thread-list').textContent='Conversations unavailable: '+errorText(e)}}
-function renderThreads(){const root=$('thread-list');empty(root);root.append(make('h3','Conversations'));if(!S.threads.length)root.append(make('p','No conversations.','fine'));for(const row of S.threads){const p=S.items.find(x=>+x.id===+row.listing_id);const b=make('button',p?.title||'Listing #'+row.listing_id,'thread-button'+(S.active===row.id?' active':''));b.append(make('small',row.seller_id===S.session?.user?.id?'Buyer inquiry':'Seller conversation'));b.onclick=()=>selectThread(row);root.append(b)}}
-async function showChats(id){if(!S.session?.user){dialog('auth-dialog');return}await threads();dialog('chat-dialog');const selected=S.threads.find(c=>+c.id===+id)||S.threads[0];if(selected)await selectThread(selected);else{$('chat-topic').textContent='No conversations';empty($('bubbles'));$('chat-form').classList.add('hidden')}}
-async function selectThread(row){S.active=row.id;S.lastKey='';renderThreads();const p=S.items.find(x=>+x.id===+row.listing_id);$('chat-topic').textContent=p?.title||'Listing #'+row.listing_id;$('chat-sub').textContent=(row.seller_id===S.session.user.id?'Buyer inquiry':'Seller inquiry')+' · Admin may review for safety';$('chat-form').classList.remove('hidden');await messages(true);startPolling()}
-async function messages(force=false){if(!S.active||!S.session?.user||!$('chat-dialog').open)return;const id=S.active;try{const rows=await req('/rest/v1/market_messages?select=id,sender_id,body,created_at&conversation_id=eq.'+id+'&order=created_at.asc&limit=200');if(S.active!==id)return;const last=rows.at(-1),key=rows.length+':'+(last?.id||0);if(!force&&key===S.lastKey)return;S.lastKey=key;const box=$('bubbles'),nearBottom=box.scrollHeight-box.scrollTop-box.clientHeight<90;empty(box);if(!rows.length)box.append(make('p','Start a conversation about this listing.','fine'));for(const r of rows){const b=make('div',r.body,'bubble'+(r.sender_id===S.session.user.id?' mine':''));b.append(make('small',date(r.created_at)));box.append(b)}if(nearBottom||force)box.scrollTop=box.scrollHeight}catch(e){$('chat-state').textContent='Chat offline: '+errorText(e)}}
+
+function chatFeedback(message,problem=false){
+ const line=$('chat-state');
+ line.textContent=String(message||'');
+ line.classList.toggle('chat-error',!!problem);
+}
+function chatConnection(message,connected=false){
+ const el=$('chat-connection');
+ if(!el)return;
+ el.textContent=String(message||'');
+ el.classList.toggle('connection-fallback',!connected);
+ S.inboxConnected=!!connected;
+}
+function updateUnreadBadges(total){
+ const number=Math.max(0,Number(total)||0),label=number>99?'99+':String(number);
+ for(const id of ['nav-unread','hero-unread']){
+   const el=$(id);
+   if(!el)continue;
+   el.textContent=label;
+   el.classList.toggle('hidden',!number);
+ }
+ const button=$('nav-messages');
+ if(button)button.setAttribute('aria-label',number?number+' unread marketplace messages':'Marketplace conversations');
+}
+function clearChatView(){
+ $('chat-topic').textContent='Select a conversation';
+ $('chat-sub').textContent='Your conversations stay private between the buyer, seller and authorized moderators.';
+ $('chat-form').classList.add('hidden');
+ empty($('bubbles'));
+ $('bubbles').append(make('div','Choose a conversation to read and reply.','chat-placeholder'));
+}
+function renderThreads(){
+ const root=$('thread-list');empty(root);
+ const h=make('div',null,'thread-heading');
+ h.append(make('h3','Your conversations'),make('span',String(S.threads.length),'thread-total'));
+ root.append(h);
+ if(!S.threads.length){
+  root.append(make('div','No conversations yet. Open an approved listing and choose Chat with seller to get started.','thread-empty'));
+  return;
+ }
+ for(const row of S.threads){
+  const id=String(row.id);
+  const item=make('button',null,'thread-button'+(String(S.active)===id?' active':''));
+  item.type='button';item.setAttribute('aria-label','Conversation about '+(row.listing_title||'Listing #'+row.listing_id));
+  const top=make('span',null,'thread-top');
+  top.append(make('strong',row.listing_title||'Listing #'+row.listing_id));
+  if(Number(row.unread_count)>0){
+   const badge=make('span',String(Math.min(99,Number(row.unread_count)))+(Number(row.unread_count)>99?'+':''),'thread-unread');
+   badge.setAttribute('aria-label',row.unread_count+' unread messages');
+   top.append(badge);
+  }
+  item.append(top);
+  item.append(make('small',row.seller_id===S.session?.user?.id?'Buyer inquiry':'Seller conversation','thread-role'));
+  if(row.last_message_preview)item.append(make('span',row.last_message_preview,'thread-preview'));
+  else item.append(make('span','New conversation — say hello','thread-preview'));
+  if(row.last_message_at||row.created_at)item.append(make('time',date(row.last_message_at||row.created_at),'thread-date'));
+  item.onclick=()=>selectThread(row);
+  root.append(item);
+ }
+}
+async function threads(){
+ if(!S.session?.user){S.threads=[];updateUnreadBadges(0);renderThreads();return []}
+ if(S.inboxBusy)return S.inboxBusy;
+ const owner=S.session.user.id;
+ S.inboxBusy=(async()=>{
+  const result=await rpc('market_inbox');
+  if(!Array.isArray(result))throw Error('Inbox returned an unexpected response');
+  if(S.session?.user?.id!==owner)return [];
+  S.threads=result.map(row=>({
+   ...row,id:String(row.id),listing_id:String(row.listing_id),
+   unread_count:Math.max(0,Number(row.unread_count)||0)
+  }));
+  updateUnreadBadges(S.threads.reduce((count,row)=>count+row.unread_count,0));
+  S.inboxInitialized=true;
+  renderThreads();
+  return S.threads;
+ })().catch(e=>{
+  if(S.session?.user?.id===owner){
+   chatFeedback('Unable to refresh conversations: '+errorText(e),true);
+   if($('chat-dialog').open&&!S.threads.length){
+    empty($('thread-list'));
+    $('thread-list').append(make('div','Inbox unavailable. Check your connection and reopen messages.','thread-empty'));
+   }
+  }
+  throw e;
+ }).finally(()=>{S.inboxBusy=null});
+ return S.inboxBusy;
+}
+async function showChats(id=null){
+ if(!S.session?.user){dialog('auth-dialog');return}
+ dialog('chat-dialog');
+ if(!S.active)clearChatView();
+ chatFeedback('Loading your conversations…');
+ try{
+  await threads();
+  if(!$('chat-dialog').open)return;
+  let selected=null;
+  if(id!==null&&id!==undefined){
+   // Never silently route to another seller if a freshly created thread
+   // cannot be loaded yet.
+   selected=S.threads.find(c=>String(c.id)===String(id));
+   if(!selected){
+    chatFeedback('Your conversation is being prepared. Close and reopen Messages in a moment.',true);
+    return;
+   }
+  }else{
+   selected=S.threads.find(c=>String(c.id)===String(S.active))||S.threads[0];
+  }
+  if(selected)await selectThread(selected);
+  else{
+   S.active=null;clearChatView();
+   chatFeedback('No conversations yet. Open a listing and choose Chat with seller.');
+  }
+ }catch(e){chatFeedback('Could not open your inbox: '+errorText(e),true)}
+}
+async function selectThread(row){
+ if(!S.session?.user)return;
+ const id=String(row.id);
+ if(S.active!==id){stopPolling();S.lastKey='';}
+ S.active=id;S.lastKey='';
+ renderThreads();
+ $('chat-topic').textContent=row.listing_title||'Listing #'+row.listing_id;
+ const side=row.seller_id===S.session.user.id?'Talking with a buyer':'Talking with the seller';
+ $('chat-sub').textContent=side+' · Listing #'+row.listing_id+' · Keep account credentials private';
+ $('chat-form').classList.remove('hidden');
+ chatFeedback('Loading messages…');
+ await messages(true);
+ if(S.active===id&&$('chat-dialog').open){
+   startPolling();
+   $('chat-body').focus({preventScroll:true});
+ }
+}
+async function markRead(conversationId,lastMessageId=0){
+ if(!S.session?.user)return;
+ const owner=S.session.user.id;
+ const id=String(conversationId);
+ const key=owner+':'+id+':'+String(lastMessageId);
+ if(S.readMarks.get(id)===key)return;
+ S.readMarks.set(id,key);
+ try{
+  await rpc('market_mark_read',{p_conversation:Number(id)});
+  if(S.session?.user?.id===owner)await threads();
+ }catch(e){
+  if(S.readMarks.get(id)===key)S.readMarks.delete(id);
+  console.warn('Could not update read state',errorText(e));
+ }
+}
+async function messages(force=false){
+ if(!S.active||!S.session?.user||!$('chat-dialog').open)return;
+ const room=String(S.active),owner=S.session.user.id;
+ try{
+  const rows=await req('/rest/v1/market_messages?select=id,sender_id,body,created_at&conversation_id=eq.'+encodeURIComponent(room)+'&order=created_at.asc,id.asc&limit=200');
+  if(String(S.active)!==room||S.session?.user?.id!==owner||!$('chat-dialog').open)return;
+  if(!Array.isArray(rows))throw Error('Invalid message response');
+  const last=rows[rows.length-1];
+  const key=rows.length+':'+(last?.id||0);
+  if(!force&&key===S.lastKey)return;
+  S.lastKey=key;
+  const box=$('bubbles'),nearBottom=box.scrollHeight-box.scrollTop-box.clientHeight<100;
+  empty(box);
+  if(!rows.length)box.append(make('div','No messages yet. Send a friendly introduction about this listing.','chat-placeholder'));
+  for(const item of rows){
+   const own=item.sender_id===owner;
+   const bubble=make('div',null,'bubble'+(own?' mine':''));
+   bubble.append(make('span',item.body,'bubble-body'));
+   bubble.append(make('small',date(item.created_at),'bubble-time'));
+   box.append(bubble);
+  }
+  if(nearBottom||force)box.scrollTop=box.scrollHeight;
+  const current=S.threads.find(t=>String(t.id)===room);
+  if(force||(current&&current.unread_count>0)||(last&&last.sender_id!==owner))
+    markRead(room,last?.id||0);
+  chatFeedback('Messages updated · '+new Date().toLocaleTimeString());
+ }catch(e){chatFeedback('Unable to load messages: '+errorText(e),true)}
+}
 function stopPolling(){
  if(S.timer){clearInterval(S.timer);S.timer=null}
- if(S.rt&&S.channel){S.rt.removeChannel(S.channel).catch(()=>{});S.channel=null}
 }
-function realtimeSubscribe(){
- if(!S.session?.access_token||!S.active||!window.supabase?.createClient)return;
+function startPolling(){
+ stopPolling();
+ // Live events are push-based; polling is an automatic fallback if a socket
+ // connection is blocked by the browser or network.
+ S.timer=setInterval(()=>{
+  if(!document.hidden&&$('chat-dialog').open&&S.active)messages();
+ },3500);
+}
+function stopInbox(){
+ if(S.inboxTimer){clearInterval(S.inboxTimer);S.inboxTimer=null}
+ if(S.rt&&S.inboxChannel){S.rt.removeChannel(S.inboxChannel).catch(()=>{});S.inboxChannel=null}
+ S.inboxOwner=null;S.inboxConnected=false;
+ S.inboxInitialized=false;S.inboxBusy=null;S.readMarks.clear();
+ updateUnreadBadges(0);
+}
+function startInbox(){
+ if(!S.session?.user||!S.session?.access_token)return;
+ const owner=S.session.user.id;
+ if(S.inboxOwner===owner&&S.inboxTimer){
+   if(S.rt)S.rt.realtime.setAuth(S.session.access_token);
+   return;
+ }
+ stopInbox();
+ S.inboxOwner=owner;
+ chatConnection('Connecting…');
+ threads().catch(()=>{});
+ S.inboxTimer=setInterval(()=>{
+  if(!document.hidden&&S.session?.user?.id===owner)threads().catch(()=>{});
+ },7000);
+ if(!window.supabase?.createClient){
+  chatConnection('Auto-refresh every few seconds');
+  return;
+ }
  try{
   if(!S.rt)S.rt=window.supabase.createClient(API,KEY,{auth:{persistSession:false,autoRefreshToken:false}});
   S.rt.realtime.setAuth(S.session.access_token);
-  const room=S.active;
-  S.channel=S.rt.channel('triso-market-chat-'+room)
-   .on('postgres_changes',{event:'INSERT',schema:'public',table:'market_messages',filter:'conversation_id=eq.'+room},()=>{if(S.active===room)messages()})
-   .subscribe(state=>{$('chat-state').textContent=state==='SUBSCRIBED'?'Realtime connected · live messages':'Messages sync every 3 seconds'});
- }catch(e){console.warn('Realtime fallback enabled',e)}
+  S.inboxChannel=S.rt.channel('triso-market-inbox-'+owner)
+   .on('postgres_changes',{event:'INSERT',schema:'public',table:'market_messages'},payload=>{
+      if(S.session?.user?.id!==owner)return;
+      threads().catch(()=>{});
+      if(S.active&&$('chat-dialog').open&&String(payload.new?.conversation_id)===String(S.active))messages();
+   })
+   .on('postgres_changes',{event:'INSERT',schema:'public',table:'market_conversations'},()=>{
+      if(S.session?.user?.id===owner)threads().catch(()=>{});
+   })
+   .subscribe(status=>{
+      if(S.inboxOwner!==owner)return;
+      if(status==='SUBSCRIBED')chatConnection('Live connected',true);
+      else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'||status==='CLOSED')chatConnection('Auto-refresh active');
+   });
+ }catch(e){
+  console.warn('Realtime unavailable; inbox refresh fallback remains active',e);
+  chatConnection('Auto-refresh active');
+ }
 }
-function startPolling(){stopPolling();S.timer=setInterval(()=>{if(!document.hidden&&$('chat-dialog').open)messages()},3000);$('chat-state').textContent='Messages sync every 3 seconds';realtimeSubscribe()}
-async function send(e){e.preventDefault();if(!S.active)return;const txt=$('chat-body').value.trim();if(!txt)return;if(/password|recovery code|seed phrase|access token|one.time code/i.test(txt)){note('Do not share passwords, recovery codes or login tokens.');return}const btn=$('chat-send');btn.disabled=true;try{await rpc('market_send_message',{p_conversation:S.active,p_body:txt});$('chat-body').value='';await messages(true)}catch(e){note(errorText(e))}finally{btn.disabled=false}}
+async function send(e){
+ e.preventDefault();
+ if(!S.active||!S.session?.user){chatFeedback('Choose a conversation before sending.',true);return}
+ const box=$('chat-body'),body=box.value.trim();
+ if(!body)return;
+ if(/(?:password|recovery code|seed phrase|access token|one.time code)/i.test(body)){
+  chatFeedback('For your security, never send passwords or recovery codes in chat.',true);return;
+ }
+ const id=String(S.active),btn=$('chat-send');
+ btn.disabled=true;chatFeedback('Sending…');
+ try{
+  await rpc('market_send_message',{p_conversation:Number(id),p_body:body});
+  if(String(S.active)===id){box.value='';await messages(true)}
+  await threads().catch(()=>{});
+  chatFeedback('Sent · '+new Date().toLocaleTimeString());
+ }catch(e){
+  // Keep the unsent draft so the buyer/seller can retry safely.
+  chatFeedback('Message not sent. '+errorText(e),true);
+ }finally{btn.disabled=false}
+}
+
 async function init(){
  S.session=window.TrisoAuth.read();
  const checkbox=$('auth-remember');
  if(checkbox){checkbox.checked=window.TrisoAuth.remembered();checkbox.addEventListener('change',()=>window.TrisoAuth.setRemember(checkbox.checked))}
  if(S.session?.refresh_token&&(!S.session.expires_at||S.session.expires_at*1000<Date.now()+120000))await refresh();
-S.lang=['en','fa','ar'].includes(localStorage.getItem('tc_market_lang'))?localStorage.getItem('tc_market_lang'):'en';S.admin=await adminCheck();translate();await browse();if(S.session?.user)await Promise.allSettled([mine(),threads()]);
+S.lang=['en','fa','ar'].includes(localStorage.getItem('tc_market_lang'))?localStorage.getItem('tc_market_lang'):'en';S.admin=await adminCheck();translate();await browse();if(S.session?.user){startInbox();await Promise.allSettled([mine(),threads()]);}
 const hash=Number(new URLSearchParams(location.search).get('listing'));if(hash){const found=S.items.find(x=>+x.id===hash);if(found)details(found)}}
 document.querySelectorAll('[data-cat]').forEach(b=>b.addEventListener('click',()=>{S.category=b.dataset.cat;renderItems();$('listing-section').scrollIntoView({block:'start'})}));
 $('search').addEventListener('input',e=>{S.query=e.target.value.trim().toLowerCase();renderItems()});
@@ -164,6 +407,8 @@ $('nav-login').addEventListener('click',()=>S.session?.user?dialog('sell-dialog'
 $('open-sell').addEventListener('click',()=>dialog(S.session?.user?'sell-dialog':'auth-dialog'));
 $('open-rules').addEventListener('click',()=>dialog('rules-dialog'));
 $('open-messages').addEventListener('click',()=>showChats());
+$('nav-messages').addEventListener('click',()=>showChats());
+$('seller-messages').addEventListener('click',()=>showChats());
 $('auth-signin').addEventListener('click',()=>login(false));$('auth-signup').addEventListener('click',()=>login(true));
 $('logout').addEventListener('click',logout);
 $('listing-form').addEventListener('submit',submit);
@@ -172,18 +417,24 @@ $('retry-save').addEventListener('click',retry);
 $('accept').addEventListener('change',e=>{$('chat-seller').disabled=!e.target.checked});
 $('chat-seller').addEventListener('click',contact);
 $('chat-form').addEventListener('submit',send);
+$('chat-body').addEventListener('keydown',e=>{
+ if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){
+  e.preventDefault();
+  if(!$('chat-send').disabled)$('chat-form').requestSubmit();
+ }
+});
 $('chat-dialog').addEventListener('close',stopPolling);
 document.addEventListener('visibilitychange',async()=>{if(!document.hidden){
  if(S.session?.refresh_token&&(!S.session.expires_at||S.session.expires_at*1000<Date.now()+120000))await refresh();
- if(S.active)messages();browse();sessionUI();
+ if(S.active)messages();if(S.session?.user)threads().catch(()=>{});browse();sessionUI();
 }});
 window.addEventListener('storage',e=>{
  if(e.key===window.TrisoAuth.key){
   const next=window.TrisoAuth.read();
   if((S.session?.access_token||null)!==(next?.access_token||null)){
-   if(!next)stopPolling();
-   S.session=next;S.dailyCount=0;S.pro=false;sessionUI();
-   if(next)Promise.allSettled([mine(),threads()]);
+   stopPolling();stopInbox();S.active=null;
+   S.session=next;S.dailyCount=0;S.pro=false;S.threads=[];sessionUI();
+   if(next){startInbox();Promise.allSettled([mine(),threads()]);}
   }
  }
 });
