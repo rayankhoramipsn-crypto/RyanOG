@@ -126,6 +126,25 @@ try{
  console.log('OK mobile marketplace and Persian RTL details');
  await mobile.close();
 
+ const missing=await open('/404.html');
+ await missing.getByRole('heading',{name:'Looks like this page went offline.'}).waitFor();
+ assert.equal(await missing.locator('a[href="/"]').count(),2,'404 needs home navigation');
+ assert.equal(await missing.locator('a[href="/marketplace.html"]').count(),2,'404 needs marketplace navigation');
+ assert.equal(await missing.locator('a[href="/help/"]').count(),2,'404 needs support navigation');
+ assert.equal(await missing.locator('html').getAttribute('lang'),'en');
+ await missing.locator('#language-switch').click();
+ assert.equal(await missing.locator('html').getAttribute('lang'),'fa');
+ assert.equal(await missing.locator('html').getAttribute('dir'),'rtl');
+ await missing.reload({waitUntil:'domcontentloaded'});
+ assert.equal(await missing.locator('html').getAttribute('lang'),'fa','language preference not retained');
+ await missing.setViewportSize({width:390,height:844});
+ const missingOverflow=await missing.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
+ assert(missingOverflow<=5,'404 mobile page overflows horizontally by '+missingOverflow+'px');
+ await missing.getByRole('link',{name:/مارکت‌پلیس/}).first().click();
+ assert(missing.url().includes('/marketplace.html'),'404 marketplace recovery navigation failed');
+ console.log('OK branded 404, EN/FA toggle, RTL/mobile layout and marketplace link');
+ await missing.close();
+
  const admin=await open('/admin/');
  await admin.locator('#admin-auth').waitFor({state:'visible'});
  assert(await admin.locator('#dashboard.hidden').count()===1,'admin exposed without login');
