@@ -228,3 +228,11 @@ html[dir="rtl"] #store-screen .tc52-language-menu{right:auto;left:0}
 @media(max-width:1100px){#store-screen .tc52-category-list{grid-template-columns:repeat(3,1fr)}#store-screen .store-hero{grid-template-columns:1.25fr .9fr!important}}
 @media(max-width:760px){#store-screen .store-hero{grid-template-columns:1fr!important}#store-screen .tc52-hero-promos{grid-template-columns:repeat(3,1fr)!important;grid-template-rows:1fr!important;min-height:135px!important}#store-screen .tc52-promo{padding:13px!important}#store-screen .tc52-promo strong{font-size:16px!important}#store-screen .tc52-promo i{font-size:38px;right:12px}#store-screen .tc52-promo span:not(.tc52-promo-art){font-size:9px}#store-screen .tc52-category-list{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:490px){#store-screen .tc52-hero-promos{grid-template-columns:1fr!important;grid-template-rows:repeat(3,1fr)!important}#store-screen .tc52-promo{min-height:110px!important}#store-screen .tc52-category-list>a{padding:12px 9px;gap:8px;min-height:94px}#store-screen .tc52-category-list>a>span{width:43px;height:50px;font-size:29px}#store-screen .tc52-category-list strong{font-size:11px}#store-screen .tc52-category-heading{align-items:start;flex-direction:column}}
+
+
+/* Original resolution-independent visual artwork (SVG, not stock placeholders) */
+#store-screen .tc52-promo-fn{background-image:linear-gradient(90deg,#160c27 7%,#180e29bd 55%,#140c2008),url("assets/triso-fortnite-art.svg")!important;background-repeat:no-repeat!important;background-size:cover,auto 145%!important;background-position:center,right -5px center!important}
+#store-screen .tc52-promo-gear{background-image:linear-gradient(90deg,#100e26 10%,#13102bc9 55%,#0d0c1900),url("assets/triso-gear-art.svg")!important;background-repeat:no-repeat!important;background-size:cover,auto 155%!important;background-position:center,right -8px center!important}
+#store-screen .tc52-promo-fn i,#store-screen .tc52-promo-gear i{display:none!important}
+#store-screen .tc52-category-list>a:nth-child(1)>span{background:#261037 url("assets/triso-fortnite-art.svg") center/145% no-repeat!important;font-size:0!important}
+#store-screen .tc52-category-list>a:nth-child(2)>span{background:#241336 url("assets/triso-gear-art.svg") center/155% no-repeat!important;font-size:0!important}
