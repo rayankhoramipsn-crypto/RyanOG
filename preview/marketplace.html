@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="description" content="Browse TRISOCMD community marketplace gaming listings, view product photos, and message sellers securely. Listings are reviewed before publication.">
 <title>TRISOCMD | Marketplace</title>
-<link rel="stylesheet" href="../assets/marketplace-v15.css?v=15">
+<link rel="stylesheet" href="../assets/marketplace-v15.css?v=17">
 </head>
 <body>
 <header class="topbar">
@@ -19,6 +19,7 @@
      <label for="language" class="fine" style="position:absolute;clip:rect(0,0,0,0)">Language</label>
      <select id="language" aria-label="Language" style="width:72px;padding:10px 6px"><option value="en">EN</option><option value="fa">FA</option><option value="ar">AR</option></select>
      <a class="btn secondary small hidden" id="nav-admin" href="admin/" aria-label="Open marketplace approval queue">Review listings</a>
+     <button class="btn ghost small nav-inbox" id="nav-messages" type="button" aria-label="Marketplace conversations">✉ Inbox <span id="nav-unread" class="unread-pill hidden" aria-label="Unread messages">0</span></button>
      <button class="btn ghost small" id="nav-login" type="button">Sign in</button>
      <button class="btn primary small" id="open-sell" type="button" data-t="sell">Sell an item</button>
    </div>
@@ -33,7 +34,7 @@
        <p>A curated place to discover seller listings, compare offers and talk directly with verified-by-login members. Each new listing is reviewed before it appears publicly.</p>
        <div class="hero-actions">
          <a href="#listing-section" class="btn primary" data-t="browse">Explore listings</a>
-         <button class="btn secondary" id="open-messages" data-t="messages" type="button">Messages</button>
+         <button class="btn secondary" id="open-messages" type="button"><span data-t="messages">Messages</span> <span id="hero-unread" class="unread-pill hidden">0</span></button>
          <button class="btn ghost" id="open-rules" data-t="rules" type="button">Marketplace rules</button>
        </div>
      </div>
@@ -88,7 +89,7 @@
    </section>
    <section id="mine-wrap" class="seller-section hidden">
      <div class="section-box">
-       <div class="section-heading"><h2 >My listings</h2><button class="btn small secondary" type="button" onclick="document.getElementById('open-sell').click()">New listing</button></div>
+       <div class="section-heading"><h2>My listings</h2><div class="hero-actions" style="margin:0"><button id="seller-messages" class="btn small secondary" type="button">✉ Buyer messages</button><button class="btn small secondary" type="button" onclick="document.getElementById('open-sell').click()">New listing</button></div></div>
        <p class="fine">Pending listings are visible only to you and moderators; approved listings appear publicly.</p>
        <div id="mine"></div>
      </div>
@@ -174,19 +175,20 @@
  <div class="dialog-content"><p>For a pending listing, add real photos from your gallery. Max 4 total.</p><input type="file" id="retry-input" accept="image/jpeg,image/png,image/webp" multiple required><p id="retry-note" class="notice"></p><button id="retry-save" class="btn primary" type="button">Upload images</button></div>
 </dialog>
 <dialog id="chat-dialog" class="dialog" aria-label="Buyer and seller messages" style="width:min(1020px,calc(100vw - 26px))">
- <div class="dialog-header"><h2>TRISOCMD · Live messages</h2><div class="live-indicator">Live refresh</div><button class="close" type="button" onclick="document.getElementById('chat-dialog').close()" aria-label="Close">✕</button></div>
+ <div class="dialog-header"><h2>TRISOCMD · Conversations</h2><div class="live-indicator" id="chat-connection" role="status">Connecting…</div><button class="close" type="button" onclick="document.getElementById('chat-dialog').close()" aria-label="Close">✕</button></div>
  <div id="chat-guest" class="dialog-content hidden">Sign in to message sellers.</div>
  <div class="chat-shell">
-  <aside id="thread-list" class="thread-list"></aside>
+  <aside id="thread-list" class="thread-list" aria-label="Your conversations"><p class="fine">Loading conversations…</p></aside>
   <section class="chat-main"><div class="chat-context"><h3 id="chat-topic">Select a conversation</h3><small id="chat-sub">Messages may be reviewed by administrators.</small></div>
-  <div id="bubbles" class="chat-messages" role="log" aria-live="polite"></div>
-  <form id="chat-form" class="chat-form hidden"><label for="chat-body" class="fine" style="position:absolute;clip:rect(0,0,0,0)">Message</label><textarea id="chat-body" maxlength="2000" required placeholder="Write a message… Never send codes or passwords."></textarea><button class="btn primary" id="chat-send" type="submit">Send ↗</button></form>
-  <div id="chat-state" class="fine" role="status" style="padding:0 13px 10px"></div>
+  <div id="bubbles" class="chat-messages" role="log" aria-live="polite" aria-label="Messages in conversation"><div class="chat-placeholder">Choose a conversation to read and reply.</div></div>
+  <form id="chat-form" class="chat-form hidden"><label for="chat-body" class="fine" style="position:absolute;clip:rect(0,0,0,0)">Message</label><textarea id="chat-body" maxlength="2000" required rows="2" placeholder="Write a message… Enter to send · Shift+Enter for a new line. Never share passwords or codes."></textarea><button class="btn primary" id="chat-send" type="submit">Send ↗</button></form>
+  <div id="chat-state" class="chat-feedback" role="status" aria-live="polite"></div>
+  <p class="chat-privacy-note">Only the buyer, seller and authorized moderators can view this conversation. Do not send payment details or account recovery codes.</p>
   </section>
  </div>
 </dialog>
 <script src="../assets/triso-auth-storage.js?v=2"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer src="../assets/marketplace-v15.js?v=15"></script>
+<script defer src="../assets/marketplace-v15.js?v=17"></script>
 </body>
 </html>
