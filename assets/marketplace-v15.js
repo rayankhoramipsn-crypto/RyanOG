@@ -68,7 +68,7 @@ async function submit(e){
  let id=null;
  try{
   // The backend is authoritative: free sellers may submit 3 listings per UTC day.
-  if(!S.pro&&S.dailyCount>=3)throw Error('You have used your 3 free listings for today (UTC). Try again tomorrow.');
+  // Never trust a cached client-side count to reject submissions; the server enforces 3/day.
   const payload={p_title:$('title').value.trim(),p_platform:$('platform').value,p_description:$('description').value.trim(),p_price:Number($('price').value),p_image_url:null};
   if(payload.p_title.length<5||payload.p_description.length<20||!payload.p_platform||!Number.isFinite(payload.p_price)||payload.p_price<1)
     throw Error('Enter an item title, game/category, description (at least 20 characters), valid price and 1–4 photos.');
@@ -85,6 +85,7 @@ async function submit(e){
   close('sell-dialog');
   note('Listing #'+id+' submitted with photos. It will appear in the admin approval queue, not publicly, until reviewed.');
   await mine();
+  $('mine-wrap').scrollIntoView({block:'start',behavior:'smooth'});
  }catch(e){
   const msg=errorText(e);
   const info=id?
