@@ -76,7 +76,9 @@ class StagingRoutes(unittest.TestCase):
 
     def test_admin_moderation_guardrails(self):
         admin = (ROOT / "admin/index.html").read_text(encoding="utf-8")
-        self.assertIn("app_metadata?.role==='admin'", admin)
+        self.assertIn("rpc/is_admin", admin)
+        self.assertIn("admin-login-form", admin)
+        self.assertIn("Promise.allSettled", admin)
         self.assertIn("status=eq.pending", admin)
         self.assertIn("reviewed_by:session.user.id", admin)
         self.assertIn("Payment confirmation and fulfillment are intentionally disabled", admin)
@@ -85,6 +87,24 @@ class StagingRoutes(unittest.TestCase):
         product = (ROOT / "product.html").read_text(encoding="utf-8")
         self.assertIn("Purchasing is disabled", product)
         self.assertNotIn("/rpc/tc42_create_order", product)
+
+
+    def test_marketplace_admin_queue_is_independent_and_secure(self):
+        for rel in ("preview/admin/index.html", "admin/index.html"):
+            admin = (ROOT.parent / rel).read_text(encoding="utf-8")
+            with self.subTest(page=rel):
+                self.assertIn("rpc/is_admin", admin)
+                self.assertIn("Promise.allSettled", admin)
+                self.assertIn("admin-login-form", admin)
+                self.assertIn("reviewed_by:session.user.id", admin)
+                self.assertNotIn("raw_user_meta_data", admin)
+        for rel in ("preview/marketplace.html", "marketplace.html"):
+            market = (ROOT.parent / rel).read_text(encoding="utf-8")
+            with self.subTest(page=rel):
+                self.assertIn("market_submit", market)
+                self.assertIn("status=eq.pending", market)
+                self.assertIn('href="admin/"', market)
+                self.assertIn("awaiting administrator approval", market)
 
 if __name__ == "__main__":
     unittest.main()
