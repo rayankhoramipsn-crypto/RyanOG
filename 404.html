@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,follow">
+  <meta name="theme-color" content="#080711">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Page not found. Return to the TRISOCMD gaming store, marketplace or support.">
+  <title>404 — Page Not Found | TRISOCMD</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --background: #080711;
+      --surface: rgba(22, 17, 38, .73);
+      --border: rgba(191, 160, 255, .19);
+      --muted: #ada6c0;
+      --white: #f8f6ff;
+      --violet: #bd98ff;
+      --pink: #e19de9;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { min-height: 100%; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100svh;
+      overflow-x: hidden;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: var(--background);
+      color: var(--white);
+      -webkit-font-smoothing: antialiased;
+      position: relative;
+      isolation: isolate;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 60% 48% at 52% 34%, rgba(99, 54, 167, .30), transparent 68%),
+        radial-gradient(ellipse 32% 43% at 8% 82%, rgba(89, 38, 153, .14), transparent 75%),
+        radial-gradient(ellipse 38% 40% at 96% 4%, rgba(135, 65, 160, .13), transparent 75%),
+        linear-gradient(180deg, #0c0a17 0%, #07060e 95%);
+    }
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: .45;
+      background-image:
+        linear-gradient(rgba(182, 156, 255, .035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(182, 156, 255, .035) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: linear-gradient(180deg, transparent, black 36%, transparent 100%);
+    }
+    a { color: inherit; }
+    button { font: inherit; }
+    a:focus-visible, button:focus-visible { outline: 2px solid #e9c0ff; outline-offset: 5px; }
+    .container { width: min(100% - 48px, 1180px); margin-inline: auto; }
+    .site-header {
+      min-height: 86px;
+      border-bottom: 1px solid rgba(178, 153, 237, .095);
+      position: relative;
+      z-index: 2;
+    }
+    .header-inner { min-height: 86px; display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+    .wordmark {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      gap: 11px;
+      letter-spacing: .08em;
+      font-size: 20px;
+      font-weight: 880;
+      white-space: nowrap;
+    }
+    .wordmark-symbol {
+      width: 31px;
+      height: 31px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(205, 170, 255, .39);
+      border-radius: 9px;
+      background: linear-gradient(145deg, rgba(141, 81, 235, .22), rgba(50, 29, 91, .5));
+      box-shadow: inset 0 1px rgba(255,255,255,.13), 0 4px 25px rgba(103,50,181,.13);
+      color: #e1c3ff;
+      font-size: 17px;
+      letter-spacing: 0;
+    }
+    .wordmark em { font-style: normal; color: var(--violet); }
+    .top-navigation { display: flex; align-items: center; gap: clamp(15px, 2.4vw, 34px); }
+    .top-navigation a { color: #b9b1c9; text-decoration: none; font-size: 13px; font-weight: 650; transition: color .2s ease; }
+    .top-navigation a:hover { color: #fff; }
+    .language-switch {
+      background: rgba(36, 27, 54, .7);
+      color: #decdf5;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      font-size: 12px;
+      font-weight: 750;
+      padding: 9px 12px;
+      cursor: pointer;
+      transition: background .2s ease, border-color .2s ease;
+    }
+    .language-switch:hover { background: #332548; border-color: rgba(219, 174, 255, .5); }
+    main {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100svh - 156px);
+      padding-block: 34px 58px;
+      position: relative;
+    }
+    .error-stage { width: 100%; max-width: 830px; text-align: center; position: relative; }
+    .orbit {
+      position: absolute;
+      top: 3%;
+      left: 50%;
+      width: min(66vw, 560px);
+      aspect-ratio: 1;
+      pointer-events: none;
+      transform: translateX(-50%);
+      border: 1px solid rgba(194, 141, 255, .13);
+      border-radius: 50%;
+      box-shadow: 0 0 100px rgba(122, 56, 191, .08), inset 0 0 100px rgba(122, 56, 191, .035);
+      z-index: -1;
+    }
+    .orbit::before, .orbit::after {
+      content: "";
+      position: absolute;
+      inset: 11%;
+      border-radius: 50%;
+      border: 1px solid rgba(185, 139, 255, .11);
+    }
+    .orbit::after { inset: 25%; border-color: rgba(185, 139, 255, .07); }
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 14px;
+      border: 1px solid rgba(190, 155, 255, .25);
+      border-radius: 999px;
+      background: rgba(34, 24, 51, .68);
+      padding: 8px 13px;
+      font-size: 11px;
+      font-weight: 760;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      color: #ceb6f3;
+      box-shadow: inset 0 1px rgba(255,255,255,.06);
+    }
+    .status-chip::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #d7a2ff;
+      box-shadow: 0 0 11px #c079fb;
+    }
+    .code404 {
+      margin: 0;
+      line-height: .87;
+      letter-spacing: -.09em;
+      font-size: clamp(140px, 26vw, 270px);
+      font-weight: 900;
+      user-select: none;
+      text-indent: -.075em;
+      background: linear-gradient(180deg, #f9edff 12%, #d6b6ff 40%, #9b68e8 67%, #4f337c 97%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 17px 28px rgba(112, 56, 185, .33));
+      animation: reveal .65s ease-out both;
+    }
+    h1 {
+      font-size: clamp(30px, 4.5vw, 48px);
+      font-weight: 790;
+      letter-spacing: -.052em;
+      line-height: 1.1;
+      margin: 25px 0 11px;
+    }
+    .description {
+      color: var(--muted);
+      font-size: clamp(14px, 1.8vw, 16px);
+      line-height: 1.8;
+      margin: 0 auto;
+      max-width: 510px;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: stretch;
+      gap: 12px;
+      margin: 30px 0 38px;
+    }
+    .button {
+      min-height: 50px;
+      padding: 13px 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border: 1px solid rgba(184, 147, 255, .33);
+      border-radius: 13px;
+      background: rgba(29, 24, 44, .8);
+      color: #e6ddf6;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 760;
+      cursor: pointer;
+      transition: transform .2s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+    }
+    .button svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .button:hover { transform: translateY(-2px); border-color: rgba(216, 180, 255, .75); background: rgba(53, 40, 80, .85); }
+    .button.primary {
+      background: linear-gradient(132deg, #b77aff 0%, #9264ee 48%, #6f49da 100%);
+      border-color: #c3a0ff;
+      color: #120d20;
+      box-shadow: inset 0 1px rgba(255,255,255,.43), inset 0 -1px rgba(80,44,145,.26), 0 12px 40px rgba(125, 75, 220, .24);
+    }
+    .button.primary:hover { box-shadow: inset 0 1px rgba(255,255,255,.52), 0 16px 43px rgba(159, 95, 244, .32); }
+    .button.minor { background: transparent; }
+    .help-strip {
+      margin: 0 auto;
+      max-width: 600px;
+      padding: 18px 22px;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      justify-content: space-between;
+      text-align: start;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: linear-gradient(115deg, rgba(43, 31, 65, .75), rgba(23, 17, 37, .72));
+      box-shadow: inset 0 1px rgba(255,255,255,.07), 0 18px 55px rgba(0,0,0,.17);
+      backdrop-filter: blur(13px);
+    }
+    .help-strip strong { display: block; font-size: 13px; margin-bottom: 3px; }
+    .help-strip p { margin: 0; color: #a99fbd; font-size: 12px; line-height: 1.55; }
+    .support-link { white-space: nowrap; font-size: 13px; text-decoration: none; font-weight: 750; color: #d8b5ff; }
+    .support-link:hover { color: #f4e5ff; }
+    footer { min-height: 70px; border-top: 1px solid rgba(178,153,237,.095); display: flex; align-items: center; }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 18px; font-size: 11px; letter-spacing: .04em; color: #837992; }
+    .footer-inner a { color: #aca0c4; text-decoration: none; }
+    .footer-inner a:hover { color: #e9d8ff; }
+    [dir="rtl"] .help-strip { text-align: right; }
+    [dir="rtl"] .wordmark, [dir="rtl"] .code404 { direction: ltr; }
+    [dir="rtl"] .code404 { text-indent: -.075em; }
+    [dir="rtl"] .button svg { transform: scaleX(-1); }
+    @keyframes reveal { from { opacity: 0; transform: translateY(13px); filter: blur(8px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
+    @media (max-width: 660px) {
+      .container { width: min(100% - 30px, 1180px); }
+      .header-inner, .site-header { min-height: 72px; }
+      .wordmark { font-size: 16px; }
+      .wordmark-symbol { width: 29px; height: 29px; }
+      .top-navigation { gap: 9px; }
+      .top-navigation a { display: none; }
+      main { min-height: calc(100svh - 134px); padding-block: 36px 54px; }
+      .code404 { font-size: clamp(115px, 34vw, 185px); }
+      .orbit { width: min(90vw, 390px); top: 5%; }
+      h1 { margin-top: 26px; }
+      .actions { gap: 9px; margin-bottom: 31px; }
+      .button { flex: 1 1 145px; padding-inline: 11px; font-size: 12px; }
+      .button.minor { flex-basis: 100%; }
+      .help-strip { flex-direction: column; align-items: flex-start; gap: 9px; padding: 17px; }
+      .footer-inner { font-size: 10px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="wordmark" href="/" aria-label="TRISOCMD — Home">
+        <span class="wordmark-symbol" aria-hidden="true">T</span>
+        <span>TRISO<em>CMD</em></span>
+      </a>
+      <nav class="top-navigation" aria-label="Quick navigation">
+        <a href="/" data-en="Home" data-fa="خانه">Home</a>
+        <a href="/marketplace.html" data-en="Marketplace" data-fa="مارکت‌پلیس">Marketplace</a>
+        <a href="/help/" data-en="Support" data-fa="پشتیبانی">Support</a>
+        <button id="language-switch" class="language-switch" type="button" aria-label="Switch page language to Persian">FA</button>
+      </nav>
+    </div>
+  </header>
+  <main class="container" id="main-content">
+    <section class="error-stage" aria-labelledby="error-title">
+      <div class="orbit" aria-hidden="true"></div>
+      <div class="status-chip" data-en="Error / 404" data-fa="خطا / ۴۰۴">Error / 404</div>
+      <div class="code404" aria-hidden="true">404</div>
+      <h1 id="error-title" data-en="Looks like this page went offline." data-fa="این صفحه پیدا نشد.">Looks like this page went offline.</h1>
+      <p class="description"
+         data-en="The link may have moved or the address may be incorrect. Your next gaming drop is still just a click away."
+         data-fa="شاید لینک جابه‌جا شده یا آدرس اشتباه وارد شده. می‌تونی از مسیرهای زیر به سایت برگردی.">
+        The link may have moved or the address may be incorrect. Your next gaming drop is still just a click away.
+      </p>
+      <div class="actions" aria-label="Recovery actions">
+        <a class="button primary" href="/">
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 9-8 9 8"/><path d="M5 10v11h14V10"/><path d="M9 21v-7h6v7"/></svg>
+          <span data-en="Back to Home" data-fa="بازگشت به خانه">Back to Home</span>
+        </a>
+        <a class="button" href="/marketplace.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          <span data-en="Explore Marketplace" data-fa="مشاهده مارکت‌پلیس">Explore Marketplace</span>
+        </a>
+        <button class="button minor" type="button" id="go-back">
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5m7 7-7-7 7-7"/></svg>
+          <span data-en="Previous Page" data-fa="صفحه قبلی">Previous Page</span>
+        </button>
+      </div>
+      <div class="help-strip">
+        <div>
+          <strong data-en="Still can't find what you're looking for?" data-fa="هنوز چیزی رو که می‌خوای پیدا نکردی؟">Still can't find what you're looking for?</strong>
+          <p data-en="Our support page is here to point you in the right direction." data-fa="از صفحه پشتیبانی می‌تونی راهنمایی بگیری.">Our support page is here to point you in the right direction.</p>
+        </div>
+        <a class="support-link" href="/help/">
+          <span data-en="Contact Support" data-fa="ارتباط با پشتیبانی">Contact Support</span>
+          <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <div class="container footer-inner">
+      <span>© TRISOCMD · BUILT FOR PLAYERS</span>
+      <a href="/policies/" data-en="Policies & Safety" data-fa="قوانین و امنیت">Policies & Safety</a>
+    </div>
+  </footer>
+  <script>
+    (() => {
+      'use strict';
+      const toggle = document.getElementById('language-switch');
+      const previous = document.getElementById('go-back');
+      function setLanguage(lang) {
+        const fa = lang === 'fa';
+        document.documentElement.lang = fa ? 'fa' : 'en';
+        document.documentElement.dir = fa ? 'rtl' : 'ltr';
+        document.title = fa ? '۴۰۴ — صفحه پیدا نشد | TRISOCMD' : '404 — Page Not Found | TRISOCMD';
+        for (const node of document.querySelectorAll('[data-en][data-fa]')) {
+          node.textContent = node.dataset[fa ? 'fa' : 'en'];
+        }
+        toggle.textContent = fa ? 'EN' : 'FA';
+        toggle.setAttribute('aria-label', fa ? 'Switch page language to English' : 'Switch page language to Persian');
+        try { sessionStorage.setItem('triso_404_lang', lang); } catch (e) { /* Storage can be blocked */ }
+      }
+      let saved = '';
+      try { saved = sessionStorage.getItem('triso_404_lang') || ''; } catch (e) {}
+      setLanguage(saved === 'fa' || (!saved && navigator.language.toLowerCase().startsWith('fa')) ? 'fa' : 'en');
+      toggle.addEventListener('click', () => setLanguage(document.documentElement.lang === 'fa' ? 'en' : 'fa'));
+      previous.addEventListener('click', () => {
+        // Avoid a blank history navigation on direct visits or cross-site referrals.
+        if (document.referrer) {
+          try {
+            const ref = new URL(document.referrer);
+            if (ref.origin === location.origin && history.length > 1) {
+              history.back();
+              return;
+            }
+          } catch (e) {}
+        }
+        location.assign('/');
+      });
+    })();
+  </script>
+</body>
+</html>

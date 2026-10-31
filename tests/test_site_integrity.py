@@ -9,7 +9,7 @@ import unittest
 
 ROOT=Path(__file__).resolve().parents[1]
 ROUTES=[
- "index.html","marketplace.html","admin/index.html","blog/index.html",
+ "index.html","404.html","marketplace.html","admin/index.html","blog/index.html",
  "videos/index.html","help/index.html","policies/index.html","product.html",
  "preview/index.html","preview/marketplace.html","preview/admin/index.html",
  "preview/blog/index.html","preview/videos/index.html","preview/help/index.html",
@@ -56,6 +56,17 @@ class SiteIntegrity(unittest.TestCase):
    self.assertIn("Order status transitions are not configured.",html)
    self.assertIn("payment verification/fulfillment is intentionally disabled",html.lower())
    self.assertIn("Full admin audit logging is not configured",html)
+
+ def test_branded_404_has_functional_recovery(self):
+  page=(ROOT/"404.html").read_text(encoding="utf-8")
+  self.assertIn("<title>404 — Page Not Found | TRISOCMD</title>",page)
+  self.assertIn('name="robots" content="noindex,follow"',page)
+  for target in ('href="/"','href="/marketplace.html"','href="/help/"'):
+   self.assertIn(target,page)
+  self.assertIn('id="language-switch"',page)
+  self.assertIn('id="go-back"',page)
+  self.assertIn("prefers-reduced-motion",page)
+  self.assertNotIn("service_role",page)
 
  def test_core_javascript_parses(self):
   for path in [
