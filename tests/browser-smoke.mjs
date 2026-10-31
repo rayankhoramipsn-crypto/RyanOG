@@ -108,6 +108,24 @@ try{
  console.log('OK listing detail, policy gating, category filter and search');
  await market.close();
 
+ // Mobile and RTL smoke: no horizontal scroll traps, searchable items remain
+ // reachable in both English and Persian layouts.
+ const mobile=await context.newPage();
+ mobile.setDefaultTimeout(12000);
+ await mobile.setViewportSize({width:390,height:844});
+ const mobileResponse=await mobile.goto(base+'/marketplace.html',{waitUntil:'domcontentloaded'});
+ assert(mobileResponse&&mobileResponse.status()===200);
+ await mobile.waitForFunction(()=>document.querySelectorAll('#cards .item-card').length===2,null,{timeout:15000});
+ const mobileOverflow=await mobile.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
+ assert(mobileOverflow<=5,'Mobile marketplace horizontal overflow: '+mobileOverflow+'px');
+ await mobile.locator('#language').selectOption('fa');
+ assert.equal(await mobile.locator('html').getAttribute('dir'),'rtl','Persian layout must be RTL');
+ await mobile.locator('.item-card button').first().click();
+ await mobile.locator('#detail-dialog[open]').waitFor();
+ await mobile.keyboard.press('Escape');
+ console.log('OK mobile marketplace and Persian RTL details');
+ await mobile.close();
+
  const admin=await open('/admin/');
  await admin.locator('#admin-auth').waitFor({state:'visible'});
  assert(await admin.locator('#dashboard.hidden').count()===1,'admin exposed without login');
