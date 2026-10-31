@@ -21,3 +21,5 @@ jobs:
         run: python3 tests/test_main_ui.py
       - name: Verify persistent login and marketplace moderation
         run: python3 tests/test_marketplace_auth_admin.py
+      - name: Verify buyer seller live chat and unread message safety
+        run: python3 tests/test_marketplace_live_chat.py
