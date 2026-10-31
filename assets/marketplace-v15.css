@@ -69,3 +69,17 @@ h1,h2,h3,p{margin-top:0}h1,h2,h3{line-height:1.16}p{color:#c4bfd2}img{display:bl
  .chat-form{padding:9px;gap:7px}
  .chat-form button{padding:9px}
 }
+
+/* V18 — marketplace purchase review and seller listing management */
+.purchase-action{margin-top:18px;padding:18px;border:1px solid #715293;border-radius:15px;background:linear-gradient(150deg,#2f1c45,#191427)}
+.purchase-action h3{margin:0 0 10px;font-size:18px;color:#ead7ff}
+.purchase-action p{line-height:1.65}
+.purchase-action label{font-weight:700;font-size:13px;color:#d2bfee;display:block;margin:10px 0 7px}
+.purchase-action select{margin-bottom:12px}
+.purchase-action #request-purchase{border-color:#805cb7}
+.purchase-action #purchase-status{display:block;margin-top:11px;white-space:pre-wrap;overflow-wrap:anywhere;color:#dfc5ff}
+.request-list{display:grid;gap:12px}
+.request-row{display:grid;gap:8px;padding:14px;background:#221a32;border:1px solid #4b3865;border-radius:12px;overflow-wrap:anywhere}
+.request-row strong{color:#f3e8ff}
+.submission .warn{background:#512334;border-color:#99506b;color:#ffd2df}
+.submission .warn:hover{background:#6c2a45}
