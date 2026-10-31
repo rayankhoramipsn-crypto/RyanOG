@@ -1431,6 +1431,43 @@ body,#store-screen{background:radial-gradient(ellipse 75% 22% at 50% 0%,#271338 
 <meta name="twitter:description" content="Fortnite, gaming gear and a moderated community marketplace. Explore TRISOCMD products, listings and player resources.">
 <meta name="twitter:image" content="https://trisocmd.shop/assets/trisocmd-social.png?v=19">
 
+<style id="tc-v20-auth-design">
+/* V20 full-viewport auth experience; preserves original language picker and Supabase flows */
+#tc31-panel.screen.active{min-height:100svh;padding:clamp(18px,3vw,44px);background:radial-gradient(circle at 78% 12%,rgba(96,72,158,.23),transparent 43%),linear-gradient(135deg,#080a10 0%,#11131d 62%,#090b12 100%);color:#f5f2ff}
+#tc31-panel .tc31-wrap{width:min(1260px,100%);min-height:calc(100svh - 88px);margin:0 auto;display:flex;flex-direction:column;justify-content:center}
+#tc31-panel .tc31-nav{margin-bottom:clamp(28px,5vh,62px);padding-bottom:18px;border-bottom:1px solid rgba(207,195,255,.13)}
+#tc31-panel .tc31-nav strong{font-size:16px;letter-spacing:.1em}
+#tc31-panel .tc31-nav button{border:1px solid rgba(208,194,249,.25);color:#efecfb;background:rgba(255,255,255,.04);padding:12px 19px;border-radius:12px;cursor:pointer}
+#tc31-panel .tc31-kicker,#tc31-panel .tc-v20-form-eyebrow{color:#bba4ff;font-size:12px;letter-spacing:.19em;font-weight:800}
+#tc31-panel .tc31-heading{font-size:clamp(36px,5vw,64px);line-height:1.02;letter-spacing:-.06em;margin:14px 0 12px}
+#tc31-panel .tc31-grid{grid-template-columns:minmax(0,1fr) minmax(0,0.95fr);gap:22px;align-items:stretch;margin:30px 0}
+#tc31-panel .tc31-grid>.tc31-card{margin:0;padding:clamp(25px,4vw,55px);border-radius:24px;background:#131622;border:1px solid rgba(201,187,255,.19);box-shadow:0 25px 70px rgba(0,0,0,.24)}
+#tc31-panel .tc31-grid>.tc31-card:first-child{background:linear-gradient(145deg,#191b29,#10131d)}
+#tc31-panel .tc31-card h3{font-size:clamp(25px,3vw,36px);line-height:1.12;letter-spacing:-.04em;margin:14px 0}
+#tc31-panel .tc-v20-intro{color:#a9aabd;line-height:1.7;margin:0 0 25px}
+#tc31-panel .tc31-input{width:100%;border:1px solid #45445b;border-radius:12px;background:#0b0e18;color:#fff;padding:16px 18px;min-height:52px}
+#tc31-panel .tc31-input:focus{outline:2px solid #aa93f2;outline-offset:1px}
+#tc31-panel .tc31-card label{display:block;font-size:13px;font-weight:600;color:#e8e2f8;margin-top:8px}
+#tc31-panel .tc31-card label.tc31-remember{display:flex;align-items:center;gap:10px;margin:0 0 19px;font-weight:400;color:#bebbd0}
+#tc31-panel .tc31-btn{background:#a991ff;color:#0f0d1a;border-radius:12px;min-height:50px;transition:filter .2s ease}
+#tc31-panel .tc31-btn:hover{filter:brightness(1.09)}
+#tc31-panel .tc31-row .tc31-btn{width:100%}
+#tc31-panel .tc31-btn.tc31-alt{background:transparent;color:#eee9fa;border:1px solid rgba(205,191,246,.32)}
+#tc31-panel .tc-v20-register{font-size:14px;text-align:center;margin:20px 0;color:#bdb8ce}
+#tc31-panel .tc-v20-register button{background:none;border:0;color:#beaaff;font:inherit;font-weight:800;cursor:pointer}
+#tc31-panel .tc-v20-side{background:radial-gradient(circle at 90% 10%,rgba(173,143,255,.2),transparent 52%),linear-gradient(135deg,#201d35,#121523)!important}
+#tc31-panel .tc-v20-side-inner{display:flex;flex-direction:column;height:100%;justify-content:center;gap:12px}
+#tc31-panel .tc-v20-chip{display:inline-block;align-self:flex-start;padding:9px 13px;border-radius:99px;border:1px solid rgba(195,166,255,.35);font-size:10px;letter-spacing:.13em;color:#d7c6ff}
+#tc31-panel .tc-v20-side h3{font-size:clamp(30px,4vw,50px)}
+#tc31-panel .tc-v20-or{font-size:11px;letter-spacing:.18em;color:#aaa1c4;margin-top:24px}
+#tc31-panel .tc-v20-foot{color:#9691ac;font-size:12px;margin-top:12px}
+#tc31-panel .tc31-signup-shell{max-width:900px;width:100%;margin:18px auto 35px}
+#tc31-panel .tc31-signup-card{padding:clamp(24px,4vw,48px);border-radius:22px}
+#tc31-panel #tc31-signup-view .tc31-btn{min-height:50px}
+#tc31-panel .tc31-status{margin-top:12px}
+@media(max-width:780px){#tc31-panel.screen.active{padding:18px 15px}#tc31-panel .tc31-wrap{min-height:calc(100svh - 36px)}#tc31-panel .tc31-grid{grid-template-columns:1fr;gap:16px}#tc31-panel .tc31-grid>.tc31-card{padding:24px}#tc31-panel .tc-v20-side{padding:24px!important}#tc31-panel .tc31-heading{font-size:39px}}
+@media(prefers-reduced-motion:reduce){#tc31-panel .tc31-btn{transition:none}}
+</style>
 </head>
 <body><div id="tc50-staging-banner" role="status" style="position:relative;z-index:99999;background:#122330;border-bottom:1px solid #467487;color:#c2eaff;padding:10px 18px;text-align:center;font:600 12px/1.5 system-ui,sans-serif">STAGING PREVIEW · Payments, order processing, and support notifications are not live. Do not send funds.</div>
 <a class="tc49-skip" href="#tc-shop-heading">SKIP TO PRODUCTS</a>
@@ -1745,9 +1782,9 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElement
 </div>
 
 
-<section class="screen" id="tc31-panel"><div class="tc31-wrap"><div class="tc31-nav"><strong>TRISO<span style="color:#67d9ff">CMD.</span> / ACCOUNT</strong><button onclick="showScreen('store-screen')">← Back to shop</button></div><div class="tc31-kicker">PLAYER PORTAL / 001</div><h1 class="tc31-heading">YOUR SPACE.<br>YOUR GAME.</h1><p class="tc31-muted">Secure account access, your profile and your orders.</p>
-<div id="tc31-guest" class="tc31-grid"><div class="tc31-card"><h3>Sign in</h3><label>Email</label><input id="tc31-email" type="email" class="tc31-input" autocomplete="email" placeholder="player@example.com"><label>Password</label><input id="tc31-password" type="password" class="tc31-input" autocomplete="current-password" placeholder="At least 8 characters"><label class="tc31-remember"><input id="tc31-remember" type="checkbox" checked> Remember me on this device</label>
-<div class="tc31-row"><button class="tc31-btn" onclick="tc31Email('login')">Sign in</button><button class="tc31-btn tc31-alt" onclick="tc31ShowSignup()">Create account ↗</button></div><p class="tc31-small">By creating an account you agree to the store's published policies.</p><button class="tc31-btn tc31-alt" onclick="tc31Reset()">Forgot password?</button></div><div class="tc31-card"><h3>One-click access</h3><p class="tc31-muted">Sign in using your Google account.</p><button class="tc31-btn tc31-alt" onclick="tc31Google()">Continue with Google ↗</button><p class="tc31-small">Google sign-in requires provider setup in Supabase before use.</p><div class="tc31-pill">SUPABASE AUTH</div></div></div>
+<section class="screen" id="tc31-panel"><div class="tc31-wrap"><div class="tc31-nav"><strong>TRISO<span style="color:#67d9ff">CMD.</span> / ACCOUNT</strong><button onclick="showScreen('store-screen')">← Back to shop</button></div><div class="tc31-kicker">PLAYER PORTAL / 001</div><h1 class="tc31-heading">YOUR SPACE.<br>YOUR GAME.</h1><p class="tc31-muted">Your account, your gaming marketplace.</p>
+<div id="tc31-guest" class="tc31-grid"><div class="tc31-card"><div class="tc-v20-form-eyebrow">WELCOME BACK</div><h3>Sign in to your account</h3><p class="tc-v20-intro">Manage your profile, conversations and marketplace listings in one place.</p><label>Email</label><input id="tc31-email" type="email" class="tc31-input" autocomplete="email" placeholder="player@example.com"><label>Password</label><input id="tc31-password" type="password" class="tc31-input" autocomplete="current-password" placeholder="At least 8 characters"><label class="tc31-remember"><input id="tc31-remember" type="checkbox" checked> Remember me on this device</label>
+<div class="tc31-row"><button class="tc31-btn" onclick="tc31Email('login')">Sign in securely →</button></div><p class="tc-v20-register">New to TRISOCMD? <button type="button" onclick="tc31ShowSignup()">Create an account</button></p><p class="tc31-small">By creating an account you agree to the store's published policies.</p><button class="tc31-btn tc31-alt" onclick="tc31Reset()">Forgot password?</button></div><div class="tc31-card tc-v20-side"><div class="tc-v20-side-inner"><span class="tc-v20-chip">TRISOCMD / MEMBER ACCESS</span><h3>Everything gaming.<br>One account.</h3><p class="tc31-muted">Find gear, explore listings, message sellers and keep your account in one secure place.</p><div class="tc-v20-or">OR CONTINUE WITH</div><button class="tc31-btn tc31-alt" onclick="tc31Google()">Continue with Google ↗</button><p class="tc31-small">Google sign-in requires provider setup in Supabase before use.</p><div class="tc-v20-foot">Protected account access powered by Supabase Auth.</div></div></div></div>
 <div class="tc31-card" id="tc31-recovery-shell" hidden style="margin:20px 0"><h3>Set a new password</h3><div id="tc31-recovery-form" hidden style="margin-top:16px"><label>New password</label><input id="tc31-new-password" type="password" class="tc31-input" autocomplete="new-password" placeholder="At least 8 characters"><label>Confirm new password</label><input id="tc31-confirm-new-password" type="password" class="tc31-input" autocomplete="new-password" placeholder="Repeat new password"><button class="tc31-btn" onclick="tc31UpdatePassword()">Update password</button></div></div>
 <div id="tc31-signup-view" style="display:none" class="tc31-signup-shell"><div class="tc31-signup-top"><button type="button" class="tc31-btn tc31-alt" onclick="tc31HideSignup()">← Back to sign in</button><span>TRISOCMD / JOIN THE COMMUNITY</span></div><div class="tc31-card tc31-signup-card"><div class="tc31-signup-kicker">CREATE YOUR PLAYER PROFILE / 001</div><h2>YOUR ACCOUNT.<br><em>YOUR WORLD.</em></h2><p class="tc31-muted">One account for your orders, marketplace listings and conversations.</p><form id="tc31-signup-form" onsubmit="event.preventDefault();tc31Register()"><label for="tc31-signup-name">Display name</label><input id="tc31-signup-name" class="tc31-input" type="text" minlength="2" maxlength="40" autocomplete="nickname" placeholder="What should we call you?" required><label for="tc31-signup-email">Email address</label><input id="tc31-signup-email" class="tc31-input" type="email" autocomplete="email" placeholder="you@example.com" required><label for="tc31-signup-password">Password</label><input id="tc31-signup-password" class="tc31-input" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters" required><label for="tc31-signup-confirm">Confirm password</label><input id="tc31-signup-confirm" class="tc31-input" type="password" autocomplete="new-password" minlength="8" placeholder="Repeat your password" required><p class="tc31-small">Use a unique password. You may be asked to confirm your email before signing in.</p><button type="submit" class="tc31-btn tc31-signup-submit">CREATE ACCOUNT ↗</button><p class="tc31-small">By creating an account, you agree to the store's published policies.</p></form><div class="tc31-signup-divider">OR</div><button type="button" class="tc31-btn tc31-alt tc31-google-wide" onclick="tc31Google()">Continue with Google ↗</button><p class="tc31-small">Already have an account? <button type="button" class="tc31-signup-inline" onclick="tc31HideSignup()">Sign in instead</button></p></div></div>
 <div id="tc31-user" class="tc31-card" style="display:none"><div id="tc40-admin-status" class="tc40-admin-status" role="status">Checking account permissions…</div><div id="tc40-admin-preview" hidden><div class="tc40-admin-title">ADMIN ACCESS VERIFIED</div><p class="tc31-muted">Your account is recognized by Supabase. Manage products and fulfillment below. Changes require server-verified admin permissions.</p><button class="tc31-btn tc31-alt" onclick="tc40RefreshProducts()">Refresh product overview</button><div id="tc40-inventory" class="tc40-inventory"></div>
@@ -2274,7 +2311,7 @@ function setLang(lang, dir, origin) {
   applyTranslations();
   if(origin === 'navbar' && !firstEntry)return;
   showScreen('store-screen');
-  if(firstEntry && origin !== 'navbar' && !window.TrisoAuth?.read()?.user)tc37ShowWelcome();
+  if(firstEntry && origin !== 'navbar' && !window.TrisoAuth?.read()?.user)showScreen('tc31-panel');
 }
 
 function applyTranslations() {
@@ -3131,14 +3168,14 @@ async function api(path,body,token){
  const d=await res.json().catch(()=>({}));if(!res.ok)throw Error(d.error_description||d.msg||d.message||d.error||'Authentication failed');return d;
 }
 function update(){const u=session?.user;const guest=$('tc31-guest'),user=$('tc31-user');if(guest)guest.style.display=u?'none':($('tc31-signup-view')?.style.display==='block'?'none':'grid');if(u&&$('tc31-signup-view'))$('tc31-signup-view').style.display='none';if(user)user.style.display=u?'block':'none';if(u){$('tc31-user-email').textContent=u.email||'Player';window.tc36LoadOrders?.();window.tc40CheckAdmin?.(session.access_token)}else{window.tc40ResetAdmin?.();const el=$('tc36-orders');if(el)el.textContent='Sign in to view orders.';}}
-function save(d){if(d?.access_token&&d?.refresh_token){window.TrisoAuth.write(d);session=window.TrisoAuth.read()||d;}update();}
+function save(d){if(d?.access_token&&d?.refresh_token){window.TrisoAuth.write(d);session=window.TrisoAuth.read()||d;if(session?.user&&$('tc37-welcome')?.classList.contains('open'))tc37Close();}update();}
 async function refresh(){if(!session?.refresh_token)return false;try{save(await api('token?grant_type=refresh_token',{refresh_token:session.refresh_token}));return true}catch(e){const t=(e.message||'').toLowerCase();if(/invalid.refresh|refresh.token.not.found|already.used|invalid.grant/.test(t))clear();else status('Connection interrupted. Your remembered login is saved; retry when online.');return false}}
 function clear(){session=null;window.TrisoAuth.clear();update()}
 async function restore(){
  session=window.TrisoAuth.read();
  if(!session?.refresh_token){update();return}
  // Restore the store for returning members rather than showing login onboarding.
- if($('lang-screen')?.classList.contains('active'))showScreen('store-screen');
+ // Keep the original language selection as the first screen even for returning members.
  if($('tc37-welcome')?.classList.contains('open'))tc37Close();
  try{
    if(!session.expires_at||session.expires_at<Math.floor(Date.now()/1000)+120){await refresh()}
