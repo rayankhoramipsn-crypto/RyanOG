@@ -83,7 +83,7 @@
          <div class="mini-card"><strong>02 · Admin review</strong><p>Your offer and attached images stay pending until a moderator reviews the listing.</p></div>
          <div class="mini-card"><strong>03 · Talk to buyers</strong><p>Approved listings appear in search. Buyers can message you in the site's conversation panel.</p></div>
        </div>
-       <p class="fine" style="margin:18px 0 0">Free: one listing per UTC day. Pro: additional submissions when enabled by an administrator. The stated marketplace commission is 4% if a supported transaction service is activated later. No live checkout or escrow is currently offered.</p>
+       <p class="fine" style="margin:18px 0 0">Free: up to 3 listings per UTC day, per account. Pro: unlimited submissions while the subscription is active. The stated marketplace commission is 4% if a supported transaction service is activated later. No live checkout or escrow is currently offered.</p>
      </div>
    </section>
    <section id="mine-wrap" class="seller-section hidden">
@@ -151,6 +151,11 @@
   <div id="seller-panel" class="hidden">
   <div class="section-heading"><strong>Seller dashboard</strong><button id="logout" class="btn small secondary hidden" type="button">Sign out</button></div>
   <p class="fine">Your listing and its photos must be reviewed by an administrator. Do not include account passwords or recovery credentials in photos or text.</p>
+  <div class="seller-quota" aria-live="polite">
+    <strong id="seller-identity">Checking seller account…</strong>
+    <span id="seller-quota-count">Free accounts: 3 listings per UTC day</span>
+  </div>
+  <p class="fine">If you're testing two accounts, use separate browser profiles or an incognito window to keep each login independent.</p>
   <form id="listing-form">
    <div class="form-grid">
     <div class="form-field full"><label for="title">Item title *</label><input id="title" name="title" required minlength="5" maxlength="120" placeholder="Describe your gaming item clearly"></div>
@@ -159,6 +164,7 @@
     <div class="form-field full"><label for="description">Full item description *</label><textarea id="description" required minlength="20" maxlength="3000" placeholder="Explain what is included, ownership and condition; no private credentials."></textarea></div>
     <div class="form-field full"><label for="photos">Item photos from your device * (1–4)</label><div class="upload-box"><p style="margin:0 0 8px">Upload actual item pictures from your gallery · JPG / PNG / WebP</p><input id="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple required><div id="photo-preview" class="upload-preview" aria-live="polite"></div><div id="upload-status" class="fine" role="status"></div></div></div>
    </div><p class="fine">Max 5 MB per image. All new listings need admin approval and at least one image. No live payments.</p>
+   <p id="sell-status" class="notice" role="alert" aria-live="assertive"></p>
    <button type="submit" id="post" class="btn primary block">Submit for admin review</button>
   </form></div>
  </div>

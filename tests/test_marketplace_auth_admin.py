@@ -84,6 +84,28 @@ class PersistentMarketAdmin(unittest.TestCase):
         self.assertIn("adminLink.classList.toggle('hidden',!on||!S.admin)", script)
         self.assertIn("S.admin=await adminCheck()", script)
 
+    def test_three_daily_free_submissions_and_visible_errors(self):
+        for path in ["marketplace.html", "preview/marketplace.html"]:
+            with self.subTest(path=path):
+                source = (ROOT / path).read_text(encoding="utf-8")
+                self.assertIn("Free: up to 3 listings per UTC day", source)
+                self.assertIn('id="seller-quota-count"', source)
+                self.assertIn('id="seller-identity"', source)
+                self.assertIn('id="sell-status"', source)
+                self.assertNotIn("Free: one listing per UTC day", source)
+        script = (ROOT / "assets/marketplace-v15.js").read_text(encoding="utf-8")
+        for phrase in ("Math.max(0,3-today)", "sellStatus(info)", "quotaDisplay()",
+                       "market_submit", "Your listing #", "await mine()",
+                       "profiles?.[0]?.is_pro", "utcDay"):
+            self.assertIn(phrase, script)
+
+        migration = (ROOT / "docs/marketplace-v16-three-free-listings-per-day.sql").read_text(encoding="utf-8")
+        self.assertIn("v_today_count >= 3", migration)
+        self.assertIn("auth.uid()", migration)
+        self.assertIn("pg_advisory_xact_lock", migration)
+        self.assertIn("grant execute on function", migration)
+        self.assertIn("to authenticated, service_role", migration)
+
     def test_script_syntax(self):
         for path in ["assets/triso-auth-storage.js",
                      "assets/triso-market-admin.js",
