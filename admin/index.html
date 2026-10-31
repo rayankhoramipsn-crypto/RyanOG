@@ -1,13 +1,161 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>TRISOCMD — Staging Admin</title><style>:root{color-scheme:dark;font:15px system-ui;background:#0b0d13;color:#f3f2f8}*{box-sizing:border-box}body{max-width:1150px;margin:auto;padding:24px}a{color:#b8a4ff}header{display:flex;gap:20px;justify-content:space-between;flex-wrap:wrap;border-bottom:1px solid #303448;padding-bottom:20px}h1{font-size:clamp(30px,5vw,52px)}p{color:#b8bbcc;line-height:1.6}section{background:#171a26;border:1px solid #34384d;border-radius:16px;padding:20px;margin:20px 0}table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #35394a;padding:12px;text-align:left;vertical-align:top;overflow-wrap:anywhere}button,input,select,textarea{font:inherit;padding:10px;border-radius:8px;background:#101320;color:white;border:1px solid #4c5065}button{cursor:pointer;background:#7459d3}button:disabled{opacity:.5}textarea{width:100%;min-height:65px}.hidden{display:none!important}.scroll{overflow-x:auto}.muted{color:#a9afc4}#status{min-height:24px}@media(max-width:600px){th,td{padding:8px;font-size:13px}}</style><link rel="stylesheet" href="../luxury-dark.css?v=20261031-luxury"></head><body><header><a href="../index.html">TRISOCMD / STORE</a><strong>STAGING ADMIN</strong><a href="../blog/">Journal</a></header><h1>Operations dashboard</h1><p id="status" role="status">Checking administrator session…</p><div id="dashboard" class="hidden"><section><h2>Overview</h2><p id="overview"></p><button id="refresh">Refresh dashboard</button></section><section><h2>Marketplace moderation</h2><p class="muted">Pending listings require review. Only approve listings that are legitimate and comply with store policy.</p><div id="listings" class="scroll"></div></section><section><h2>Support tickets</h2><div id="tickets" class="scroll"></div></section><section><h2>Orders (read-only)</h2><p class="muted">Payment confirmation and fulfillment are intentionally disabled in this dashboard.</p><div id="orders" class="scroll"></div></section><section><h2>Content management</h2><p><a href="../blog/">Open article editor →</a></p><p><a href="../videos/">Open video hub →</a></p></section></div><script>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>TRISOCMD — Staging Admin</title><style>:root{color-scheme:dark;font:15px system-ui;background:#0b0d13;color:#f3f2f8}*{box-sizing:border-box}body{max-width:1150px;margin:auto;padding:24px}a{color:#b8a4ff}header{display:flex;gap:20px;justify-content:space-between;flex-wrap:wrap;border-bottom:1px solid #303448;padding-bottom:20px}h1{font-size:clamp(30px,5vw,52px)}p{color:#b8bbcc;line-height:1.6}section{background:#171a26;border:1px solid #34384d;border-radius:16px;padding:20px;margin:20px 0}table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #35394a;padding:12px;text-align:left;vertical-align:top;overflow-wrap:anywhere}button,input,select,textarea{font:inherit;padding:10px;border-radius:8px;background:#101320;color:white;border:1px solid #4c5065}button{cursor:pointer;background:#7459d3}button:disabled{opacity:.5}textarea{width:100%;min-height:65px}.hidden{display:none!important}.scroll{overflow-x:auto}.muted{color:#a9afc4}#status{min-height:24px}@media(max-width:600px){th,td{padding:8px;font-size:13px}}#admin-login-form{display:flex;gap:12px;flex-wrap:wrap;align-items:end}#admin-login-form label{display:grid;gap:7px;flex:1 1 190px;color:#dcc9ff;font-size:13px}#admin-login-form input{width:100%;max-width:350px}#admin-login-btn{min-width:140px;background:linear-gradient(105deg,#7d32c5,#bb38d6)}#listings-status{color:#ddaff9;font-weight:700}#status{white-space:pre-wrap}button:focus-visible,input:focus-visible{outline:2px solid #db9eff;outline-offset:3px}</style><link rel="stylesheet" href="../luxury-dark.css?v=20261031-luxury"></head><body><header><a href="../index.html">TRISOCMD / STORE</a><strong>STAGING ADMIN</strong><a href="../blog/">Journal</a></header><h1>Operations dashboard</h1><p id="status" role="status" aria-live="polite">Checking administrator session…</p>
+<section id="admin-auth" class="hidden" aria-labelledby="admin-auth-title">
+<h2 id="admin-auth-title">Admin sign in</h2>
+<p class="muted">Sign in with your TRISOCMD administrator account to review new marketplace submissions. This login works even when you opened the dashboard in a different tab.</p>
+<form id="admin-login-form"><label>Email <input id="admin-email" type="email" autocomplete="username" required placeholder="Admin email"></label> <label>Password <input id="admin-password" type="password" autocomplete="current-password" required placeholder="Password"></label> <button type="submit" id="admin-login-btn">Sign in securely</button></form>
+</section>
+<div id="dashboard" class="hidden"><section><h2>Overview</h2><p id="overview"></p><button id="refresh" type="button">Refresh dashboard</button> <button id="admin-signout" type="button" style="background:#211a37;border-color:#665c92">Sign out</button></section><section><h2>Marketplace moderation</h2><p class="muted">Pending listings require review. Only approve listings that are legitimate and comply with store policy.</p><p id="listings-status" role="status" aria-live="polite">Checking pending listings…</p><div id="listings" class="scroll"></div></section><section><h2>Support tickets</h2><p id="tickets-status" class="muted"></p><div id="tickets" class="scroll"></div></section><section><h2>Orders (read-only)</h2><p class="muted">Payment confirmation and fulfillment are intentionally disabled in this dashboard.</p><p id="orders-status" class="muted"></p><div id="orders" class="scroll"></div></section><section><h2>Content management</h2><p><a href="../blog/">Open article editor →</a></p><p><a href="../videos/">Open video hub →</a></p></section></div><script>
 'use strict';
-const ROOT='https://cxtytbjvdlngahytfilr.supabase.co',KEY='sb_publishable_AqZWjpgyZ_h6-EKwOySyGQ_0LE8bcRm';const $=id=>document.getElementById(id),status=t=>{$('status').textContent=t};let session=null;try{session=JSON.parse(sessionStorage.getItem('tc35_auth_session')||'null')}catch{}const token=session?.access_token;const admin=session?.user?.app_metadata?.role==='admin';
-function el(tag,text){const e=document.createElement(tag);if(text!=null)e.textContent=text;return e}
-async function api(path,options={}){const r=await fetch(ROOT+'/rest/v1/'+path,{...options,headers:{apikey:KEY,Authorization:'Bearer '+token,'Content-Type':'application/json',...(options.headers||{})}});if(!r.ok)throw Error('API '+r.status+': '+(await r.text()).slice(0,150));const text=await r.text();return text?JSON.parse(text):null}
-function table(target,headers,rows,build){const root=$(target);root.replaceChildren();if(!rows.length){root.append(el('p','Nothing to display.'));return}const t=el('table'),thead=el('thead'),tr=el('tr');for(const h of headers)tr.append(el('th',h));thead.append(tr);const body=el('tbody');for(const row of rows){const line=el('tr');build(row,line);body.append(line)}t.append(thead,body);root.append(t)}
+// Administrator actions are authorized by the Supabase JWT app_metadata role
+// and server-side RLS. Never trust user_metadata or a local admin flag.
+const ROOT="https://cxtytbjvdlngahytfilr.supabase.co",KEY="sb_publishable_AqZWjpgyZ_h6-EKwOySyGQ_0LE8bcRm";
+const $=id=>document.getElementById(id);
+const status=t=>{$('status').textContent=String(t)};
+let session=null,authorized=false,loading=false,lastLoad=0;
+try{session=JSON.parse(sessionStorage.getItem('tc35_auth_session')||'null')}catch{}
+function el(tag,txt){const e=document.createElement(tag);if(txt!=null)e.textContent=String(txt);return e}
+function setSession(s){session=s;sessionStorage.setItem('tc35_auth_session',JSON.stringify(s))}
+function clearSession(){session=null;authorized=false;sessionStorage.removeItem('tc35_auth_session')}
+function viewAuth(show){
+ $('admin-auth').classList.toggle('hidden',!show);
+ $('dashboard').classList.toggle('hidden',show);
+}
+async function authRequest(path,body){
+ const r=await fetch(ROOT+'/auth/v1/'+path,{method:'POST',headers:{apikey:KEY,'Content-Type':'application/json'},body:JSON.stringify(body)});
+ const data=await r.json().catch(()=>({}));
+ if(!r.ok)throw Error(data?.msg||data?.error_description||data?.message||'Authentication error ('+r.status+')');
+ return data;
+}
+async function api(path,options={}){
+ if(!session?.access_token)throw Error('Please sign in with your admin account.');
+ const r=await fetch(ROOT+'/rest/v1/'+path,{...options,headers:{apikey:KEY,Authorization:'Bearer '+session.access_token,'Content-Type':'application/json',...(options.headers||{})}});
+ const raw=await r.text();
+ if(!r.ok)throw Error('API '+r.status+': '+raw.slice(0,190));
+ return raw?JSON.parse(raw):null;
+}
+async function refreshSession(){
+ if(!session?.refresh_token)return false;
+ try{
+  const updated=await authRequest('token?grant_type=refresh_token',{refresh_token:session.refresh_token});
+  if(!updated.access_token||!updated.user)throw Error('Session expired');
+  setSession(updated);
+  return true;
+ }catch(e){clearSession();status('Admin session expired. Please sign in again.');return false}
+}
+async function checkAdmin(){
+ if(!session?.access_token)return false;
+ try{
+   // is_admin() checks auth.jwt().app_metadata.role on the server.
+   const result=await api('rpc/is_admin',{method:'POST',body:'{}'});
+   return result===true;
+ }catch(e){status('Could not verify administrator access: '+e.message);return false}
+}
+function table(target,headers,rows,build){
+ const root=$(target);root.replaceChildren();
+ if(!rows.length){root.append(el('p','Nothing to display.'));return}
+ const t=el('table'),thead=el('thead'),tr=el('tr');
+ for(const h of headers)tr.append(el('th',h));
+ thead.append(tr);const body=el('tbody');
+ for(const row of rows){const line=el('tr');build(row,line);body.append(line)}
+ t.append(thead,body);root.append(t)
+}
 function cell(tr,value){tr.append(el('td',value==null?'—':String(value)))}
 function date(v){return v?new Date(v).toLocaleString():'—'}
 function safeText(v){return String(v||'').slice(0,160)}
-async function moderate(id,decision,reason){if(!admin)return;const payload={status:decision,reviewed_at:new Date().toISOString(),reviewed_by:session.user.id,decline_reason:decision==='declined'?reason||'Does not meet listing requirements':null};await api('market_listings?id=eq.'+encodeURIComponent(id)+'&status=eq.pending',{method:'PATCH',body:JSON.stringify(payload),headers:{Prefer:'return=representation'}}).then(rows=>{if(!rows?.length)throw Error('Listing no longer pending or update denied.')});await load()}
-async function load(){if(!admin||!token){status('Administrator login required. Open the staging store, sign in with your admin account, and return here in the same browser tab.');return}try{const [listings,tickets,orders,products,posts]=await Promise.all([api('market_listings?select=id,title,platform,description,price,status,seller_id,submitted_at&order=submitted_at.desc&limit=80'),api('support_tickets?select=id,subject,message,status,created_at,user_id&order=created_at.desc&limit=60'),api('orders?select=id,status,total_amount,currency,created_at,user_id&order=created_at.desc&limit=60'),api('products?select=id,status&limit=500'),api('blog_posts?select=id,status&limit=500')]);$('dashboard').classList.remove('hidden');$('overview').textContent=[products.length+' products',posts.length+' articles',listings.filter(x=>x.status==='pending').length+' pending listings',tickets.filter(x=>x.status==='open').length+' open tickets',orders.length+' recent orders'].join(' · ');table('listings',['Listing','Platform / Price','Status','Submitted','Action'],listings,(p,tr)=>{cell(tr,p.title+' — '+safeText(p.description));cell(tr,(p.platform||'')+' / $'+p.price);cell(tr,p.status);cell(tr,date(p.submitted_at));const td=el('td');if(p.status==='pending'){const approve=el('button','Approve');approve.onclick=async()=>{if(!confirm('Approve this legitimate listing?'))return;approve.disabled=true;try{await moderate(p.id,'approved',null)}catch(e){status(e.message);approve.disabled=false}};const reject=el('button','Reject');reject.onclick=async()=>{const reason=prompt('Reason for rejection (required):');if(reason===null)return;if(!reason.trim())return status('Rejection reason is required.');reject.disabled=true;try{await moderate(p.id,'declined',reason.trim().slice(0,500))}catch(e){status(e.message);reject.disabled=false}};td.append(approve,el('span',' '),reject)}tr.append(td)});table('tickets',['Subject','Message','Status','Created'],tickets,(p,tr)=>{cell(tr,p.subject);cell(tr,safeText(p.message));cell(tr,p.status);cell(tr,date(p.created_at))});table('orders',['Order','Status','Amount','Created'],orders,(p,tr)=>{cell(tr,p.id);cell(tr,p.status);cell(tr,p.currency+' '+p.total_amount);cell(tr,date(p.created_at))});status('Dashboard loaded. Actions are limited to staging moderation.')}catch(e){status('Could not load admin data: '+e.message)}}
-$('refresh').onclick=load;load();
+async function moderate(id,decision,reason){
+ if(!authorized||!session?.access_token)return status('Administrator verification required.');
+ if(!['approved','declined'].includes(decision))return;
+ const payload={status:decision,reviewed_at:new Date().toISOString(),reviewed_by:session.user.id,decline_reason:decision==='declined'?(reason||'Does not meet listing requirements'):null};
+ // Check status in URL to avoid accidentally overwriting a reviewed listing.
+ const rows=await api('market_listings?id=eq.'+encodeURIComponent(id)+'&status=eq.pending',{method:'PATCH',body:JSON.stringify(payload),headers:{Prefer:'return=representation'}});
+ if(!rows?.length)throw Error('Listing is no longer pending, or moderation was denied by RLS.');
+ await load();
+}
+async function load(){
+ if(!authorized||!session?.access_token){viewAuth(true);return}
+ if(loading)return;
+ loading=true;lastLoad=Date.now();
+ $('listings-status').textContent='Loading marketplace submissions…';
+ // Independent queries: missing access to tickets/orders/blog cannot blank moderation.
+ const entries=[
+  ['listings','market_listings?select=id,title,platform,description,price,status,seller_id,submitted_at&order=submitted_at.desc&limit=150'],
+  ['tickets','support_tickets?select=id,subject,message,status,created_at,user_id&order=created_at.desc&limit=60'],
+  ['orders','orders?select=id,status,total_amount,currency,created_at,user_id&order=created_at.desc&limit=60'],
+  ['products','products?select=id,status&limit=500'],
+  ['posts','blog_posts?select=id,status&limit=500']
+ ];
+ try{
+  const values=await Promise.allSettled(entries.map(([,path])=>api(path)));
+  const read=i=>values[i].status==='fulfilled'&&Array.isArray(values[i].value)?values[i].value:null;
+  const listings=read(0),tickets=read(1),orders=read(2),products=read(3),posts=read(4);
+  let partial=[];
+  if(listings){
+   const pending=listings.filter(p=>p.status==='pending');
+   const reviewed=listings.filter(p=>p.status!=='pending');
+   const ordered=pending.concat(reviewed);
+   $('listings-status').textContent=pending.length+' pending submission'+(pending.length===1?'':'s')+' · '+listings.length+' total recent listings. Pending submissions are shown first.';
+   table('listings',['Listing','Platform / Price','Status','Submitted','Action'],ordered,(p,tr)=>{
+    cell(tr,'#'+p.id+' · '+p.title+' — '+safeText(p.description));
+    cell(tr,(p.platform||'')+' / $'+p.price);
+    cell(tr,p.status);cell(tr,date(p.submitted_at));
+    const td=el('td');
+    if(p.status==='pending'){
+     const approve=el('button','Approve');
+     approve.onclick=async()=>{if(!confirm('Approve this eligible, legitimately owned listing?'))return;approve.disabled=true;try{await moderate(p.id,'approved',null)}catch(e){status(e.message);approve.disabled=false}};
+     const reject=el('button','Decline');
+     reject.onclick=async()=>{const reason=prompt('Reason for declining this listing:');if(reason===null)return;if(!reason.trim())return status('A decline reason is required.');reject.disabled=true;try{await moderate(p.id,'declined',reason.trim().slice(0,500))}catch(e){status(e.message);reject.disabled=false}};
+     td.append(approve,el('span',' '),reject)
+    }
+    tr.append(td)
+   });
+  }else{
+   const e=values[0].status==='rejected'?values[0].reason?.message:'Unexpected listing response';
+   $('listings-status').textContent='Unable to load moderation queue: '+e;
+   $('listings').replaceChildren();
+   partial.push('marketplace moderation')
+  }
+  if(tickets){$('tickets-status').textContent=tickets.length+' recent support tickets';table('tickets',['Subject','Message','Status','Created'],tickets,(p,tr)=>{cell(tr,p.subject);cell(tr,safeText(p.message));cell(tr,p.status);cell(tr,date(p.created_at))})}
+  else{$('tickets-status').textContent='Support tickets unavailable — marketplace moderation can still work.';partial.push('support tickets')}
+  if(orders){$('orders-status').textContent=orders.length+' recent orders';table('orders',['Order','Status','Amount','Created'],orders,(p,tr)=>{cell(tr,p.id);cell(tr,p.status);cell(tr,(p.currency||'')+' '+p.total_amount);cell(tr,date(p.created_at))})}
+  else{$('orders-status').textContent='Orders unavailable — marketplace moderation can still work.';partial.push('orders')}
+  const parts=[];
+  if(products)parts.push(products.length+' products');else partial.push('products');
+  if(posts)parts.push(posts.length+' articles');else partial.push('blog');
+  if(listings)parts.push(listings.filter(x=>x.status==='pending').length+' pending listings');
+  if(tickets)parts.push(tickets.filter(x=>x.status==='open').length+' open tickets');
+  if(orders)parts.push(orders.length+' recent orders');
+  $('overview').textContent=parts.join(' · ')||'Some dashboard modules are unavailable.';
+  status(partial.length?'Marketplace review dashboard loaded with limited access to: '+partial.join(', ')+'.':'Dashboard ready. Review pending listings below.');
+ }finally{loading=false}
+}
+async function init(){
+ viewAuth(true);
+ if(session?.refresh_token && await refreshSession()){
+  authorized=await checkAdmin();
+  if(authorized){viewAuth(false);await load();return}
+  clearSession();
+ }
+ status('Sign in with the administrator account to review pending marketplace listings.');
+}
+$('admin-login-form').addEventListener('submit',async e=>{
+ e.preventDefault();
+ const email=$('admin-email').value.trim(),password=$('admin-password').value,btn=$('admin-login-btn');
+ if(!email||!password)return;
+ btn.disabled=true;status('Signing in and verifying administrator access…');
+ try{
+  const data=await authRequest('token?grant_type=password',{email,password});
+  if(!data.access_token||!data.refresh_token)throw Error('Sign-in did not return a valid session.');
+  setSession(data);
+  authorized=await checkAdmin();
+  if(!authorized){clearSession();throw Error('This account does not have administrator permission. Use the admin account.')}
+  $('admin-password').value='';
+  viewAuth(false);
+  await load();
+ }catch(err){status('Admin sign-in failed: '+err.message);viewAuth(true)}
+ finally{btn.disabled=false}
+});
+$('refresh').addEventListener('click',load);
+$('admin-signout').addEventListener('click',()=>{clearSession();viewAuth(true);status('Signed out of the admin dashboard.')});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&authorized&&Date.now()-lastLoad>15000)load()});
+init();
 </script></body></html>
