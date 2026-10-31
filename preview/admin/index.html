@@ -117,7 +117,11 @@ async function load(){
     const description=el('td');
     description.append(el('strong','#'+p.id+' · '+p.title),el('div',safeText(p.description)));
     const photos=photosByListing.get(String(p.id))||[];
-    if(!photos.length)description.append(el('div','No uploaded gallery photos — approval blocked.')).lastChild.className='photo-missing';
+    if(!photos.length){
+      const warning=el('div','No uploaded gallery photos — approval blocked.');
+      warning.className='photo-missing';
+      description.append(warning);
+    }
     else {
       const info=el('span',photos.length+' uploaded photo(s) · Click to inspect');
       info.className='photo-status';description.append(info);
@@ -159,6 +163,10 @@ async function load(){
   if(orders)parts.push(orders.length+' recent orders');
   $('overview').textContent=parts.join(' · ')||'Some dashboard modules are unavailable.';
   status(partial.length?'Marketplace review dashboard loaded with limited access to: '+partial.join(', ')+'.':'Dashboard ready. Review pending listings below.');
+ }catch(error){
+   const message='Moderation panel could not finish rendering: '+(error?.message||String(error));
+   $('listings-status').textContent=message;
+   status(message);
  }finally{loading=false}
 }
 async function init(){

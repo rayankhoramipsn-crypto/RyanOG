@@ -60,6 +60,30 @@ class PersistentMarketAdmin(unittest.TestCase):
         self.assertNotIn("service_role", code)
         self.assertNotIn("sb_secret_", code)
 
+    def test_admin_approval_queue_handles_old_photoless_listings(self):
+        # Legacy approved/declined rows with no gallery records must not crash
+        # rendering of newer pending items with uploaded photos.
+        for path in ["admin/index.html", "preview/admin/index.html"]:
+            with self.subTest(path=path):
+                page = (ROOT / path).read_text(encoding="utf-8")
+                self.assertIn("const warning=el('div','No uploaded gallery photos", page)
+                self.assertIn("warning.className='photo-missing';", page)
+                self.assertIn("description.append(warning);", page)
+                self.assertNotIn("description.append(el('div','No uploaded gallery photos", page)
+                self.assertIn("catch(error){", page)
+                self.assertIn("Moderation panel could not finish rendering:", page)
+                self.assertIn("status=eq.pending", page)
+
+    def test_marketplace_admin_shortcut_is_role_gated(self):
+        for path in ["marketplace.html", "preview/marketplace.html"]:
+            with self.subTest(path=path):
+                page = (ROOT / path).read_text(encoding="utf-8")
+                self.assertIn('id="nav-admin"', page)
+                self.assertIn('href="admin/"', page)
+        script = (ROOT / "assets/marketplace-v15.js").read_text(encoding="utf-8")
+        self.assertIn("adminLink.classList.toggle('hidden',!on||!S.admin)", script)
+        self.assertIn("S.admin=await adminCheck()", script)
+
     def test_script_syntax(self):
         for path in ["assets/triso-auth-storage.js",
                      "assets/triso-market-admin.js",
