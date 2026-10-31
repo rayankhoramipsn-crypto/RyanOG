@@ -98,13 +98,31 @@ class StagingRoutes(unittest.TestCase):
                 self.assertIn("admin-login-form", admin)
                 self.assertIn("reviewed_by:session.user.id", admin)
                 self.assertNotIn("raw_user_meta_data", admin)
+        # The marketplace now uses real DOM controls and a versioned external script.
+        script = (ROOT.parent / "assets/marketplace-v15.js").read_text(encoding="utf-8")
         for rel in ("preview/marketplace.html", "marketplace.html"):
             market = (ROOT.parent / rel).read_text(encoding="utf-8")
             with self.subTest(page=rel):
-                self.assertIn("market_submit", market)
-                self.assertIn("status=eq.pending", market)
-                self.assertIn('href="admin/"', market)
-                self.assertIn("awaiting administrator approval", market)
+                self.assertIn("marketplace-v15.js", market)
+                self.assertIn("marketplace-v15.css", market)
+                self.assertIn('id="cards"', market)
+                self.assertIn('id="detail-dialog"', market)
+                self.assertIn('id="photos" type="file"', market)
+                self.assertIn("multiple required", market)
+                self.assertIn('id="chat-dialog"', market)
+                self.assertIn('id="accept" type="checkbox" required', market)
+                self.assertNotIn("service_role", market.lower())
+        for critical in ("market_browse", "market_submit", "market_listing_media",
+                         "market_start_chat", "market_send_message", "market_messages",
+                         "market_conversations", "market-gallery", "realtimeSubscribe",
+                         "setInterval", "checkFiles(files)", "p_image_url:null"):
+            self.assertIn(critical, script)
+        # Admin reviews seller photos; approval is blocked if gallery is empty.
+        for rel in ("preview/admin/index.html", "admin/index.html"):
+            content = (ROOT.parent / rel).read_text(encoding="utf-8")
+            self.assertIn("loadListingGallery", content)
+            self.assertIn("galleryPhotoUrl", content)
+            self.assertIn("if(!photos.length){approve.disabled=true", content)
 
 if __name__ == "__main__":
     unittest.main()

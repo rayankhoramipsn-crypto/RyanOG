@@ -1,12 +1,183 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TRISOCMD | Community Marketplace</title><meta name="robots" content="noindex,nofollow"><style>
-:root{color-scheme:dark;font-family:Inter,system-ui,Arial;background:#080812;color:#f7f5ff}*{box-sizing:border-box}body{margin:0}header,main,footer{max-width:1120px;margin:auto;padding:24px}header{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #29233c}a{color:#bca7ff}h1{font-size:clamp(32px,5vw,60px);margin:15px 0}h2{font-size:23px}p{line-height:1.65;color:#c2bcd3}.eyebrow{color:#a991ff;font-weight:800;letter-spacing:2px}section{margin:28px 0;padding:25px;border:1px solid #302844;border-radius:20px;background:#12101e}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}.card{background:#1b172b;padding:20px;border-radius:14px;border:1px solid #342b4c}.card img{max-width:100%;height:160px;object-fit:cover;border-radius:10px}input,textarea,select,button{width:100%;font:inherit;padding:12px;margin:7px 0;border-radius:10px;border:1px solid #4d4269;background:#0d0b17;color:#fff}textarea{min-height:110px}button{background:#7854e9;border:0;cursor:pointer;font-weight:750}button:disabled{opacity:.55;cursor:not-allowed}.row{display:flex;gap:12px;flex-wrap:wrap}.row>*{flex:1}.muted{color:#aca5be;font-size:14px}.price{font-size:23px;font-weight:800;color:#d2c1ff}.pill{display:inline-block;background:#30234c;padding:6px 12px;border-radius:99px;font-size:12px}.hidden{display:none!important}#notice{min-height:24px;color:#d4bdff}.btnlink{background:#262039;padding:10px 14px;border-radius:9px;text-decoration:none}.listing{word-break:break-word}</style></head><body><header><strong>TRISOCMD <span style="color:#ab8cff">/ MARKET</span></strong><a href="/">← Back to store</a></header><main><span class="eyebrow">COMMUNITY MARKETPLACE · PREVIEW</span><h1>List it. Get seen.<br>Sell on your terms.</h1><p>Submit eligible, legitimately owned gaming listings for review. Every listing is checked before appearing publicly. No account passwords, recovery codes, or login credentials should be posted.</p><div class="grid"><div class="card"><b>FREE SELLER</b><h2>1 listing / day</h2><p>One submission per UTC day. Listings go live only after approval.</p></div><div class="card"><b>PRO SELLER</b><h2>Unlimited submissions</h2><p>Eligible Pro sellers can submit without the daily cap and receive priority placement. Pro access is granted by the shop administrator; purchasing Pro is not available yet.</p></div><div class="card"><b>SHOP COMMISSION</b><h2>4%</h2><p>Displayed sale commission: 4% of the listing price. A transaction and payout service is not yet active.</p></div></div><section><h2>Browse approved listings</h2><p class="muted">Pro listings appear first. Only administrator-approved listings are visible.</p><div id="listings" class="grid">Loading…</div></section><section><h2>Seller account</h2><p class="muted">Email and password login. You don't need to upload an identity document to submit a listing in this preview, but additional checks may be required later. You must own what you list and follow the platform's rules.</p><div id="notice" role="status"></div><div id="auth"><div class="row"><input id="email" type="email" autocomplete="email" placeholder="Email"><input id="password" type="password" autocomplete="current-password" placeholder="Password (8+ characters)"></div><div class="row"><button id="signin">Sign in</button><button id="signup">Create account</button></div></div><div id="signed" class="hidden"><p id="who"></p><button id="signout">Sign out</button><h2>Submit a listing</h2><form id="submit"><input id="title" maxlength="120" minlength="5" required placeholder="Listing title"><input id="platform" maxlength="50" minlength="2" required placeholder="Platform / game"><textarea id="description" maxlength="3000" minlength="20" required placeholder="Describe the item, proof of ownership, and what is included. Never include passwords, tokens or recovery information."></textarea><div class="row"><input id="price" type="number" min="1" max="1000000" step=".01" required placeholder="Price in USD"><input id="image" type="url" placeholder="Public image URL (optional)"></div><p class="muted">Seller receives 96% before any separately disclosed payment costs. All submissions require review. No live checkout.</p><button>Submit for approval</button></form><h2>My submissions</h2><p class="muted">Pending submissions remain visible to you and administrators only. They appear to buyers after administrator approval.</p><div id="mine"></div></div></section><section id="admin" class="hidden"><h2>Admin moderation</h2><p><a href="admin/" class="pill" style="display:inline-block;color:#e8c8ff;text-decoration:underline">Open the full moderation dashboard ↗</a></p><p class="muted">Approve or decline submissions. Only the authorized administrator can perform these actions.</p><div id="queue"></div><h3>Chat oversight</h3><p class="muted">Administrator access is disclosed to both chat participants.</p><div id="admin-chats"></div></section><section id="chat-area"><h2>Buyer / seller messages</h2><p class="muted">Messages are visible to the buyer, seller and TRISOCMD administrators for moderation, fraud prevention and dispute review. Never share passwords, login codes or recovery details in chat.</p><div id="conversations"></div><div id="chat-box" class="hidden"><h3 id="chat-title">Conversation</h3><div id="messages" style="max-height:360px;overflow:auto;border:1px solid #344155;padding:15px;border-radius:10px;margin:12px 0"></div><form id="message-form"><textarea id="message-body" maxlength="2000" required placeholder="Write a message. Do not share account credentials."></textarea><button>Send message</button></form></div></section><section><h2>Seller terms</h2><p>TRISOCMD provides a moderated place for eligible digital gaming listings. Only list accounts or items you legally own and are permitted to transfer. Listings involving stolen access, unauthorized credentials, or misrepresented ownership are not accepted. Approval is not a guarantee of sale. The 4% fee applies only when an eligible transaction is completed through an enabled checkout. Pro boosts ranking; it does not bypass moderation.</p></section></main><footer><span class="muted">TRISOCMD Marketplace · Preview only · No live payments</span></footer><script>
-(()=>{'use strict';const URL='https://cxtytbjvdlngahytfilr.supabase.co',KEY='sb_publishable_AqZWjpgyZ_h6-EKwOySyGQ_0LE8bcRm';const $=id=>document.getElementById(id),say=s=>$('notice').textContent=s;let session=null,admin=false,activeChat=null;const headers=()=>({'apikey':KEY,'Authorization':'Bearer '+(session?.access_token||KEY),'Content-Type':'application/json'});async function api(path,opts={}){const res=await fetch(URL+path,{...opts,headers:{...headers(),...(opts.headers||{})}});let data=await res.json().catch(()=>null);if(!res.ok)throw Error(data?.message||data?.error_description||data?.msg||'Request failed');return data}function element(tag,txt,cls){let x=document.createElement(tag);if(txt!==undefined)x.textContent=String(txt);if(cls)x.className=cls;return x}function clear(el){el.replaceChildren()}function listingCard(p,mod=false){let c=element('article',undefined,'card listing');if(p.image_url&&/^https:\/\//.test(p.image_url)){const img=element('img');img.src=p.image_url;img.loading='lazy';img.referrerPolicy='no-referrer';img.alt='Listing image';c.append(img)}c.append(element('span',p.platform+(p.is_pro?' · PRO PRIORITY':''),'pill'),element('h3',p.title),element('p',p.description),element('p','$'+Number(p.price).toFixed(2),'price'),element('p','Shop fee (4%): $'+(Number(p.price)*.04).toFixed(2),'muted'));if(!mod){let chat=element('button','Chat with seller');chat.onclick=async()=>{if(!session?.user){say('Sign in to message the seller.');document.getElementById('auth').scrollIntoView();return}try{let id=await api('/rest/v1/rpc/market_start_chat',{method:'POST',body:JSON.stringify({p_listing:p.id})});activeChat=id;await loadConversations();await loadMessages();document.getElementById('chat-area').scrollIntoView()}catch(e){say(e.message)}};c.append(chat)}if(mod)c.append(element('p','Listing #'+p.id+' · '+p.status+(p.seller_id?' · Seller: '+p.seller_id:''),'muted'));return c}
-async function publicListings(){let root=$('listings');try{let data=await api('/rest/v1/rpc/market_browse',{method:'POST',body:'{}'});clear(root);if(!data.length)root.append(element('p','No approved listings yet.'));data.forEach(p=>root.append(listingCard(p)))}catch(e){root.textContent='Listings unavailable: '+e.message}}
-async function refresh(){let user=session?.user;$('auth').classList.toggle('hidden',!!user);$('signed').classList.toggle('hidden',!user);$('admin').classList.add('hidden');if(!user){clear($('conversations'));$('chat-box').classList.add('hidden');return}await loadConversations();$('who').textContent='Signed in as '+user.email;try{admin=!!(await api('/rest/v1/rpc/is_admin',{method:'POST',body:'{}'}));}catch{admin=false}try{let mine=await api('/rest/v1/market_listings?select=*&seller_id=eq.'+encodeURIComponent(user.id)+'&order=submitted_at.desc&limit=100');clear($('mine'));mine.forEach(p=>$('mine').append(listingCard(p,true)));if(!mine.length)$('mine').textContent='No submissions yet.';else if(mine.some(p=>p.status==='pending'))say('Your listing is saved and awaiting administrator approval. It is not public yet.');}catch(e){say(e.message)}if(admin){$('admin').classList.remove('hidden');await queue();await loadAdminChats()}}
-async function loadAdminChats(){let root=$('admin-chats');try{let rows=await api('/rest/v1/market_conversations?select=id,listing_id,created_at&order=created_at.desc&limit=100');clear(root);if(!rows.length)root.textContent='No conversations yet.';for(const c of rows){let b=element('button','Review chat #'+c.id+' · Listing #'+c.listing_id);b.onclick=async()=>{activeChat=c.id;await loadMessages();$('chat-area').scrollIntoView()};root.append(b)}}catch(e){root.textContent=e.message}}
-async function queue(){let root=$('queue');try{let data=await api('/rest/v1/market_listings?select=*&status=eq.pending&order=submitted_at.asc&limit=100');clear(root);if(!data.length)root.textContent='No pending submissions.';else root.append(element('p',data.length+' pending submission'+(data.length===1?'':'s')+' awaiting review.','pill'));for(let p of data){let c=listingCard(p,true);for(let [label,status] of [['Approve','approved'],['Decline','declined']]){let b=element('button',label);b.addEventListener('click',async()=>{b.disabled=true;try{await api('/rest/v1/market_listings?id=eq.'+p.id,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({status,reviewed_at:new Date().toISOString(),reviewed_by:session.user.id})});await queue();await publicListings();say('Listing '+status)}catch(e){say(e.message);b.disabled=false}});c.append(b)}let pro=element('button','Grant seller Pro');pro.addEventListener('click',async()=>{pro.disabled=true;try{await api('/rest/v1/rpc/market_set_pro',{method:'POST',body:JSON.stringify({p_user:p.seller_id,p_enabled:true})});say('Pro enabled for seller.');}catch(e){say(e.message)}finally{pro.disabled=false}});c.append(pro);root.append(c)}}catch(e){root.textContent=e.message}}
-async function authenticate(signup){let email=$('email').value.trim(),password=$('password').value;if(!email||password.length<8){say('Enter an email and a password of at least 8 characters.');return}try{let d=await api('/auth/v1/'+(signup?'signup':'token?grant_type=password'),{method:'POST',body:JSON.stringify({email,password})});if(!d.access_token){say('Account created. Confirm your email, then sign in.');return}session=d;sessionStorage.setItem('tc35_auth_session',JSON.stringify(session));say('Signed in.');await refresh()}catch(e){say(e.message)}}$('signin').onclick=()=>authenticate(false);$('signup').onclick=()=>authenticate(true);$('signout').onclick=()=>{session=null;sessionStorage.removeItem('tc35_auth_session');admin=false;say('Signed out.');refresh()};$('submit').onsubmit=async e=>{e.preventDefault();let payload={p_title:$('title').value,p_platform:$('platform').value,p_description:$('description').value,p_price:Number($('price').value),p_image_url:$('image').value||null};if(/password|recovery code|seed phrase|access token/i.test(payload.p_description)){say('Remove passwords or recovery information from the description.');return}try{let id=await api('/rest/v1/rpc/market_submit',{method:'POST',body:JSON.stringify(payload)});say('Submitted for review (#'+id+').');$('submit').reset();await refresh()}catch(e){say(e.message)}};async function loadConversations(){if(!session?.user)return;let root=$('conversations');try{let rows=await api('/rest/v1/market_conversations?select=id,listing_id,seller_id,buyer_id,created_at&order=created_at.desc&limit=100');clear(root);if(!rows.length)root.append(element('p','No conversations yet.'));for(const c of rows){let b=element('button','Conversation #'+c.id+' · Listing #'+c.listing_id+(c.seller_id===session.user.id?' · Buyer inquiry':' · Seller chat'));b.onclick=async()=>{activeChat=c.id;await loadMessages()};root.append(b)}}catch(e){root.textContent=e.message}}
-async function loadMessages(){if(!activeChat||!session?.user)return;let box=$('chat-box');box.classList.remove('hidden');$('chat-title').textContent='Conversation #'+activeChat;let root=$('messages');try{let rows=await api('/rest/v1/market_messages?select=id,sender_id,body,created_at&conversation_id=eq.'+activeChat+'&order=created_at.asc&limit=200');clear(root);rows.forEach(m=>{let item=element('p',(m.sender_id===session.user.id?'You':'Participant')+' · '+new Date(m.created_at).toLocaleString()+': '+m.body);root.append(item)});root.scrollTop=root.scrollHeight}catch(e){root.textContent=e.message}}
-$('message-form').onsubmit=async e=>{e.preventDefault();if(!activeChat)return;let body=$('message-body').value;if(/password|recovery code|seed phrase|access token/i.test(body)){say('Do not share credentials in chat.');return}try{await api('/rest/v1/rpc/market_send_message',{method:'POST',body:JSON.stringify({p_conversation:activeChat,p_body:body})});$('message-body').value='';await loadMessages()}catch(e){say(e.message)}};
-async function init(){try{session=JSON.parse(sessionStorage.getItem('tc35_auth_session')||'null');if(session?.refresh_token){let d=await api('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:JSON.stringify({refresh_token:session.refresh_token})});session=d;sessionStorage.setItem('tc35_auth_session',JSON.stringify(d))}}catch{session=null;sessionStorage.removeItem('tc35_auth_session')}await publicListings();await refresh()}document.addEventListener('visibilitychange',()=>{if(!document.hidden&&session?.user){if(admin)queue();publicListings()}});init()})();
-</script></body></html>
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="description" content="Browse TRISOCMD community marketplace gaming listings, view product photos, and message sellers securely. Listings are reviewed before publication.">
+<title>TRISOCMD | Marketplace</title>
+<link rel="stylesheet" href="../assets/marketplace-v15.css?v=15">
+</head>
+<body>
+<header class="topbar">
+ <div class="container nav">
+   <a class="brand" href="../index.html">TRISO<span>CMD</span></a>
+   <nav class="navlinks" aria-label="Main navigation">
+     <a href="../index.html">Home</a><a class="current" href="marketplace.html">Marketplace</a>
+     <a href="../blog/">Journal</a><a href="../help/">Support</a>
+   </nav>
+   <div class="navtools">
+     <label for="language" class="fine" style="position:absolute;clip:rect(0,0,0,0)">Language</label>
+     <select id="language" aria-label="Language" style="width:72px;padding:10px 6px"><option value="en">EN</option><option value="fa">FA</option><option value="ar">AR</option></select>
+     <button class="btn ghost small" id="nav-login" type="button">Sign in</button>
+     <button class="btn primary small" id="open-sell" type="button" data-t="sell">Sell an item</button>
+   </div>
+ </div>
+</header>
+<main>
+ <section class="hero container">
+   <div class="hero-layout">
+     <div>
+       <span class="eyebrow">PLAYER-TO-PLAYER MARKETPLACE</span>
+       <h1>Find your next <span class="gradient-text">gaming drop.</span></h1>
+       <p>A curated place to discover seller listings, compare offers and talk directly with verified-by-login members. Each new listing is reviewed before it appears publicly.</p>
+       <div class="hero-actions">
+         <a href="#listing-section" class="btn primary" data-t="browse">Explore listings</a>
+         <button class="btn secondary" id="open-messages" data-t="messages" type="button">Messages</button>
+         <button class="btn ghost" id="open-rules" data-t="rules" type="button">Marketplace rules</button>
+       </div>
+     </div>
+     <aside class="hero-status">
+       <span class="eyebrow">MARKETPLACE PROTECTION</span>
+       <h3>Shop with your <strong>eyes open.</strong></h3>
+       <div class="status-item"><span class="status-icon">✓</span><span>New listings need administrator approval.</span></div>
+       <div class="status-item"><span class="status-icon">✓</span><span>Real photos from sellers' devices are required for new submissions.</span></div>
+       <div class="status-item"><span class="status-icon">✓</span><span>Messages are available to both parties and moderators.</span></div>
+       <p class="fine" style="margin:18px 0 0">Preview: checkout, payment holding and escrow are not active. Do not send payments in chat.</p>
+     </aside>
+   </div>
+ </section>
+ <div class="container market-layout" id="listing-section">
+   <aside class="sidebar" aria-label="Categories">
+     <h3>Explore categories</h3>
+     <button class="active" data-cat="all" data-t="all" type="button">All listings</button>
+     <button data-cat="fortnite" data-t="fortnite" type="button">Fortnite</button>
+     <button data-cat="roblox" data-t="roblox" type="button">Roblox</button>
+     <button data-cat="steam" data-t="steam" type="button">Steam</button>
+     <button data-cat="gear" data-t="gear" type="button">Gaming gear</button>
+     <button data-cat="other" data-t="other" type="button">Other</button>
+     <h4>Buyer resources</h4>
+     <button type="button" onclick="document.getElementById('open-rules').click()">Safety policy ↗</button>
+     <p class="disclaimer">Only approved listings are searchable. Availability and transferability must be confirmed with the seller. Follow the applicable game's terms.</p>
+   </aside>
+   <div>
+     <div class="search-row">
+       <div class="search-box"><input id="search" type="search" autocomplete="off" aria-label="Search listings" placeholder="Search accounts, games, gear..."></div>
+       <label for="sort" class="fine">Sort</label>
+       <select id="sort" aria-label="Sort listings">
+         <option value="new">Recommended / Newest</option>
+         <option value="low">Price: low to high</option>
+         <option value="high">Price: high to low</option>
+       </select>
+     </div>
+     <div class="results-top"><h2>THE MARKET.</h2><span id="count" role="status">Loading listings…</span></div>
+     <div id="cards" class="cards" aria-live="polite"><div class="empty">Loading approved offers…</div></div>
+   </div>
+ </div>
+ <div class="container">
+   <section class="seller-section" id="seller-section">
+     <div class="section-box">
+       <div class="section-heading"><div><span class="eyebrow">SELL ON TRISOCMD</span><h2>Start listing in minutes.</h2></div><button type="button" class="btn primary" onclick="document.getElementById('open-sell').click()" data-t="sell">Sell an item</button></div>
+       <div class="mini-grid">
+         <div class="mini-card"><strong>01 · Post your item</strong><p>Write a detailed description and upload 1–4 actual item images from your gallery. No image URL needed.</p></div>
+         <div class="mini-card"><strong>02 · Admin review</strong><p>Your offer and attached images stay pending until a moderator reviews the listing.</p></div>
+         <div class="mini-card"><strong>03 · Talk to buyers</strong><p>Approved listings appear in search. Buyers can message you in the site's conversation panel.</p></div>
+       </div>
+       <p class="fine" style="margin:18px 0 0">Free: one listing per UTC day. Pro: additional submissions when enabled by an administrator. The stated marketplace commission is 4% if a supported transaction service is activated later. No live checkout or escrow is currently offered.</p>
+     </div>
+   </section>
+   <section id="mine-wrap" class="seller-section hidden">
+     <div class="section-box">
+       <div class="section-heading"><h2 >My listings</h2><button class="btn small secondary" type="button" onclick="document.getElementById('open-sell').click()">New listing</button></div>
+       <p class="fine">Pending listings are visible only to you and moderators; approved listings appear publicly.</p>
+       <div id="mine"></div>
+     </div>
+   </section>
+   <section class="safe-section">
+     <div class="section-box">
+       <div class="section-heading"><h2>Marketplace safety, clearly explained.</h2><button class="btn small secondary" type="button" onclick="document.getElementById('open-rules').click()">Read all rules</button></div>
+       <div class="mini-grid"><div class="mini-card"><strong>Real ownership</strong><p>Do not list stolen, unauthorized or misrepresented goods. Only list items you have the right to sell or transfer.</p></div><div class="mini-card"><strong>No outside-payment requests</strong><p>Off-platform deals are not protected by TRISOCMD. We cannot verify payments or escrow in this preview.</p></div><div class="mini-card"><strong>Keep your credentials private</strong><p>Never share passwords, email login codes, recovery links or account tokens in messages.</p></div></div>
+     </div>
+   </section>
+   <div id="notice" class="notice" role="status" aria-live="polite"></div>
+ </div>
+</main>
+<footer class="footer"><div class="container"><span>© TRISOCMD · Marketplace preview · No live payments</span><div><a href="../index.html">Store</a> · <a href="../help/">Support</a> · <a href="../policies/">Policies</a></div></div></footer>
+<dialog id="detail-dialog" class="dialog" aria-labelledby="detail-title">
+ <div class="dialog-header"><h2>Listing details</h2><button class="close" type="button" onclick="document.getElementById('detail-dialog').close()" aria-label="Close">✕</button></div>
+ <div class="dialog-content">
+  <div class="detail-grid">
+   <div><img id="detail-cover" class="detail-photo" alt="Listing photo"><div id="detail-placeholder" class="item-cover">No gallery photo</div><div id="thumbs" class="detail-gallery"></div></div>
+   <div><span id="detail-platform" class="eyebrow"></span><h2 id="detail-title"></h2><span class="fine" id="detail-date"></span><div class="detail-price" id="detail-price"></div>
+      <p id="detail-desc"></p>
+      <div class="secure-info">⚑ Only administrator-approved listings appear publicly. Approval does not guarantee ownership, authenticity, delivery or safety. Checkout/escrow is not active.</div>
+      <label class="policy-accept"><input id="accept" type="checkbox" required><span>I have read the <a href="#" onclick="event.preventDefault();document.getElementById('rules-dialog').showModal()">marketplace rules</a>. I understand that TRISOCMD does not currently process or protect payments and I will not share account credentials.</span></label>
+      <button id="chat-seller" class="btn primary block" type="button" style="margin-top:13px" disabled data-t="contact">Chat with seller</button>
+   </div>
+  </div>
+ </div>
+</dialog>
+<dialog id="rules-dialog" class="dialog" aria-labelledby="rules-title">
+ <div class="dialog-header"><h2 id="rules-title">TRISOCMD marketplace policy</h2><button class="close" type="button" onclick="document.getElementById('rules-dialog').close()" aria-label="Close">✕</button></div>
+ <div class="dialog-content">
+ <p>These rules apply to every marketplace listing and conversation. Read them before contacting another user. This preview is not an active checkout or escrow platform.</p>
+ <ol class="policy-list">
+   <li><strong>Legal ownership and transfer rights.</strong> Sellers may list only items they own and are permitted to transfer under relevant rules. Stolen, compromised or unauthorized accounts are forbidden.</li>
+   <li><strong>Accurate descriptions and real photos.</strong> Include the platform, condition, limitations and at least one genuine photo. Misleading listings, stock photos presented as the item, fake reviews and impersonation are prohibited.</li>
+   <li><strong>No fraud or manipulation.</strong> No scams, chargeback abuse, fake payment confirmations, pressure tactics, phishing links or requests for private recovery information.</li>
+   <li><strong>No secrets in messages.</strong> Never send passwords, session tokens, one-time codes, recovery phrases, private identification documents or other sensitive credentials.</li>
+   <li><strong>Verify independently.</strong> Approval is a moderation decision, not a guarantee of sale, account authenticity, seller reliability or compliance with a game's terms of service.</li>
+   <li><strong>Payments and escrow.</strong> The marketplace is in preview. TRISOCMD does not currently accept marketplace payments, hold funds, guarantee delivery or offer a functioning escrow service. Do not treat chat messages as payment instructions.</li>
+   <li><strong>Moderation and reporting.</strong> Administrators can review listings, their images and conversations for fraud prevention and disputes. Listings can be removed or declined for safety or policy violations.</li>
+   <li><strong>Platform rules.</strong> Some publishers prohibit account transfers or resales. Buyers and sellers must comply with the relevant platform's terms and all applicable laws.</li>
+ </ol><button class="btn primary" type="button" onclick="document.getElementById('rules-dialog').close()">I understand</button>
+ </div>
+</dialog>
+<dialog id="auth-dialog" class="dialog" aria-label="Sign in or create account" style="width:min(550px,calc(100vw - 26px))">
+ <div class="dialog-header"><h2>Welcome to TRISOCMD</h2><button class="close" type="button" onclick="document.getElementById('auth-dialog').close()">✕</button></div>
+ <div class="dialog-content">
+  <p>Sign in to post listings or message sellers.</p>
+  <div class="form-field"><label for="auth-email">Email</label><input id="auth-email" type="email" autocomplete="email" placeholder="you@example.com"></div>
+  <div class="form-field" style="margin-top:14px"><label for="auth-password">Password</label><input id="auth-password" type="password" autocomplete="current-password" placeholder="At least 8 characters"></div>
+  <p id="auth-note" class="notice" role="status"></p>
+  <div class="hero-actions"><button id="auth-signin" class="btn primary" type="button">Sign in</button><button id="auth-signup" class="btn secondary" type="button">Create account</button></div>
+ </div>
+</dialog>
+<dialog id="sell-dialog" class="dialog" aria-labelledby="sell-title">
+ <div class="dialog-header"><h2 id="sell-title">Post a new listing</h2><button class="close" type="button" onclick="document.getElementById('sell-dialog').close()">✕</button></div>
+ <div class="dialog-content">
+  <div id="seller-auth" class="hidden"><p>Sign in first to submit an item.</p><button class="btn primary" onclick="document.getElementById('sell-dialog').close();document.getElementById('auth-dialog').showModal()">Sign in</button></div>
+  <div id="seller-panel" class="hidden">
+  <div class="section-heading"><strong>Seller dashboard</strong><button id="logout" class="btn small secondary hidden" type="button">Sign out</button></div>
+  <p class="fine">Your listing and its photos must be reviewed by an administrator. Do not include account passwords or recovery credentials in photos or text.</p>
+  <form id="listing-form">
+   <div class="form-grid">
+    <div class="form-field full"><label for="title">Item title *</label><input id="title" name="title" required minlength="5" maxlength="120" placeholder="Describe your gaming item clearly"></div>
+    <div class="form-field"><label for="platform">Game / platform *</label><select id="platform" required><option value="">Choose a category</option><option value="Fortnite">Fortnite</option><option value="Roblox">Roblox</option><option value="Steam">Steam</option><option value="Gaming Gear">Gaming gear</option><option value="Other">Other digital / gaming goods</option></select></div>
+    <div class="form-field"><label for="price">Asking price (USD) *</label><input type="number" id="price" min="1" max="1000000" step=".01" required></div>
+    <div class="form-field full"><label for="description">Full item description *</label><textarea id="description" required minlength="20" maxlength="3000" placeholder="Explain what is included, ownership and condition; no private credentials."></textarea></div>
+    <div class="form-field full"><label for="photos">Item photos from your device * (1–4)</label><div class="upload-box"><p style="margin:0 0 8px">Upload actual item pictures from your gallery · JPG / PNG / WebP</p><input id="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple required><div id="photo-preview" class="upload-preview" aria-live="polite"></div><div id="upload-status" class="fine" role="status"></div></div></div>
+   </div><p class="fine">Max 5 MB per image. All new listings need admin approval and at least one image. No live payments.</p>
+   <button type="submit" id="post" class="btn primary block">Submit for admin review</button>
+  </form></div>
+ </div>
+</dialog>
+<dialog id="retry-dialog" class="dialog" aria-label="Upload missing listing photos" style="width:min(540px,calc(100vw - 26px))">
+ <div class="dialog-header"><h2>Upload item photos</h2><button class="close" type="button" onclick="document.getElementById('retry-dialog').close()">✕</button></div>
+ <div class="dialog-content"><p>For a pending listing, add real photos from your gallery. Max 4 total.</p><input type="file" id="retry-input" accept="image/jpeg,image/png,image/webp" multiple required><p id="retry-note" class="notice"></p><button id="retry-save" class="btn primary" type="button">Upload images</button></div>
+</dialog>
+<dialog id="chat-dialog" class="dialog" aria-label="Buyer and seller messages" style="width:min(1020px,calc(100vw - 26px))">
+ <div class="dialog-header"><h2>TRISOCMD · Live messages</h2><div class="live-indicator">Live refresh</div><button class="close" type="button" onclick="document.getElementById('chat-dialog').close()" aria-label="Close">✕</button></div>
+ <div id="chat-guest" class="dialog-content hidden">Sign in to message sellers.</div>
+ <div class="chat-shell">
+  <aside id="thread-list" class="thread-list"></aside>
+  <section class="chat-main"><div class="chat-context"><h3 id="chat-topic">Select a conversation</h3><small id="chat-sub">Messages may be reviewed by administrators.</small></div>
+  <div id="bubbles" class="chat-messages" role="log" aria-live="polite"></div>
+  <form id="chat-form" class="chat-form hidden"><label for="chat-body" class="fine" style="position:absolute;clip:rect(0,0,0,0)">Message</label><textarea id="chat-body" maxlength="2000" required placeholder="Write a message… Never send codes or passwords."></textarea><button class="btn primary" id="chat-send" type="submit">Send ↗</button></form>
+  <div id="chat-state" class="fine" role="status" style="padding:0 13px 10px"></div>
+  </section>
+ </div>
+</dialog>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="../assets/marketplace-v15.js?v=15"></script>
+</body>
+</html>

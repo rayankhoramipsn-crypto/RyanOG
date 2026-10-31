@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>TRISOCMD — Staging Admin</title><style>:root{color-scheme:dark;font:15px system-ui;background:#0b0d13;color:#f3f2f8}*{box-sizing:border-box}body{max-width:1150px;margin:auto;padding:24px}a{color:#b8a4ff}header{display:flex;gap:20px;justify-content:space-between;flex-wrap:wrap;border-bottom:1px solid #303448;padding-bottom:20px}h1{font-size:clamp(30px,5vw,52px)}p{color:#b8bbcc;line-height:1.6}section{background:#171a26;border:1px solid #34384d;border-radius:16px;padding:20px;margin:20px 0}table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #35394a;padding:12px;text-align:left;vertical-align:top;overflow-wrap:anywhere}button,input,select,textarea{font:inherit;padding:10px;border-radius:8px;background:#101320;color:white;border:1px solid #4c5065}button{cursor:pointer;background:#7459d3}button:disabled{opacity:.5}textarea{width:100%;min-height:65px}.hidden{display:none!important}.scroll{overflow-x:auto}.muted{color:#a9afc4}#status{min-height:24px}@media(max-width:600px){th,td{padding:8px;font-size:13px}}#admin-login-form{display:flex;gap:12px;flex-wrap:wrap;align-items:end}#admin-login-form label{display:grid;gap:7px;flex:1 1 190px;color:#dcc9ff;font-size:13px}#admin-login-form input{width:100%;max-width:350px}#admin-login-btn{min-width:140px;background:linear-gradient(105deg,#7d32c5,#bb38d6)}#listings-status{color:#ddaff9;font-weight:700}#status{white-space:pre-wrap}button:focus-visible,input:focus-visible{outline:2px solid #db9eff;outline-offset:3px}</style><link rel="stylesheet" href="../luxury-dark.css?v=20261031-luxury"></head><body><header><a href="../index.html">TRISOCMD / STORE</a><strong>STAGING ADMIN</strong><a href="../blog/">Journal</a></header><h1>Operations dashboard</h1><p id="status" role="status" aria-live="polite">Checking administrator session…</p>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>TRISOCMD — Staging Admin</title><style>:root{color-scheme:dark;font:15px system-ui;background:#0b0d13;color:#f3f2f8}*{box-sizing:border-box}body{max-width:1150px;margin:auto;padding:24px}a{color:#b8a4ff}header{display:flex;gap:20px;justify-content:space-between;flex-wrap:wrap;border-bottom:1px solid #303448;padding-bottom:20px}h1{font-size:clamp(30px,5vw,52px)}p{color:#b8bbcc;line-height:1.6}section{background:#171a26;border:1px solid #34384d;border-radius:16px;padding:20px;margin:20px 0}table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #35394a;padding:12px;text-align:left;vertical-align:top;overflow-wrap:anywhere}button,input,select,textarea{font:inherit;padding:10px;border-radius:8px;background:#101320;color:white;border:1px solid #4c5065}button{cursor:pointer;background:#7459d3}button:disabled{opacity:.5}textarea{width:100%;min-height:65px}.hidden{display:none!important}.scroll{overflow-x:auto}.muted{color:#a9afc4}#status{min-height:24px}@media(max-width:600px){th,td{padding:8px;font-size:13px}}#admin-login-form{display:flex;gap:12px;flex-wrap:wrap;align-items:end}#admin-login-form label{display:grid;gap:7px;flex:1 1 190px;color:#dcc9ff;font-size:13px}#admin-login-form input{width:100%;max-width:350px}#admin-login-btn{min-width:140px;background:linear-gradient(105deg,#7d32c5,#bb38d6)}#listings-status{color:#ddaff9;font-weight:700}#status{white-space:pre-wrap}button:focus-visible,input:focus-visible{outline:2px solid #db9eff;outline-offset:3px}#listings img.moderation-photo{width:115px;height:85px;object-fit:cover;border:1px solid #645082;border-radius:10px;margin-top:9px;cursor:zoom-in}#listings .photo-status{display:block;color:#d8c7ee;font-size:12px;margin-top:7px}#listings .photo-missing{color:#f2a9b1;font-size:12px;margin-top:8px}</style><link rel="stylesheet" href="../luxury-dark.css?v=20261031-luxury"></head><body><header><a href="../index.html">TRISOCMD / STORE</a><strong>STAGING ADMIN</strong><a href="../blog/">Journal</a></header><h1>Operations dashboard</h1><p id="status" role="status" aria-live="polite">Checking administrator session…</p>
 <section id="admin-auth" class="hidden" aria-labelledby="admin-auth-title">
 <h2 id="admin-auth-title">Admin sign in</h2>
 <p class="muted">Sign in with your TRISOCMD administrator account to review new marketplace submissions. This login works even when you opened the dashboard in a different tab.</p>
@@ -62,6 +62,24 @@ function table(target,headers,rows,build){
 function cell(tr,value){tr.append(el('td',value==null?'—':String(value)))}
 function date(v){return v?new Date(v).toLocaleString():'—'}
 function safeText(v){return String(v||'').slice(0,160)}
+async function galleryPhotoUrl(path){
+ const safe=path.split('/').map(encodeURIComponent).join('/');
+ const r=await fetch(ROOT+'/storage/v1/object/sign/market-gallery/'+safe,{method:'POST',headers:{apikey:KEY,Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:JSON.stringify({expiresIn:600})});
+ const d=await r.json().catch(()=>({}));
+ if(!r.ok)throw Error(d?.message||'Could not view photo');
+ const url=d.signedURL||d.signedUrl;
+ return url?(url.startsWith('http')?url:ROOT+'/storage/v1'+(url.startsWith('/')?url:'/'+url)):null;
+}
+async function loadListingGallery(listings){
+ const media=new Map();if(!listings.length)return media;
+ try{
+  const ids=listings.map(x=>Number(x.id)).filter(Number.isInteger).join(',');
+  if(!ids)return media;
+  const rows=await api('market_listing_media?select=listing_id,object_path,sort_order&listing_id=in.('+ids+')&order=sort_order.asc&limit=500');
+  for(const row of rows){const id=String(row.listing_id);if(!media.has(id))media.set(id,[]);media.get(id).push(row)}
+ }catch(e){status('Marketplace gallery could not load: '+e.message)}
+ return media;
+}
 async function moderate(id,decision,reason){
  if(!authorized||!session?.access_token)return status('Administrator verification required.');
  if(!['approved','declined'].includes(decision))return;
@@ -90,17 +108,32 @@ async function load(){
   const listings=read(0),tickets=read(1),orders=read(2),products=read(3),posts=read(4);
   let partial=[];
   if(listings){
+   const photosByListing=await loadListingGallery(listings);
    const pending=listings.filter(p=>p.status==='pending');
    const reviewed=listings.filter(p=>p.status!=='pending');
    const ordered=pending.concat(reviewed);
    $('listings-status').textContent=pending.length+' pending submission'+(pending.length===1?'':'s')+' · '+listings.length+' total recent listings. Pending submissions are shown first.';
    table('listings',['Listing','Platform / Price','Status','Submitted','Action'],ordered,(p,tr)=>{
-    cell(tr,'#'+p.id+' · '+p.title+' — '+safeText(p.description));
+    const description=el('td');
+    description.append(el('strong','#'+p.id+' · '+p.title),el('div',safeText(p.description)));
+    const photos=photosByListing.get(String(p.id))||[];
+    if(!photos.length)description.append(el('div','No uploaded gallery photos — approval blocked.')).lastChild.className='photo-missing';
+    else {
+      const info=el('span',photos.length+' uploaded photo(s) · Click to inspect');
+      info.className='photo-status';description.append(info);
+      for(const file of photos.slice(0,4)){
+       const img=el('img');img.className='moderation-photo';img.alt='Seller-uploaded item photo';img.loading='lazy';
+       galleryPhotoUrl(file.object_path).then(url=>{if(url){img.src=url;img.onclick=()=>window.open(url,'_blank','noopener,noreferrer')}}).catch(()=>{img.alt='Photo unavailable'});
+       description.append(img);
+      }
+    }
+    tr.append(description);
     cell(tr,(p.platform||'')+' / $'+p.price);
     cell(tr,p.status);cell(tr,date(p.submitted_at));
     const td=el('td');
     if(p.status==='pending'){
      const approve=el('button','Approve');
+     if(!photos.length){approve.disabled=true;approve.title='At least one uploaded photo is required before approval';}
      approve.onclick=async()=>{if(!confirm('Approve this eligible, legitimately owned listing?'))return;approve.disabled=true;try{await moderate(p.id,'approved',null)}catch(e){status(e.message);approve.disabled=false}};
      const reject=el('button','Decline');
      reject.onclick=async()=>{const reason=prompt('Reason for declining this listing:');if(reason===null)return;if(!reason.trim())return status('A decline reason is required.');reject.disabled=true;try{await moderate(p.id,'declined',reason.trim().slice(0,500))}catch(e){status(e.message);reject.disabled=false}};
