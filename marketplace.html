@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="description" content="Browse TRISOCMD community marketplace gaming listings, view product photos, and message sellers securely. Listings are reviewed before publication.">
 <title>TRISOCMD | Marketplace</title>
-<link rel="stylesheet" href="assets/marketplace-v15.css?v=17">
+<link rel="stylesheet" href="assets/marketplace-v15.css?v=18">
 </head>
 <body>
 <header class="topbar">
@@ -44,7 +44,7 @@
        <div class="status-item"><span class="status-icon">✓</span><span>New listings need administrator approval.</span></div>
        <div class="status-item"><span class="status-icon">✓</span><span>Real photos from sellers' devices are required for new submissions.</span></div>
        <div class="status-item"><span class="status-icon">✓</span><span>Messages are available to both parties and moderators.</span></div>
-       <p class="fine" style="margin:18px 0 0">Preview: checkout, payment holding and escrow are not active. Do not send payments in chat.</p>
+       <p class="fine" style="margin:18px 0 0">Purchase requests can be submitted for administrator review. Payment collection, holding funds and seller payouts are not yet active. Do not send funds in chat.</p>
      </aside>
    </div>
  </section>
@@ -84,7 +84,7 @@
          <div class="mini-card"><strong>02 · Admin review</strong><p>Your offer and attached images stay pending until a moderator reviews the listing.</p></div>
          <div class="mini-card"><strong>03 · Talk to buyers</strong><p>Approved listings appear in search. Buyers can message you in the site's conversation panel.</p></div>
        </div>
-       <p class="fine" style="margin:18px 0 0">Free: up to 3 listings per UTC day, per account. Pro: unlimited submissions while the subscription is active. The stated marketplace commission is 4% if a supported transaction service is activated later. No live checkout or escrow is currently offered.</p>
+       <p class="fine" style="margin:18px 0 0">Free: up to 3 listings per UTC day, per account. Pro: unlimited submissions while the subscription is active. The stated marketplace commission is 4% if a supported transaction service is activated later. No live checkout, verified escrow or seller payout is currently offered.</p>
      </div>
    </section>
    <section id="mine-wrap" class="seller-section hidden">
@@ -93,6 +93,13 @@
        <p class="fine">Pending listings are visible only to you and moderators; approved listings appear publicly.</p>
        <div id="mine"></div>
      </div>
+   </section>
+   <section class="seller-section hidden" id="purchase-requests-wrap">
+    <div class="section-box">
+      <div class="section-heading"><h2>Purchase requests</h2><button class="btn small secondary" type="button" id="refresh-purchases">Refresh requests</button></div>
+      <p class="fine">These are requests for review, not completed purchases. Wait for officially verified payment instructions; do not send funds through chat. No payment or escrow service is active yet.</p>
+      <div id="purchase-requests" class="request-list" role="status" aria-live="polite"></div>
+    </div>
    </section>
    <section class="safe-section">
      <div class="section-box">
@@ -111,9 +118,17 @@
    <div><img id="detail-cover" class="detail-photo" alt="Listing photo"><div id="detail-placeholder" class="item-cover">No gallery photo</div><div id="thumbs" class="detail-gallery"></div></div>
    <div><span id="detail-platform" class="eyebrow"></span><h2 id="detail-title"></h2><span class="fine" id="detail-date"></span><div class="detail-price" id="detail-price"></div>
       <p id="detail-desc"></p>
-      <div class="secure-info">⚑ Only administrator-approved listings appear publicly. Approval does not guarantee ownership, authenticity, delivery or safety. Checkout/escrow is not active.</div>
-      <label class="policy-accept"><input id="accept" type="checkbox" required><span>I have read the <a href="#" onclick="event.preventDefault();document.getElementById('rules-dialog').showModal()">marketplace rules</a>. I understand that TRISOCMD does not currently process or protect payments and I will not share account credentials.</span></label>
+      <div class="secure-info">⚑ Only administrator-approved listings appear publicly. Approval does not guarantee ownership, authenticity, delivery or safety. TRISOCMD does not currently accept or hold marketplace payments.</div>
+      <label class="policy-accept"><input id="accept" type="checkbox" required><span>I have read the <a href="#" onclick="event.preventDefault();document.getElementById('rules-dialog').showModal()">marketplace rules</a>. I understand that payments to sellers directly are not permitted for marketplace-managed sales; any future payment would go to the officially configured marketplace recipient, and only verified completion would permit a seller payout. The marketplace currently does not process, hold or protect funds, so I will not send money or account credentials.</span></label>
       <button id="chat-seller" class="btn primary block" type="button" style="margin-top:13px" disabled data-t="contact">Chat with seller</button>
+      <div class="purchase-action">
+        <h3>Request to purchase</h3>
+        <p class="fine">If a payment service is activated later, buyers pay the marketplace administrator, not the seller. Seller payout would follow verification, confirmed delivery and any applicable dispute process. Until then, this creates a request only; no money moves.</p>
+        <label for="purchase-method">Preferred payment method (for review)</label>
+        <select id="purchase-method"><option value="CONTACT_SUPPORT">Discuss with support</option><option value="LTC">Litecoin (LTC)</option><option value="BTC">Bitcoin (BTC)</option><option value="BANK">Bank transfer</option></select>
+        <button id="request-purchase" class="btn secondary block" type="button" disabled>Request purchase review · No payment</button>
+        <p id="purchase-status" class="fine" role="status" aria-live="polite"></p>
+      </div>
    </div>
   </div>
  </div>
@@ -128,7 +143,12 @@
    <li><strong>No fraud or manipulation.</strong> No scams, chargeback abuse, fake payment confirmations, pressure tactics, phishing links or requests for private recovery information.</li>
    <li><strong>No secrets in messages.</strong> Never send passwords, session tokens, one-time codes, recovery phrases, private identification documents or other sensitive credentials.</li>
    <li><strong>Verify independently.</strong> Approval is a moderation decision, not a guarantee of sale, account authenticity, seller reliability or compliance with a game's terms of service.</li>
-   <li><strong>Payments and escrow.</strong> The marketplace is in preview. TRISOCMD does not currently accept marketplace payments, hold funds, guarantee delivery or offer a functioning escrow service. Do not treat chat messages as payment instructions.</li>
+   <li><strong>Centralized payments (planned).</strong> Sellers must not request direct payment for marketplace-managed transactions. When a compliant payment process becomes active, buyers will pay TRISOCMD through official published payment instructions; TRISOCMD would confirm cleared funds, verify delivery and any dispute, then arrange seller payout less any disclosed marketplace fee. This is a planned process, not a live escrow guarantee.</li>
+   <li><strong>Current payment status.</strong> Purchase requests only ask the administrator to review an offer. The site does not currently accept deposits, hold funds, verify crypto transactions, release seller payouts or guarantee refunds. Never send money based on a private chat, screenshots or unverified payment details.</li>
+   <li><strong>Seller's 4% fee.</strong> Any future supported marketplace transaction may include a 4% service commission, clearly displayed before payment. No fee is currently charged through this preview.</li>
+   <li><strong>Disputes and delivery.</strong> If a payment workflow is activated, sellers must provide the described product and cooperate with buyer and moderator verification. Neither party may pressure the other to mark a delivery complete prematurely. Unresolved complaints are reviewed before any seller payout.</li>
+   <li><strong>Listing removal.</strong> Sellers can withdraw their own listings, and administrators can remove any listing that breaks site rules. Past chat and purchase request records are kept for moderation and disputes; removal cannot be used to erase a pending transaction.</li>
+   <li><strong>Administrator oversight.</strong> Authorized moderators may review buyer-seller messages, attached listing images and purchase requests for fraud prevention, safety and dispute resolution. Users must not assume the chat is private from marketplace moderation.</li>
    <li><strong>Moderation and reporting.</strong> Administrators can review listings, their images and conversations for fraud prevention and disputes. Listings can be removed or declined for safety or policy violations.</li>
    <li><strong>Platform rules.</strong> Some publishers prohibit account transfers or resales. Buyers and sellers must comply with the relevant platform's terms and all applicable laws.</li>
  </ol><button class="btn primary" type="button" onclick="document.getElementById('rules-dialog').close()">I understand</button>
@@ -189,6 +209,6 @@
 </dialog>
 <script src="assets/triso-auth-storage.js?v=2"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer src="assets/marketplace-v15.js?v=17"></script>
+<script defer src="assets/marketplace-v15.js?v=18"></script>
 </body>
 </html>

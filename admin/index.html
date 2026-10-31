@@ -1,10 +1,40 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>TRISOCMD — Staging Admin</title><style>:root{color-scheme:dark;font:15px system-ui;background:#0b0d13;color:#f3f2f8}*{box-sizing:border-box}body{max-width:1150px;margin:auto;padding:24px}a{color:#b8a4ff}header{display:flex;gap:20px;justify-content:space-between;flex-wrap:wrap;border-bottom:1px solid #303448;padding-bottom:20px}h1{font-size:clamp(30px,5vw,52px)}p{color:#b8bbcc;line-height:1.6}section{background:#171a26;border:1px solid #34384d;border-radius:16px;padding:20px;margin:20px 0}table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #35394a;padding:12px;text-align:left;vertical-align:top;overflow-wrap:anywhere}button,input,select,textarea{font:inherit;padding:10px;border-radius:8px;background:#101320;color:white;border:1px solid #4c5065}button{cursor:pointer;background:#7459d3}button:disabled{opacity:.5}textarea{width:100%;min-height:65px}.hidden{display:none!important}.scroll{overflow-x:auto}.muted{color:#a9afc4}#status{min-height:24px}@media(max-width:600px){th,td{padding:8px;font-size:13px}}#admin-login-form{display:flex;gap:12px;flex-wrap:wrap;align-items:end}#admin-login-form label{display:grid;gap:7px;flex:1 1 190px;color:#dcc9ff;font-size:13px}#admin-login-form input{width:100%;max-width:350px}#admin-login-btn{min-width:140px;background:linear-gradient(105deg,#7d32c5,#bb38d6)}#listings-status{color:#ddaff9;font-weight:700}#status{white-space:pre-wrap}button:focus-visible,input:focus-visible{outline:2px solid #db9eff;outline-offset:3px}#listings img.moderation-photo{width:115px;height:85px;object-fit:cover;border:1px solid #645082;border-radius:10px;margin-top:9px;cursor:zoom-in}#listings .photo-status{display:block;color:#d8c7ee;font-size:12px;margin-top:7px}#listings .photo-missing{color:#f2a9b1;font-size:12px;margin-top:8px}</style><link rel="stylesheet" href="../luxury-dark.css?v=20261031-luxury"><script src="../assets/triso-auth-storage.js?v=2"></script></head><body><header><a href="../index.html">TRISOCMD / STORE</a><strong>STAGING ADMIN</strong><a href="../blog/">Journal</a></header><h1>Operations dashboard</h1><p id="status" role="status" aria-live="polite">Checking administrator session…</p>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>TRISOCMD — Staging Admin</title><style>:root{color-scheme:dark;font:15px system-ui;background:#0b0d13;color:#f3f2f8}*{box-sizing:border-box}body{max-width:1150px;margin:auto;padding:24px}a{color:#b8a4ff}header{display:flex;gap:20px;justify-content:space-between;flex-wrap:wrap;border-bottom:1px solid #303448;padding-bottom:20px}h1{font-size:clamp(30px,5vw,52px)}p{color:#b8bbcc;line-height:1.6}section{background:#171a26;border:1px solid #34384d;border-radius:16px;padding:20px;margin:20px 0}table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #35394a;padding:12px;text-align:left;vertical-align:top;overflow-wrap:anywhere}button,input,select,textarea{font:inherit;padding:10px;border-radius:8px;background:#101320;color:white;border:1px solid #4c5065}button{cursor:pointer;background:#7459d3}button:disabled{opacity:.5}textarea{width:100%;min-height:65px}.hidden{display:none!important}.scroll{overflow-x:auto}.muted{color:#a9afc4}#status{min-height:24px}@media(max-width:600px){th,td{padding:8px;font-size:13px}}#admin-login-form{display:flex;gap:12px;flex-wrap:wrap;align-items:end}#admin-login-form label{display:grid;gap:7px;flex:1 1 190px;color:#dcc9ff;font-size:13px}#admin-login-form input{width:100%;max-width:350px}#admin-login-btn{min-width:140px;background:linear-gradient(105deg,#7d32c5,#bb38d6)}#listings-status{color:#ddaff9;font-weight:700}#status{white-space:pre-wrap}button:focus-visible,input:focus-visible{outline:2px solid #db9eff;outline-offset:3px}#listings img.moderation-photo{width:115px;height:85px;object-fit:cover;border:1px solid #645082;border-radius:10px;margin-top:9px;cursor:zoom-in}#listings .photo-status{display:block;color:#d8c7ee;font-size:12px;margin-top:7px}#listings .photo-missing{color:#f2a9b1;font-size:12px;margin-top:8px}</style><link rel="stylesheet" href="../luxury-dark.css?v=20261031-luxury"><style id="tc18-admin-style">
+.tc18-admin-section{border-color:#53416a}
+.tc18-chat-layout{display:grid;grid-template-columns:minmax(190px,32%) 1fr;gap:14px;min-height:320px;margin-top:15px}
+.tc18-chat-list{border:1px solid #403250;border-radius:13px;padding:10px;overflow-y:auto;max-height:420px}
+.tc18-conversation{display:block;width:100%;text-align:left;background:#251b35;border:1px solid #46385c;color:#ede5ff;padding:12px;margin-bottom:8px;border-radius:10px}
+.tc18-conversation.active{background:#4a306d;border-color:#ae86f5}.tc18-conversation small{display:block;color:#c6bcdb;font-size:11px;overflow-wrap:anywhere;margin-top:4px}
+.tc18-chat-view{min-width:0;border:1px solid #3f3454;border-radius:13px;padding:15px}
+.tc18-chat-view h3{margin:0 0 8px}.tc18-chat-view p{margin:6px 0}
+.tc18-chat-messages{min-height:220px;max-height:410px;overflow-y:auto;display:flex;flex-direction:column;gap:9px;padding:8px}
+.tc18-msg{max-width:85%;border-radius:13px;border:1px solid #49385c;background:#242033;padding:9px 12px;overflow-wrap:anywhere;align-self:flex-start}
+.tc18-msg.seller{background:#473065;align-self:flex-end;border-color:#7852a8}.tc18-msg p{white-space:pre-wrap;color:#f4efff}.tc18-msg small{color:#bdb0cd}
+.tc18-order-card{border:1px solid #443856;border-radius:12px;padding:14px;margin:13px 0;background:#191525;overflow-wrap:anywhere}
+.tc18-order-card p,.tc18-order-card small{color:#c8bbd9}.tc18-order-controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+@media(max-width:740px){.tc18-chat-layout{grid-template-columns:1fr}.tc18-chat-list{max-height:190px}}
+</style><script src="../assets/triso-auth-storage.js?v=2"></script></head><body><header><a href="../index.html">TRISOCMD / STORE</a><strong>STAGING ADMIN</strong><a href="../blog/">Journal</a></header><h1>Operations dashboard</h1><p id="status" role="status" aria-live="polite">Checking administrator session…</p>
 <section id="admin-auth" class="hidden" aria-labelledby="admin-auth-title">
 <h2 id="admin-auth-title">Admin sign in</h2>
 <p class="muted">Sign in with your TRISOCMD administrator account to review new marketplace submissions. This login works even when you opened the dashboard in a different tab.</p>
 <form id="admin-login-form"><label>Email <input id="admin-email" type="email" autocomplete="username" required placeholder="Admin email"></label> <label>Password <input id="admin-password" type="password" autocomplete="current-password" required placeholder="Password"></label> <label style="display:flex;flex-direction:row;gap:8px;align-items:center;flex:1 0 100%;color:#ddd1f1"><input type="checkbox" id="admin-remember" checked style="width:17px;height:17px;accent-color:#ae80fc"> Remember me on this device</label><button type="submit" id="admin-login-btn">Sign in securely</button></form>
 </section>
-<div id="dashboard" class="hidden"><section><h2>Overview</h2><p id="overview"></p><button id="refresh" type="button">Refresh dashboard</button> <button id="admin-signout" type="button" style="background:#211a37;border-color:#665c92">Sign out</button></section><section><h2>Marketplace moderation</h2><p class="muted">Pending listings require review. Only approve listings that are legitimate and comply with store policy.</p><p id="listings-status" role="status" aria-live="polite">Checking pending listings…</p><div id="listings" class="scroll"></div></section><section><h2>Support tickets</h2><p id="tickets-status" class="muted"></p><div id="tickets" class="scroll"></div></section><section><h2>Orders (read-only)</h2><p class="muted">Payment confirmation and fulfillment are intentionally disabled in this dashboard.</p><p id="orders-status" class="muted"></p><div id="orders" class="scroll"></div></section><section><h2>Content management</h2><p><a href="../blog/">Open article editor →</a></p><p><a href="../videos/">Open video hub →</a></p></section></div><script>
+<div id="dashboard" class="hidden"><section><h2>Overview</h2><p id="overview"></p><button id="refresh" type="button">Refresh dashboard</button> <button id="admin-signout" type="button" style="background:#211a37;border-color:#665c92">Sign out</button></section><section><h2>Marketplace moderation</h2><p class="muted">Pending listings require review. Only approve listings that are legitimate and comply with store policy.</p><p id="listings-status" role="status" aria-live="polite">Checking pending listings…</p><div id="listings" class="scroll"></div></section><section class="tc18-admin-section" aria-label="Marketplace conversations">
+<h2>All buyer / seller conversations</h2>
+<p class="muted">Authorized administrators can review every marketplace conversation for disputes and fraud prevention. This panel is read-only; administrators cannot impersonate buyers or sellers.</p>
+<button id="tc18-chat-refresh" type="button">Refresh conversations</button>
+<p id="tc18-chat-status" class="muted" role="status">Loading conversations…</p>
+<div class="tc18-chat-layout"><div id="tc18-chat-list" class="tc18-chat-list"></div>
+<div class="tc18-chat-view"><h3 id="tc18-chat-heading">Select a conversation</h3>
+<p id="tc18-chat-context" class="muted">Select a buyer-seller thread to inspect messages.</p>
+<div id="tc18-chat-messages" class="tc18-chat-messages" role="log"></div></div></div>
+</section>
+<section class="tc18-admin-section" aria-label="Marketplace purchase requests">
+<h2>Marketplace purchase requests · Review only</h2>
+<p class="muted">Requests are not payments. Money collection, escrow and seller payouts are not enabled. Do not provide payment instructions until the operational and legal workflow is configured.</p>
+<button id="tc18-orders-refresh" type="button">Refresh purchase requests</button>
+<p id="tc18-orders-status" role="status" class="muted">Loading requests…</p><div id="tc18-order-list"></div>
+</section>
+<section><h2>Support tickets</h2><p id="tickets-status" class="muted"></p><div id="tickets" class="scroll"></div></section><section><h2>Orders (read-only)</h2><p class="muted">Payment confirmation and fulfillment are intentionally disabled in this dashboard.</p><p id="orders-status" class="muted"></p><div id="orders" class="scroll"></div></section><section><h2>Content management</h2><p><a href="../blog/">Open article editor →</a></p><p><a href="../videos/">Open video hub →</a></p></section></div><script>
 'use strict';
 // Administrator actions are authorized by the Supabase JWT app_metadata role
 // and server-side RLS. Never trust user_metadata or a local admin flag.
@@ -143,6 +173,12 @@ async function load(){
      reject.onclick=async()=>{const reason=prompt('Reason for declining this listing:');if(reason===null)return;if(!reason.trim())return status('A decline reason is required.');reject.disabled=true;try{await moderate(p.id,'declined',reason.trim().slice(0,500))}catch(e){status(e.message);reject.disabled=false}};
      td.append(approve,el('span',' '),reject)
     }
+    if(p.status!=='removed'){
+      const remove=el('button','Remove listing');remove.type='button';
+      remove.style.cssText='margin:8px 0;background:#522838;border-color:#995367';
+      remove.onclick=()=>window.tc18RemoveListing?.(p);
+      td.append(el('div'),remove);
+    }
     tr.append(td)
    });
   }else{
@@ -211,4 +247,4 @@ document.addEventListener('visibilitychange',async()=>{if(document.hidden)return
 window.addEventListener('storage',e=>{if(e.key===window.TrisoAuth.key){const next=window.TrisoAuth.read();if((next?.access_token||null)!==(session?.access_token||null)){session=next;authorized=false;init()}}});
 setInterval(async()=>{if(!session?.refresh_token)return;if(session.expires_at&&session.expires_at>Math.floor(Date.now()/1000)+120)return;await refreshSession()},60000);
 init();
-</script></body></html>
+</script><script src="../assets/triso-admin-v18.js?v=18"></script></body></html>
