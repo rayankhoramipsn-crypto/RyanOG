@@ -1400,6 +1400,7 @@ body,#store-screen{background:radial-gradient(ellipse 75% 22% at 50% 0%,#271338 
 @media(max-width:950px){#store-screen .tc52-hero-promos{grid-template-rows:repeat(2,minmax(155px,1fr))!important}#store-screen .tc52-hero-promos .tc52-promo{min-height:155px!important}}
 @media(max-width:580px){#store-screen .tc52-hero-promos{grid-template-columns:1fr!important;grid-template-rows:auto!important}#store-screen .tc52-hero-promos .tc52-promo{min-height:150px!important}#lang-screen .lang-wrap{margin:16px!important;padding:26px 16px!important}#lang-screen .lang-grid{gap:8px!important}#lang-screen .lang-btn{padding:12px 9px!important}}
 </style><link rel="stylesheet" href="assets/trisocmd-native-v13.css?v=13">
+<link rel="stylesheet" href="assets/trisocmd-lower-v14.css?v=14">
 </head>
 <body><div id="tc50-staging-banner" role="status" style="position:relative;z-index:99999;background:#122330;border-bottom:1px solid #467487;color:#c2eaff;padding:10px 18px;text-align:center;font:600 12px/1.5 system-ui,sans-serif">STAGING PREVIEW · Payments, order processing, and support notifications are not live. Do not send funds.</div>
 <a class="tc49-skip" href="#tc-shop-heading">SKIP TO PRODUCTS</a>
@@ -1546,22 +1547,81 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElement
  <button type="button" class="tc-native-ribbon-item" data-native-filter="gear"><span class="tc-native-ribbon-icon">♫</span> <span>02 &nbsp; GAMING GEAR</span></button>
  <button type="button" class="tc-native-ribbon-item" data-native-filter="digital"><span class="tc-native-ribbon-icon">◇</span> <span>03 &nbsp; DIGITAL GOODS</span></button>
 </div>
-<div class="tc-v8-shop-wrap"><div class="tc-v8-shop-eyebrow">♨ &nbsp; FEATURED PRODUCTS</div><div class="tc-shop-heading" id="tc-shop-heading"><div><span class="tc-section-kicker">THE MARKET / 002</span><h2>THE <i>DROP.</i></h2><p>Fortnite accounts, gaming gear and digital essentials — browse current inventory.</p></div><span class="tc-shop-aside">CURATED FOR YOUR NEXT SESSION ↘</span></div>
-  <div class="tc-native-filter-row" role="group" aria-label="Filter products">
- <button class="active" type="button" data-native-filter="all">All</button>
- <button type="button" data-native-filter="fortnite">Fortnite</button>
- <button type="button" data-native-filter="gear">Gaming Gear</button>
- <button type="button" data-native-filter="digital">Digital Goods</button>
-</div><div class="product-section">
-    <div class="tc39-toolbar" role="search"><input id="tc39-search" aria-label="Search products" placeholder="SEARCH THE COLLECTION..." oninput="tc39Filter()"><select id="tc39-category" aria-label="Category" onchange="tc39Filter()"><option value="">All categories</option></select><select id="tc39-sort" aria-label="Sort" onchange="tc39Filter()"><option value="featured">Featured</option><option value="low">Price: Low to High</option><option value="high">Price: High to Low</option></select><button class="tc39-cart-button" onclick="tc39CartOpen()">BAG <span id="tc39-count">0</span> ↗</button></div><div class="product-grid" id="product-grid"></div>
-    <div class="empty" id="store-empty" style="display:none;">
-      <p id="store-empty-text">No products available yet.</p>
+<main class="tc14-lower" id="tc14-lower">
+  <section class="tc14-journal" id="tc-journal" aria-labelledby="tc14-journal-title">
+    <div class="tc14-journal-copy">
+      <span class="tc14-kicker">THE JOURNAL / 003</span>
+      <h2 class="tc14-big-title" id="tc14-journal-title">PLAY MORE.<br><em>KNOW MORE.</em></h2>
+      <p class="tc14-copy">Fortnite guides, setup inspiration and stories from the TRISOCMD community.</p>
+      <a class="tc14-outline-btn" href="blog/">EXPLORE THE JOURNAL <span aria-hidden="true">→</span></a>
+    </div>
+    <a class="tc14-journal-art" href="blog/" aria-label="Explore the TRISOCMD Journal">
+      <span class="tc14-journal-art-inner">
+        <span class="tc14-journal-art-kicker">TRISO / NOTES</span>
+        <strong class="tc14-journal-gg">GG<span>.</span></strong>
+        <small class="tc14-journal-art-caption">THE CULTURE DOESN'T STOP AT THE GAME.</small>
+      </span>
+    </a>
+  </section>
+  <section class="tc14-feature" aria-labelledby="tc14-feature-title">
+    <div class="tc14-feature-intro">
+      <span class="tc14-kicker">WHY TRISOCMD / 004</span>
+      <h2 class="tc14-big-title" id="tc14-feature-title">THE DETAILS<br><em>MATTER.</em></h2>
+      <p class="tc14-copy">More than just a store. We're here to make your gaming experience better.</p>
+    </div>
+    <a class="tc14-feature-card" href="#tc-shop-heading"><div class="tc14-feature-card-head"><span class="tc14-feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 13 12 21 3 12V4h8l9 9Z"/><circle cx="8" cy="8" r="1"/></svg></span><span class="tc14-feature-no">01</span></div><h3>PRODUCT CLARITY</h3><p>See pricing, descriptions and availability before ordering.</p><span class="tc14-feature-arrow" aria-hidden="true">↗</span></a>
+    <a class="tc14-feature-card" href="help/"><div class="tc14-feature-card-head"><span class="tc14-feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13v-2a8 8 0 0 1 16 0v2M4 13h4v7H6a2 2 0 0 1-2-2Zm16 0h-4v7h2a2 2 0 0 0 2-2ZM16 20a4 4 0 0 1-4 2h-2"/></svg></span><span class="tc14-feature-no">02</span></div><h3>REAL SUPPORT</h3><p>Questions about an order? Contact our published support channel.</p><span class="tc14-feature-arrow" aria-hidden="true">↗</span></a>
+    <a class="tc14-feature-card" href="blog/"><div class="tc14-feature-card-head"><span class="tc14-feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l3 3v15H6zM14 3v4h4M9 12h6M9 16h6"/></svg></span><span class="tc14-feature-no">03</span></div><h3>PLAYER-FIRST CONTENT</h3><p>Guides and setup ideas for people who actually play.</p><span class="tc14-feature-arrow" aria-hidden="true">↗</span></a>
+  </section>
+  <section class="tc-v8-shop-wrap tc14-shop" aria-labelledby="tc-shop-title">
+    <div class="tc14-shop-intro">
+      <span class="tc14-kicker">✦ &nbsp; FEATURED PRODUCTS</span>
+      <div class="tc-shop-heading" id="tc-shop-heading">
+        <h2 class="tc14-big-title" id="tc-shop-title">THE<br><em>DROP.</em></h2>
+      </div>
+      <p class="tc14-copy">Curated gear, digital goods and more — browse our current listings.</p>
+      <a class="tc14-outline-btn" href="#tc14-products">VIEW ALL PRODUCTS <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="tc14-shop-main" id="tc14-products">
+      <div class="tc14-shop-top">
+        <div class="tc39-toolbar" role="search">
+          <input id="tc39-search" aria-label="Search products" placeholder="Search products, categories..." oninput="tc39Filter()" autocomplete="off">
+          <select id="tc39-category" aria-label="Category" onchange="tc39Filter()"><option value="">All categories</option></select>
+          <select id="tc39-sort" aria-label="Sort products" onchange="tc39Filter()"><option value="featured">Featured</option><option value="low">Price: Low to High</option><option value="high">Price: High to Low</option></select>
+          <button class="tc39-cart-button" type="button" onclick="tc39CartOpen()">BAG <span id="tc39-count">0</span> ↗</button>
+        </div>
+        <div class="tc-native-filter-row" role="group" aria-label="Filter products">
+          <button type="button" class="active" data-native-filter="all" aria-pressed="true">All</button>
+          <button type="button" data-native-filter="fortnite" aria-pressed="false">Fortnite</button>
+          <button type="button" data-native-filter="gear" aria-pressed="false">Gaming Gear</button>
+          <button type="button" data-native-filter="digital" aria-pressed="false">Digital Goods</button>
+        </div>
+      </div>
+      <div class="product-section">
+        <div class="product-grid" id="product-grid" aria-live="polite"></div>
+        <div class="empty" id="store-empty" style="display:none;"><p id="store-empty-text">No products available yet.</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer class="tc14-footer" id="tc14-footer">
+  <div class="tc14-footer-main">
+    <div class="tc14-footer-brand"><strong>TRISO<span>CMD.</span></strong><p>Gaming culture. Digital essentials. Made for players.</p></div>
+    <div class="tc14-footer-col"><h3>SHOP</h3><a href="#tc-shop-heading">All Products</a><a href="#tc-shop-heading" data-native-category="fortnite">Fortnite</a><a href="#tc-shop-heading" data-native-category="gear">Gaming Gear</a><a href="#tc-shop-heading" data-native-category="digital">Digital Goods</a></div>
+    <div class="tc14-footer-col"><h3>SUPPORT</h3><a href="help/">Contact &amp; Help</a><a href="help/">Order Help</a><a href="policies/">Policies (Draft)</a><button type="button" onclick="showScreen('tc31-trust')">Trust / FAQ</button></div>
+    <div class="tc14-footer-col"><h3>EXPLORE</h3><a href="blog/">The Journal</a><a href="videos/">Guides &amp; Videos</a><a href="marketplace.html">Community Market</a><button type="button" onclick="showScreen('tc31-panel')">Account</button></div>
+    <div class="tc14-footer-news"><h3>STAY IN THE LOOP</h3><p>Request updates about new drops, guides and more.</p>
+      <form class="tc14-update-form" id="tc14-update-form"><input type="email" required autocomplete="email" aria-label="Your email for update request" placeholder="Enter your email"><button type="submit" aria-label="Request email updates">→</button></form>
+      <span id="tc14-footer-status" class="tc14-footer-status" role="status">Email requests open your email app.</span>
+      <div class="tc14-socials"><a href="https://t.me/trisocmd" target="_blank" rel="noopener noreferrer" title="TRISOCMD Telegram" aria-label="Telegram">✈</a><a href="videos/" title="Gaming videos" aria-label="Videos">▶</a><a href="blog/" title="Journal" aria-label="Journal">✦</a></div>
     </div>
   </div>
-  </div><section class="tc-editorial" id="tc-journal"><div><span class="tc-section-kicker">THE JOURNAL / 003</span><h2>PLAY MORE.<br><i>KNOW MORE.</i></h2><p>Fortnite guides, setup inspiration, and stories from the community. Explore our first original guides, with articles and a dedicated video hub.</p><a class="tc-editorial-pill" href="blog/">EXPLORE THE JOURNAL ↗</a></div><div class="tc-editorial-art"><span>TRISO / NOTES</span><strong>GG<span>.</span></strong><small>THE CULTURE DOESN'T STOP AT THE GAME</small></div></section>
-  <section class="tc-feature" aria-label="Our approach"><div class="tc-feature-intro"><span class="tc-section-kicker">WHY TRISOCMD / 004</span><h2>THE DETAILS<br><i>MATTER.</i></h2></div><div class="tc-feature-grid"><div><span>01 —</span><h3>PRODUCT CLARITY</h3><p>Check descriptions, pricing and availability before placing an order.</p></div><div><span>02 —</span><h3>REAL SUPPORT</h3><p>Need help with an order? Contact us through our published support channel.</p></div><div><span>03 —</span><h3>PLAYER-FIRST CONTENT</h3><p>Guides and setup ideas made for gamers, not filler articles.</p></div></div></section>
-  <section class="tc49-quick-help" aria-label="Shopping help"><strong>NEED A HAND?</strong><p>Find checkout instructions, account help, and contact options before ordering.</p><a href="help/">SHOPPING HELP ↗</a><a href="policies/">POLICY DRAFTS ↗</a></section>
-  <footer class="tc-footer"><div><strong>TRISO<span>CMD.</span></strong><p>Gaming culture. Digital essentials. Made for players.</p></div><div class="tc-footer-links"><a href="https://t.me/trisocmd" target="_blank" rel="noopener noreferrer">CONTACT ↗</a><a href="blog/">JOURNAL ↗</a><a href="videos/">VIDEOS ↗</a><a href="help/">HELP ↗</a><button onclick="showScreen('tc31-panel')">ACCOUNT ↗</button><button onclick="showScreen('tc31-trust')">TRUST / FAQ ↗</button><button onclick="showScreen('lang-screen')">LANGUAGE ↗</button></div><small>© TRISOCMD · INDEPENDENT GAMING MARKETPLACE · <a href="policies/">POLICIES (DRAFT)</a></small></footer>
+  <div class="tc14-footer-bottom">
+    <span>© 2026 TRISOCMD. Independent gaming marketplace.</span>
+    <span><a href="policies/">Privacy &amp; Policies (Draft)</a> &nbsp; · &nbsp; <a href="help/">Contact</a> &nbsp; · &nbsp; <a href="blog/">Journal</a></span>
+    <button class="tc14-footer-support" type="button" onclick="tc41ToggleChat(true)">◉ &nbsp; LIVE SUPPORT <small>↗</small></button>
+  </div>
+</footer>
 </div>
 
 <!-- ════ PRODUCT DETAIL ════ -->
@@ -2213,36 +2273,47 @@ function applyTranslations() {
 function tc50Esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function tc50ImgUrl(v){try{const u=new URL(String(v));return u.protocol==='https:'?tc50Esc(u.href):''}catch{return ''}}
 function tc50Num(v){const n=Number(v);return Number.isFinite(n)?n:0}
-function renderStore() {
-  const grid = document.getElementById('product-grid');
-  const empty = document.getElementById('store-empty');
-  const et=document.getElementById('store-empty-text'); if(et) et.textContent=t('empty_store');
-  const prods = tc39Filtered();
-  if (!prods.length) { grid.innerHTML=''; empty.style.display='block'; return; }
-  empty.style.display='none';
-  grid.innerHTML = prods.map(p => `
-    <div class="product-card tc51-product ${p.status==='sold'?'sold':''}" onclick="openProduct(${tc50Num(p.id)})">
-      <div class="product-badge ${p.status==='available'?'badge-available':'badge-sold'}">${p.status==='available'?t('available'):t('sold')}</div>
-      ${renderProductImg(p, '200px')}
-      <div class="product-body">
-        <div class="tc34-product-meta">TRISOCMD <span>✦</span> ${tc50Esc(p.category||"GAMING")}</div>
-        <div class="product-title">${tc50Esc(p.title)}</div>
-        <div class="product-desc">${tc50Esc(getDesc(p))}</div>
-        <div class="product-footer">
-          <div class="product-price">$${tc50Num(p.price)} <span>USD</span></div>
-          ${p.status==='available'?`<button class="product-buy-btn" onclick="event.stopPropagation();openProduct(${tc50Num(p.id)})">VIEW PRODUCT ↗</button>`:''}
-        </div>
-        ${p.status==='available' && p.stock!==undefined && p.stock!==null ? `<div style="font-size:11px;color:var(--text3);margin-top:6px;">${tc50Num(p.stock)} ${tc34word("stock")}</div>` : ''}
-      </div>
-    </div>
-  `).join('');
+function tc14ProductKind(p) {
+  const text=String((p.category||'')+' '+(p.title||'')).toLowerCase();
+  if (/fortnite|v[- ]?bucks|epic|skin/.test(text)) return 'fortnite';
+  if (/gear|gaming|headset|keyboard|controller|mouse|monitor|accessor/.test(text)) return 'gear';
+  if (/digital|steam|psn|xbox|gift|code|roblox|amazon/.test(text)) return 'digital';
+  return 'other';
 }
-
-function renderProductImg(p, h) {
-  if (tc50ImgUrl(p.img)) {
-    return `<div style="width:100%;height:${h};overflow:hidden;"><img src="${tc50ImgUrl(p.img)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"></div>`;
-  }
-  return `<div style="width:100%;height:${h};display:flex;align-items:center;justify-content:center;font-size:48px;background:var(--bg4);">${tc50Esc(p.img||'📦')}</div>`;
+function renderStore() {
+  const grid=document.getElementById('product-grid');
+  const empty=document.getElementById('store-empty');
+  if(!grid||!empty)return;
+  const et=document.getElementById('store-empty-text');if(et)et.textContent=t('empty_store');
+  const prods=tc39Filtered();
+  if(!prods.length){grid.replaceChildren();empty.style.display='block';return}
+  empty.style.display='none';
+  grid.innerHTML=prods.map(p=>{
+    const id=tc50Num(p.id);
+    const available=p.status==='available';
+    const saved=window.tc14IsFavorite?.(p.id)===true;
+    return `<article class="product-card tc51-product tc14-product ${p.status==='sold'?'sold':''}" tabindex="0" aria-label="${tc50Esc(p.title)}" onclick="openProduct(${id})" onkeydown="if(event.key==='Enter'&&event.target===this)openProduct(${id})">
+      <div class="tc14-product-visual">${renderProductImg(p,'133px')}
+        <div class="product-badge ${available?'badge-available':'badge-sold'}">${available?t('available'):t('sold')}</div>
+      </div>
+      <div class="product-body">
+        <div class="tc34-product-meta">TRISOCMD <span>✦</span> ${tc50Esc(p.category||'GAMING')}</div>
+        <div class="product-title">${tc50Esc(p.title)}</div>
+        <div class="product-desc">${tc50Esc(getDesc(p)||'')}</div>
+        <div class="product-footer">
+          <div class="product-price">$${tc50Num(p.price).toFixed(2)} <span>USD</span></div>
+          ${available?`<button type="button" class="product-buy-btn" onclick="event.stopPropagation();openProduct(${id})">VIEW ↗</button>`:''}
+          <button type="button" class="tc14-fav" data-tc14-id="${id}" title="Save on this device" aria-label="${saved?'Remove from saved products':'Save product on this device'}" aria-pressed="${saved}" onclick="event.stopPropagation();tc14ToggleFavorite(this,${id})"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 5.5a5.2 5.2 0 0 0-7.3 0L12 7l-1.5-1.5a5.2 5.2 0 0 0-7.3 7.4L12 21l8.8-8.1a5.2 5.2 0 0 0 0-7.4Z"/></svg></button>
+        </div>
+        ${available&&p.stock!==undefined&&p.stock!==null?`<div class="tc14-stock-note">${tc50Num(p.stock)} ${tc34word('stock')}</div>`:''}
+      </div>
+    </article>`;
+  }).join('');
+}
+function renderProductImg(p,h) {
+  const kind=tc14ProductKind(p);
+  const src=tc50ImgUrl(p.img);
+  return `<div class="tc14-product-media tc14-product-media-${kind}" style="height:${h}">${src?`<img src="${src}" alt="${tc50Esc(p.title||'Product')}" loading="lazy" decoding="async" onerror="this.remove()">`:''}</div>`;
 }
 
 function getDesc(p) {
@@ -3614,5 +3685,6 @@ function init(){
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script><script src="assets/trisocmd-native-v13.js?v=13" defer></script>
+<script src="assets/trisocmd-lower-v14.js?v=14" defer></script>
 </body>
 </html>
