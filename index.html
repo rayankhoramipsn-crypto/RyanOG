@@ -1561,6 +1561,315 @@ body,#store-screen{background:radial-gradient(ellipse 75% 22% at 50% 0%,#271338 
 #lang-screen .lang-title{color:#fff!important;letter-spacing:-.04em!important}
 @media(max-width:1199px){.tc-v9-reference-stage{display:none!important}}
 @media(prefers-reduced-motion:reduce){.tc-v9-reference-stage *,#lang-screen .lang-btn{transition:none!important}}
+</style><style id="tc-v10-bugfix-gloss">
+/* Correct the reference artwork's interactive overlay. The reference already
+   contains visuals for the buttons, menu, search field, cart and support. */
+@media(min-width:1200px){
+  html body #store-screen .tc-v9-reference-stage{
+    isolation:isolate!important;
+    overflow:hidden!important;
+    background:#090517!important;
+    border-radius:0 0 14px 14px!important;
+  }
+  html body #store-screen .tc-v9-reference-image{
+    display:block!important;
+    width:100%!important;
+    height:100%!important;
+    object-fit:fill!important;
+    image-rendering:auto!important;
+    filter:contrast(1.055) saturate(1.13) brightness(1.035)!important;
+    transform:translateZ(0);
+  }
+  html body #store-screen .tc-v9-reference-stage:before{
+    content:"";
+    position:absolute;
+    inset:0 0 auto;
+    height:12%;
+    z-index:1;
+    pointer-events:none;
+    background:linear-gradient(180deg,rgba(255,230,255,.067),rgba(255,220,255,0) 85%);
+  }
+  html body #store-screen .tc-v9-reference-stage:after{
+    content:"";
+    position:absolute;
+    inset:auto 0 0;
+    height:20%;
+    z-index:1;
+    pointer-events:none;
+    background:linear-gradient(0deg,rgba(110,38,171,.05),transparent 90%);
+  }
+  /* Hide the duplicate floating support UI while the raster's actual
+     support button (with its own functional hotspot) is displayed. */
+  html body:has(#store-screen.active .tc-v9-reference-stage) #tc41-fab{
+    display:none!important;
+  }
+  /* One safety notice remains visible at the bottom. */
+  html body:has(#store-screen.active .tc-v9-reference-stage) #tc50-staging-banner{
+    display:none!important;
+  }
+  /* Hotspot buttons must never inherit the old store button's filled styles. */
+  html body #store-screen .tc-v9-reference-stage .tc-v9-hot{
+    appearance:none!important;
+    background:transparent!important;
+    background-color:transparent!important;
+    background-image:none!important;
+    border:0!important;
+    border-color:transparent!important;
+    box-shadow:none!important;
+    color:transparent!important;
+    text-shadow:none!important;
+    outline:0!important;
+    opacity:1!important;
+    padding:0!important;
+    margin:0!important;
+    min-width:0!important;
+    min-height:0!important;
+    max-width:none!important;
+    font-size:0!important;
+    cursor:pointer!important;
+    display:block!important;
+    z-index:6!important;
+    transition:box-shadow .22s ease,background .22s ease!important;
+  }
+  html body #store-screen .tc-v9-reference-stage .tc-v9-hot:hover{
+    background:linear-gradient(135deg,rgba(239,142,255,.10),rgba(136,57,249,.055) 50%,rgba(255,255,255,.02))!important;
+    box-shadow:inset 0 0 0 1px rgba(237,158,255,.52),0 0 24px rgba(172,43,241,.21)!important;
+  }
+  html body #store-screen .tc-v9-reference-stage .tc-v9-hot:focus-visible{
+    outline:2px solid #f2aaff!important;
+    outline-offset:2px!important;
+  }
+  /* The source image already paints the selected categories and filter pills. */
+  html body #store-screen .tc-v9-reference-stage .tc-v9-stage-category,
+  html body #store-screen .tc-v9-reference-stage .tc-v9-stage-filters{
+    position:absolute!important;
+    inset:0!important;
+    pointer-events:none!important;
+    z-index:5!important;
+  }
+  html body #store-screen .tc-v9-reference-stage .tc-v9-stage-category > button,
+  html body #store-screen .tc-v9-reference-stage .tc-v9-stage-filters > button{
+    appearance:none!important;
+    display:block!important;
+    position:absolute!important;
+    background:transparent!important;
+    background-image:none!important;
+    background-color:transparent!important;
+    border:0!important;
+    border-radius:999px!important;
+    box-shadow:none!important;
+    color:transparent!important;
+    text-shadow:none!important;
+    opacity:1!important;
+    padding:0!important;
+    margin:0!important;
+    font-size:0!important;
+    line-height:0!important;
+    min-width:0!important;
+    min-height:0!important;
+    cursor:pointer!important;
+    pointer-events:auto!important;
+    transition:box-shadow .2s ease!important;
+  }
+  html body #store-screen .tc-v9-reference-stage .tc-v9-stage-category > button{
+    top:79%!important;
+    height:5%!important;
+    border-radius:0!important;
+  }
+  html body #store-screen .tc-v9-reference-stage .tc-v9-stage-filters > button{
+    top:89.5%!important;
+    height:5.1%!important;
+  }
+  html body #store-screen .tc-v9-reference-stage .tc-v9-stage-category > button:hover,
+  html body #store-screen .tc-v9-reference-stage .tc-v9-stage-category > button.active{
+    box-shadow:inset 0 -2px 0 rgba(228,148,255,.9)!important;
+  }
+  html body #store-screen .tc-v9-reference-stage .tc-v9-stage-filters > button:hover,
+  html body #store-screen .tc-v9-reference-stage .tc-v9-stage-filters > button:focus-visible{
+    box-shadow:inset 0 0 0 2px rgba(225,143,255,.8),0 0 20px #ae33f744!important;
+  }
+  /* Use ONE search field: the image paints the border, icon and placeholder;
+     HTML supplies a real input when focused/typed. */
+  html body #store-screen .tc-v9-reference-stage .tc-v9-search{
+    background:transparent!important;
+    background-image:none!important;
+    border:0!important;
+    box-shadow:none!important;
+    z-index:8!important;
+    padding:0 11px!important;
+    border-radius:999px!important;
+    transition:background-color .18s ease!important;
+  }
+  html body #store-screen .tc-v9-reference-stage .tc-v9-search > span{
+    display:none!important;
+  }
+  html body #store-screen .tc-v9-reference-stage .tc-v9-search input{
+    width:100%!important;
+    height:100%!important;
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+    outline:0!important;
+    font-weight:500!important;
+    font-size:clamp(10px,.85vw,14px)!important;
+    caret-color:#fff!important;
+    color:transparent!important;
+  }
+  html body #store-screen .tc-v9-reference-stage .tc-v9-search input::placeholder{
+    color:transparent!important;
+    opacity:0!important;
+  }
+  html body #store-screen .tc-v9-reference-stage .tc-v9-search:focus-within{
+    background:rgba(16,9,32,.98)!important;
+    box-shadow:0 0 0 1px #ba63f6,0 0 20px #ad41f337!important;
+  }
+  html body #store-screen .tc-v9-reference-stage .tc-v9-search:focus-within input{
+    color:#f6edff!important;
+  }
+  /* Baked-in language menu stays visible exactly as drawn in the image.
+     Invisible rows over it provide functional language switching. */
+  html body #store-screen .tc-v9-reference-stage .tc-v9-menu-cover{
+    display:none!important;
+  }
+  html body #store-screen .tc-v9-reference-stage .tc-v9-lang-toggle{
+    appearance:none!important;
+    background:transparent!important;
+    background-color:transparent!important;
+    background-image:none!important;
+    border:0!important;
+    box-shadow:none!important;
+    color:transparent!important;
+    padding:0!important;
+    margin:0!important;
+    border-radius:999px!important;
+    z-index:10!important;
+  }
+  html body #store-screen .tc-v9-reference-stage .tc-v9-language-menu:not([hidden]){
+    position:absolute!important;
+    left:80.35%!important;
+    top:7.55%!important;
+    width:15.3%!important;
+    height:31.7%!important;
+    max-height:none!important;
+    z-index:9!important;
+    display:grid!important;
+    grid-template-rows:repeat(7,minmax(0,1fr))!important;
+    gap:0!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:16px!important;
+    background:transparent!important;
+    background-image:none!important;
+    box-shadow:none!important;
+    overflow:hidden!important;
+    pointer-events:auto!important;
+    direction:ltr!important;
+  }
+  html body #store-screen .tc-v9-reference-stage .tc-v9-language-menu > button{
+    appearance:none!important;
+    display:flex!important;
+    width:100%!important;
+    height:100%!important;
+    min-height:0!important;
+    max-height:none!important;
+    border:0!important;
+    border-radius:9px!important;
+    background:transparent!important;
+    background-image:none!important;
+    box-shadow:none!important;
+    padding:0!important;
+    margin:0!important;
+    color:transparent!important;
+    text-shadow:none!important;
+    font-size:0!important;
+    line-height:0!important;
+    cursor:pointer!important;
+  }
+  html body #store-screen .tc-v9-reference-stage .tc-v9-language-menu > button > *{
+    color:transparent!important;
+    opacity:0!important;
+    font-size:0!important;
+  }
+  html body #store-screen .tc-v9-reference-stage .tc-v9-language-menu > button:hover{
+    background:rgba(197,69,255,.17)!important;
+    box-shadow:inset 0 0 0 1px rgba(225,140,255,.5)!important;
+  }
+  html body #store-screen .tc-v9-reference-stage .tc-v9-language-menu > button:focus-visible,
+  html body #store-screen .tc-v9-reference-stage .tc-v9-lang-toggle:focus-visible{
+    outline:2px solid #f1c0ff!important;
+    outline-offset:2px!important;
+  }
+  /* The image contains its own 0 badge: show a live badge only for real carts. */
+  html body #store-screen .tc-v9-reference-stage .tc-v9-cart-quantity[data-empty="true"]{
+    display:none!important;
+  }
+  html body #store-screen .tc-v9-reference-stage .tc-v9-cart-quantity:not([data-empty="true"]){
+    position:absolute!important;
+    left:94.3%!important;
+    top:2.1%!important;
+    background:linear-gradient(135deg,#d935ef,#952bdf)!important;
+    z-index:11!important;
+    border-radius:50%!important;
+    box-shadow:0 0 10px #dd4dff!important;
+    color:white!important;
+  }
+  /* Gentle glass glints on the four reference cards; no duplicate text. */
+  html body #store-screen .tc-v10-gloss-tiles{
+    position:absolute!important;
+    inset:0!important;
+    z-index:2!important;
+    pointer-events:none!important;
+  }
+  html body #store-screen .tc-v10-gloss-tiles > i{
+    position:absolute!important;
+    display:block!important;
+    border:1px solid rgba(202,109,255,.2)!important;
+    border-radius:22px!important;
+    overflow:hidden!important;
+    background:linear-gradient(147deg,rgba(255,255,255,.095) 0%,rgba(255,255,255,.013) 17%,transparent 32%,transparent 75%,rgba(176,79,255,.045) 100%)!important;
+    box-shadow:inset 0 1px 0 rgba(251,211,255,.15),0 0 22px rgba(157,44,239,.08)!important;
+  }
+  html body #store-screen .tc-v10-gloss-tiles > i:nth-child(1){left:45.2%;top:19.2%;width:23.7%;height:24.8%}
+  html body #store-screen .tc-v10-gloss-tiles > i:nth-child(2){left:69.9%;top:19.2%;width:23.8%;height:24.8%}
+  html body #store-screen .tc-v10-gloss-tiles > i:nth-child(3){left:45.2%;top:45.5%;width:23.7%;height:23.3%}
+  html body #store-screen .tc-v10-gloss-tiles > i:nth-child(4){left:69.9%;top:45.5%;width:23.8%;height:23.3%}
+  html body #store-screen .tc-v9-reference-stage:has(.tc-v9-hot[data-tc9-filter="fortnite"]:hover) .tc-v10-gloss-tiles > i:nth-child(1),
+  html body #store-screen .tc-v9-reference-stage:has(.tc-v9-hot[data-tc9-filter="gear"]:hover) .tc-v10-gloss-tiles > i:nth-child(2),
+  html body #store-screen .tc-v9-reference-stage:has(.tc-v9-hot[data-tc9-filter="digital"]:hover) .tc-v10-gloss-tiles > i:nth-child(3){
+    background:linear-gradient(135deg,rgba(255,231,255,.18),transparent 39%,rgba(180,82,255,.13))!important;
+    box-shadow:inset 0 1px 0 rgba(255,224,255,.36),0 0 28px rgba(189,61,255,.2)!important;
+  }
+}
+/* Improve the actual product area and mobile fallback without replacing its logic */
+#store-screen .product-card{
+  border-radius:18px!important;
+  border-color:rgba(177,104,235,.32)!important;
+  box-shadow:0 12px 30px rgba(3,0,12,.36),inset 0 1px rgba(241,219,255,.07)!important;
+  transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease!important;
+}
+#store-screen .product-card:hover{
+  transform:translateY(-4px)!important;
+  border-color:rgba(213,143,255,.75)!important;
+  box-shadow:0 20px 44px rgba(18,1,31,.6),0 0 20px rgba(157,53,246,.19)!important;
+}
+#store-screen .tc-v8-shop-wrap{
+  background:radial-gradient(ellipse at 85% 5%,rgba(144,41,194,.15),transparent 46%),#0b071a!important;
+}
+#store-screen .tc-v8-shop-wrap .tc39-toolbar input,
+#store-screen .tc-v8-shop-wrap .tc39-toolbar select{
+  border-color:rgba(185,105,255,.42)!important;
+  background:linear-gradient(145deg,#1d1031,#10091f)!important;
+  box-shadow:inset 0 1px rgba(247,208,255,.07)!important;
+}
+#lang-screen .lang-btn,
+#store-screen .tc52-category-list a{
+  box-shadow:inset 0 1px rgba(255,226,255,.09),0 12px 28px rgba(2,0,12,.22)!important;
+}
+@media(prefers-reduced-motion:reduce){
+  html body #store-screen .tc-v9-reference-stage .tc-v9-hot{transition:none!important}
+  #store-screen .product-card{transition:none!important}
+}
 </style></head>
 <body><div id="tc50-staging-banner" role="status" style="position:relative;z-index:99999;background:#122330;border-bottom:1px solid #467487;color:#c2eaff;padding:10px 18px;text-align:center;font:600 12px/1.5 system-ui,sans-serif">STAGING PREVIEW · Payments, order processing, and support notifications are not live. Do not send funds.</div>
 <a class="tc49-skip" href="#tc-shop-heading">SKIP TO PRODUCTS</a>
@@ -1658,8 +1967,9 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElement
  <label class="tc-v9-search" aria-label="Search products"><input id="tc-v9-search" type="search" autocomplete="off" placeholder="Search products..." aria-label="Search products"><span aria-hidden="true">⌕</span></label>
  <button class="tc-v9-lang-toggle" type="button" aria-expanded="true" aria-controls="tc-v9-language-menu" aria-label="Choose language" data-tc9="language"></button>
  <div class="tc-v9-menu-cover" aria-hidden="true"></div>
+ <div class="tc-v10-gloss-tiles" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
  <div class="tc-v9-language-menu" id="tc-v9-language-menu"><button type="button" data-tc9-lang="en" data-tc9-dir="ltr"><span>🇺🇸 &nbsp;English</span><small>EN</small></button><button type="button" data-tc9-lang="fa" data-tc9-dir="rtl"><span>🇮🇷 &nbsp;فارسی</span><small>FA</small></button><button type="button" data-tc9-lang="ar" data-tc9-dir="rtl"><span>🇸🇦 &nbsp;العربية</span><small>AR</small></button><button type="button" data-tc9-lang="fr" data-tc9-dir="ltr"><span>🇫🇷 &nbsp;Français</span><small>FR</small></button><button type="button" data-tc9-lang="de" data-tc9-dir="ltr"><span>🇩🇪 &nbsp;Deutsch</span><small>DE</small></button><button type="button" data-tc9-lang="es" data-tc9-dir="ltr"><span>🇪🇸 &nbsp;Español</span><small>ES</small></button><button type="button" data-tc9-lang="ro" data-tc9-dir="ltr"><span>🇷🇴 &nbsp;Română</span><small>RO</small></button><button type="button" data-tc9-lang="ru" data-tc9-dir="ltr"><span>🇷🇺 &nbsp;Русский</span><small>RU</small></button></div>
- <span class="tc-v9-cart-quantity" aria-hidden="true" id="tc-v9-cart-quantity">0</span>
+ <span class="tc-v9-cart-quantity" aria-hidden="true" id="tc-v9-cart-quantity" data-empty="true">0</span>
  <button class="tc-v9-hot" style="left:4.8%;top:54%;width:17.8%;height:7.7%" aria-label="Explore the store" type="button" data-tc9="shop"><span class="tc-v9-sr">Explore the store</span></button><button class="tc-v9-hot" style="left:23.7%;top:54%;width:16.5%;height:7.7%" aria-label="Discover TRISOCMD" type="button" data-tc9="discover"><span class="tc-v9-sr">Discover TRISOCMD</span></button><button class="tc-v9-hot" style="left:45.2%;top:19.2%;width:23.7%;height:24.8%" aria-label="Explore Fortnite Accounts" type="button" data-tc9-filter="fortnite"><span class="tc-v9-sr">Explore Fortnite Accounts</span></button><button class="tc-v9-hot" style="left:69.9%;top:19.2%;width:23.8%;height:24.8%" aria-label="Explore Gaming Gear" type="button" data-tc9-filter="gear"><span class="tc-v9-sr">Explore Gaming Gear</span></button><button class="tc-v9-hot" style="left:45.2%;top:45.5%;width:23.7%;height:23.3%" aria-label="Explore Digital Goods" type="button" data-tc9-filter="digital"><span class="tc-v9-sr">Explore Digital Goods</span></button><a class="tc-v9-hot" style="left:69.9%;top:45.5%;width:23.8%;height:23.3%" aria-label="Visit player marketplace" href="marketplace.html"><span class="tc-v9-sr">Visit player marketplace</span></a>
  <div class="tc-v9-stage-category" role="group" aria-label="Product categories">
  <button type="button" class="active" style="left:4.9%;width:15.3%" data-tc9-filter="fortnite" aria-label="Fortnite accounts category"></button>
@@ -3804,13 +4114,13 @@ function setMenu(open){st.dataset.menuOpen=String(open);menu.hidden=!open;langTr
 setMenu(true);
 st.addEventListener('click',e=>{
  const opt=e.target.closest('[data-tc9-lang]');
- if(opt){setMenu(false);if(typeof window.setLang==='function')window.setLang(opt.dataset.tc9Lang,opt.dataset.tc9Dir);return}
+ if(opt){if(typeof window.setLang==='function')window.setLang(opt.dataset.tc9Lang,opt.dataset.tc9Dir);setMenu(opt.dataset.tc9Lang==='en');return}
  const filter=e.target.closest('[data-tc9-filter]');
  if(filter){selectCategory(filter.dataset.tc9Filter);return}
  const btn=e.target.closest('[data-tc9]');
  if(!btn)return;
  switch(btn.dataset.tc9){
- case 'language':setMenu(menu.hidden);break;
+ case 'language':setMenu(true);break;
  case 'home':window.scrollTo({top:0,behavior:'smooth'});break;
  case 'shop':scrollProduct();break;
  case 'discover':scrollProduct();break;
@@ -3828,11 +4138,11 @@ search?.addEventListener('input',()=>{
  if(typeof window.tc39Filter==='function')window.tc39Filter();
 });
 search?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();scrollProduct()}});
-document.addEventListener('click',e=>{if(!st.contains(e.target))setMenu(false)});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')setMenu(false)});
+/* The reference image already paints an open language list; keep its clickable options active. */
+document.addEventListener('keydown',e=>{if(e.key==='Escape')langTrigger?.blur()});
 const syncLang=()=>{const lang=(document.documentElement.lang||'en').toLowerCase();document.body.classList.toggle('tc-v9-nonenglish',lang!=='en');};
 syncLang();new MutationObserver(syncLang).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
-if(nativeBadge&&cartBadge){const sync=()=>cartBadge.textContent=nativeBadge.textContent||'0';sync();new MutationObserver(sync).observe(nativeBadge,{childList:true,characterData:true,subtree:true})}
+if(nativeBadge&&cartBadge){const sync=()=>{const value=(nativeBadge.textContent||'0').trim();cartBadge.textContent=value;cartBadge.dataset.empty=String(value==='0')};sync();new MutationObserver(sync).observe(nativeBadge,{childList:true,characterData:true,subtree:true})}
 })();
 </script></body>
 </html>
