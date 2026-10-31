@@ -38,8 +38,17 @@ jobs:
           test -s _site/preview/index.html
           test -s _site/preview/admin/index.html
           test -s _site/preview/marketplace.html
-          grep -q 'tc-v9-reference-stage' _site/index.html
-          grep -q 'assets/trisocmd-neon-reference.webp' _site/index.html
+          # Only accept the native storefront, never the old image hotspot overlay.
+          grep -q 'class="tc-native-hero"' _site/index.html
+          grep -q 'tc-native-lang-menu' _site/index.html
+          ! grep -q 'tc-v9-reference-stage' _site/index.html
+          test -s _site/assets/trisocmd-native-v13.css
+          test -s _site/assets/trisocmd-native-v13.js
+          test -s _site/assets/triso-native-fortnite.webp
+          test -s _site/assets/triso-native-gear.webp
+          test -s _site/assets/triso-native-digital.webp
+          test -s _site/assets/triso-native-marketplace.webp
+          test -s _site/assets/triso-native-hero.webp
           grep -q 'noindex,nofollow' _site/index.html
           grep -q 'STAGING PREVIEW ONLY' _site/index.html
           grep -q 'cxtytbjvdlngahytfilr.supabase.co' _site/preview/index.html
