@@ -1870,6 +1870,52 @@ body,#store-screen{background:radial-gradient(ellipse 75% 22% at 50% 0%,#271338 
   html body #store-screen .tc-v9-reference-stage .tc-v9-hot{transition:none!important}
   #store-screen .product-card{transition:none!important}
 }
+</style><style id="tc-v11-crisp-interaction-polish">
+@media(min-width:1200px){
+  /* Crisp native filter pills replace the baked-in static filter selection.
+     Precise bounds match the reference screenshot without opaque lavender blocks. */
+  html body #store-screen .tc-v9-reference-stage .tc-v9-stage-filters > button{
+    position:absolute!important;
+    top:89.82%!important;
+    height:4.34%!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    padding:0 4px!important;
+    margin:0!important;
+    background:rgba(16,10,31,.99)!important;
+    background-image:none!important;
+    border:1px solid rgba(101,59,145,.7)!important;
+    border-radius:999px!important;
+    box-shadow:0 2px 13px rgba(0,0,0,.4),inset 0 1px rgba(236,199,255,.05)!important;
+    color:#e8d8f5!important;
+    font:600 clamp(9px,.72vw,13px)/1.1 Inter,system-ui,sans-serif!important;
+    text-shadow:none!important;
+    opacity:1!important;
+    cursor:pointer!important;
+    white-space:nowrap!important;
+    z-index:8!important;
+    transition:background .2s,border-color .2s,box-shadow .2s!important;
+  }
+  html body #store-screen .tc-v9-reference-stage .tc-v9-stage-filters > button.active{
+    color:#fff!important;
+    background:linear-gradient(110deg,#a51ce7,#db2bda)!important;
+    border-color:#e178fa!important;
+    box-shadow:0 0 17px rgba(195,50,238,.4),inset 0 1px rgba(255,228,255,.25)!important;
+  }
+  html body #store-screen .tc-v9-reference-stage .tc-v9-stage-filters > button:hover{
+    border-color:#e9a5ff!important;
+    box-shadow:0 0 18px rgba(200,69,245,.35)!important;
+  }
+  /* Display the user's search term whenever it exists, not only on focus. */
+  html body #store-screen .tc-v9-reference-stage .tc-v9-search:has(input:not(:placeholder-shown)){
+    background:rgba(16,9,32,.97)!important;
+    box-shadow:0 0 0 1px rgba(176,90,234,.75)!important;
+  }
+  html body #store-screen .tc-v9-reference-stage .tc-v9-search:has(input:not(:placeholder-shown)) input{
+    color:#f8ecff!important;
+  }
+}
 </style></head>
 <body><div id="tc50-staging-banner" role="status" style="position:relative;z-index:99999;background:#122330;border-bottom:1px solid #467487;color:#c2eaff;padding:10px 18px;text-align:center;font:600 12px/1.5 system-ui,sans-serif">STAGING PREVIEW · Payments, order processing, and support notifications are not live. Do not send funds.</div>
 <a class="tc49-skip" href="#tc-shop-heading">SKIP TO PRODUCTS</a>
@@ -1977,10 +2023,10 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElement
  <button type="button" style="left:43.3%;width:15.5%" data-tc9-filter="digital" aria-label="Digital goods category"></button>
  </div>
  <div class="tc-v9-stage-filters" role="group" aria-label="Featured products filters">
- <button type="button" class="active" style="left:53.9%;width:5.9%" data-tc9-filter="all">All</button>
- <button type="button" style="left:59.9%;width:6.0%" data-tc9-filter="fortnite">Fortnite</button>
- <button type="button" style="left:66.2%;width:7.7%" data-tc9-filter="gear">Gaming Gear</button>
- <button type="button" style="left:74.1%;width:7.0%" data-tc9-filter="digital">Digital Goods</button>
+ <button type="button" class="active" style="left:53.86%;width:4.0%" data-tc9-filter="all">All</button>
+ <button type="button" style="left:58.64%;width:4.95%" data-tc9-filter="fortnite">Fortnite</button>
+ <button type="button" style="left:64.31%;width:6.68%" data-tc9-filter="gear">Gaming Gear</button>
+ <button type="button" style="left:71.69%;width:6.39%" data-tc9-filter="digital">Digital Goods</button>
  </div>
  <button class="tc-v9-hot" style="left:81.1%;top:89.7%;width:2.8%;height:6%" type="button" data-tc9="prev" aria-label="Previous products"><span class="tc-v9-sr">Previous products</span></button>
  <button class="tc-v9-hot" style="left:83.9%;top:89.7%;width:2.8%;height:6%" type="button" data-tc9="next" aria-label="Next products"><span class="tc-v9-sr">Next products</span></button>
