@@ -18,15 +18,15 @@ class V34Tests(unittest.TestCase):
    self.assertIn(term,j)
   for page in ('index.html','marketplace.html','admin/index.html'):
    text=(ROOT/page).read_text()
-   self.assertIn('triso-notifications-v34.js?v=34',text)
+   self.assertIn('triso-notifications-v34.js?v=35',text)
    self.assertIn('triso-notifications-v34.css?v=34',text)
  def test_fixed_search_and_image(self):
   store=(ROOT/'index.html').read_text()
   market=(ROOT/'marketplace.html').read_text()
   style=(ROOT/'assets/trisocmd-native-v13.css').read_text()
-  for tag in ('tc34_store_catalog_query','tc34_store_header_query','type="search"'):
+  for tag in ('tc35_store_catalog_lookup','tc35_store_header_lookup','type="search"'):
    self.assertIn(tag,store)
-  self.assertIn('tc34_market_listing_query',market)
+  self.assertIn('tc35_market_product_lookup',market)
   self.assertIn("triso-gear-art.svg",style)
   self.assertNotIn("tc-native-promo-gear{background-image:url('triso-native-gear.webp')",style)
  def test_no_fake_paid_status(self):
