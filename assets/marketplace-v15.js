@@ -121,7 +121,8 @@ function details(p){
  let loaded=false;
  for(const [i,file] of images.entries()){
   signed(file.object_path).then(url=>{
-   if(sequence!==tc33DetailSeq||!url||S.selected?.id!==p.id)return;
+   if(sequence!==tc33DetailSeq||S.selected?.id!==p.id)return;
+   if(!url){if(!loaded)fallbackMessage('Photos unavailable — try again later');return}
    const img=make('img');img.src=url;img.alt='Photo '+(i+1);img.tabIndex=0;
    img.onerror=()=>{img.remove();if(!loaded)fallbackMessage('Photos unavailable — try again later')};
    const choose=()=>{
