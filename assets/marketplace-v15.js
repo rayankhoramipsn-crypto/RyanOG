@@ -499,8 +499,8 @@ $('open-sell').addEventListener('click',()=>dialog(S.session?.user?'sell-dialog'
 $('open-rules').addEventListener('click',()=>dialog('rules-dialog'));
 $('open-messages').addEventListener('click',()=>showChats());
 $('nav-messages').addEventListener('click',()=>showChats());
-$('tc26-thread-search').addEventListener('input',e=>{S.threadQuery=e.target.value;renderThreads()});
-$('tc26-unread-only').addEventListener('change',e=>{S.unreadOnly=e.target.checked;renderThreads()});
+$('tc26-thread-search')?.addEventListener('input',e=>{S.threadQuery=e.target.value;renderThreads()});
+$('tc26-unread-only')?.addEventListener('change',e=>{S.unreadOnly=e.target.checked;renderThreads()});
 $('seller-messages').addEventListener('click',()=>showChats());
 $('auth-signin').addEventListener('click',()=>login(false));$('auth-signup').addEventListener('click',()=>login(true));
 $('logout').addEventListener('click',logout);
