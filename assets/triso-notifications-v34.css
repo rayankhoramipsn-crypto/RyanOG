@@ -20,3 +20,6 @@
 .tc34-notice-permission{padding:9px 10px!important;min-height:36px!important;font-size:11px!important;border:1px solid #70548f!important;border-radius:9px!important;background:#312544!important;color:#efe1ff!important;cursor:pointer!important}
 .tc34-notice-help{font-size:11px;color:#c9b9dd}
 @media(max-width:700px){.tc34-notice-button{padding:8px 10px;min-height:36px}.tc34-notice-panel{position:fixed;top:68px;right:10px;left:10px;width:auto;max-width:none;max-height:78dvh}}
+
+.tc35-email-pref{display:flex;align-items:center;gap:10px;font-size:12px;line-height:1.5;color:#e5d6f6}
+.tc35-email-pref input{width:18px;height:18px;flex:none;accent-color:#a788eb}
