@@ -272,7 +272,7 @@ try{
  await orderPage.locator('#tc27-my-filter').selectOption('buyer');
  assert.equal(await orderPage.locator('#purchase-requests .tc27-request-card').count(),0);
  await orderPage.locator('#tc27-my-filter').selectOption('all');
- await orderPage.locator('#cards .item-card button').first().click();
+ await orderPage.locator('#cards .item-card').filter({hasText:'Fortnite Demo Listing'}).getByRole('button').first().click();
  await orderPage.locator('#detail-dialog[open]').waitFor();
  await orderPage.locator('#accept').check();
  orderPage.once('dialog',d=>d.accept());
