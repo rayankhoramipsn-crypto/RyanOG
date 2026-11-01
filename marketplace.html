@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="description" content="Browse TRISOCMD community marketplace gaming listings, view product photos, and message sellers securely. Listings are reviewed before publication.">
 <title>TRISOCMD | Marketplace</title>
-<link rel="stylesheet" href="assets/marketplace-v15.css?v=33">
+<link rel="stylesheet" href="assets/marketplace-v15.css?v=35">
 
 <!-- TRISOCMD brand / share-preview metadata -->
 <link rel="icon" type="image/svg+xml" href="assets/trisocmd-icon.svg">
@@ -86,7 +86,7 @@
    </aside>
    <div>
      <div class="search-row">
-       <div class="search-box"><input id="search" name="tc34_market_listing_query" type="search" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="search" aria-autocomplete="none" aria-label="Search listings" placeholder="Search accounts, games, gear..."></div>
+       <div class="search-box"><input id="search" name="tc35_market_product_lookup" type="search" readonly onfocus="this.readOnly=false" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="search" aria-autocomplete="none" aria-label="Search listings" placeholder="Search accounts, games, gear..."></div>
        <label for="sort" class="fine">Sort</label>
        <select id="sort" aria-label="Sort listings">
          <option value="new">Recommended / Newest</option>
@@ -125,6 +125,18 @@
       <select id="tc27-my-filter"><option value="all">All requests</option><option value="buyer">As buyer</option><option value="seller">As seller</option><option value="open">Open requests</option><option value="cancelled">Cancelled requests</option></select></label>
       <span id="tc27-my-count" class="fine" role="status" aria-live="polite"></span></div>
       <div id="purchase-requests" class="request-list" role="status" aria-live="polite"></div>
+ <section class="tc35-txid-box" aria-label="Transaction reference review" id="tc35-txid-section">
+ <h3>Submit a transaction ID for manual review</h3>
+ <p class="fine">Only for an existing LTC/BTC request if you already transferred funds through a separately agreed, verified process. A 64-character TXID is <strong>not payment confirmation</strong>; it will not mark an item Sold. Do not send money based on this screen.</p>
+ <form id="tc35-txid-form">
+ <label for="tc35-txid-request">Your open crypto request</label>
+ <select id="tc35-txid-request" required><option value="">Select a request</option></select>
+ <label for="tc35-txid-value">Blockchain transaction ID</label>
+ <input id="tc35-txid-value" name="tc35_txid_reference" type="text" inputmode="text" maxlength="64" minlength="64" pattern="[0-9a-fA-F]{64}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="64 hexadecimal characters" required>
+ <button type="submit" id="tc35-txid-send" class="btn secondary">Submit for review (not payment verification)</button>
+ </form>
+ <p id="tc35-txid-feedback" role="status" aria-live="polite"></p>
+ </section>
     </div>
    </section>
    <section class="safe-section">
@@ -157,7 +169,14 @@
         <p id="tc33-request-hint" class="tc33-request-hint" role="status" aria-live="polite">Tick the checkbox above to enable the request.</p>
         <label for="purchase-method">Preferred payment method (for review)</label>
         <select id="purchase-method"><option value="CONTACT_SUPPORT">Discuss with support</option><option value="LTC">Litecoin (LTC)</option><option value="BTC">Bitcoin (BTC)</option><option value="BANK">Bank transfer</option></select>
-        <button id="request-purchase" class="btn secondary block" type="button" disabled>Request purchase review · No payment</button>
+        <section class="tc35-optin-box" aria-label="Optional purchase notifications">
+  <strong>Get purchase updates faster</strong>
+  <p>For purchase progress and new messages, enable notifications. Optional — you can continue without enabling them.</p>
+  <button type="button" id="tc35-enable-device" class="btn small secondary">Enable device alerts</button>
+  <label><input type="checkbox" id="tc35-email-optin"> Email updates about my purchase requests and messages</label>
+  <p id="tc35-optin-feedback" role="status" aria-live="polite">Email delivery requires a configured sender; opting in saves your preference.</p>
+ </section>
+ <button id="request-purchase" class="btn secondary block" type="button" disabled>Request purchase review · No payment</button>
         <p id="purchase-status" class="fine tc27-purchase-feedback" role="status" aria-live="polite" aria-atomic="true"></p>
       </div>
    </div>
@@ -246,7 +265,7 @@
 <link rel="stylesheet" href="assets/triso-notifications-v34.css?v=34">
 <script src="assets/triso-auth-storage.js?v=2"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer src="assets/marketplace-v15.js?v=33"></script>
-<script defer src="assets/triso-notifications-v34.js?v=34"></script>
+<script defer src="assets/marketplace-v15.js?v=35"></script>
+<script defer src="assets/triso-notifications-v34.js?v=35"></script>
 </body>
 </html>
