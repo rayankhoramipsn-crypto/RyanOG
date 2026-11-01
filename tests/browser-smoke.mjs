@@ -113,6 +113,10 @@ try{
  await home.locator('#lang-screen.active').waitFor({timeout:12000});
  await home.evaluate(()=>setLang('en','ltr'));
  await home.locator('#tc31-panel.active').waitFor();
+ assert.equal(await home.locator('#tc-native-search').getAttribute('name'),'tc34_store_header_query');
+ assert.equal(await home.locator('#tc39-search').getAttribute('type'),'search');
+ await home.waitForFunction(()=>getComputedStyle(document.querySelector('.tc-native-promo-gear')).backgroundImage.includes('triso-gear-art.svg'));
+
  assert.equal(await home.locator('#tc31-guest:visible').count(),1,'login mode should be visible');
  assert.equal(await home.locator('#tc31-forgot-view:visible').count(),0,'forgot mode should start hidden');
  // A mocked rejected sign-in must produce an unmistakable red alert.
@@ -252,6 +256,7 @@ try{
  await market.locator('.item-card button').first().click();
  await market.locator('#detail-dialog[open]').waitFor();
  assert(await market.locator('#request-purchase').isDisabled());
+ assert.equal(await market.locator('#search').getAttribute('name'),'tc34_market_listing_query');
  assert.equal(await market.locator('#detail-dialog .purchase-action #accept').count(),1,'rules checkbox must be beside purchase request');
  assert.match(await market.locator('#tc33-request-hint').textContent(),/Tick the checkbox/);
  assert(await market.locator('#detail-placeholder').isVisible(),'missing photos must have a visible fallback');
@@ -287,8 +292,20 @@ try{
    access_token:'seller-mock',refresh_token:'seller-refresh',expires_at:Math.floor(Date.now()/1000)+3600,
    user:{id:'00000000-0000-4000-8000-000000000009',email:'seller@example.test'}
  },true));
+ await market.route(origin+'/rest/v1/market_notifications?**',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify([{
+  id:104,kind:'purchase_requested',title:'New purchase review request',listing_id:701,
+  request_id:'11111111-1111-4111-8111-111111111111',conversation_id:null,created_at:'2026-11-02T00:01:00Z'
+ }])}));
  await market.reload({waitUntil:'domcontentloaded'});
  await market.waitForFunction(()=>!document.querySelector('#seller-panel')?.classList.contains('hidden'));
+ await market.locator('.tc34-notice-button:visible').waitFor();
+ await market.locator('.tc34-notice-badge:visible').waitFor();
+ await market.locator('.tc34-notice-button').click();
+ await market.locator('.tc34-notice-link').getByText('New purchase review request').waitFor();
+ assert.match(await market.locator('.tc34-notice-list').textContent(),/Listing #701/);
+ assert.equal(await market.locator('.tc34-notice-badge:visible').count(),0,'opening bell marks notices viewed');
+ console.log('OK V34 in-site notification center (read-only mock)');
+
  await market.locator('#open-sell').click();
  await market.locator('#sell-dialog[open]').waitFor();
  await market.locator('#title').fill('Gaming headset for sale');
