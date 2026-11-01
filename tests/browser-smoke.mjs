@@ -290,7 +290,7 @@ try{
  await chatPage.locator('#tc26-unread-only').uncheck();
  await chatPage.locator('#thread-list .thread-button').filter({hasText:'Smoke headset'}).click();
  await chatPage.locator('#chat-form:not(.hidden)').waitFor();
- await chatPage.locator('#nav-unread.hidden').waitFor();
+ await chatPage.waitForFunction(()=>document.getElementById('nav-unread')?.classList.contains('hidden'));
  assert.doesNotMatch(await chatPage.title(),/^\(3\) /);
  await chatPage.locator('#chat-body').fill('I am interested in the headset.');
  await chatPage.locator('#chat-send').click();
