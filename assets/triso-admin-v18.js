@@ -4,7 +4,7 @@
 'use strict';
 const get=id=>document.getElementById(id);
 const el=(tag,text,cls)=>{const e=document.createElement(tag);if(text!=null)e.textContent=String(text);if(cls)e.className=cls;return e};
-let active=null,chatList=[],orders=[],busy=false,lastRefresh=0,chatQuery='',tc27OrderFilter='open',tc27OrderSearch='',tc27OrderBusy=false,tc27SelectedOrder=null;
+let active=null,chatList=[],orders=[],paymentClaims=[],busy=false,lastRefresh=0,chatQuery='',tc27OrderFilter='open',tc27OrderSearch='',tc27OrderBusy=false,tc27SelectedOrder=null;
 const say=(id,text)=>{const e=get(id);if(e)e.textContent=String(text||'')};
 const safeCall=async(fn)=>{if(typeof authorized==='undefined'||!authorized)throw Error('Verified admin sign-in required');return fn()};
 async function rpcV18(name,body){
@@ -70,7 +70,7 @@ async function openChat(c,focus=true){
   if(focus)box.scrollTop=box.scrollHeight;
  }catch(err){say('tc18-chat-status','Cannot read messages: '+err.message)}
 }
-const tc27ActiveStates=['requested','awaiting_payment_setup','disputed','payment_reported','payment_verified','delivery_reported'];
+const tc27ActiveStates=['requested','awaiting_payment_setup','disputed'];
 function tc27AdminFeedback(message='',kind='info'){
  const target=get('tc27-admin-order-feedback');if(!target)return;
  target.textContent=message;target.hidden=!message;target.dataset.state=kind;
@@ -91,6 +91,14 @@ function renderOrders(){
   card.append(el('small','Buyer '+o.buyer_id+' · Seller '+o.seller_id));
   if(o.buyer_note)card.append(el('p','Buyer note: '+o.buyer_note));
   if(o.admin_note)card.append(el('p','Admin note: '+o.admin_note));
+  const claim=paymentClaims.find(c=>String(c.request_id)===String(o.id));
+  if(claim){
+   const review=el('div',null,'tc27-admin-review-only');
+   review.append(el('strong','Unverified '+claim.network+' TXID · No funds confirmed'));
+   review.append(el('p',claim.txid));
+   review.append(el('small','Submitted '+new Date(claim.created_at).toLocaleString()+' · This is a claimed transaction reference, not payment evidence.'));
+   card.append(review);
+  }
   card.append(el('p','This is a review-only request, not a paid order. Do not instruct either party to transfer funds.','tc27-admin-review-only'));
   if(['requested','awaiting_payment_setup','disputed'].includes(o.status)){
    const button=el('button','Review request');button.type='button';
@@ -133,6 +141,8 @@ async function loadPurchases(){
  return safeCall(async()=>{
   try{
    orders=await api('market_purchase_requests?select=id,listing_id,listing_title,buyer_id,seller_id,price_usd,payment_method,status,buyer_note,admin_note,created_at&order=created_at.desc&limit=150');
+   try{paymentClaims=await api('market_txid_claims?select=id,request_id,network,txid,status,created_at&order=created_at.desc&limit=150')}
+   catch(err){paymentClaims=[];console.warn('Unverified TXID review list unavailable',err)}
    say('tc18-orders-status',orders.length+' requests · Payment collection and escrow are NOT active; do not tell buyers to send funds.');
    renderOrders();
   }catch(err){say('tc18-orders-status','Cannot load requests: '+err.message)}
@@ -146,7 +156,7 @@ async function refresh(){
 }
 window.tc18Refresh=refresh;
 function reset(){
- active=null;chatList=[];orders=[];chatQuery='';tc27OrderSearch='';tc27OrderFilter='open';const f=get('tc27-admin-order-filter'),q=get('tc27-admin-order-search');if(f)f.value='open';if(q)q.value='';tc27AdminFeedback('');if(searchBox)searchBox.value='';say('tc26-admin-chat-count','');
+ active=null;chatList=[];orders=[];paymentClaims=[];chatQuery='';tc27OrderSearch='';tc27OrderFilter='open';const f=get('tc27-admin-order-filter'),q=get('tc27-admin-order-search');if(f)f.value='open';if(q)q.value='';tc27AdminFeedback('');if(searchBox)searchBox.value='';say('tc26-admin-chat-count','');
  for(const id of ['tc18-chat-list','tc18-chat-messages','tc18-order-list'])get(id)?.replaceChildren();
  say('tc18-chat-status','Sign in with admin permissions to review conversations.');
  say('tc18-orders-status','Sign in with admin permissions to review purchase requests.');
