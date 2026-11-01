@@ -14,7 +14,17 @@ const money=x=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).
 const date=x=>x?new Date(x).toLocaleString(S.lang==='fa'?'fa-IR':S.lang==='ar'?'ar':'en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):'';
 const errorText=e=>e?.message||String(e||'Unknown error');
 function note(msg){$('notice').textContent=String(msg||'');if(msg&&!document.querySelector('dialog[open]'))$('notice').scrollIntoView({block:'nearest'})}
-function sellStatus(message){const e=$('sell-status');if(!e)return;e.textContent=String(message||'');if(message)e.scrollIntoView({block:'nearest',behavior:'smooth'});}
+function marketFeedback(id,message,kind='error'){
+ const e=$(id);if(!e)return;
+ e.textContent=String(message||'');
+ e.dataset.state=message?kind:'';
+ e.setAttribute('role',kind==='error'?'alert':'status');
+ e.setAttribute('aria-live',kind==='error'?'assertive':'polite');
+ if(message&&kind==='error')e.scrollIntoView({block:'nearest',behavior:'smooth'});
+}
+function sellStatus(message,kind='error'){marketFeedback('sell-status',message,kind)}
+function authStatus(message,kind='error'){marketFeedback('auth-note',message,kind)}
+function retryStatus(message,kind='error'){marketFeedback('retry-note',message,kind)}
 const utcDay=date=>new Date(date).toISOString().slice(0,10);
 function quotaDisplay(){
  const today=S.dailyCount;
@@ -63,7 +73,7 @@ async function readPhotos(ids){if(!ids.length)return;const valid=ids.map(Number)
 async function browse(){try{S.items=await rpc('market_browse')||[];await readPhotos(S.items.map(p=>p.id));renderItems()}catch(e){empty($('cards'));$('cards').append(make('div','Listings unavailable: '+errorText(e),'empty'))}}
 function details(p){S.selected=p;$('purchase-status').textContent='';$('detail-title').textContent=p.title;$('detail-platform').textContent=p.platform;$('detail-desc').textContent=p.description;$('detail-price').textContent=money(p.price);$('detail-date').textContent='Posted '+date(p.submitted_at);$('accept').checked=false;$('chat-seller').disabled=true;$('request-purchase').disabled=true;const cover=$('detail-cover'),thumbs=$('thumbs');cover.removeAttribute('src');cover.style.display='none';empty(thumbs);const images=S.photos.get(String(p.id))||[];$('detail-placeholder').classList.toggle('hidden',images.length>0);for(const [i,file] of images.entries()){signed(file.object_path).then(url=>{if(!url||S.selected?.id!==p.id)return;const img=make('img');img.src=url;img.alt='Photo '+(i+1);img.onclick=()=>{cover.src=url;cover.style.display='block'};thumbs.append(img);if(i===0){cover.src=url;cover.style.display='block'}})}dialog('detail-dialog')}
 async function contact(){if(!S.selected||!$('accept').checked)return;if(!S.session?.user){close('detail-dialog');dialog('auth-dialog');note('Sign in to contact the seller.');return}const b=$('chat-seller');b.disabled=true;try{const id=await rpc('market_start_chat',{p_listing:S.selected.id});close('detail-dialog');await showChats(id)}catch(e){note(errorText(e))}finally{b.disabled=false}}
-async function login(signup){const email=$('auth-email').value.trim(),password=$('auth-password').value;if(!email||password.length<8){$('auth-note').textContent='Enter email and a password of at least 8 characters.';return}const btn=$('auth-signin');btn.disabled=true;try{const data=await req('/auth/v1/'+(signup?'signup':'token?grant_type=password'),{method:'POST',json:{email,password}});if(!data.access_token){$('auth-note').textContent='Account created. Confirm your email to sign in.';return}saveSession(data);S.admin=await adminCheck();close('auth-dialog');sessionUI();$('auth-note').textContent='';startInbox();await Promise.allSettled([mine(),threads(),purchases()]);note('Signed in')}catch(e){$('auth-note').textContent=errorText(e)}finally{btn.disabled=false}}
+async function login(signup){const email=$('auth-email').value.trim(),password=$('auth-password').value;if(!email||password.length<8){authStatus('Enter email and a password of at least 8 characters.');return}const btn=$('auth-signin');btn.disabled=true;try{const data=await req('/auth/v1/'+(signup?'signup':'token?grant_type=password'),{method:'POST',json:{email,password}});if(!data.access_token){authStatus('Account created. Confirm your email to sign in.','success');return}saveSession(data);S.admin=await adminCheck();close('auth-dialog');sessionUI();authStatus('');startInbox();await Promise.allSettled([mine(),threads(),purchases()]);note('Signed in')}catch(e){authStatus(errorText(e))}finally{btn.disabled=false}}
 function logout(){stopPolling();stopInbox();saveSession(null);S.admin=false;S.active=null;S.threads=[];S.dailyCount=0;S.pro=false;close('chat-dialog');$('purchase-requests-wrap').classList.add('hidden');empty($('purchase-requests'));sessionUI();note('Signed out')}
 const mime={'image/jpeg':'jpg','image/png':'png','image/webp':'webp'};
 function checkFiles(files){if(!files.length)throw Error('At least one photo is required.');if(files.length>4)throw Error('Maximum four photos per listing.');for(const f of files)if(!mime[f.type]||f.size>5*1024*1024||f.size===0)throw Error('Use JPG, PNG or WebP photos under 5 MB each.')}
@@ -83,7 +93,7 @@ async function submit(e){
   const payload={p_title:$('title').value.trim(),p_platform:$('platform').value,p_description:$('description').value.trim(),p_price:Number($('price').value),p_image_url:null};
   if(payload.p_title.length<5||payload.p_description.length<20||!payload.p_platform||!Number.isFinite(payload.p_price)||payload.p_price<1)
     throw Error('Enter an item title, game/category, description (at least 20 characters), valid price and 1–4 photos.');
-  sellStatus('Saving listing and uploading '+files.length+' photo(s)…');
+  sellStatus('Saving listing and uploading '+files.length+' photo(s)…','info');
   id=await rpc('market_submit',payload);
   for(let i=0;i<files.length;i++){
     $('upload-status').textContent='Uploading photo '+(i+1)+' of '+files.length;
@@ -100,13 +110,13 @@ async function submit(e){
  }catch(e){
   const msg=errorText(e);
   const info=id?
-   'Your listing #'+id+' was saved as pending, but at least one photo could not be uploaded. Open My listings and use Add photos to finish it. Your listing still counts toward today’s limit. Error: '+msg:
+   'Listing #'+id+' is saved as pending, but the photo upload did not finish. It will NOT be approved without a photo. Use My listings → Upload required photos (or Add more photos) to complete it. This submission counts toward today’s limit. Details: '+msg:
    msg;
   sellStatus(info);
   if(id)await mine();
  }finally{b.disabled=false}
 }
-function previewFiles(){const root=$('photo-preview');empty(root);const files=Array.from($('photos').files||[]);try{checkFiles(files);$('upload-status').textContent=files.length+' image(s) selected'}catch(e){$('upload-status').textContent=e.message;return}for(const file of files){const url=URL.createObjectURL(file);const img=make('img');img.src=url;img.alt=file.name;img.onload=()=>URL.revokeObjectURL(url);root.append(img)}}
+function previewFiles(){const root=$('photo-preview');empty(root);const files=Array.from($('photos').files||[]);try{checkFiles(files);marketFeedback('upload-status',files.length+' valid image(s) selected','success')}catch(e){marketFeedback('upload-status',e.message,'error');return}for(const file of files){const url=URL.createObjectURL(file);const img=make('img');img.src=url;img.alt=file.name;img.onload=()=>URL.revokeObjectURL(url);root.append(img)}}
 async function mine(){
  if(!S.session?.user)return;
  const root=$('mine');
@@ -129,7 +139,7 @@ async function mine(){
     row.append(make('strong',p.title),make('span',p.status,'status-chip '+p.status),make('span',count+' photos','fine'));
     if(p.status==='pending'&&count<4){
       const btn=make('button',count?'Add more photos':'Upload required photos','btn small secondary');
-      btn.onclick=()=>{S.retryId=p.id;$('retry-input').value='';$('retry-note').textContent='';dialog('retry-dialog')};
+      btn.onclick=()=>{S.retryId=p.id;$('retry-input').value='';retryStatus('');dialog('retry-dialog')};
       row.append(btn);
     }
     if(p.status!=='removed'){
@@ -183,7 +193,27 @@ async function requestPurchase(){
  }catch(e){$('purchase-status').textContent='Request failed: '+errorText(e)}
  finally{btn.disabled=!$('accept').checked}
 }
-async function retry(){const files=Array.from($('retry-input').files||[]);try{checkFiles(files);const n=(S.photos.get(String(S.retryId))||[]).length;if(n+files.length>4)throw Error('Maximum four photos total.');$('retry-save').disabled=true;for(let i=0;i<files.length;i++)await uploadPhoto(S.retryId,files[i],n+i);close('retry-dialog');note('Photos saved, pending admin review.');await mine()}catch(e){$('retry-note').textContent=errorText(e)}finally{$('retry-save').disabled=false}}
+async async function retry(){
+ const files=Array.from($('retry-input').files||[]);
+ const button=$('retry-save');
+ try{
+  checkFiles(files);
+  const n=(S.photos.get(String(S.retryId))||[]).length;
+  if(n+files.length>4)throw Error('Maximum four photos total.');
+  button.disabled=true;
+  retryStatus('Uploading '+files.length+' photo(s)…','info');
+  for(let i=0;i<files.length;i++)await uploadPhoto(S.retryId,files[i],n+i);
+  close('retry-dialog');
+  retryStatus('');
+  note('Photos saved. Your listing remains pending until an administrator approves it.');
+ }catch(e){
+  retryStatus('Upload not completed: '+errorText(e),'error');
+ }finally{
+  button.disabled=false;
+  // Refresh media counts even after partial failures so retry never shows stale counts.
+  if(S.session?.user)await mine().catch(()=>{});
+ }
+}
 
 function chatFeedback(message,problem=false){
  const line=$('chat-state');
