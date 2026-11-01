@@ -83,3 +83,11 @@ h1,h2,h3,p{margin-top:0}h1,h2,h3{line-height:1.16}p{color:#c4bfd2}img{display:bl
 .request-row strong{color:#f3e8ff}
 .submission .warn{background:#512334;border-color:#99506b;color:#ffd2df}
 .submission .warn:hover{background:#6c2a45}
+
+/* V24 — seller feedback with accessible high-contrast status */
+#auth-note,#sell-status,#retry-note,#upload-status{white-space:pre-wrap;overflow-wrap:anywhere}
+#auth-note:empty,#sell-status:empty,#retry-note:empty,#upload-status:empty{display:none}
+#auth-note:not(:empty),#sell-status:not(:empty),#retry-note:not(:empty),#upload-status:not(:empty){margin:14px 0;padding:14px 16px;border:1px solid #ff7384;border-radius:12px;background:#531824;color:#ffe6eb;font-size:13px;font-weight:700;line-height:1.65;box-shadow:0 8px 24px rgba(82,10,29,.14)}
+#auth-note[data-state="error"]:not(:empty)::before,#sell-status[data-state="error"]:not(:empty)::before,#retry-note[data-state="error"]:not(:empty)::before,#upload-status[data-state="error"]:not(:empty)::before{content:"!";display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;margin-inline-end:10px;background:#ff7384;color:#2a0810;font-size:14px;font-weight:900}
+#auth-note[data-state="info"]:not(:empty),#sell-status[data-state="info"]:not(:empty),#retry-note[data-state="info"]:not(:empty),#upload-status[data-state="info"]:not(:empty){border-color:#8071aa;background:#27213c;color:#e9ddff}
+#auth-note[data-state="success"]:not(:empty),#sell-status[data-state="success"]:not(:empty),#retry-note[data-state="success"]:not(:empty),#upload-status[data-state="success"]:not(:empty){border-color:#55d49a;background:#143b2c;color:#dfffec}

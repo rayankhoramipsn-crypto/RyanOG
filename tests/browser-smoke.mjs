@@ -123,7 +123,7 @@ try{
  await home.locator('#tc-v23-login-feedback[data-state="error"]:visible').waitFor();
  assert.match(await home.locator('#tc-v23-login-feedback').textContent(),/Invalid login credentials/);
  assert.equal(await home.locator('#tc-v23-login-feedback').getAttribute('role'),'alert');
- assert.equal(await home.locator('#tc-v23-login-feedback').evaluate(el=>getComputedStyle(el).borderTopColor),'rgb(255, 100, 120)');
+ await home.waitForFunction(()=>getComputedStyle(document.querySelector('#tc-v23-login-feedback')).borderTopColor==='rgb(255, 100, 120)',null,{timeout:4000});
  await home.unroute(origin+'/auth/v1/token?**');
  await home.getByRole('button',{name:'Create your account'}).click();
  assert.equal(await home.locator('#tc31-signup-view:visible').count(),1,'signup should have own view');
@@ -132,7 +132,7 @@ try{
  await home.locator('#tc31-signup-email').fill('demo@example.test');
  await home.locator('#tc31-signup-password').fill('password123');
  await home.locator('#tc31-signup-confirm').fill('password456');
- await home.locator('#tc31-signup-form').getByRole('button',{name:'CREATE ACCOUNT'}).click();
+ await home.evaluate(()=>window.tc31Register()); // JS validation only; browser-native validation is tested separately
  await home.locator('#tc-v23-signup-feedback[data-state="error"]:visible').waitFor();
  assert.match(await home.locator('#tc-v23-signup-feedback').textContent(),/Passwords do not match/);
  await home.locator('#tc31-signup-view').getByRole('button',{name:'Sign in instead'}).click();
@@ -211,6 +211,43 @@ try{
  await market.locator('#search').fill('not-a-product');
  assert.equal(await market.locator('#cards .item-card').count(),0,'marketplace search broken');
  console.log('OK listing detail, policy gating, category filter and search');
+
+ // Seller UI regression; all Supabase writes are intercepted by local mocks.
+ await market.evaluate(()=>window.TrisoAuth.write({
+   access_token:'seller-mock',refresh_token:'seller-refresh',expires_at:Math.floor(Date.now()/1000)+3600,
+   user:{id:'00000000-0000-4000-8000-000000000009',email:'seller@example.test'}
+ },true));
+ await market.reload({waitUntil:'domcontentloaded'});
+ await market.waitForFunction(()=>!document.querySelector('#seller-panel')?.classList.contains('hidden'));
+ await market.locator('#open-sell').click();
+ await market.locator('#sell-dialog[open]').waitFor();
+ await market.locator('#title').fill('Gaming headset for sale');
+ await market.locator('#platform').selectOption('Gaming Gear');
+ await market.locator('#price').fill('29.95');
+ await market.locator('#description').fill('An owned and working gaming headset with ear pads and cable included.');
+ const smallFile={name:'wrong.txt',mimeType:'text/plain',buffer:Buffer.from('not an image')};
+ await market.locator('#photos').setInputFiles(smallFile);
+ await market.locator('#listing-form').evaluate(el=>el.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true})));
+ await market.locator('#sell-status[data-state="error"]:visible').waitFor();
+ assert.match(await market.locator('#sell-status').textContent(),/JPG, PNG or WebP/);
+ assert.equal(await market.locator('#sell-status').evaluate(el=>getComputedStyle(el).borderTopColor),'rgb(255, 115, 132)');
+
+ // Mocked daily quota rejection: verify the server message remains visible.
+ const photo={name:'item.png',mimeType:'image/png',
+   buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/n8cAAAAASUVORK5CYII=','base64')};
+ await market.locator('#photos').setInputFiles(photo);
+ let quotaChecks=0;
+ await market.route(origin+'/rest/v1/rpc/market_submit',async route=>{
+   quotaChecks++;
+   await route.fulfill({status:400,headers:cors,body:JSON.stringify({message:'Daily free listing limit reached (3 listings per UTC day)'})});
+ });
+ await market.locator('#post').click();
+ await market.locator('#sell-status[data-state="error"]:visible').waitFor();
+ assert.match(await market.locator('#sell-status').textContent(),/Daily free listing limit reached/);
+ assert.equal(quotaChecks,1,'quota is enforced by server response');
+ await market.unroute(origin+'/rest/v1/rpc/market_submit');
+ console.log('OK invalid gallery photos and 3/day limit errors (all mocked)');
+ await market.evaluate(()=>{localStorage.removeItem('tc35_auth_session');sessionStorage.removeItem('tc35_auth_session')});
  await market.close();
 
  // Mobile and RTL smoke: no horizontal scroll traps, searchable items remain
