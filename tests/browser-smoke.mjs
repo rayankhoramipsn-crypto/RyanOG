@@ -250,6 +250,46 @@ try{
  await market.evaluate(()=>{localStorage.removeItem('tc35_auth_session');sessionStorage.removeItem('tc35_auth_session')});
  await market.close();
 
+ // V27: review-only requests, duplicate prevention, ownership filters; no live writes.
+ const orderPage=await open('/marketplace.html');
+ const buyer='00000000-0000-4000-8000-000000000088';
+ const orderId='aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa';
+ const rows=[{id:'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb',listing_id:702,listing_title:'Demo Gaming Keyboard',price_usd:49.99,payment_method:'CONTACT_SUPPORT',status:'awaiting_payment_setup',buyer_id:'00000000-0000-4000-8000-000000000077',seller_id:buyer,created_at:'2026-11-01T12:00:00Z',admin_note:'Payment service has not been enabled.'}];
+ let requests=0;
+ await orderPage.route(origin+'/rest/v1/market_purchase_requests?**',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify(rows)}));
+ await orderPage.route(origin+'/rest/v1/rpc/market_request_purchase',route=>{
+  const payload=JSON.parse(route.request().postData());
+  assert.equal(payload.p_listing,701);
+  requests++;
+  if(!rows.some(x=>x.id===orderId))rows.push({id:orderId,listing_id:701,listing_title:'Fortnite Demo Listing',price_usd:19.99,payment_method:payload.p_method,status:'requested',buyer_id:buyer,seller_id:'00000000-0000-4000-8000-000000000087',created_at:'2026-11-01T12:05:00Z',admin_note:null});
+  return route.fulfill({status:200,headers:cors,body:JSON.stringify(orderId)});
+ });
+ await orderPage.evaluate(id=>window.TrisoAuth.write({access_token:'buyer-order-mock',refresh_token:'buyer-order-refresh',expires_at:Math.floor(Date.now()/1000)+3600,user:{id,email:'order-buyer@example.test'}},true),buyer);
+ await orderPage.reload({waitUntil:'domcontentloaded'});
+ await orderPage.waitForFunction(()=>document.querySelectorAll('#cards .item-card').length===2);
+ await orderPage.locator('#tc27-my-filter').selectOption('seller');
+ assert.equal(await orderPage.locator('#purchase-requests .tc27-request-card').count(),1);
+ await orderPage.locator('#tc27-my-filter').selectOption('buyer');
+ assert.equal(await orderPage.locator('#purchase-requests .tc27-request-card').count(),0);
+ await orderPage.locator('#tc27-my-filter').selectOption('all');
+ await orderPage.locator('#cards .item-card button').first().click();
+ await orderPage.locator('#detail-dialog[open]').waitFor();
+ await orderPage.locator('#accept').check();
+ orderPage.once('dialog',d=>d.accept());
+ await orderPage.locator('#request-purchase').click();
+ await orderPage.locator('#purchase-status[data-state="success"]').waitFor();
+ assert.equal(requests,1,'only one review request created');
+ assert.equal(await orderPage.locator('#request-purchase').isDisabled(),true,'repeat submission must be disabled');
+ await orderPage.locator('#request-purchase').evaluate(el=>el.click());
+ assert.equal(requests,1,'duplicate click must not create second request');
+ await orderPage.keyboard.press('Escape');
+ await orderPage.locator('#tc27-my-filter').selectOption('buyer');
+ assert.equal(await orderPage.locator('#purchase-requests .tc27-request-card').count(),1);
+ assert.match(await orderPage.locator('#purchase-requests').textContent(),/No payment, delivery confirmation or escrow is active/);
+ console.log('OK review request, duplicate guard and buyer/seller status filters (mocked)');
+ await orderPage.evaluate(()=>{localStorage.removeItem('tc35_auth_session');sessionStorage.removeItem('tc35_auth_session')});
+ await orderPage.close();
+
  // V26: exercise buyer/seller inbox filtering and retry without sending real messages.
  const chatPage=await open('/marketplace.html');
  const chatUser='00000000-0000-4000-8000-000000000091';
@@ -393,6 +433,36 @@ try{
  await admin.locator('#tc18-chat-messages').getByText('Demo inquiry only').waitFor();
  assert.equal(await admin.locator('#tc18-chat-messages textarea').count(),0,'admin conversation viewing must remain read-only');
  await admin.locator('#tc26-admin-chat-search').fill('');
+ // V27: mock admin status review; no real purchases or payouts.
+ const adminOrders=[
+ {id:'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa',listing_id:111,listing_title:'Demo headset with real photo',buyer_id:'00000000-0000-4000-8000-000000000081',seller_id:'00000000-0000-4000-8000-000000000082',price_usd:42,payment_method:'CONTACT_SUPPORT',status:'requested',created_at:'2026-11-01T13:00:00Z',buyer_note:null,admin_note:null},
+ {id:'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb',listing_id:112,listing_title:'Cancelled demo order',buyer_id:'00000000-0000-4000-8000-000000000083',seller_id:'00000000-0000-4000-8000-000000000084',price_usd:16,payment_method:'LTC',status:'cancelled',created_at:'2026-10-31T13:00:00Z',buyer_note:null,admin_note:'Cancelled'}
+ ];
+ let reviews=0;
+ await admin.route(origin+'/rest/v1/market_purchase_requests?**',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify(adminOrders)}));
+ await admin.route(origin+'/rest/v1/rpc/market_admin_update_purchase',route=>{
+  const x=JSON.parse(route.request().postData());
+  assert.equal(x.p_status,'awaiting_payment_setup');
+  assert.match(x.p_note,/not enabled/);
+  adminOrders[0].status=x.p_status;adminOrders[0].admin_note=x.p_note;reviews++;
+  return route.fulfill({status:200,headers:cors,body:'null'});
+ });
+ await admin.locator('#tc18-orders-refresh').click();
+ await admin.waitForFunction(()=>document.querySelectorAll('#tc18-order-list .tc27-admin-order-card').length===1);
+ await admin.locator('#tc27-admin-order-filter').selectOption('all');
+ assert.equal(await admin.locator('#tc18-order-list .tc27-admin-order-card').count(),2);
+ await admin.locator('#tc27-admin-order-search').fill('Cancelled demo');
+ assert.equal(await admin.locator('#tc18-order-list .tc27-admin-order-card').count(),1);
+ await admin.locator('#tc27-admin-order-search').fill('');
+ await admin.locator('#tc27-admin-order-filter').selectOption('open');
+ await admin.locator('#tc18-order-list .tc27-admin-order-card').first().getByRole('button',{name:'Review request'}).click();
+ await admin.locator('#tc27-order-dialog[open]').waitFor();
+ await admin.locator('#tc27-order-note').fill('Payment processing is not enabled; this is a review status only.');
+ await admin.locator('#tc27-order-confirm').click();
+ await admin.locator('#tc27-order-dialog').waitFor({state:'hidden'});
+ await admin.locator('#tc27-admin-order-feedback[data-state="success"]').waitFor();
+ assert.equal(reviews,1,'admin review-only RPC should be called once');
+ console.log('OK admin order review status, search and no-payment messaging (mocked)');
  console.log('OK moderator conversation search and read-only viewer (mocked)');
  await admin.locator('#listings tbody tr').first().waitFor();
  assert.equal(await admin.locator('#listings tbody tr:visible').count(),2,'pending moderation should be default filter');
