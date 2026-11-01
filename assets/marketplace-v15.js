@@ -3,7 +3,7 @@
 const API='https://cxtytbjvdlngahytfilr.supabase.co';
 const KEY='sb_publishable_AqZWjpgyZ_h6-EKwOySyGQ_0LE8bcRm';
 const $=id=>document.getElementById(id);
-const S={session:null,admin:false,items:[],photos:new Map(),signed:new Map(),category:'all',sort:'new',query:'',selected:null,threads:[],active:null,lastKey:'',timer:null,rt:null,inboxChannel:null,inboxTimer:null,inboxOwner:null,inboxBusy:null,inboxInitialized:false,inboxConnected:false,readMarks:new Map(),lang:'en',dailyCount:0,pro:false};
+const S={session:null,admin:false,items:[],photos:new Map(),signed:new Map(),category:'all',sort:'new',query:'',selected:null,threads:[],active:null,lastKey:'',timer:null,rt:null,inboxChannel:null,inboxTimer:null,inboxOwner:null,inboxBusy:null,inboxInitialized:false,inboxConnected:false,readMarks:new Map(),lang:'en',dailyCount:0,pro:false,threadQuery:'',unreadOnly:false};
 const i18n={en:{all:'All listings',fortnite:'Fortnite',roblox:'Roblox',steam:'Steam',gear:'Gaming gear',other:'Other',browse:'Explore listings',sell:'Sell an item',messages:'Messages',rules:'Marketplace rules',noresults:'No approved listings match your search.',details:'View details',contact:'Chat with seller',login:'Sign in',logout:'Sign out'},
 fa:{all:'تمام آگهی‌ها',fortnite:'فورتنایت',roblox:'روبلاکس',steam:'استیم',gear:'تجهیزات گیمینگ',other:'سایر',browse:'آگهی‌های مارکت‌پلیس',sell:'ثبت آگهی',messages:'پیام‌ها',rules:'قوانین بازار',noresults:'آگهی تأییدشده‌ای پیدا نشد.',details:'مشاهده جزئیات',contact:'چت با فروشنده',login:'ورود',logout:'خروج'},
 ar:{all:'كل الإعلانات',fortnite:'فورتنايت',roblox:'روبلوكس',steam:'ستيم',gear:'معدات الألعاب',other:'أخرى',browse:'تصفح السوق',sell:'نشر إعلان',messages:'الرسائل',rules:'قواعد السوق',noresults:'لا توجد إعلانات مطابقة.',details:'عرض التفاصيل',contact:'مراسلة البائع',login:'تسجيل الدخول',logout:'تسجيل الخروج'}};
@@ -219,6 +219,8 @@ function chatFeedback(message,problem=false){
  const line=$('chat-state');
  line.textContent=String(message||'');
  line.classList.toggle('chat-error',!!problem);
+ line.setAttribute('role',problem?'alert':'status');
+ line.setAttribute('aria-live',problem?'assertive':'polite');
 }
 function chatConnection(message,connected=false){
  const el=$('chat-connection');
@@ -227,8 +229,10 @@ function chatConnection(message,connected=false){
  el.classList.toggle('connection-fallback',!connected);
  S.inboxConnected=!!connected;
 }
+const tc26DocumentTitle=document.title;
 function updateUnreadBadges(total){
  const number=Math.max(0,Number(total)||0),label=number>99?'99+':String(number);
+ document.title=number?'('+label+') '+tc26DocumentTitle:tc26DocumentTitle;
  for(const id of ['nav-unread','hero-unread']){
    const el=$(id);
    if(!el)continue;
@@ -247,17 +251,26 @@ function clearChatView(){
 }
 function renderThreads(){
  const root=$('thread-list');empty(root);
+ const query=S.threadQuery.toLowerCase().trim();
+ const rows=S.threads.filter(row=>(!S.unreadOnly||row.unread_count>0)
+   &&(!query||[row.listing_title,row.listing_id,row.last_message_preview,row.seller_id,row.buyer_id]
+     .some(value=>String(value??'').toLowerCase().includes(query))));
+ const unread=S.threads.reduce((n,row)=>n+row.unread_count,0);
+ const summary=$('tc26-inbox-summary');
+ if(summary)summary.textContent=rows.length+' of '+S.threads.length+' conversations · '+unread+' unread message'+(unread===1?'':'s');
  const h=make('div',null,'thread-heading');
  h.append(make('h3','Your conversations'),make('span',String(S.threads.length),'thread-total'));
  root.append(h);
- if(!S.threads.length){
-  root.append(make('div','No conversations yet. Open an approved listing and choose Chat with seller to get started.','thread-empty'));
+ if(!rows.length){
+  root.append(make('div',S.threads.length?'No conversations match this filter. Clear search or turn off Unread only.':'No conversations yet. Open an approved listing and choose Chat with seller to get started.','thread-empty'));
   return;
  }
- for(const row of S.threads){
+ for(const row of rows){
   const id=String(row.id);
   const item=make('button',null,'thread-button'+(String(S.active)===id?' active':''));
-  item.type='button';item.setAttribute('aria-label','Conversation about '+(row.listing_title||'Listing #'+row.listing_id));
+  item.type='button';item.classList.toggle('tc26-has-unread',row.unread_count>0);
+  item.setAttribute('aria-label','Conversation about '+(row.listing_title||'Listing #'+row.listing_id)+(row.unread_count?' · '+row.unread_count+' unread messages':''));
+  item.setAttribute('aria-current',String(S.active)===id?'true':'false');
   const top=make('span',null,'thread-top');
   top.append(make('strong',row.listing_title||'Listing #'+row.listing_id));
   if(Number(row.unread_count)>0){
@@ -320,12 +333,14 @@ async function showChats(id=null){
     return;
    }
   }else{
-   selected=S.threads.find(c=>String(c.id)===String(S.active))||S.threads[0];
+   // Do not auto-open the first unread conversation when merely opening Inbox.
+   // Only explicit selection should mark a conversation read.
+   selected=S.threads.find(c=>String(c.id)===String(S.active))||null;
   }
   if(selected)await selectThread(selected);
   else{
    S.active=null;clearChatView();
-   chatFeedback('No conversations yet. Open a listing and choose Chat with seller.');
+   chatFeedback(S.threads.length?'Select a conversation to read and reply.':'No conversations yet. Open a listing and choose Chat with seller.');
   }
  }catch(e){chatFeedback('Could not open your inbox: '+errorText(e),true)}
 }
@@ -456,7 +471,7 @@ async function send(e){
   chatFeedback('For your security, never send passwords or recovery codes in chat.',true);return;
  }
  const id=String(S.active),btn=$('chat-send');
- btn.disabled=true;chatFeedback('Sending…');
+ btn.disabled=true;btn.textContent='Sending…';chatFeedback('Sending…');
  try{
   await rpc('market_send_message',{p_conversation:Number(id),p_body:body});
   if(String(S.active)===id){box.value='';await messages(true)}
@@ -465,7 +480,7 @@ async function send(e){
  }catch(e){
   // Keep the unsent draft so the buyer/seller can retry safely.
   chatFeedback('Message not sent. '+errorText(e),true);
- }finally{btn.disabled=false}
+ }finally{btn.disabled=false;btn.textContent='Send ↗'}
 }
 
 async function init(){
@@ -484,6 +499,8 @@ $('open-sell').addEventListener('click',()=>dialog(S.session?.user?'sell-dialog'
 $('open-rules').addEventListener('click',()=>dialog('rules-dialog'));
 $('open-messages').addEventListener('click',()=>showChats());
 $('nav-messages').addEventListener('click',()=>showChats());
+$('tc26-thread-search')?.addEventListener('input',e=>{S.threadQuery=e.target.value;renderThreads()});
+$('tc26-unread-only')?.addEventListener('change',e=>{S.unreadOnly=e.target.checked;renderThreads()});
 $('seller-messages').addEventListener('click',()=>showChats());
 $('auth-signin').addEventListener('click',()=>login(false));$('auth-signup').addEventListener('click',()=>login(true));
 $('logout').addEventListener('click',logout);

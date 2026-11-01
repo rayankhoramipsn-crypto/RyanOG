@@ -250,6 +250,60 @@ try{
  await market.evaluate(()=>{localStorage.removeItem('tc35_auth_session');sessionStorage.removeItem('tc35_auth_session')});
  await market.close();
 
+ // V26: exercise buyer/seller inbox filtering and retry without sending real messages.
+ const chatPage=await open('/marketplace.html');
+ const chatUser='00000000-0000-4000-8000-000000000091';
+ const chatRows=[
+ {id:801,listing_id:101,listing_title:'Smoke headset',seller_id:'00000000-0000-4000-8000-000000000092',buyer_id:chatUser,created_at:'2026-10-30T11:00:00Z',last_message_at:'2026-11-01T10:00:00Z',last_message_preview:'Is the headset available?',last_sender_id:'00000000-0000-4000-8000-000000000092',unread_count:3},
+ {id:802,listing_id:102,listing_title:'Smoke keyboard',seller_id:chatUser,buyer_id:'00000000-0000-4000-8000-000000000093',created_at:'2026-10-29T11:00:00Z',last_message_at:'2026-10-31T10:00:00Z',last_message_preview:'Thank you!',last_sender_id:chatUser,unread_count:0}
+ ];
+ const serverMessages=[{id:9001,sender_id:chatRows[0].seller_id,body:'Is the headset available?',created_at:'2026-11-01T10:00:00Z'}];
+ let sendAttempts=0;
+ await chatPage.route(origin+'/rest/v1/rpc/market_inbox',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify(chatRows)}));
+ await chatPage.route(origin+'/rest/v1/rpc/market_mark_read',route=>{
+   chatRows[0].unread_count=0;
+   return route.fulfill({status:200,headers:cors,body:'null'});
+ });
+ await chatPage.route(origin+'/rest/v1/market_messages?**',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify(serverMessages)}));
+ await chatPage.route(origin+'/rest/v1/rpc/market_send_message',route=>{
+   const payload=JSON.parse(route.request().postData());
+   assert.equal(payload.p_conversation,801);
+   assert.equal(payload.p_body,'I am interested in the headset.');
+   sendAttempts++;
+   if(sendAttempts===1)return route.fulfill({status:503,headers:cors,body:JSON.stringify({message:'Temporary test error'})});
+   serverMessages.push({id:9002,sender_id:chatUser,body:payload.p_body,created_at:'2026-11-01T10:02:00Z'});
+   return route.fulfill({status:200,headers:cors,body:'9002'});
+ });
+ await chatPage.evaluate(userId=>window.TrisoAuth.write({access_token:'chat-mock',refresh_token:'chat-refresh',expires_at:Math.floor(Date.now()/1000)+3600,user:{id:userId,email:'buyer@example.test'}},true),chatUser);
+ await chatPage.reload({waitUntil:'domcontentloaded'});
+ await chatPage.locator('#nav-unread:not(.hidden)').waitFor();
+ assert.equal((await chatPage.locator('#nav-unread').textContent()).trim(),'3');
+ assert.match(await chatPage.title(),/^\(3\) /);
+ await chatPage.locator('#nav-messages').click();
+ await chatPage.locator('#chat-dialog[open]').waitFor();
+ await chatPage.locator('#tc26-unread-only').check();
+ assert.equal(await chatPage.locator('#thread-list .thread-button').count(),1);
+ await chatPage.locator('#tc26-thread-search').fill('keyboard');
+ await chatPage.locator('#thread-list .thread-button').first().waitFor({state:'detached'});
+ assert.match(await chatPage.locator('#thread-list').textContent(),/No conversations match/);
+ await chatPage.locator('#tc26-thread-search').fill('');
+ await chatPage.locator('#tc26-unread-only').uncheck();
+ await chatPage.locator('#thread-list .thread-button').filter({hasText:'Smoke headset'}).click();
+ await chatPage.locator('#chat-form:not(.hidden)').waitFor();
+ await chatPage.waitForFunction(()=>document.getElementById('nav-unread')?.classList.contains('hidden'));
+ assert.doesNotMatch(await chatPage.title(),/^\(3\) /);
+ await chatPage.locator('#chat-body').fill('I am interested in the headset.');
+ await chatPage.locator('#chat-send').click();
+ await chatPage.locator('#chat-state.chat-error').waitFor();
+ assert.equal(await chatPage.locator('#chat-body').inputValue(),'I am interested in the headset.','failed send must preserve draft');
+ await chatPage.locator('#chat-send').click();
+ await chatPage.waitForFunction(()=>document.querySelector('#chat-body')?.value==='');
+ assert.equal(sendAttempts,2);
+ await chatPage.locator('#bubbles').getByText('I am interested in the headset.').waitFor();
+ console.log('OK inbox unread filter, search, read receipts and retryable sending (all mocked)');
+ await chatPage.evaluate(()=>{localStorage.removeItem('tc35_auth_session');sessionStorage.removeItem('tc35_auth_session')});
+ await chatPage.close();
+
  // Mobile and RTL smoke: no horizontal scroll traps, searchable items remain
  // reachable in both English and Persian layouts.
  const mobile=await context.newPage();
@@ -324,6 +378,22 @@ try{
  },true));
  await admin.reload({waitUntil:'domcontentloaded'});
  await admin.locator('#dashboard:not(.hidden)').waitFor({timeout:12000});
+ // Moderator chat search is read-only; fetch replies are local fixtures.
+ const adminChatRows=[
+  {id:811,listing_id:101,buyer_id:'00000000-0000-4000-8000-000000000091',seller_id:'00000000-0000-4000-8000-000000000092',created_at:'2026-10-31T10:00:00Z'},
+  {id:812,listing_id:102,buyer_id:'00000000-0000-4000-8000-000000000094',seller_id:'00000000-0000-4000-8000-000000000095',created_at:'2026-10-31T11:00:00Z'}
+ ];
+ await admin.route(origin+'/rest/v1/market_conversations?**',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify(adminChatRows)}));
+ await admin.route(origin+'/rest/v1/market_messages?**',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify([{id:991,conversation_id:811,sender_id:adminChatRows[0].buyer_id,body:'Demo inquiry only',created_at:'2026-10-31T10:02:00Z'}])}));
+ await admin.evaluate(()=>window.tc18Refresh?.());
+ await admin.waitForFunction(()=>document.querySelectorAll('#tc18-chat-list .tc18-conversation').length===2);
+ await admin.locator('#tc26-admin-chat-search').fill('811');
+ assert.equal(await admin.locator('#tc18-chat-list .tc18-conversation').count(),1);
+ await admin.locator('#tc18-chat-list .tc18-conversation').first().click();
+ await admin.locator('#tc18-chat-messages').getByText('Demo inquiry only').waitFor();
+ assert.equal(await admin.locator('#tc18-chat-messages textarea').count(),0,'admin conversation viewing must remain read-only');
+ await admin.locator('#tc26-admin-chat-search').fill('');
+ console.log('OK moderator conversation search and read-only viewer (mocked)');
  await admin.locator('#listings tbody tr').first().waitFor();
  assert.equal(await admin.locator('#listings tbody tr:visible').count(),2,'pending moderation should be default filter');
  assert.equal(await admin.locator('#listings tbody tr:visible button:disabled').count(),1,'missing-photo listing must not be approvable');

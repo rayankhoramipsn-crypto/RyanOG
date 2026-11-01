@@ -4,7 +4,7 @@
 'use strict';
 const get=id=>document.getElementById(id);
 const el=(tag,text,cls)=>{const e=document.createElement(tag);if(text!=null)e.textContent=String(text);if(cls)e.className=cls;return e};
-let active=null,chatList=[],orders=[],busy=false,lastRefresh=0;
+let active=null,chatList=[],orders=[],busy=false,lastRefresh=0,chatQuery='';
 const say=(id,text)=>{const e=get(id);if(e)e.textContent=String(text||'')};
 const safeCall=async(fn)=>{if(typeof authorized==='undefined'||!authorized)throw Error('Verified admin sign-in required');return fn()};
 async function rpcV18(name,body){
@@ -21,10 +21,14 @@ async function removeAdminListing(item){
 window.tc18RemoveListing=removeAdminListing;
 function renderChatList(){
  const box=get('tc18-chat-list');if(!box)return;box.replaceChildren();
- if(!chatList.length){box.append(el('p','No marketplace conversations yet.'));return}
- for(const c of chatList){
+ const needle=chatQuery.trim().toLowerCase();
+ const visible=chatList.filter(c=>!needle||[c.id,c.listing_id,c.seller_id,c.buyer_id].some(v=>String(v||'').toLowerCase().includes(needle)));
+ say('tc26-admin-chat-count',visible.length+' of '+chatList.length+' conversations shown');
+ if(!visible.length){box.append(el('p',chatList.length?'No conversations match this search.':'No marketplace conversations yet.','tc26-admin-empty'));return}
+ for(const c of visible){
   const card=el('button',null,'tc18-conversation'+(String(c.id)===String(active)?' active':''));
-  card.type='button';
+  card.type='button';card.classList.toggle('tc26-last-selected',String(c.id)===String(active));
+  card.setAttribute('aria-current',String(c.id)===String(active)?'true':'false');
   card.append(el('strong','#'+c.id+' · Listing #'+c.listing_id));
   card.append(el('small','Buyer '+c.buyer_id.slice(0,8)+' · Seller '+c.seller_id.slice(0,8)+' · '+new Date(c.created_at).toLocaleString()));
   card.onclick=()=>openChat(c);
@@ -113,11 +117,13 @@ async function refresh(){
 }
 window.tc18Refresh=refresh;
 function reset(){
- active=null;chatList=[];orders=[];
+ active=null;chatList=[];orders=[];chatQuery='';if(searchBox)searchBox.value='';say('tc26-admin-chat-count','');
  for(const id of ['tc18-chat-list','tc18-chat-messages','tc18-order-list'])get(id)?.replaceChildren();
  say('tc18-chat-status','Sign in with admin permissions to review conversations.');
  say('tc18-orders-status','Sign in with admin permissions to review purchase requests.');
 }
+const searchBox=get('tc26-admin-chat-search');
+if(searchBox)searchBox.addEventListener('input',event=>{chatQuery=event.target.value;renderChatList()});
 const originalLoad=window.tc18Refresh;
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&authorized&&Date.now()-lastRefresh>15000)refresh()});
 const observer=new MutationObserver(()=>{
