@@ -30,8 +30,9 @@ class LiveChatV17(unittest.TestCase):
                     self.assertEqual(parser.ids.get(id_),1,id_)
                 # Production cache versions may advance independently of preview.
                 import re
-                self.assertRegex(source, r"marketplace-v15\\.js\\?v=(18|24)")
-                self.assertRegex(source, r"marketplace-v15\\.css\\?v=(18|24)")
+                revision = "24" if path == "marketplace.html" else "18"
+                self.assertIn("marketplace-v15.js?v="+revision, source)
+                self.assertIn("marketplace-v15.css?v="+revision, source)
                 self.assertIn('type="submit">Send',source)
 
     def test_signed_in_buyer_and_seller_receive_live_updates(self):
