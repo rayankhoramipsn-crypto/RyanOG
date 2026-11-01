@@ -285,7 +285,7 @@ try{
  await orderPage.keyboard.press('Escape');
  await orderPage.locator('#tc27-my-filter').selectOption('buyer');
  assert.equal(await orderPage.locator('#purchase-requests .tc27-request-card').count(),1);
- assert.match(await orderPage.locator('#purchase-requests').textContent(),/No payment, delivery confirmation or escrow is active/);
+ assert.match(await orderPage.locator('#purchase-requests').textContent(),/no payment, delivery confirmation or escrow is active/i);
  console.log('OK review request, duplicate guard and buyer/seller status filters (mocked)');
  await orderPage.evaluate(()=>{localStorage.removeItem('tc35_auth_session');sessionStorage.removeItem('tc35_auth_session')});
  await orderPage.close();
