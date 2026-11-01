@@ -124,6 +124,24 @@ try{
  assert.equal(await home.locator('#tc31-forgot-view:visible').count(),1,'forgot password must have dedicated view');
  assert.equal(await home.locator('#tc31-guest:visible').count(),0,'forgot password must hide login');
  assert.equal(await home.locator('#tc31-signup-view:visible').count(),0,'forgot password must hide signup');
+ // Mocked email request only: no live reset email is sent.
+ let recoveryRedirect=null;
+ await home.route(origin+'/auth/v1/recover**',async route=>{
+   const target=new URL(route.request().url());
+   assert.equal(route.request().method(),'POST');
+   assert.equal(JSON.parse(route.request().postData()).email,'demo@example.test');
+   recoveryRedirect=target.searchParams.get('redirect_to');
+   await route.fulfill({status:200,headers:cors,body:'{}'});
+ });
+ await home.locator('#tc31-forgot-email').fill('demo@example.test');
+ await home.locator('#tc31-reset-button').click();
+ await home.locator('#tc31-reset-feedback').getByText('we sent a reset link',{exact:false}).waitFor();
+ assert.equal(recoveryRedirect,base+'/index.html','recovery redirect must point at callback-aware route');
+ await home.unroute(origin+'/auth/v1/recover**');
+ await home.setViewportSize({width:390,height:844});
+ assert.equal(await home.locator('#tc31-forgot-view:visible').count(),1);
+ const cardWidth=await home.locator('#tc31-forgot-view').evaluate(el=>el.getBoundingClientRect().width);
+ assert(cardWidth<=390,'forgot-password card must fit mobile viewport');
  await home.locator('#tc31-forgot-view').getByRole('button',{name:'Back to sign in'}).click();
  assert.equal(await home.locator('#tc31-guest:visible').count(),1);
  console.log('OK separate login, signup and forgot-password views');
@@ -135,7 +153,24 @@ try{
  assert.equal(await callback.locator('#tc31-signup-view:visible').count(),0,'valid recovery callback must never show signup');
  assert.equal(await callback.locator('#tc31-recovery-form:visible').count(),1,'valid recovery callback must show new password fields');
  assert.equal(new URL(callback.url()).hash,'','sensitive callback fragment should be removed');
- console.log('OK recovery callback opens dedicated reset-password UI');
+ // Verify password update UI with mocked Supabase API; never change an actual password.
+ let changed=false;
+ await callback.route(origin+'/auth/v1/user',async route=>{
+   if(route.request().method()!=='PUT')return route.fallback();
+   const request=JSON.parse(route.request().postData());
+   assert.equal(request.password,'mock-password-123');
+   changed=true;
+   await route.fulfill({status:200,headers:cors,body:'{}'});
+ });
+ await callback.route(origin+'/auth/v1/logout',async route=>route.fulfill({status:204,headers:cors,body:''}));
+ await callback.locator('#tc31-new-password').fill('mock-password-123');
+ await callback.locator('#tc31-confirm-new-password').fill('mock-password-123');
+ await callback.locator('#tc31-update-password-button').click();
+ await callback.waitForFunction(()=>document.querySelector('#tc31-panel')?.dataset.authMode==='signin');
+ assert(changed,'mock reset request was not sent');
+ assert.equal(await callback.locator('#tc31-recovery-shell:visible').count(),0,'password reset should close recovery form');
+ assert.equal(await callback.locator('#tc31-guest:visible').count(),1,'password reset should return to sign in');
+ console.log('OK verified callback and new password submission (fully mocked)');
  await callback.close();
 
  const market=await open('/marketplace.html');
