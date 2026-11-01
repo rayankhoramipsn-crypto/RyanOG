@@ -291,6 +291,63 @@ try{
  await admin.locator('#admin-auth').waitFor({state:'visible'});
  assert(await admin.locator('#dashboard.hidden').count()===1,'admin exposed without login');
  console.log('OK admin sign-in gate');
+
+ // V25 admin review tests are 100% mocked and must never write live records.
+ const moderationFixture=[
+  {id:111,title:'Demo headset with real photo',platform:'Gaming Gear',description:'Owned, complete working gaming headset with original cable.',price:42,status:'pending',seller_id:'00000000-0000-4000-8000-000000000009',submitted_at:'2026-10-31T16:00:00Z'},
+  {id:112,title:'Demo listing missing gallery',platform:'Fortnite',description:'Demo account with no seller photo for approval testing.',price:30,status:'pending',seller_id:'00000000-0000-4000-8000-000000000008',submitted_at:'2026-10-31T15:00:00Z'},
+  {id:113,title:'Previously approved demo',platform:'Steam',description:'Demo previously moderated item with clear description.',price:18,status:'approved',seller_id:'00000000-0000-4000-8000-000000000007',submitted_at:'2026-10-29T16:00:00Z'},
+  {id:114,title:'Removed old demonstration',platform:'Roblox',description:'Removed historical test listing shown with all filter.',price:11,status:'removed',seller_id:'00000000-0000-4000-8000-000000000006',submitted_at:'2026-10-28T16:00:00Z'}
+ ];
+ let mockedModerations=0;
+ await admin.route(origin+'/rest/v1/rpc/is_admin',route=>route.fulfill({status:200,headers:cors,body:'true'}));
+ await admin.route(origin+'/rest/v1/market_listings?**',async route=>{
+  if(route.request().method()==='PATCH'){
+   const payload=JSON.parse(route.request().postData());
+   const id=Number(new URL(route.request().url()).searchParams.get('id')?.replace('eq.',''));
+   const row=moderationFixture.find(x=>x.id===id);
+   assert(row&&row.status==='pending','moderation should update a pending row only');
+   assert(['approved','declined'].includes(payload.status));
+   if(payload.status==='declined')assert(payload.decline_reason.length>=5);
+   row.status=payload.status;
+   mockedModerations++;
+   return route.fulfill({status:200,headers:cors,body:JSON.stringify([row])});
+  }
+  return route.fulfill({status:200,headers:cors,body:JSON.stringify(moderationFixture)});
+ });
+ await admin.route(origin+'/rest/v1/market_listing_media?**',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify([{listing_id:111,object_path:'demo/photo.png',sort_order:0}])}));
+ await admin.route(origin+'/storage/v1/object/sign/market-gallery/**',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify({signedURL:base+'/assets/trisocmd-icon-64.png'})}));
+ await admin.evaluate(()=>window.TrisoAuth.write({
+   access_token:'admin-mock',refresh_token:'admin-refresh',
+   expires_at:Math.floor(Date.now()/1000)+3600,
+   user:{id:'00000000-0000-4000-8000-000000000099',email:'admin@example.test',app_metadata:{role:'admin'}}
+ },true));
+ await admin.reload({waitUntil:'domcontentloaded'});
+ await admin.locator('#dashboard:not(.hidden)').waitFor({timeout:12000});
+ await admin.locator('#listings tbody tr').first().waitFor();
+ assert.equal(await admin.locator('#listings tbody tr:visible').count(),2,'pending moderation should be default filter');
+ assert.equal(await admin.locator('#listings tbody tr:visible button:disabled').count(),1,'missing-photo listing must not be approvable');
+ await admin.locator('#tc25-filter').selectOption('all');
+ assert.equal(await admin.locator('#listings tbody tr:visible').count(),4,'all filter should show reviewed/removed listings');
+ await admin.locator('#tc25-search').fill('Demo listing missing gallery');
+ assert.equal(await admin.locator('#listings tbody tr:visible').count(),1,'listing search did not filter rows');
+ await admin.locator('#tc25-search').fill('');
+ await admin.locator('#tc25-filter').selectOption('pending');
+ await admin.locator('#listings tbody tr').filter({hasText:'Demo listing missing gallery'}).getByRole('button',{name:'Decline'}).click();
+ await admin.locator('#tc25-decline-dialog[open]').waitFor();
+ await admin.locator('#tc25-decline-reason').fill('Please provide actual item photographs before resubmitting.');
+ await admin.locator('#tc25-decline-confirm').click();
+ await admin.locator('#tc25-decline-dialog').waitFor({state:'hidden'});
+ await admin.locator('#tc25-action-status[data-state="success"]').waitFor();
+ assert.equal(mockedModerations,1,'admin decline must call only mocked PATCH');
+ assert.equal(await admin.locator('#listings tbody tr:visible').count(),1,'declined row should leave pending queue');
+ admin.once('dialog',d=>d.accept());
+ await admin.locator('#listings tbody tr').filter({hasText:'Demo headset with real photo'}).getByRole('button',{name:'Approve'}).click();
+ await admin.locator('#tc25-action-status[data-state="success"]').waitFor();
+ assert.equal(mockedModerations,2,'admin approval must call only mocked PATCH');
+ assert.equal(await admin.locator('#listings tbody tr:visible').count(),0,'approved row should leave pending queue');
+ console.log('OK authorized moderation queue, status filters, photo gate and decline reason (mocked)');
+ await admin.evaluate(()=>{localStorage.removeItem('tc35_auth_session');sessionStorage.removeItem('tc35_auth_session')});
  await admin.close();
 
  for(const route of ['/blog/','/videos/','/help/','/policies/','/product.html',
