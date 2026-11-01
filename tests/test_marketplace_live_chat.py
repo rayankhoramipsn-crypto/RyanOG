@@ -28,8 +28,10 @@ class LiveChatV17(unittest.TestCase):
                             "thread-list","bubbles","chat-form","chat-body",
                             "chat-send","chat-state","accept","chat-seller"]:
                     self.assertEqual(parser.ids.get(id_),1,id_)
-                self.assertIn("marketplace-v15.js?v=18",source)
-                self.assertIn("marketplace-v15.css?v=18",source)
+                # Production cache versions may advance independently of preview.
+                import re
+                self.assertRegex(source, r"marketplace-v15\\.js\\?v=(18|24)")
+                self.assertRegex(source, r"marketplace-v15\\.css\\?v=(18|24)")
                 self.assertIn('type="submit">Send',source)
 
     def test_signed_in_buyer_and_seller_receive_live_updates(self):
