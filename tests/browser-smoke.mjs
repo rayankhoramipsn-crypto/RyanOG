@@ -174,6 +174,29 @@ try{
  assert.match(await home.locator('#co-title').textContent(),/بررسی روش‌های پرداخت/);
  await home.evaluate(()=>setLang('en','ltr','navbar'));
  assert.match(await home.locator('#co-title').textContent(),/Review payment options/);
+ // V30: mock the order RPC, not a real order or payment.
+ let saveCalls=0;
+ await home.route(origin+'/rest/v1/rpc/tc42_create_order',async route=>{
+  saveCalls++;
+  await new Promise(resolve=>setTimeout(resolve,120));
+  return route.fulfill({status:200,headers:cors,body:JSON.stringify('11111111-2222-4333-8444-555555555555')});
+ });
+ await home.evaluate(()=>{
+  window.tc42AccessToken=async()=> 'mock-signed-in-token';
+  window.tc42OrderItems=[{id:901,qty:1}];
+ });
+ const saves=home.evaluate(()=>Promise.all([window.tc42SaveOrder(),window.tc42SaveOrder()]));
+ await saves;
+ assert.equal(saveCalls,1,'double click must send only one server order request');
+ assert.match(await home.locator('#tc42-order-result').textContent(),/Not paid and not confirmed/);
+ assert.equal(await home.locator('#tc42-order-result').getAttribute('data-state'),'success');
+ await home.unroute(origin+'/rest/v1/rpc/tc42_create_order');
+ await home.route(origin+'/rest/v1/rpc/tc42_create_order',route=>route.fulfill({status:503,headers:cors,body:JSON.stringify({message:'Temporary test failure'})}));
+ await home.evaluate(()=>window.tc42SaveOrder());
+ assert.equal(await home.locator('#tc42-order-result').getAttribute('data-state'),'error');
+ assert.match(await home.locator('#tc42-order-result').textContent(),/check My Orders before retrying/i);
+ await home.unroute(origin+'/rest/v1/rpc/tc42_create_order');
+ console.log('OK V30 order double-submit guard, saved-not-paid status and retry warning (mocked)');
  console.log('OK V28 manual checkout warning and EN/FA localized non-payment wording');
  await home.close();
 
