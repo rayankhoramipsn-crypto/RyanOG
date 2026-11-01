@@ -3131,9 +3131,12 @@ function checkRoute() {
     applyTranslations();
   }
 
-  // Language selection is always the first screen for regular visits.
-  // Auth callbacks are handled by the auth bootstrap after this legacy initializer.
-  showScreen('lang-screen');
+  // The older store initializer must not overwrite a password recovery callback
+  // that the Supabase auth bootstrap has already opened.
+  const authCallback=new URLSearchParams(location.hash.slice(1)).get('type')==='recovery'
+     ||new URLSearchParams(location.search).get('type')==='recovery';
+  const currentAuthMode=document.getElementById('tc31-panel')?.dataset.authMode;
+  showScreen(authCallback||currentAuthMode==='reset'||currentAuthMode==='forgot'?'tc31-panel':'lang-screen');
 
   // Pre-fetch exchange rates in the background so the first checkout is instant
   prefetchRates();
