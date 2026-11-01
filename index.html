@@ -3269,13 +3269,55 @@ function spawnParticles() {
 const url=SUPA_URL,anon=SUPA_KEY;
 const $=id=>document.getElementById(id);
 const storeKey='tc35_auth_session';
-let session=null;
-const status=t=>{const el=$('tc31-status');if(el)el.textContent=t};
+let session=null,authMode='signin';
+const status=t=>{for(const id of ['tc31-status','tc-v22-global-feedback']){const el=$(id);if(el)el.textContent=t||''}};
 async function api(path,body,token){
  const res=await fetch(url+'/auth/v1/'+path,{method:'POST',headers:{apikey:anon,'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify(body||{})});
  const d=await res.json().catch(()=>({}));if(!res.ok)throw Error(d.error_description||d.msg||d.message||d.error||'Authentication failed');return d;
 }
-function update(){const u=session?.user;const guest=$('tc31-guest'),user=$('tc31-user');if(guest)guest.style.display=u?'none':($('tc31-signup-view')?.style.display==='block'?'none':'grid');if(u&&$('tc31-signup-view'))$('tc31-signup-view').style.display='none';if(user)user.style.display=u?'block':'none';if(u){$('tc31-user-email').textContent=u.email||'Player';window.tc36LoadOrders?.();window.tc40CheckAdmin?.(session.access_token)}else{window.tc40ResetAdmin?.();const el=$('tc36-orders');if(el)el.textContent='Sign in to view orders.';}}
+function renderAccountMode(focus=false){
+ const panel=$('tc31-panel');if(!panel)return;
+ panel.dataset.authMode=authMode;
+ panel.classList.toggle('tc31-recovering',authMode==='reset');
+ const isAccount=authMode==='account';
+ $('tc31-guest').style.display=authMode==='signin'?'grid':'none';
+ $('tc31-signup-view').style.display=authMode==='signup'?'block':'none';
+ $('tc31-forgot-view').hidden=authMode!=='forgot';
+ $('tc31-recovery-shell').hidden=authMode!=='reset';
+ $('tc31-recovery-form').hidden=authMode!=='reset';
+ $('tc31-user').style.display=isAccount?'block':'none';
+ const copy=$('tc-v22-hero-copy'),title=$('tc31-panel')?.querySelector('.tc31-heading'),kicker=$('tc31-panel')?.querySelector('.tc31-kicker');
+ const labels={
+  signin:['PLAYER PORTAL / SIGN IN','YOUR SPACE.<br>YOUR GAME.','Welcome back to TRISOCMD.'],
+  signup:['PLAYER PORTAL / REGISTER','JOIN THE<br>COMMUNITY.','One account for everything TRISOCMD.'],
+  forgot:['ACCOUNT SECURITY / REQUEST','GET BACK<br>IN THE GAME.','A secure way back to your account.'],
+  reset:['ACCOUNT SECURITY / NEW PASSWORD','SECURE YOUR<br>ACCOUNT.','Almost there. Choose a new password.'],
+  account:['PLAYER PORTAL / ACCOUNT','YOUR SPACE.<br>YOUR GAME.','Your account, your gaming marketplace.']
+ };
+ const [k,h,c]=labels[authMode]||labels.signin;
+ if(kicker)kicker.textContent=k;if(title)title.innerHTML=h;if(copy)copy.textContent=c;
+ if(focus){
+  const id={signin:'tc31-email',signup:'tc31-signup-name',forgot:'tc31-forgot-email',reset:'tc31-new-password'}[authMode];
+  if(id)requestAnimationFrame(() => $(id)?.focus());
+ }
+}
+function setAuthMode(mode,focus=true){
+ authMode=mode;
+ if(mode!=='reset')$('tc-v22-recovery-feedback').textContent='';
+ renderAccountMode(focus);
+}
+function update(){
+ if(!['forgot','reset','signup'].includes(authMode))authMode=session?.user?'account':'signin';
+ renderAccountMode();
+ const u=session?.user;
+ if(u&&authMode==='account'){
+  $('tc31-user-email').textContent=u.email||'Player';
+  window.tc36LoadOrders?.();window.tc40CheckAdmin?.(session.access_token);
+ }else{
+  window.tc40ResetAdmin?.();
+  const el=$('tc36-orders');if(el&&!u)el.textContent='Sign in to view orders.';
+ }
+}
 function save(d){if(d?.access_token&&d?.refresh_token){window.TrisoAuth.write(d);session=window.TrisoAuth.read()||d;if(session?.user&&$('tc37-welcome')?.classList.contains('open'))tc37Close();}update();}
 async function refresh(){if(!session?.refresh_token)return false;try{save(await api('token?grant_type=refresh_token',{refresh_token:session.refresh_token}));return true}catch(e){const t=(e.message||'').toLowerCase();if(/invalid.refresh|refresh.token.not.found|already.used|invalid.grant/.test(t))clear();else status('Connection interrupted. Your remembered login is saved; retry when online.');return false}}
 function clear(){session=null;window.TrisoAuth.clear();update()}
@@ -3349,55 +3391,126 @@ window.tc36LoadOrders=async()=>{
  }catch(e){el.textContent=e.message}
 };
 window.tc42AccessToken=async()=>{if(session?.expires_at&&session.expires_at<Math.floor(Date.now()/1000)+90)await refresh();return session?.access_token||null};
-window.tc31ShowSignup=()=>{const email=$('tc31-email')?.value;if(email)$('tc31-signup-email').value=email;$('tc31-guest').style.display='none';$('tc31-signup-view').style.display='block';status('');$('tc31-signup-name').focus()};
-window.tc31HideSignup=()=>{$('tc31-signup-view').style.display='none';$('tc31-guest').style.display='grid';status('')};
-window.tc31Register=async()=>{try{const name=$('tc31-signup-name').value.trim(),email=$('tc31-signup-email').value.trim(),password=$('tc31-signup-password').value,confirm=$('tc31-signup-confirm').value;if(name.length<2||name.length>40)throw Error('Display name must be 2–40 characters.');if(password.length<8)throw Error('Password must contain at least 8 characters.');if(password!==confirm)throw Error('Passwords do not match.');status('Creating account…');const d=await api('signup',{email,password,data:{display_name:name}});if(d.access_token){save(d);$('tc31-signup-view').style.display='none';status('Account created. Welcome to TRISOCMD.')}else status('Account created. Check your inbox for a confirmation email, then sign in.')}catch(e){status(e.message)}};
-window.tc31Email=async mode=>{try{status('Please wait…');const email=$('tc31-email').value.trim(),password=$('tc31-password').value;if(!email||password.length<8)throw Error('Enter an email and a password of at least 8 characters.');const d=await api(mode==='login'?'token?grant_type=password':'signup',{email,password});if(d.access_token){save(d);status('Signed in. Welcome back.')}else status('If confirmation is required, check your email for a verification link.')}catch(e){status(e.message)}};
+window.tc31ShowSignup=()=>{const email=$('tc31-email')?.value;if(email)$('tc31-signup-email').value=email;status('');setAuthMode('signup')};
+window.tc31HideSignup=()=>{status('');setAuthMode(session?.user?'account':'signin')};
+window.tc31ShowForgot=()=>{const email=$('tc31-email')?.value?.trim();if(email)$('tc31-forgot-email').value=email;status('');setAuthMode('forgot')};
+window.tc31TogglePassword=(button,id)=>{const input=$(id);if(!input)return;const show=input.type==='password';input.type=show?'text':'password';button.textContent=show?'Hide':'Show';button.setAttribute('aria-pressed',String(show));button.setAttribute('aria-label',show?'Hide password':'Show password')};
+window.tc31Register=async()=>{try{const name=$('tc31-signup-name').value.trim(),email=$('tc31-signup-email').value.trim(),password=$('tc31-signup-password').value,confirm=$('tc31-signup-confirm').value;if(name.length<2||name.length>40)throw Error('Display name must be 2–40 characters.');if(password.length<8)throw Error('Password must contain at least 8 characters.');if(password!==confirm)throw Error('Passwords do not match.');status('Creating account…');const d=await api('signup',{email,password,data:{display_name:name}});if(d.access_token){setAuthMode('account',false);save(d);status('Account created. Welcome to TRISOCMD.')}else status('Account created. Check your inbox for a confirmation email, then sign in.')}catch(e){status(e.message)}};
+window.tc31Email=async mode=>{
+ const button=$('tc-v22-login-submit');
+ try{
+  status('Signing in…');
+  const input=$('tc31-email'),email=input.value.trim(),password=$('tc31-password').value;
+  if(!input.checkValidity()||password.length<8)throw Error('Enter a valid email and password (at least 8 characters).');
+  if(button)button.disabled=true;
+  const d=await api(mode==='login'?'token?grant_type=password':'signup',{email,password});
+  if(d.access_token){setAuthMode('account',false);save(d);status('Signed in successfully. Welcome back.')}
+  else status('Check your inbox for a verification link.');
+ }catch(e){status(e.message)}finally{if(button)button.disabled=false}
+};
 window.tc31Google=()=>{if(location.protocol==='file:'){status('Google sign-in needs a hosted HTTPS URL.');return}const redirect=location.origin+location.pathname;location.href=url+'/auth/v1/authorize?provider=google&redirect_to='+encodeURIComponent(redirect)};
 function recoveryFeedback(message){const el=$('tc31-reset-feedback');if(el)el.textContent=message;status(message)}
 window.tc31Reset=async()=>{
  const button=$('tc31-reset-button');
  try{
-  const emailInput=$('tc31-email'),email=emailInput.value.trim();
-  if(!email||!emailInput.checkValidity())throw Error('Enter a valid email address above first.');
+  const input=$('tc31-forgot-email'),email=input.value.trim();
+  if(!email||!input.checkValidity())throw Error('Enter a valid email address first.');
   if(location.protocol==='file:')throw Error('Open the live website to reset your password.');
   if(button)button.disabled=true;
-  recoveryFeedback('Requesting a password reset email…');
-  // Supabase expects redirect_to in the query string rather than the request body.
+  recoveryFeedback('Sending your reset link…');
+  // Keep the already-allowed production origin; the recovery callback is routed
+  // to the dedicated UI below, instead of language/signup onboarding.
   const redirect=location.origin+location.pathname;
   await api('recover?redirect_to='+encodeURIComponent(redirect),{email});
-  recoveryFeedback('If an account exists for this email, a reset link will be sent. Check your inbox and spam folder.');
- }catch(e){recoveryFeedback(e.message||'Could not request a password reset. Please try again.')}finally{if(button)button.disabled=false}
+  recoveryFeedback('If an account exists for this email, we sent a reset link. Check inbox and spam.');
+ }catch(e){recoveryFeedback(e.message||'Could not send reset email. Please try again.')}
+ finally{if(button)button.disabled=false}
 };
-window.tc31UpdatePassword=async()=>{try{if(!session?.access_token)throw Error('Recovery session missing. Request a new password reset link.');const password=$('tc31-new-password').value,confirm=$('tc31-confirm-new-password').value;if(password.length<8)throw Error('Use at least 8 characters.');if(password!==confirm)throw Error('Passwords do not match.');status('Updating password…');const res=await fetch(url+'/auth/v1/user',{method:'PUT',headers:{apikey:anon,Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:JSON.stringify({password})});const data=await res.json().catch(()=>({}));if(!res.ok)throw Error(data.msg||data.message||data.error_description||'Password update failed');$('tc31-new-password').value='';$('tc31-confirm-new-password').value='';$('tc31-recovery-form').hidden=true;$('tc31-recovery-shell').hidden=true;$('tc31-panel').classList.remove('tc31-recovering');status('Password updated successfully. You are signed in.');update()}catch(e){status(e.message)}};
-window.tc31Logout=async()=>{const token=session?.access_token;clear();try{if(token)await api('logout',{},token)}catch(e){}status('Signed out.')};
+window.tc31UpdatePassword=async()=>{
+ const button=$('tc31-update-password-button');
+ try{
+  if(authMode!=='reset'||!session?.access_token)throw Error('This reset link is no longer active. Request a new one.');
+  const password=$('tc31-new-password').value,confirm=$('tc31-confirm-new-password').value;
+  if(password.length<8)throw Error('Use a password of at least 8 characters.');
+  if(password!==confirm)throw Error('Passwords do not match.');
+  if(button)button.disabled=true;
+  status('Updating your password…');
+  const res=await fetch(url+'/auth/v1/user',{method:'PUT',headers:{apikey:anon,Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:JSON.stringify({password})});
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok)throw Error(data.msg||data.message||data.error_description||'Password update failed');
+  const token=session.access_token;
+  $('tc31-new-password').value='';$('tc31-confirm-new-password').value='';
+  session=null;window.TrisoAuth.clear();
+  setAuthMode('signin',false);
+  showScreen('tc31-panel');
+  status('Your password was changed. Sign in with your new password.');
+  // Best effort revocation of the temporary recovery session; never block the UI.
+  api('logout',{},token).catch(()=>{});
+ }catch(e){const el=$('tc-v22-recovery-feedback');if(el)el.textContent=e.message;status(e.message)}
+ finally{if(button)button.disabled=false}
+};
+window.tc31Logout=async()=>{const token=session?.access_token;authMode='signin';clear();try{if(token)await api('logout',{},token)}catch(e){}status('Signed out.')};
 async function init(){
  const keep=$('tc31-remember');
  if(keep){keep.checked=window.TrisoAuth.remembered();keep.addEventListener('change',()=>window.TrisoAuth.setRemember(keep.checked))}
- const h=new URLSearchParams(location.hash.slice(1));
- if(h.has('error')||h.has('error_code')){
-  history.replaceState(null,'',location.pathname+location.search);
-  showScreen('tc31-panel');
-  recoveryFeedback('This sign-in or recovery link is invalid or expired. Request a new password reset link.');
- }else if(h.has('access_token')){
-  const access_token=h.get('access_token'),refresh_token=h.get('refresh_token'),isRecovery=h.get('type')==='recovery';
+ const hash=new URLSearchParams(location.hash.slice(1)),query=new URLSearchParams(location.search);
+ const isRecovery=hash.get('type')==='recovery'||query.get('type')==='recovery';
+ const hasError=hash.has('error')||hash.has('error_code')||query.has('error_code');
+ const tokenHash=query.get('token_hash')||hash.get('token_hash');
+ // URL fragments contain sensitive auth tokens. Clear them before further work.
+ if(hasError){
+  history.replaceState(null,'',location.pathname);
+  setAuthMode('forgot',false);showScreen('tc31-panel');
+  status('This reset link is invalid or expired. Request a new one.');
+  return;
+ }
+ if(isRecovery || (tokenHash && query.get('type')==='recovery')){
+  setAuthMode('reset',false);showScreen('tc31-panel');
+  status('Verifying your secure reset link…');
+  try{
+   let d=null;
+   if(tokenHash){
+    d=await api('verify',{token_hash:tokenHash,type:'recovery'});
+   }else{
+    const access_token=hash.get('access_token'),refresh_token=hash.get('refresh_token');
+    if(!access_token||!refresh_token)throw Error('This reset link is incomplete. Request another email.');
+    const res=await fetch(url+'/auth/v1/user',{headers:{apikey:anon,Authorization:'Bearer '+access_token}});
+    if(!res.ok)throw Error('Reset link is expired or invalid. Request another email.');
+    const user=await res.json();
+    d={access_token,refresh_token,expires_in:Number(hash.get('expires_in'))||3600,user};
+   }
+   if(!d?.access_token||!d?.refresh_token||!d?.user)throw Error('Unable to verify reset link. Please request another.');
+   session=d;
+   // Recovery tokens are temporary; don't make this a remembered login.
+   window.TrisoAuth.write(d,false);
+   update();
+   history.replaceState(null,'',location.pathname);
+   status('Verified. Choose a new password below.');
+   requestAnimationFrame(()=>$('tc31-new-password')?.focus());
+  }catch(e){
+   history.replaceState(null,'',location.pathname);
+   session=null;window.TrisoAuth.clear();
+   setAuthMode('forgot',true);
+   status(e.message||'Reset link could not be verified. Request a new one.');
+  }
+  return;
+ }
+ if(hash.has('access_token')){
+  const access_token=hash.get('access_token'),refresh_token=hash.get('refresh_token');
   history.replaceState(null,'',location.pathname+location.search);
   try{
-   if(!refresh_token)throw Error('Incomplete authentication link. Request another email.');
+   if(!refresh_token)throw Error('Incomplete sign-in link.');
    const res=await fetch(url+'/auth/v1/user',{headers:{apikey:anon,Authorization:'Bearer '+access_token}});
-   if(!res.ok)throw Error(isRecovery?'Password reset link expired or invalid. Request another email.':'Sign-in link could not be verified.');
+   if(!res.ok)throw Error('Sign-in link could not be verified.');
    const user=await res.json();
-   save({access_token,refresh_token,expires_in:Number(h.get('expires_in'))||3600,user});
-   showScreen('tc31-panel');
-   if(isRecovery){
-    $('tc31-panel').classList.add('tc31-recovering');
-    $('tc31-recovery-shell').hidden=false;
-    $('tc31-recovery-form').hidden=false;
-    status('Choose a new password for your account.');
-    requestAnimationFrame(()=>$('tc31-new-password')?.focus());
-   }else status('Signed in successfully.');
-  }catch(e){showScreen('tc31-panel');status(e.message)}
- }else await restore();}
+   session={access_token,refresh_token,expires_in:Number(hash.get('expires_in'))||3600,user};
+   setAuthMode('account',false);save(session);showScreen('tc31-panel');
+   status('Signed in successfully.');
+  }catch(e){setAuthMode('signin',false);showScreen('tc31-panel');status(e.message)}
+  return;
+ }
+ await restore();
+}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 window.addEventListener('storage',event=>{
  if(event.key===storeKey||event.key==='tc35_remember_me'){
