@@ -12,6 +12,14 @@
 .tc18-order-card{border:1px solid #443856;border-radius:12px;padding:14px;margin:13px 0;background:#191525;overflow-wrap:anywhere}
 .tc18-order-card p,.tc18-order-card small{color:#c8bbd9}.tc18-order-controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 @media(max-width:740px){.tc18-chat-layout{grid-template-columns:1fr}.tc18-chat-list{max-height:190px}}
+</style><style id="tc26-admin-chat-style">
+.tc26-admin-toolbar{display:flex;flex-wrap:wrap;align-items:end;gap:12px;margin:16px 0}
+.tc26-admin-toolbar label{display:grid;gap:7px;flex:1 1 230px;color:#e3d5fb;font-size:13px;font-weight:700}
+.tc26-admin-toolbar input{width:100%;min-height:44px}
+.tc26-admin-toolbar button{min-height:44px}
+#tc26-admin-chat-count{font-size:12px;margin:7px 0;color:#c7b2e6}
+.tc18-conversation.tc26-last-selected{border-color:#bb93ff;box-shadow:0 0 0 1px #8b69be}
+.tc26-admin-empty{padding:15px;color:#dfcde9}
 </style><script src="../assets/triso-auth-storage.js?v=2"></script>
 <!-- TRISOCMD favicon / mobile home-screen icon -->
 <link rel="icon" type="image/svg+xml" href="../assets/trisocmd-icon.svg">
@@ -75,7 +83,10 @@
 </section><section class="tc18-admin-section" aria-label="Marketplace conversations">
 <h2>All buyer / seller conversations</h2>
 <p class="muted">Authorized administrators can review every marketplace conversation for disputes and fraud prevention. This panel is read-only; administrators cannot impersonate buyers or sellers.</p>
-<button id="tc18-chat-refresh" type="button">Refresh conversations</button>
+<div class="tc26-admin-toolbar"><label for="tc26-admin-chat-search">Find conversations
+<input id="tc26-admin-chat-search" type="search" autocomplete="off" placeholder="Search listing or participant ID"></label>
+<button id="tc18-chat-refresh" type="button">Refresh conversations</button></div>
+<p class="muted" id="tc26-admin-chat-count" role="status" aria-live="polite"></p>
 <p id="tc18-chat-status" class="muted" role="status">Loading conversations…</p>
 <div class="tc18-chat-layout"><div id="tc18-chat-list" class="tc18-chat-list"></div>
 <div class="tc18-chat-view"><h3 id="tc18-chat-heading">Select a conversation</h3>
@@ -377,4 +388,4 @@ document.addEventListener('visibilitychange',async()=>{if(document.hidden)return
 window.addEventListener('storage',e=>{if(e.key===window.TrisoAuth.key){const next=window.TrisoAuth.read();if((next?.access_token||null)!==(session?.access_token||null)){session=next;authorized=false;init()}}});
 setInterval(async()=>{if(!session?.refresh_token)return;if(session.expires_at&&session.expires_at>Math.floor(Date.now()/1000)+120)return;await refreshSession()},60000);
 init();
-</script><script src="../assets/triso-admin-v18.js?v=18"></script></body></html>
+</script><script src="../assets/triso-admin-v18.js?v=26"></script></body></html>
