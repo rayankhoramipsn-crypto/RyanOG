@@ -51,6 +51,21 @@ async function inspect(target){
     console.log('LIVE marketplace category controls present:',await filters.count());
    }
   }
+  if(target.v32){
+   // Pure UI interaction: no credentials, signup submission or password-reset email.
+   await page.evaluate(()=>setLang('en','ltr'));
+   await page.locator('#tc31-panel.active').waitFor({timeout:8000});
+   assert.equal(await page.locator('#tc31-guest:visible').count(),1);
+   await page.getByRole('button',{name:'Create your account'}).click();
+   assert.equal(await page.locator('#tc31-signup-view:visible').count(),1);
+   await page.locator('#tc31-signup-view').getByRole('button',{name:'Sign in instead'}).click();
+   assert.equal(await page.locator('#tc31-guest:visible').count(),1);
+   await page.locator('#tc31-login-form').getByRole('button',{name:'Forgot password?'}).click();
+   assert.equal(await page.locator('#tc31-forgot-view:visible').count(),1);
+   await page.locator('#tc31-forgot-view').getByRole('button',{name:'Back to sign in'}).click();
+   assert.equal(await page.locator('#tc31-guest:visible').count(),1);
+   console.log('LIVE AUTH UI: login/signup/forgot/back navigation passed; no form submission');
+  }
   await page.setViewportSize({width:390,height:844});
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+18);
   console.log('LIVE mobile overflow '+target.path+': '+overflow);
