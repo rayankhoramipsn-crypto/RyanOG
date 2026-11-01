@@ -197,6 +197,21 @@ try{
  assert.match(await home.locator('#tc42-order-result').textContent(),/check My Orders before retrying/i);
  await home.unroute(origin+'/rest/v1/rpc/tc42_create_order');
  console.log('OK V30 order double-submit guard, saved-not-paid status and retry warning (mocked)');
+ // V32: no active invoice controls or client-only payment success.
+ assert.equal(await home.locator('#tc43-invoice-btn').isDisabled(),true);
+ assert.equal(await home.locator('#tc43-verify-btn').isDisabled(),true);
+ assert.equal(await home.locator('#tc43-txid').isDisabled(),true);
+ assert.match(await home.locator('#tc43-status').textContent(),/No hosted invoice or TXID verification is active/);
+ await home.evaluate(()=>window.tc43CreateInvoice());
+ assert.match(await home.locator('#tc43-status').textContent(),/invoices are not available/i);
+ const localeCases={en:'Review payment options',fa:'بررسی روش‌های پرداخت',ar:'مراجعة خيارات الدفع',fr:'Consulter les options de paiement',de:'Zahlungsoptionen prüfen',ru:'Проверить варианты оплаты',ro:'Verifică opțiunile de plată',es:'Revisar opciones de pago'};
+ for(const [lang,label] of Object.entries(localeCases)){
+  await home.evaluate(l=>setLang(l,['fa','ar'].includes(l)?'rtl':'ltr','navbar'),lang);
+  assert.equal(await home.locator('#co-title').textContent(),label,lang+' checkout disclaimer was not translated');
+  assert.equal(await home.locator('#tc28-checkout-notice').count(),1);
+ }
+ await home.evaluate(()=>setLang('en','ltr','navbar'));
+ console.log('OK V32 disabled invoice/TXID controls and all eight checkout locales');
  console.log('OK V28 manual checkout warning and EN/FA localized non-payment wording');
  await home.close();
 
