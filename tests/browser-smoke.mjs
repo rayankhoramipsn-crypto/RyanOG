@@ -132,7 +132,7 @@ try{
  await home.locator('#tc31-signup-email').fill('demo@example.test');
  await home.locator('#tc31-signup-password').fill('password123');
  await home.locator('#tc31-signup-confirm').fill('password456');
- await home.locator('#tc31-signup-form').getByRole('button',{name:'CREATE ACCOUNT'}).click();
+ await home.evaluate(()=>window.tc31Register()); // JS validation only; browser-native validation is tested separately
  await home.locator('#tc-v23-signup-feedback[data-state="error"]:visible').waitFor();
  assert.match(await home.locator('#tc-v23-signup-feedback').textContent(),/Passwords do not match/);
  await home.locator('#tc31-signup-view').getByRole('button',{name:'Sign in instead'}).click();
