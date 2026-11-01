@@ -60,6 +60,26 @@
 .tc25-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
 .tc25-actions .tc25-danger{background:#76273e;border-color:#c35b79}
 @media(max-width:640px){#tc25-moderation-section{padding:15px}#listings .moderation-photo{width:90px;height:75px}}
+</style><style id="tc27-admin-order-style">
+.tc27-admin-toolbar{display:flex;flex-wrap:wrap;align-items:end;gap:12px;margin:18px 0}
+.tc27-admin-toolbar label{display:grid;gap:7px;flex:1 1 200px;color:#e6d9fc;font-size:13px;font-weight:700}
+.tc27-admin-toolbar button{min-height:44px}
+.tc27-admin-toolbar input,.tc27-admin-toolbar select{width:100%;min-height:44px}
+#tc27-admin-order-summary{font-size:12px;margin:10px 0}
+.tc27-admin-order-card{border:1px solid #4b3c61;border-radius:14px;background:#1b1628;padding:15px;margin:12px 0}
+.tc27-admin-order-card strong{font-size:15px;color:#fff}
+.tc27-admin-order-card .tc27-state{display:inline-flex;width:max-content;font-weight:700;font-size:12px;padding:5px 9px;border:1px solid #78634c;border-radius:999px;background:#34291f;color:#ffe0b1;margin:9px 0}
+.tc27-admin-order-card .tc27-state.cancelled{border-color:#77576c;color:#d6cbd3;background:#312330}
+.tc27-admin-order-card .tc27-state.disputed{border-color:#dd657b;color:#ffe1e7;background:#492130}
+.tc27-admin-order-card .tc27-admin-review-only{font-size:12px;color:#e5cfaf;border:1px solid #665039;border-radius:9px;padding:10px;background:#30241f}
+#tc27-order-dialog{width:min(520px,calc(100vw - 30px));background:#171522;border:1px solid #735996;color:#f5eeff;border-radius:17px;padding:23px}
+#tc27-order-dialog::backdrop{background:rgba(0,0,0,.8)}
+#tc27-order-dialog form{display:grid;gap:10px}
+#tc27-order-dialog label{font-size:13px;font-weight:700;color:#e4d6f4}
+#tc27-order-dialog select,#tc27-order-dialog textarea{width:100%}
+#tc27-order-error,#tc27-admin-order-feedback[data-state=error]{background:#541b28;color:#ffe7ed;border:1px solid #ff778d;border-radius:10px;padding:12px}
+#tc27-admin-order-feedback[data-state=success]{background:#183a2b;color:#e5ffef;border:1px solid #5bce92;border-radius:10px;padding:12px}
+#tc27-order-error[hidden],#tc27-admin-order-feedback[hidden]{display:none}
 </style></head><body><header><a href="../index.html">TRISOCMD / STORE</a><strong>TRISOCMD / ADMIN</strong><a href="../blog/">Journal</a></header><h1>Operations dashboard</h1><p id="status" role="status" aria-live="polite">Checking administrator session…</p>
 <section id="admin-auth" class="hidden" aria-labelledby="admin-auth-title">
 <h2 id="admin-auth-title">Admin sign in</h2>
@@ -96,10 +116,34 @@
 <section class="tc18-admin-section" aria-label="Marketplace purchase requests">
 <h2>Marketplace purchase requests · Review only</h2>
 <p class="muted">Requests are not payments. Money collection, escrow and seller payouts are not enabled. Do not provide payment instructions until the operational and legal workflow is configured.</p>
-<button id="tc18-orders-refresh" type="button">Refresh purchase requests</button>
-<p id="tc18-orders-status" role="status" class="muted">Loading requests…</p><div id="tc18-order-list"></div>
+<div class="tc27-admin-toolbar">
+<label for="tc27-admin-order-filter">Request status
+<select id="tc27-admin-order-filter"><option value="open">Open reviews</option><option value="all">All requests</option><option value="requested">New requests</option><option value="awaiting_payment_setup">Payment setup unavailable</option><option value="disputed">Needs review</option><option value="cancelled">Cancelled</option></select></label>
+<label for="tc27-admin-order-search">Search request
+<input id="tc27-admin-order-search" type="search" placeholder="Search item, request ID or participants"></label>
+<button id="tc18-orders-refresh" type="button">Refresh purchase requests</button></div>
+<p id="tc18-orders-status" role="status" class="muted">Loading requests…</p>
+<div id="tc27-admin-order-summary" class="muted" role="status" aria-live="polite"></div>
+<p id="tc27-admin-order-feedback" role="status" aria-live="polite" hidden></p><div id="tc18-order-list"></div>
 </section>
 <section><h2>Support tickets</h2><p id="tickets-status" class="muted"></p><div id="tickets" class="scroll"></div></section><section><h2>Orders (read-only)</h2><p class="muted">Payment confirmation and fulfillment are intentionally disabled in this dashboard.</p><p id="orders-status" class="muted"></p><div id="orders" class="scroll"></div></section><section><h2>Content management</h2><p><a href="../blog/">Open article editor →</a></p><p><a href="../videos/">Open video hub →</a></p></section></div>
+<dialog id="tc27-order-dialog" aria-labelledby="tc27-order-title">
+<form id="tc27-order-form">
+<h2 id="tc27-order-title">Review purchase request</h2>
+<p id="tc27-order-context" class="muted">This action only records review status. No money moves.</p>
+<label for="tc27-order-action">Review action</label>
+<select id="tc27-order-action" required>
+<option value="awaiting_payment_setup">Awaiting payment setup (no payment)</option>
+<option value="disputed">Needs administrator review</option>
+<option value="cancelled">Cancel request</option>
+</select>
+<label for="tc27-order-note">Admin note (max 500 characters)</label>
+<textarea id="tc27-order-note" maxlength="500" placeholder="Reason or next step visible to buyer and seller. Do not include payment instructions." rows="4"></textarea>
+<p id="tc27-order-warning" class="muted">No payment collection, escrow, payout or delivery confirmation is enabled.</p>
+<p id="tc27-order-error" role="alert" hidden></p>
+<div class="tc25-actions"><button type="button" id="tc27-order-close">Back</button><button id="tc27-order-confirm" type="submit">Save review status</button></div>
+</form>
+</dialog>
 <dialog id="tc25-decline-dialog" aria-labelledby="tc25-decline-title">
 <form id="tc25-decline-form" method="dialog">
  <h2 id="tc25-decline-title">Decline listing</h2>
@@ -388,4 +432,4 @@ document.addEventListener('visibilitychange',async()=>{if(document.hidden)return
 window.addEventListener('storage',e=>{if(e.key===window.TrisoAuth.key){const next=window.TrisoAuth.read();if((next?.access_token||null)!==(session?.access_token||null)){session=next;authorized=false;init()}}});
 setInterval(async()=>{if(!session?.refresh_token)return;if(session.expires_at&&session.expires_at>Math.floor(Date.now()/1000)+120)return;await refreshSession()},60000);
 init();
-</script><script src="../assets/triso-admin-v18.js?v=26"></script></body></html>
+</script><script src="../assets/triso-admin-v18.js?v=27"></script></body></html>
