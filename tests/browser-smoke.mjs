@@ -130,8 +130,6 @@ try{
  await home.close();
 
  const callback=await open('/index.html#access_token=smoke-token&refresh_token=smoke-refresh&type=recovery&expires_in=3600');
- await callback.waitForTimeout(850);
- console.log('DEBUG recovery state', await callback.evaluate(() => ({hash:location.hash,mode:document.getElementById('tc31-panel')?.dataset.authMode,active:[...document.querySelectorAll('.screen.active')].map(x=>x.id),recoveryHidden:document.getElementById('tc31-recovery-shell')?.hidden,recoveryDisplay:getComputedStyle(document.getElementById('tc31-recovery-shell')).display,formHidden:document.getElementById('tc31-recovery-form')?.hidden,feedback:document.getElementById('tc-v22-global-feedback')?.textContent})),pageErrors.slice(-4));
  await callback.locator('#tc31-recovery-shell:visible').waitFor({timeout:12000});
  assert.equal(await callback.locator('#tc31-guest:visible').count(),0,'valid recovery callback must never show login');
  assert.equal(await callback.locator('#tc31-signup-view:visible').count(),0,'valid recovery callback must never show signup');
