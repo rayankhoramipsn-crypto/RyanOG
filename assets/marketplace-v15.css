@@ -137,3 +137,55 @@ h1,h2,h3,p{margin-top:0}h1,h2,h3{line-height:1.16}p{color:#c4bfd2}img{display:bl
 .tc27-purchase-feedback[data-state="error"]{border:1px solid #ff788b;background:#4e1e2b;color:#ffe6ec;font-weight:700}
 .tc27-purchase-feedback[data-state="success"]{border:1px solid #58cd90;background:#1b3c2c;color:#dbffe9;font-weight:700}
 .tc27-purchase-feedback[data-state="info"]{border:1px solid #8c78b0;background:#2b2442;color:#eee5ff}
+
+/* V33 — stable, accessible listing detail / review request modal */
+body:has(#detail-dialog[open]){overflow:hidden}
+#detail-dialog{width:min(960px,calc(100vw - 28px));max-height:min(86dvh,850px);overflow:hidden;scroll-behavior:auto}
+#detail-dialog[open]{display:flex;flex-direction:column}
+#detail-dialog .dialog-header{position:relative;top:auto;flex:0 0 auto;z-index:2}
+#detail-dialog .dialog-content{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;scroll-behavior:auto;scrollbar-gutter:stable;padding:22px}
+#detail-dialog .detail-grid{grid-template-columns:minmax(0,.92fr) minmax(0,1fr);gap:20px;align-items:start}
+#detail-dialog .tc33-media-column{position:sticky;top:0;min-width:0}
+#detail-dialog .tc33-media-stage{position:relative;min-height:280px;border-radius:15px;overflow:hidden;background:linear-gradient(145deg,#29203d,#130f1e);border:1px solid #4b3b62}
+#detail-dialog .detail-photo{display:none;width:100%;height:300px;border-radius:0;object-fit:contain;background:#110e19}
+#detail-dialog .tc33-photo-fallback{min-height:300px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:8px;text-align:center;padding:20px;color:#d7c6ed}
+#detail-dialog .tc33-photo-fallback strong{font-size:17px}
+#detail-dialog .tc33-photo-fallback span:last-child{font-size:12px;color:#a99abb}
+#detail-dialog .tc33-image-icon{font-size:45px;color:#a78ad7;line-height:1}
+#detail-dialog .tc33-photo-fallback.hidden{display:none}
+#detail-dialog .detail-gallery{flex-wrap:wrap}
+#detail-dialog .detail-gallery img{width:68px;height:60px;flex:0 0 auto;object-fit:cover;cursor:pointer}
+#detail-dialog .detail-gallery img:focus-visible{outline:2px solid #d1b6ff;outline-offset:3px}
+#detail-dialog .tc33-detail-column{min-width:0}
+#detail-dialog .tc33-detail-column>h2{overflow-wrap:anywhere;margin:9px 0}
+#detail-dialog .tc33-terms{margin:12px 0 16px;background:#241c33;border:1px solid #554168;border-radius:12px;padding:12px}
+#detail-dialog .tc33-terms summary{cursor:pointer;font-size:13px;font-weight:750;color:#e8d6ff}
+#detail-dialog .tc33-terms summary span{float:right}
+#detail-dialog .tc33-terms p{font-size:12px;line-height:1.75;color:#c5b9d9;margin:10px 0 0}
+#detail-dialog .tc33-terms a,#detail-dialog .tc33-consent a{color:#dec6ff;text-decoration:underline}
+#detail-dialog .purchase-action{margin-top:15px;padding:15px}
+#detail-dialog .purchase-action>p.fine{font-size:12px;line-height:1.6}
+#detail-dialog .tc33-consent{margin:13px 0 0;display:flex;align-items:flex-start;gap:11px;padding:13px;border:1px solid #6e5986;border-radius:11px;background:#2b203b;cursor:pointer;color:#eee0ff}
+#detail-dialog .tc33-consent input{width:21px;height:21px;min-height:21px;accent-color:#a788eb;margin:1px 0 0;flex:none;cursor:pointer}
+#detail-dialog .tc33-consent span{font-size:12px;line-height:1.7;min-width:0;overflow-wrap:anywhere}
+#detail-dialog .tc33-request-hint{font-size:12px;line-height:1.5;margin:8px 0 12px;color:#dec6ff}
+#detail-dialog .tc33-request-hint[data-state="ready"]{color:#b2eccb}
+#detail-dialog .tc33-request-hint[data-state="blocked"]{color:#e2baca}
+#detail-dialog #request-purchase:disabled{opacity:.65;cursor:not-allowed}
+#detail-dialog #chat-seller:disabled{opacity:.65;cursor:not-allowed}
+@media(max-width:750px){
+ #detail-dialog{max-height:92dvh}
+ #detail-dialog .dialog-content{padding:14px}
+ #detail-dialog .detail-grid{grid-template-columns:minmax(0,1fr);gap:14px}
+ #detail-dialog .tc33-media-column{position:relative;top:auto}
+ #detail-dialog .tc33-media-stage{min-height:190px}
+ #detail-dialog .detail-photo{height:210px}
+ #detail-dialog .tc33-photo-fallback{min-height:210px}
+ #detail-dialog .purchase-action{padding:13px}
+}
+@media(max-width:450px){
+ #detail-dialog .dialog-header{padding:12px 14px}
+ #detail-dialog .dialog-header h2{font-size:17px}
+ #detail-dialog .detail-photo{height:180px}
+ #detail-dialog .tc33-photo-fallback{min-height:180px}
+}

@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="description" content="Browse TRISOCMD community marketplace gaming listings, view product photos, and message sellers securely. Listings are reviewed before publication.">
 <title>TRISOCMD | Marketplace</title>
-<link rel="stylesheet" href="assets/marketplace-v15.css?v=27">
+<link rel="stylesheet" href="assets/marketplace-v15.css?v=33">
 
 <!-- TRISOCMD brand / share-preview metadata -->
 <link rel="icon" type="image/svg+xml" href="assets/trisocmd-icon.svg">
@@ -141,15 +141,20 @@
  <div class="dialog-header"><h2>Listing details</h2><button class="close" type="button" onclick="document.getElementById('detail-dialog').close()" aria-label="Close">✕</button></div>
  <div class="dialog-content">
   <div class="detail-grid">
-   <div><img id="detail-cover" class="detail-photo" alt="Listing photo"><div id="detail-placeholder" class="item-cover">No gallery photo</div><div id="thumbs" class="detail-gallery"></div></div>
-   <div><span id="detail-platform" class="eyebrow"></span><h2 id="detail-title"></h2><span class="fine" id="detail-date"></span><div class="detail-price" id="detail-price"></div>
+   <div class="tc33-media-column"><div class="tc33-media-stage"><img id="detail-cover" class="detail-photo" alt="Listing photo"><div id="detail-placeholder" class="tc33-photo-fallback" role="status"><span class="tc33-image-icon" aria-hidden="true">◇</span><strong>Listing gallery</strong><span class="tc33-fallback-message">Image not available yet</span></div></div><div id="thumbs" class="detail-gallery" aria-label="Listing photos"></div></div>
+   <div class="tc33-detail-column"><span id="detail-platform" class="eyebrow"></span><h2 id="detail-title"></h2><span class="fine" id="detail-date"></span><div class="detail-price" id="detail-price"></div>
       <p id="detail-desc"></p>
       <div class="secure-info">⚑ Only administrator-approved listings appear publicly. Approval does not guarantee ownership, authenticity, delivery or safety. TRISOCMD does not currently accept or hold marketplace payments.</div>
-      <label class="policy-accept"><input id="accept" type="checkbox" required><span>I have read the <a href="#" onclick="event.preventDefault();document.getElementById('rules-dialog').showModal()">marketplace rules</a>. I understand that payments to sellers directly are not permitted for marketplace-managed sales; any future payment would go to the officially configured marketplace recipient, and only verified completion would permit a seller payout. The marketplace currently does not process, hold or protect funds, so I will not send money or account credentials.</span></label>
+      <details class="tc33-terms">
+        <summary>How purchase reviews work <span aria-hidden="true">⌄</span></summary>
+        <p>Administrator approval does not guarantee that a listing is authentic, owned or deliverable. This marketplace does not currently collect, hold or protect customer funds. Payments to sellers directly are not permitted for marketplace-managed sales. The request is for review only: no payment, escrow or seller payout is initiated. Never send money, passwords or account credentials in chat. Read the <a href="#" onclick="event.preventDefault();document.getElementById('rules-dialog').showModal()">marketplace rules</a> before requesting a review.</p>
+      </details>
       <button id="chat-seller" class="btn primary block" type="button" style="margin-top:13px" disabled data-t="contact">Chat with seller</button>
       <div class="purchase-action">
         <h3>Request to purchase</h3>
         <p class="fine">If a payment service is activated later, buyers pay the marketplace administrator, not the seller. Seller payout would follow verification, confirmed delivery and any applicable dispute process. Until then, this creates a request only; no money moves.</p>
+        <label class="policy-accept tc33-consent"><input id="accept" type="checkbox" required><span>I've read the <a href="#" onclick="event.preventDefault();document.getElementById('rules-dialog').showModal()">marketplace rules</a> and understand this is a <strong>review request only</strong>. No payment, escrow, or delivery guarantee is provided.</span></label>
+        <p id="tc33-request-hint" class="tc33-request-hint" role="status" aria-live="polite">Tick the checkbox above to enable the request.</p>
         <label for="purchase-method">Preferred payment method (for review)</label>
         <select id="purchase-method"><option value="CONTACT_SUPPORT">Discuss with support</option><option value="LTC">Litecoin (LTC)</option><option value="BTC">Bitcoin (BTC)</option><option value="BANK">Bank transfer</option></select>
         <button id="request-purchase" class="btn secondary block" type="button" disabled>Request purchase review · No payment</button>
@@ -240,6 +245,6 @@
 </dialog>
 <script src="assets/triso-auth-storage.js?v=2"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer src="assets/marketplace-v15.js?v=27"></script>
+<script defer src="assets/marketplace-v15.js?v=33"></script>
 </body>
 </html>
