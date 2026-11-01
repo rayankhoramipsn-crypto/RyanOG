@@ -3,7 +3,7 @@
 const API='https://cxtytbjvdlngahytfilr.supabase.co';
 const KEY='sb_publishable_AqZWjpgyZ_h6-EKwOySyGQ_0LE8bcRm';
 const $=id=>document.getElementById(id);
-const S={session:null,admin:false,items:[],photos:new Map(),signed:new Map(),category:'all',sort:'new',query:'',selected:null,threads:[],active:null,lastKey:'',timer:null,rt:null,inboxChannel:null,inboxTimer:null,inboxOwner:null,inboxBusy:null,inboxInitialized:false,inboxConnected:false,readMarks:new Map(),lang:'en',dailyCount:0,pro:false,threadQuery:'',unreadOnly:false,purchaseRows:[],purchaseBusy:false,purchaseFilter:'all'};
+const S={session:null,admin:false,items:[],photos:new Map(),signed:new Map(),category:'all',sort:'new',query:'',selected:null,threads:[],active:null,lastKey:'',timer:null,rt:null,inboxChannel:null,inboxTimer:null,inboxOwner:null,inboxBusy:null,inboxInitialized:false,inboxConnected:false,readMarks:new Map(),lang:'en',dailyCount:0,pro:false,threadQuery:'',unreadOnly:false,purchaseRows:[],txidClaims:[],purchaseBusy:false,purchaseFilter:'all'};
 const i18n={en:{all:'All listings',fortnite:'Fortnite',roblox:'Roblox',steam:'Steam',gear:'Gaming gear',other:'Other',browse:'Explore listings',sell:'Sell an item',messages:'Messages',rules:'Marketplace rules',noresults:'No approved listings match your search.',details:'View details',contact:'Chat with seller',login:'Sign in',logout:'Sign out'},
 fa:{all:'تمام آگهی‌ها',fortnite:'فورتنایت',roblox:'روبلاکس',steam:'استیم',gear:'تجهیزات گیمینگ',other:'سایر',browse:'آگهی‌های مارکت‌پلیس',sell:'ثبت آگهی',messages:'پیام‌ها',rules:'قوانین بازار',noresults:'آگهی تأییدشده‌ای پیدا نشد.',details:'مشاهده جزئیات',contact:'چت با فروشنده',login:'ورود',logout:'خروج'},
 ar:{all:'كل الإعلانات',fortnite:'فورتنايت',roblox:'روبلوكس',steam:'ستيم',gear:'معدات الألعاب',other:'أخرى',browse:'تصفح السوق',sell:'نشر إعلان',messages:'الرسائل',rules:'قواعد السوق',noresults:'لا توجد إعلانات مطابقة.',details:'عرض التفاصيل',contact:'مراسلة البائع',login:'تسجيل الدخول',logout:'تسجيل الخروج'}};
@@ -244,7 +244,8 @@ function tc35TxidOptions(){
  const emptyChoice=make('option','Choose a crypto request');emptyChoice.value='';select.append(emptyChoice);
  const owner=S.session?.user?.id;
  for(const req of S.purchaseRows.filter(r=>r.buyer_id===owner&&['LTC','BTC'].includes(r.payment_method)
-    &&['requested','awaiting_payment_setup','disputed'].includes(r.status))){
+    &&['requested','awaiting_payment_setup','disputed'].includes(r.status)
+    &&!S.txidClaims.some(c=>c.request_id===r.id))){
   const option=make('option','#'+String(req.id).slice(0,8)+' · '+req.listing_title+' · '+req.payment_method);
   option.value=req.id;select.append(option);
  }
@@ -260,6 +261,7 @@ async function tc35SubmitTxid(e){
  button.disabled=true;out.textContent='Submitting transaction reference…';
  try{
   await rpc('market_submit_txid',{p_request:id,p_txid:reference});
+  await purchases();
   out.textContent='Reference received for manual review. No payment was verified, no item was sold.';
   $('tc35-txid-value').value='';
  }catch(error){out.textContent='Reference not accepted: '+errorText(error)}
@@ -288,6 +290,8 @@ function tc27RenderPurchases(){
   card.append(make('span',state.replaceAll('_',' '),'tc27-request-tag '+state));
   card.append(make('span','Request #'+p.id+' · Listing #'+p.listing_id+' · Preferred: '+p.payment_method+' · '+date(p.created_at),'tc27-request-meta'));
   if(p.admin_note)card.append(make('p','Administrator note: '+p.admin_note,'fine'));
+  const claim=S.txidClaims.find(c=>String(c.request_id)===String(p.id));
+  if(claim)card.append(make('div','TXID submitted ('+claim.network+') · Unverified. Listing is NOT sold.','tc27-request-warning'));
   card.append(make('div','Review only — no payment, delivery confirmation or escrow is active.','tc27-request-warning'));
   root.append(card);
  }
@@ -300,7 +304,11 @@ async function purchases(){
   const rows=await req('/rest/v1/market_purchase_requests?select=id,listing_id,listing_title,price_usd,payment_method,status,buyer_id,seller_id,created_at,admin_note&order=created_at.desc&limit=100');
   if(S.session?.user?.id!==owner)return;
   if(!Array.isArray(rows))throw Error('Unexpected request list from server');
-  S.purchaseRows=rows;tc27RenderPurchases();tc35TxidOptions();
+  S.purchaseRows=rows;
+  try{
+   S.txidClaims=await req('/rest/v1/market_txid_claims?select=id,request_id,network,status,created_at&order=created_at.desc&limit=100');
+  }catch{S.txidClaims=[]}
+  tc27RenderPurchases();tc35TxidOptions();
   if(S.selected)tc27UpdatePurchaseButton();
  }catch(e){$('purchase-requests').textContent='Purchase requests unavailable: '+errorText(e)}
 }
