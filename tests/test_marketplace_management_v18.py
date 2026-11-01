@@ -54,7 +54,7 @@ class MarketplaceV18(unittest.TestCase):
     for id_ in ("tc18-chat-list","tc18-chat-messages","tc18-chat-refresh",
                 "tc18-order-list","tc18-orders-refresh"):
      self.assertEqual(parser.ids.get(id_),1,id_)
-    revision="26" if path=="admin/index.html" else "18"
+    revision="27" if path=="admin/index.html" else "18"
     self.assertIn("triso-admin-v18.js?v="+revision,html)
     self.assertIn("window.tc18RemoveListing",html)
  def test_migration_enforces_roles_and_no_fake_escrow(self):
