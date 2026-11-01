@@ -113,9 +113,12 @@ try{
  await home.locator('#lang-screen.active').waitFor({timeout:12000});
  await home.evaluate(()=>setLang('en','ltr'));
  await home.locator('#tc31-panel.active').waitFor();
- assert.equal(await home.locator('#tc-native-search').getAttribute('name'),'tc34_store_header_query');
+ assert.equal(await home.locator('#tc-native-search').getAttribute('name'),'tc35_store_header_lookup');
  assert.equal(await home.locator('#tc39-search').getAttribute('type'),'search');
  await home.waitForFunction(()=>getComputedStyle(document.querySelector('.tc-native-promo-gear')).backgroundImage.includes('triso-gear-art.svg'));
+ assert.equal(await home.locator('#tc39-search').getAttribute('readonly'),'','catalog search must initially reject autofill');
+ assert.equal(await home.locator('#tc-native-search').getAttribute('readonly'),'','header search must initially reject autofill');
+
 
  assert.equal(await home.locator('#tc31-guest:visible').count(),1,'login mode should be visible');
  assert.equal(await home.locator('#tc31-forgot-view:visible').count(),0,'forgot mode should start hidden');
@@ -256,7 +259,12 @@ try{
  await market.locator('.item-card button').first().click();
  await market.locator('#detail-dialog[open]').waitFor();
  assert(await market.locator('#request-purchase').isDisabled());
- assert.equal(await market.locator('#search').getAttribute('name'),'tc34_market_listing_query');
+ assert.equal(await market.locator('#search').getAttribute('name'),'tc35_market_product_lookup');
+ assert.equal(await market.locator('#search').getAttribute('readonly'),'','market search must reject autofill until focused');
+ assert.equal(await market.locator('#tc35-email-optin').count(),1);
+ assert.match(await market.locator('.tc35-optin-box').textContent(),/Get purchase updates faster/);
+ assert.equal(await market.locator('#tc35-email-optin').isDisabled(),true,'email opt-in needs signed-in user');
+
  assert.equal(await market.locator('#detail-dialog .purchase-action #accept').count(),1,'rules checkbox must be beside purchase request');
  assert.match(await market.locator('#tc33-request-hint').textContent(),/Tick the checkbox/);
  assert(await market.locator('#detail-placeholder').isVisible(),'missing photos must have a visible fallback');
@@ -361,6 +369,18 @@ try{
  const orderId='aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa';
  const rows=[{id:'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb',listing_id:702,listing_title:'Demo Gaming Keyboard',price_usd:49.99,payment_method:'CONTACT_SUPPORT',status:'awaiting_payment_setup',buyer_id:'00000000-0000-4000-8000-000000000077',seller_id:buyer,created_at:'2026-11-01T12:00:00Z',admin_note:'Payment service has not been enabled.'}];
  let requests=0;
+ let claimed=[];
+ await orderPage.route(origin+'/rest/v1/market_txid_claims?**',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify(claimed)}));
+ let txids=0;
+ await orderPage.route(origin+'/rest/v1/rpc/market_submit_txid',route=>{
+  const payload=JSON.parse(route.request().postData());
+  assert.equal(payload.p_request,orderId);
+  assert.match(payload.p_txid,/^[0-9a-f]{64}$/);
+  txids++;
+  if(claimed.some(c=>c.txid===payload.p_txid))return route.fulfill({status:409,headers:cors,body:JSON.stringify({message:'TXID already registered'})});
+  claimed=[{id:'cccccccc-cccc-4ccc-8ccc-cccccccccccc',request_id:orderId,network:'LTC',status:'unverified',txid:payload.p_txid,created_at:new Date().toISOString()}];
+  return route.fulfill({status:200,headers:cors,body:JSON.stringify('cccccccc-cccc-4ccc-8ccc-cccccccccccc')});
+ });
  await orderPage.route(origin+'/rest/v1/market_purchase_requests?**',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify(rows)}));
  await orderPage.route(origin+'/rest/v1/rpc/market_request_purchase',route=>{
   const payload=JSON.parse(route.request().postData());
@@ -380,6 +400,7 @@ try{
  await orderPage.locator('#cards .item-card').filter({hasText:'Fortnite Demo Listing'}).getByRole('button').first().click();
  await orderPage.locator('#detail-dialog[open]').waitFor();
  await orderPage.locator('#accept').check();
+ await orderPage.locator('#purchase-method').selectOption('LTC');
  orderPage.once('dialog',d=>d.accept());
  await orderPage.locator('#request-purchase').click();
  await orderPage.locator('#purchase-status[data-state="success"]').waitFor();
@@ -391,6 +412,16 @@ try{
  await orderPage.locator('#tc27-my-filter').selectOption('buyer');
  assert.equal(await orderPage.locator('#purchase-requests .tc27-request-card').count(),1);
  assert.match(await orderPage.locator('#purchase-requests').textContent(),/no payment, delivery confirmation or escrow is active/i);
+ await orderPage.locator('#tc35-txid-request').selectOption(orderId);
+ await orderPage.locator('#tc35-txid-value').fill('a'.repeat(64));
+ orderPage.once('dialog',d=>d.accept());
+ await orderPage.locator('#tc35-txid-send').click();
+ await orderPage.locator('#tc35-txid-feedback').getByText(/Reference received for manual review/).waitFor();
+ assert.equal(txids,1,'one claimed TXID submitted');
+ assert.equal(await orderPage.locator('#tc35-txid-request').locator('option[value="'+orderId+'"]').count(),0,'claim must be excluded from repeat submission');
+ assert.match(await orderPage.locator('#purchase-requests').textContent(),/Unverified. Listing is NOT sold/);
+ assert.equal(rows.find(x=>x.id===orderId).status,'requested','a TXID must not mark request paid/sold');
+
  console.log('OK review request, duplicate guard and buyer/seller status filters (mocked)');
  await orderPage.evaluate(()=>{localStorage.removeItem('tc35_auth_session');sessionStorage.removeItem('tc35_auth_session')});
  await orderPage.close();
