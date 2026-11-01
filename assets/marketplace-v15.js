@@ -110,7 +110,7 @@ async function submit(e){
  }catch(e){
   const msg=errorText(e);
   const info=id?
-   'Listing #'+id+' is saved as pending, but the photo upload did not finish. It will NOT be approved without a photo. Use My listings → Upload required photos (or Add more photos) to complete it. This submission counts toward today’s limit. Details: '+msg:
+   'Your listing #'+id+' is saved as pending, but the photo upload did not finish. It will NOT be approved without a photo. Use My listings → Upload required photos (or Add more photos) to complete it. This submission counts toward today’s limit. Details: '+msg:
    msg;
   sellStatus(info);
   if(id)await mine();
@@ -193,7 +193,7 @@ async function requestPurchase(){
  }catch(e){$('purchase-status').textContent='Request failed: '+errorText(e)}
  finally{btn.disabled=!$('accept').checked}
 }
-async async function retry(){
+async function retry(){
  const files=Array.from($('retry-input').files||[]);
  const button=$('retry-save');
  try{
