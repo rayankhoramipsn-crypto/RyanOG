@@ -333,12 +333,14 @@ async function showChats(id=null){
     return;
    }
   }else{
-   selected=S.threads.find(c=>String(c.id)===String(S.active))||S.threads[0];
+   // Do not auto-open the first unread conversation when merely opening Inbox.
+   // Only explicit selection should mark a conversation read.
+   selected=S.threads.find(c=>String(c.id)===String(S.active))||null;
   }
   if(selected)await selectThread(selected);
   else{
    S.active=null;clearChatView();
-   chatFeedback('No conversations yet. Open a listing and choose Chat with seller.');
+   chatFeedback(S.threads.length?'Select a conversation to read and reply.':'No conversations yet. Open a listing and choose Chat with seller.');
   }
  }catch(e){chatFeedback('Could not open your inbox: '+errorText(e),true)}
 }
