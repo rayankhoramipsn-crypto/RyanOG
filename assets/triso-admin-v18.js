@@ -4,7 +4,7 @@
 'use strict';
 const get=id=>document.getElementById(id);
 const el=(tag,text,cls)=>{const e=document.createElement(tag);if(text!=null)e.textContent=String(text);if(cls)e.className=cls;return e};
-let active=null,chatList=[],orders=[],busy=false,lastRefresh=0,chatQuery='';
+let active=null,chatList=[],orders=[],busy=false,lastRefresh=0,chatQuery='',tc27OrderFilter='open',tc27OrderSearch='',tc27OrderBusy=false,tc27SelectedOrder=null;
 const say=(id,text)=>{const e=get(id);if(e)e.textContent=String(text||'')};
 const safeCall=async(fn)=>{if(typeof authorized==='undefined'||!authorized)throw Error('Verified admin sign-in required');return fn()};
 async function rpcV18(name,body){
@@ -70,36 +70,65 @@ async function openChat(c,focus=true){
   if(focus)box.scrollTop=box.scrollHeight;
  }catch(err){say('tc18-chat-status','Cannot read messages: '+err.message)}
 }
+const tc27ActiveStates=['requested','awaiting_payment_setup','disputed','payment_reported','payment_verified','delivery_reported'];
+function tc27AdminFeedback(message='',kind='info'){
+ const target=get('tc27-admin-order-feedback');if(!target)return;
+ target.textContent=message;target.hidden=!message;target.dataset.state=kind;
+ target.setAttribute('role',kind==='error'?'alert':'status');
+}
 function renderOrders(){
  const box=get('tc18-order-list');if(!box)return;box.replaceChildren();
- if(!orders.length){box.append(el('p','No purchase requests yet.'));return}
- for(const o of orders){
-  const card=el('article',null,'tc18-order-card');
-  card.append(el('strong',o.listing_title+' · $'+o.price_usd+' · '+o.payment_method));
-  card.append(el('p','Request '+o.id+' · '+o.status+' · '+new Date(o.created_at).toLocaleString()));
+ const needle=tc27OrderSearch.trim().toLowerCase();
+ const filtered=orders.filter(o=>(tc27OrderFilter==='all'||(tc27OrderFilter==='open'&&tc27ActiveStates.includes(o.status))||o.status===tc27OrderFilter)
+  &&(!needle||[o.id,o.listing_id,o.listing_title,o.buyer_id,o.seller_id].some(v=>String(v??'').toLowerCase().includes(needle))));
+ say('tc27-admin-order-summary',filtered.length+' of '+orders.length+' requests shown · '+orders.filter(o=>tc27ActiveStates.includes(o.status)).length+' open');
+ if(!filtered.length){box.append(el('p',orders.length?'No requests match these filters.':'No purchase requests yet.'));return}
+ for(const o of filtered){
+  const card=el('article',null,'tc18-order-card tc27-admin-order-card');
+  card.append(el('strong','#'+String(o.id).slice(0,8)+' · '+o.listing_title+' · $'+o.price_usd));
+  card.append(el('span',o.status.replaceAll('_',' '),'tc27-state '+o.status));
+  card.append(el('p','Listing #'+o.listing_id+' · '+o.payment_method+' preference · '+new Date(o.created_at).toLocaleString()));
   card.append(el('small','Buyer '+o.buyer_id+' · Seller '+o.seller_id));
   if(o.buyer_note)card.append(el('p','Buyer note: '+o.buyer_note));
   if(o.admin_note)card.append(el('p','Admin note: '+o.admin_note));
-  const controls=el('div',null,'tc18-order-controls');
+  card.append(el('p','This is a review-only request, not a paid order. Do not instruct either party to transfer funds.','tc27-admin-review-only'));
   if(['requested','awaiting_payment_setup','disputed'].includes(o.status)){
-   const pending=el('button','Awaiting payment setup');pending.type='button';
-   pending.onclick=()=>updatePurchase(o,'awaiting_payment_setup');
-   const cancel=el('button','Cancel request');cancel.type='button';
-   cancel.onclick=()=>updatePurchase(o,'cancelled');
-   controls.append(pending,cancel);
+   const button=el('button','Review request');button.type='button';
+   button.onclick=()=>updatePurchase(o);
+   card.append(button);
   }
-  card.append(controls);box.append(card);
+  box.append(card);
  }
 }
-async function updatePurchase(o,next){
- if(!confirm('Set request '+o.id+' to '+next+'? This records review only, NOT a completed payment or payout.'))return;
- const note=prompt('Optional admin note to buyer and seller (up to 500 characters):','');
- if(note===null)return;
- try{
-  await rpcV18('market_admin_update_purchase',{p_request:o.id,p_status:next,p_note:note.slice(0,500)});
-  await loadPurchases();
- }catch(e){say('tc18-orders-status','Could not update request: '+e.message)}
+async function updatePurchase(o){
+ if(!authorized||tc27OrderBusy||!['requested','awaiting_payment_setup','disputed'].includes(o.status))return;
+ tc27SelectedOrder=o;
+ get('tc27-order-context').textContent='Request #'+o.id+' · '+o.listing_title+'. Changes only describe review status; no payment is processed.';
+ get('tc27-order-note').value=o.admin_note||'';
+ get('tc27-order-action').value=o.status==='disputed'?'disputed':'awaiting_payment_setup';
+ get('tc27-order-error').hidden=true;
+ get('tc27-order-dialog').showModal();
 }
+get('tc27-order-close')?.addEventListener('click',()=>get('tc27-order-dialog').close());
+get('tc27-order-dialog')?.addEventListener('close',()=>{tc27SelectedOrder=null});
+get('tc27-order-form')?.addEventListener('submit',async e=>{
+ e.preventDefault();
+ const selected=tc27SelectedOrder,next=get('tc27-order-action').value,note=get('tc27-order-note').value.trim();
+ if(!selected||tc27OrderBusy)return;
+ if(!['cancelled','awaiting_payment_setup','disputed'].includes(next))return;
+ const button=get('tc27-order-confirm');tc27OrderBusy=true;button.disabled=true;
+ try{
+  await rpcV18('market_admin_update_purchase',{p_request:selected.id,p_status:next,p_note:note.slice(0,500)});
+  get('tc27-order-dialog').close();
+  tc27AdminFeedback('Request #'+selected.id+' review status saved as '+next.replaceAll('_',' ')+'. No payment was confirmed.','success');
+  await loadPurchases();
+ }catch(err){
+  const e=get('tc27-order-error');e.textContent='Could not save review: '+err.message;e.hidden=false;
+  tc27AdminFeedback('Could not change request status: '+err.message,'error');
+ }finally{tc27OrderBusy=false;button.disabled=false}
+});
+get('tc27-admin-order-filter')?.addEventListener('change',e=>{tc27OrderFilter=e.target.value;renderOrders()});
+get('tc27-admin-order-search')?.addEventListener('input',e=>{tc27OrderSearch=e.target.value;renderOrders()});
 async function loadPurchases(){
  return safeCall(async()=>{
   try{
@@ -117,7 +146,7 @@ async function refresh(){
 }
 window.tc18Refresh=refresh;
 function reset(){
- active=null;chatList=[];orders=[];chatQuery='';if(searchBox)searchBox.value='';say('tc26-admin-chat-count','');
+ active=null;chatList=[];orders=[];chatQuery='';tc27OrderSearch='';tc27OrderFilter='open';const f=get('tc27-admin-order-filter'),q=get('tc27-admin-order-search');if(f)f.value='open';if(q)q.value='';tc27AdminFeedback('');if(searchBox)searchBox.value='';say('tc26-admin-chat-count','');
  for(const id of ['tc18-chat-list','tc18-chat-messages','tc18-order-list'])get(id)?.replaceChildren();
  say('tc18-chat-status','Sign in with admin permissions to review conversations.');
  say('tc18-orders-status','Sign in with admin permissions to review purchase requests.');
