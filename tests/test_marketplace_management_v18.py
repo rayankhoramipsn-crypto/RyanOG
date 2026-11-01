@@ -13,10 +13,14 @@ class MarketplaceV18(unittest.TestCase):
   for path in ["index.html","preview/index.html"]:
    with self.subTest(path=path):
     code=(ROOT/path).read_text(encoding="utf-8")
-    self.assertIn("returningMember?'store-screen':'lang-screen'",code)
-    self.assertIn("tc37ShowWelcome",code)
-    self.assertIn("window.TrisoAuth?.read()?.user",code)
-    self.assertIn("auth.refresh_token",code)
+    if path=="index.html":
+     self.assertIn("showScreen('lang-screen');",code)
+     self.assertIn("function renderAccountMode",code)
+     self.assertIn("window.TrisoAuth?.read()?.user",code)
+    else:
+     self.assertIn("returningMember?'store-screen':'lang-screen'",code)
+     self.assertIn("tc37ShowWelcome",code)
+     self.assertIn("auth.refresh_token",code)
  def test_purchase_request_only_and_owner_removal(self):
   for path in ["marketplace.html","preview/marketplace.html"]:
    with self.subTest(path=path):
