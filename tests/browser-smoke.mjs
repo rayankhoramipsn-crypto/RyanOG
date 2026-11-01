@@ -163,6 +163,18 @@ try{
  await home.locator('#tc31-forgot-view').getByRole('button',{name:'Back to sign in'}).click();
  assert.equal(await home.locator('#tc31-guest:visible').count(),1);
  console.log('OK separate login, signup and forgot-password views');
+ // V28: checkout is manual enquiry only; never initiate transfers in tests.
+ await home.evaluate(()=>showScreen('checkout-screen'));
+ await home.locator('#tc28-checkout-notice:visible').waitFor();
+ assert.match(await home.locator('#tc28-checkout-notice').textContent(),/NO VERIFIED INVOICE/);
+ assert.match(await home.locator('#tc28-checkout-notice').textContent(),/does not confirm a payment/i);
+ assert.match(await home.locator('#tc44-crypto .tc44-warning').textContent(),/Do not treat this quote as a payment request/);
+ assert.equal(await home.locator('.tc44-kicker').textContent(),'CHECKOUT ENQUIRY / TRISOCMD');
+ await home.evaluate(()=>setLang('fa','rtl','navbar'));
+ assert.match(await home.locator('#co-title').textContent(),/بررسی روش‌های پرداخت/);
+ await home.evaluate(()=>setLang('en','ltr','navbar'));
+ assert.match(await home.locator('#co-title').textContent(),/Review payment options/);
+ console.log('OK V28 manual checkout warning and EN/FA localized non-payment wording');
  await home.close();
 
  const callback=await open('/index.html#access_token=smoke-token&refresh_token=smoke-refresh&type=recovery&expires_in=3600');
@@ -384,6 +396,7 @@ try{
  const admin=await open('/admin/');
  await admin.locator('#admin-auth').waitFor({state:'visible'});
  assert(await admin.locator('#dashboard.hidden').count()===1,'admin exposed without login');
+ assert.equal(await admin.locator('#tc28-readiness:visible').count(),0,'checkout readiness may not be exposed before admin auth');
  console.log('OK admin sign-in gate');
 
  // V25 admin review tests are 100% mocked and must never write live records.
@@ -418,6 +431,9 @@ try{
  },true));
  await admin.reload({waitUntil:'domcontentloaded'});
  await admin.locator('#dashboard:not(.hidden)').waitFor({timeout:12000});
+ await admin.locator('#tc28-readiness:visible').waitFor();
+ assert.match(await admin.locator('#tc28-readiness').textContent(),/NOT READY FOR AUTOMATED PAYMENT OR ESCROW/);
+ assert.match(await admin.locator('#tc28-readiness').textContent(),/No server-issued invoice/);
  // Moderator chat search is read-only; fetch replies are local fixtures.
  const adminChatRows=[
   {id:811,listing_id:101,buyer_id:'00000000-0000-4000-8000-000000000091',seller_id:'00000000-0000-4000-8000-000000000092',created_at:'2026-10-31T10:00:00Z'},
