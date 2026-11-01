@@ -119,3 +119,21 @@ h1,h2,h3,p{margin-top:0}h1,h2,h3{line-height:1.16}p{color:#c4bfd2}img{display:bl
  .tc26-inbox-column .thread-button{flex:0 0 185px;margin:0}
  .chat-main{flex:1;min-height:0}
 }
+
+/* V27 — transparent review-only purchase requests */
+.tc27-request-toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin:16px 0}
+.tc27-request-toolbar label{display:grid;gap:6px;color:#dcd0ed;font-size:12px;font-weight:700;min-width:200px}
+#tc27-my-filter{min-height:44px}
+.tc27-request-card{border:1px solid #4b3b65;background:#1a1528;border-radius:14px;padding:17px;margin:10px 0;display:grid;gap:8px}
+.tc27-request-card strong{color:#fbf7ff}
+.tc27-request-meta{font-size:12px;color:#bdb1d2;line-height:1.6}
+.tc27-request-tag{display:inline-flex;width:max-content;max-width:100%;font-size:12px;font-weight:800;border:1px solid #7c5f40;background:#35291e;color:#ffe2b5;border-radius:999px;padding:5px 10px;text-transform:none}
+.tc27-request-tag.cancelled{background:#2b242b;border-color:#715b70;color:#dfccd8}
+.tc27-request-tag.disputed{background:#542631;border-color:#f2768c;color:#ffe4e9}
+.tc27-request-tag.awaiting_payment_setup{background:#262c45;border-color:#6f84c1;color:#e2ecff}
+.tc27-request-warning{color:#f0dfc4;font-size:12px;background:#31251e;border:1px solid #665040;padding:9px 12px;border-radius:10px;line-height:1.65}
+.tc27-purchase-feedback{padding:12px 14px;border-radius:11px;line-height:1.55;font-size:13px;margin:12px 0}
+.tc27-purchase-feedback:empty{display:none}
+.tc27-purchase-feedback[data-state="error"]{border:1px solid #ff788b;background:#4e1e2b;color:#ffe6ec;font-weight:700}
+.tc27-purchase-feedback[data-state="success"]{border:1px solid #58cd90;background:#1b3c2c;color:#dbffe9;font-weight:700}
+.tc27-purchase-feedback[data-state="info"]{border:1px solid #8c78b0;background:#2b2442;color:#eee5ff}
