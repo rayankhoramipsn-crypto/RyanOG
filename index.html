@@ -3726,7 +3726,7 @@ count();
     <div class="tc441-middleman"><strong>◇ Need a middleman?</strong><p>TRISOCMD Middleman Service is a separate service for coordinating transactions, not a payment method.</p><a href="https://t.me/trisooo" target="_blank" rel="noopener noreferrer">REQUEST MIDDLEMAN SERVICE ↗</a></div>
     <label class="tc41-label" for="tc41-contact">CONTACT / TELEGRAM USERNAME (OPTIONAL)</label><input class="tc41-input" id="tc41-contact" maxlength="100" placeholder="@username or email (optional)" autocomplete="off"/>
     <p class="tc41-note">Preview: no order is created by this step. Never treat an unverified transfer or a browser-generated order ID as proof of payment.</p>
-    <button class="tc45-track-btn" onclick="tc45OpenTracking()">VIEW / TRACK MY ORDERS ↗</button><button class="tc41-secondary" id="tc42-save-order" onclick="tc42SaveOrder()">SAVE ORDER TO MY ACCOUNT (SIGN-IN REQUIRED)</button><div id="tc42-order-result" class="tc41-note tc30-order-notice" role="status" aria-live="polite" aria-atomic="true"></div><button class="tc41-primary" id="tc41-continue" onclick="tc41Continue()">CONTINUE SECURELY ↗</button>
+    <button class="tc45-track-btn" onclick="tc45OpenTracking()">VIEW / TRACK MY ORDERS ↗</button><button class="tc41-secondary" id="tc42-save-order" onclick="tc42SaveOrder()">SAVE ORDER TO MY ACCOUNT (SIGN-IN REQUIRED)</button><div id="tc42-order-result" class="tc41-note tc30-order-notice" role="status" aria-live="polite" aria-atomic="true"></div><button class="tc41-primary" id="tc41-continue" onclick="tc41Continue()">REVIEW MANUAL OPTIONS ↗</button>
     <button class="tc41-secondary" onclick="tc41CloseCheckout();tc41ToggleChat(true)">ASK SUPPORT FIRST</button>
    </div>
    <div class="tc41-panel"><h3>02 / Your order</h3><div id="tc41-summary"></div><div class="tc41-summary"><strong>SUBTOTAL</strong><strong id="tc41-total">$0.00</strong></div>
@@ -3740,15 +3740,15 @@ count();
       <p class="tc443-disclaimer">Manual payment arrangement · No automatic payment confirmation.</p>
    </div>
    <div class="tc43-pay" id="tc43-pay">
- <h3>◈ CRYPTO PAYMENT / TXID</h3>
- <p>Sign in, save your order, then request a unique payment invoice. Verification happens on the server — never from a screenshot or TXID alone.</p>
+ <h3>◈ CRYPTO INVOICE / VERIFICATION NOT ENABLED</h3>
+ <p>Backend-issued crypto invoices and TXID verification aren't available. You can save an unpaid order for your records, or ask official support about availability and terms. Do not submit funds or a transaction hash here.</p>
  <div class="tc43-tabs"><button id="tc43-ltc" type="button" aria-pressed="true" onclick="tc43Coin('LTC')">Ł LTC</button><button id="tc43-btc" type="button" aria-pressed="false" onclick="tc43Coin('BTC')">₿ BTC</button></div>
- <button class="tc43-action" type="button" id="tc43-invoice-btn" onclick="tc43CreateInvoice()">CREATE SECURE INVOICE ↗</button>
+ <button class="tc43-action" type="button" id="tc43-invoice-btn" disabled aria-disabled="true">INVOICES NOT ENABLED</button>
  <div class="tc43-invoice" id="tc43-invoice"><small>PAY EXACT AMOUNT TO THIS ADDRESS</small><strong id="tc43-amount"></strong><strong id="tc43-address"></strong><small id="tc43-expiry"></small><button class="tc41-secondary" type="button" onclick="tc43CopyAddress()">COPY ADDRESS</button></div>
  <label class="tc41-label" for="tc43-txid">TRANSACTION ID (TXID)</label>
- <input id="tc43-txid" placeholder="Paste the 64-character transaction hash" maxlength="64" spellcheck="false" autocomplete="off"/>
- <button class="tc43-action" type="button" id="tc43-verify-btn" onclick="tc43Verify()">VERIFY TRANSACTION ↗</button>
- <div class="tc43-status" id="tc43-status" role="status">No invoice created. Payment verification is unavailable until the staging Edge Function and invoice addresses are configured.</div>
+ <input id="tc43-txid" placeholder="TXID verification is not available" maxlength="64" spellcheck="false" autocomplete="off" disabled aria-disabled="true"/>
+ <button class="tc43-action" type="button" id="tc43-verify-btn" disabled aria-disabled="true">VERIFICATION NOT AVAILABLE</button>
+ <div class="tc43-status" id="tc43-status" role="status">No hosted invoice or TXID verification is active. Do not send a transfer based on this interface.</div>
  </div>
  <p class="tc41-note">✓ Guest checkout available<br>✓ Choose site or Telegram<br>✓ Live support interface<br><br>Payments, order persistence, and agent chat need secure backend integration before launch.</p></div>
   </div>
@@ -3799,7 +3799,7 @@ count();
    $('tc443-method-title').textContent=data.title;
    $('tc443-method-description').textContent=data.description;
   }
-  $('tc41-continue').textContent=crypto?'CONTINUE TO CRYPTO PAYMENT ↗':m==='telegram'?'SEND ORDER VIA TELEGRAM ↗':'CONTACT FOR '+({paypal:'PAYPAL',cashapp:'CASH APP',iban:'BANK TRANSFER'}[m])+' ↗';
+  $('tc41-continue').textContent=crypto?'VIEW CRYPTO OPTIONS (ESTIMATES ONLY) ↗':m==='telegram'?'SEND ORDER VIA TELEGRAM ↗':'CONTACT FOR '+({paypal:'PAYPAL',cashapp:'CASH APP',iban:'BANK TRANSFER'}[m])+' ↗';
  };
  window.tc41CloseCheckout=function(){$('tc41-checkout').classList.remove('open');$('tc41-checkout').setAttribute('aria-hidden','true')};
  window.tc41Continue=function(){
@@ -3811,7 +3811,7 @@ count();
    window.open('https://t.me/trisooo','_blank','noopener,noreferrer');return;
   }
   if(source==='bag'&&(orderLines.length!==1||orderLines[0].qty!==1)){
-   const el=$('tc42-order-result');if(el)el.textContent='For a multi-item crypto order, sign in and use CREATE SECURE INVOICE on the right. This requires the configured 4.3 staging backend. Do not pay without a server-issued invoice.';
+   const el=$('tc42-order-result');if(el)el.textContent='For a multi-item crypto request, save the order to your account or ask support for available options. No payment invoice or automatic verification is active.';
    $('tc43-pay').scrollIntoView({behavior:'smooth',block:'center'});
    return;
   }
@@ -3937,37 +3937,12 @@ count();
   if(!res.ok)throw Error(data.error||'Payment service unavailable ('+res.status+').');
   return data;
  }
- window.tc43CreateInvoice=async()=>{status('Preview mode: payments are disabled. Do not send funds.');return;
-
-  if(busy)return;setBusy(true);status('Creating invoice securely…');
-  try{
-   const items=window.tc42OrderItems||[];
-   if(!items.length)throw Error('Select a product before creating an invoice.');
-   const created=await api('create',{coin,items});
-   if(!created.invoice_id||!created.address||!created.amount_coin)throw Error('Incomplete invoice response.');
-   invoice=created;$('tc43-invoice').style.display='block';
-   $('tc43-amount').textContent=created.amount_coin+' '+created.coin;
-   $('tc43-address').textContent=created.address;
-   $('tc43-expiry').textContent='Valid until '+new Date(created.expires_at).toLocaleString();
-   status('Invoice created. Send only the displayed amount to the displayed address, then enter the TXID. Do not pay after expiry.');
-  }catch(e){status(e.message)}
-  finally{setBusy(false)}
- };
- window.tc43CopyAddress=()=>{if(!invoice)return;navigator.clipboard?.writeText(invoice.address).then(()=>status('Address copied. Verify network and amount before sending.')).catch(()=>status('Select and copy the address manually.'))};
- window.tc43Verify=async()=>{
-  if(busy)return;const txid=$('tc43-txid').value.trim().toLowerCase();
-  if(!invoice){status('Create an invoice first.');return}
-  if(!/^[0-9a-f]{64}$/.test(txid)){status('Invalid TXID: expected 64 hexadecimal characters.');return}
-  setBusy(true);status('Checking blockchain confirmations and payment details…');
-  try{
-   const data=await api('verify',{invoice_id:invoice.invoice_id,txid});
-   const states={pending:'Transaction found. Waiting for network confirmations.',paid:'Payment confirmed by server. Your order is marked paid.',review:'Payment needs manual review.',not_found:'Transaction not found yet. Try again later.',expired:'Invoice expired. Contact support.'};
-   status((states[data.status]||'Verification status: '+data.status)+(data.confirmations!==undefined?' Confirmations: '+data.confirmations:''));
-  }catch(e){status(e.message)}finally{setBusy(false)}
- };
- const paymentButton=$('tc43-invoice-btn');if(paymentButton){paymentButton.disabled=true;paymentButton.textContent='PAYMENTS UNAVAILABLE IN PREVIEW';paymentButton.title='This is a test store. Do not send cryptocurrency.';}
+ window.tc43CreateInvoice=()=>status('Crypto invoices are not available. Do not send funds or share payment details here.');
+ window.tc43CopyAddress=()=>status('No server-issued invoice exists; no address can be copied from this interface.');
+ window.tc43Verify=()=>status('TXID verification is not enabled; a submitted hash would not be checked.');
+ const paymentButton=$('tc43-invoice-btn');if(paymentButton){paymentButton.disabled=true;paymentButton.textContent='INVOICES NOT ENABLED';paymentButton.title='This is a test store. Do not send cryptocurrency.';}
   const old=window.tc41OpenCheckout;
- if(typeof old==='function')window.tc41OpenCheckout=function(...args){invoice=null;$('tc43-invoice').style.display='none';$('tc43-txid').value='';status('Sign in to create a secure invoice. No payment is verified yet.');return old(...args)};
+ if(typeof old==='function')window.tc41OpenCheckout=function(...args){invoice=null;$('tc43-invoice').style.display='none';$('tc43-txid').value='';status('Invoices and TXID verification are unavailable. Save an unpaid order or contact support.');return old(...args)};
 })();
 </script>
 <section id="tc45-tracking" class="tc45-track" aria-hidden="true"><div class="tc45-track-panel" role="dialog" aria-modal="true" aria-labelledby="tc45-title"><div class="tc45-track-head"><div><small>TRISOCMD / CUSTOMER CENTER</small><h2 id="tc45-title">TRACK YOUR ORDERS.</h2><div class="tc45-tracking-note">Only orders associated with your signed-in account appear here.</div></div><button onclick="tc45CloseTracking()" aria-label="Close tracking">✕</button></div><div id="tc45-tracking-list" role="status">Sign in to view your orders.</div><button class="tc45-track-btn" onclick="tc45RefreshTracking()">↻ REFRESH ORDER STATUS</button><button class="tc45-track-btn" onclick="tc45CloseTracking();tc41ToggleChat(true)">CONTACT SUPPORT ↗</button></div></section>
