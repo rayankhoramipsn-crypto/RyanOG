@@ -1663,7 +1663,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElement
    <a class="tc-native-link" href="help/"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9 9a3 3 0 0 1 6 1c0 2-3 2-3 4m0 3v.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><span data-native-i18n="faq">FAQ</span></a>
  </div>
  <div class="tc-native-navtools">
-   <label class="tc-native-search" aria-label="Search products"><input id="tc-native-search" type="search" placeholder="Search products..." autocomplete="off" aria-label="Search products"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></label>
+   <label class="tc-native-search" aria-label="Search products"><input id="tc-native-search" type="search" name="tc34_store_header_query" placeholder="Search products..." autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="search" aria-autocomplete="none" aria-label="Search products"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></label>
    <div class="tc-native-lang" id="tc-native-lang">
      <button class="tc-native-lang-button" type="button" id="tc-native-lang-toggle" aria-haspopup="true" aria-controls="tc-native-lang-menu" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 12h18M12 3c6 4 6 14 0 18-6-4-6-14 0-18Z" fill="none" stroke="currentColor" stroke-width="1.4"/></svg><span id="nav-lang-label">EN</span><span class="tc-native-chevron">⌄</span></button>
      <div class="tc-native-lang-menu" id="tc-native-lang-menu" role="menu" hidden>
@@ -1745,7 +1745,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElement
     <div class="tc14-shop-main" id="tc14-products">
       <div class="tc14-shop-top">
         <div class="tc39-toolbar" role="search">
-          <input id="tc39-search" aria-label="Search products" placeholder="Search products, categories..." oninput="tc39Filter()" autocomplete="off">
+          <input id="tc39-search" type="search" name="tc34_store_catalog_query" aria-label="Search products" placeholder="Search products, categories..." oninput="tc39Filter()" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="search" aria-autocomplete="none">
           <select id="tc39-category" aria-label="Category" onchange="tc39Filter()"><option value="">All categories</option></select>
           <select id="tc39-sort" aria-label="Sort products" onchange="tc39Filter()"><option value="featured">Featured</option><option value="low">Price: Low to High</option><option value="high">Price: High to Low</option></select>
           <button class="tc39-cart-button" type="button" onclick="tc39CartOpen()">BAG <span id="tc39-count">0</span> ↗</button>
