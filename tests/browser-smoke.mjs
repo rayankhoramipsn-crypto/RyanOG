@@ -115,9 +115,26 @@ try{
  await home.locator('#tc31-panel.active').waitFor();
  assert.equal(await home.locator('#tc31-guest:visible').count(),1,'login mode should be visible');
  assert.equal(await home.locator('#tc31-forgot-view:visible').count(),0,'forgot mode should start hidden');
+ // A mocked rejected sign-in must produce an unmistakable red alert.
+ await home.route(origin+'/auth/v1/token?**',route=>route.fulfill({status:400,headers:cors,body:JSON.stringify({message:'Invalid login credentials'})}));
+ await home.locator('#tc31-email').fill('demo@example.test');
+ await home.locator('#tc31-password').fill('not-the-password');
+ await home.locator('#tc-v22-login-submit').click();
+ await home.locator('#tc-v23-login-feedback[data-state="error"]:visible').waitFor();
+ assert.match(await home.locator('#tc-v23-login-feedback').textContent(),/Invalid login credentials/);
+ assert.equal(await home.locator('#tc-v23-login-feedback').getAttribute('role'),'alert');
+ assert.equal(await home.locator('#tc-v23-login-feedback').evaluate(el=>getComputedStyle(el).borderTopColor),'rgb(255, 100, 120)');
+ await home.unroute(origin+'/auth/v1/token?**');
  await home.getByRole('button',{name:'Create your account'}).click();
  assert.equal(await home.locator('#tc31-signup-view:visible').count(),1,'signup should have own view');
  assert.equal(await home.locator('#tc31-guest:visible').count(),0,'signup should hide login');
+ await home.locator('#tc31-signup-name').fill('Example User');
+ await home.locator('#tc31-signup-email').fill('demo@example.test');
+ await home.locator('#tc31-signup-password').fill('password123');
+ await home.locator('#tc31-signup-confirm').fill('password456');
+ await home.locator('#tc31-signup-form').getByRole('button',{name:'CREATE ACCOUNT'}).click();
+ await home.locator('#tc-v23-signup-feedback[data-state="error"]:visible').waitFor();
+ assert.match(await home.locator('#tc-v23-signup-feedback').textContent(),/Passwords do not match/);
  await home.locator('#tc31-signup-view').getByRole('button',{name:'Sign in instead'}).click();
  assert.equal(await home.locator('#tc31-guest:visible').count(),1,'back to sign in should return to login');
  await home.locator('#tc31-login-form').getByRole('button',{name:'Forgot password?'}).click();
@@ -135,6 +152,7 @@ try{
  });
  await home.locator('#tc31-forgot-email').fill('demo@example.test');
  await home.locator('#tc31-reset-button').click();
+ await home.locator('#tc31-reset-feedback[data-state="success"]:visible').waitFor();
  await home.locator('#tc31-reset-feedback').getByText('we sent a reset link',{exact:false}).waitFor();
  assert.equal(recoveryRedirect,base+'/index.html','recovery redirect must point at callback-aware route');
  await home.unroute(origin+'/auth/v1/recover**');
@@ -164,12 +182,17 @@ try{
  });
  await callback.route(origin+'/auth/v1/logout',async route=>route.fulfill({status:204,headers:cors,body:''}));
  await callback.locator('#tc31-new-password').fill('mock-password-123');
+ await callback.locator('#tc31-confirm-new-password').fill('bad-password-123');
+ await callback.locator('#tc31-update-password-button').click();
+ await callback.locator('#tc-v22-recovery-feedback[data-state="error"]:visible').waitFor();
+ assert.match(await callback.locator('#tc-v22-recovery-feedback').textContent(),/Passwords do not match/);
  await callback.locator('#tc31-confirm-new-password').fill('mock-password-123');
  await callback.locator('#tc31-update-password-button').click();
  await callback.waitForFunction(()=>document.querySelector('#tc31-panel')?.dataset.authMode==='signin');
  assert(changed,'mock reset request was not sent');
  assert.equal(await callback.locator('#tc31-recovery-shell:visible').count(),0,'password reset should close recovery form');
  assert.equal(await callback.locator('#tc31-guest:visible').count(),1,'password reset should return to sign in');
+ console.log('OK sign-in, signup and password reset errors render clear red alerts; recovery success is green');
  console.log('OK verified callback and new password submission (fully mocked)');
  await callback.close();
 
