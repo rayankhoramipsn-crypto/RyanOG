@@ -465,4 +465,4 @@ document.addEventListener('visibilitychange',async()=>{if(document.hidden)return
 window.addEventListener('storage',e=>{if(e.key===window.TrisoAuth.key){const next=window.TrisoAuth.read();if((next?.access_token||null)!==(session?.access_token||null)){session=next;authorized=false;init()}}});
 setInterval(async()=>{if(!session?.refresh_token)return;if(session.expires_at&&session.expires_at>Math.floor(Date.now()/1000)+120)return;await refreshSession()},60000);
 init();
-</script><script src="../assets/triso-admin-v18.js?v=27"></script><script src="../assets/triso-notifications-v34.js?v=34"></script></body></html>
+</script><script src="../assets/triso-admin-v18.js?v=35"></script><script src="../assets/triso-notifications-v34.js?v=35"></script></body></html>
