@@ -29,3 +29,5 @@ jobs:
         run: python3 tests/test_site_integrity.py
       - name: Verify notification-only workflow and no-payment boundaries
         run: python3 tests/test_v34_notifications.py
+      - name: Check V35 TXID uniqueness, email consent, browser notifications and search privacy
+        run: python3 tests/test_v35_payment_reference.py
