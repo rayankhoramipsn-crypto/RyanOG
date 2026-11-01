@@ -291,6 +291,8 @@ try{
  await market.keyboard.press('Escape');
  await market.locator('[data-cat="gear"]').first().click();
  assert.equal(await market.locator('#cards .item-card').count(),1,'category filter broken');
+ await market.locator('#search').click();
+ assert.equal(await market.locator('#search').getAttribute('readonly'),null,'search must become editable on actual focus');
  await market.locator('#search').fill('not-a-product');
  assert.equal(await market.locator('#cards .item-card').count(),0,'marketplace search broken');
  console.log('OK listing detail, policy gating, category filter and search');
