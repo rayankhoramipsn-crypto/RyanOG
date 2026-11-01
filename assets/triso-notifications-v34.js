@@ -14,7 +14,7 @@
   '<p class="tc34-notice-sub">Messages and purchase review requests. A request is not proof of payment.</p>'+
   '<ul class="tc34-notice-list"><li>Sign in to see notifications.</li></ul>'+
   '<div class="tc34-notice-bottom"><button type="button" class="tc34-notice-permission">Enable device alerts while site is open</button><span class="tc34-notice-help" role="status"></span></div></div>';
- const host=isAdminPage?document.querySelector('header'):document.querySelector('.topbar .navtools');
+ const host=isAdminPage?document.querySelector('header'):(document.querySelector('.topbar .navtools')||document.querySelector('#store-screen .tc-native-navtools'));
  if(!host)return;
  host.append(root);
  const trigger=root.querySelector('.tc34-notice-button'),panel=root.querySelector('.tc34-notice-panel');
