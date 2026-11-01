@@ -108,6 +108,53 @@ const ROOT="https://cxtytbjvdlngahytfilr.supabase.co",KEY="sb_publishable_AqZWjp
 const $=id=>document.getElementById(id);
 const status=t=>{$('status').textContent=String(t)};
 let session=null,authorized=false,loading=false,lastLoad=0;
+let tc25DeclineTarget=null,tc25Busy=false,tc25Stats={pending:0,approved:0,declined:0,removed:0};
+function tc25Feedback(message='',kind='info'){
+ const e=$('tc25-action-status');if(!e)return;
+ e.textContent=message;e.hidden=!message;e.dataset.state=kind;
+ e.setAttribute('role',kind==='error'?'alert':'status');
+}
+function tc25ReasonError(message=''){const e=$('tc25-decline-error');e.textContent=message;e.hidden=!message}
+function tc25Filters(){
+ const selection=$('tc25-filter').value,query=$('tc25-search').value.trim().toLowerCase();
+ let shown=0;
+ for(const row of $('listings').querySelectorAll('tbody tr')){
+  const visible=(selection==='all'||row.dataset.status===selection)
+   &&(!query||row.dataset.search.includes(query));
+  row.hidden=!visible;if(visible)shown++;
+ }
+ const old=$('tc25-empty');if(old)old.remove();
+ if(!shown&&$('listings').querySelector('table')){
+  const msg=el('p',selection==='pending'?'No pending listings. Use All recent listings to inspect previous submissions.':'No listings match the selected filter and search.');
+  msg.id='tc25-empty';$('listings').append(msg);
+ }
+ $('listings-status').textContent=tc25Stats.pending+' pending submission'+(tc25Stats.pending===1?'':'s')+' · '+shown+' shown in current filter.';
+}
+function tc25Decline(item){
+ if(!authorized||tc25Busy)return;
+ tc25DeclineTarget=item;
+ $('tc25-decline-context').textContent='Listing #'+item.id+' · '+item.title;
+ $('tc25-decline-reason').value='';tc25ReasonError('');
+ $('tc25-decline-dialog').showModal();$('tc25-decline-reason').focus();
+}
+$('tc25-filter').addEventListener('change',tc25Filters);
+$('tc25-search').addEventListener('input',tc25Filters);
+$('tc25-refresh').addEventListener('click',()=>load());
+$('tc25-decline-cancel').addEventListener('click',()=>$('tc25-decline-dialog').close());
+$('tc25-decline-dialog').addEventListener('close',()=>{tc25DeclineTarget=null;tc25ReasonError('')});
+$('tc25-decline-form').addEventListener('submit',async event=>{
+ event.preventDefault();
+ const listing=tc25DeclineTarget,reason=$('tc25-decline-reason').value.trim(),button=$('tc25-decline-confirm');
+ if(!listing||tc25Busy)return;
+ if(reason.length<5)return tc25ReasonError('Write a reason of at least 5 characters.');
+ tc25Busy=true;button.disabled=true;tc25ReasonError('');
+ try{
+  await moderate(listing.id,'declined',reason.slice(0,500));
+  $('tc25-decline-dialog').close();
+  tc25Feedback('Listing #'+listing.id+' declined. Seller can see the review reason.','success');
+ }catch(e){tc25ReasonError(e.message);tc25Feedback('Decline failed: '+e.message,'error')}
+ finally{tc25Busy=false;button.disabled=false}
+});
 try{session=window.TrisoAuth.read()}catch{}
 function el(tag,txt){const e=document.createElement(tag);if(txt!=null)e.textContent=String(txt);return e}
 function setSession(s){window.TrisoAuth.write(s);session=window.TrisoAuth.read()||s}
@@ -115,6 +162,7 @@ function clearSession(){session=null;authorized=false;window.TrisoAuth.clear()}
 function viewAuth(show){
  $('admin-auth').classList.toggle('hidden',!show);
  $('dashboard').classList.toggle('hidden',show);
+ if(show){$('listings').replaceChildren();$('tc25-stats').replaceChildren();tc25Feedback('')}
 }
 async function authRequest(path,body){
  const r=await fetch(ROOT+'/auth/v1/'+path,{method:'POST',headers:{apikey:KEY,'Content-Type':'application/json'},body:JSON.stringify(body)});
@@ -173,7 +221,7 @@ async function loadListingGallery(listings){
   if(!ids)return media;
   const rows=await api('market_listing_media?select=listing_id,object_path,sort_order&listing_id=in.('+ids+')&order=sort_order.asc&limit=500');
   for(const row of rows){const id=String(row.listing_id);if(!media.has(id))media.set(id,[]);media.get(id).push(row)}
- }catch(e){status('Marketplace gallery could not load: '+e.message)}
+ }catch(e){tc25Feedback('Unable to inspect listing photos: '+e.message+'. Photo-dependent approval is blocked until they load.','error')}
  return media;
 }
 async function moderate(id,decision,reason){
@@ -208,10 +256,19 @@ async function load(){
    const pending=listings.filter(p=>p.status==='pending');
    const reviewed=listings.filter(p=>p.status!=='pending');
    const ordered=pending.concat(reviewed);
-   $('listings-status').textContent=pending.length+' pending submission'+(pending.length===1?'':'s')+' · '+listings.length+' total recent listings. Pending submissions are shown first.';
+   tc25Stats={pending:pending.length,approved:0,declined:0,removed:0};
+   for(const p of reviewed)if(Object.hasOwn(tc25Stats,p.status))tc25Stats[p.status]++;
+   $('tc25-stats').replaceChildren();
+   for(const key of ['pending','approved','declined','removed']){
+    const chip=el('span',tc25Stats[key]+' '+key);chip.className='tc25-stat';$('tc25-stats').append(chip);
+   }
+   $('listings-status').textContent=pending.length+' pending submission'+(pending.length===1?'':'s')+' · '+listings.length+' total recent listings.';
    table('listings',['Listing','Platform / Price','Status','Submitted','Action'],ordered,(p,tr)=>{
+    tr.dataset.status=p.status;
+    tr.dataset.search=[p.id,p.title,p.platform,p.description,p.seller_id].join(' ').toLowerCase();
     const description=el('td');
     description.append(el('strong','#'+p.id+' · '+p.title),el('div',safeText(p.description)));
+    const seller=el('small','Seller '+String(p.seller_id||'unknown').slice(0,8)+'…');seller.className='tc25-seller';description.append(seller);
     const photos=photosByListing.get(String(p.id))||[];
     if(!photos.length){
       const warning=el('div','No uploaded gallery photos — approval blocked.');
@@ -223,30 +280,37 @@ async function load(){
       info.className='photo-status';description.append(info);
       for(const file of photos.slice(0,4)){
        const img=el('img');img.className='moderation-photo';img.alt='Seller-uploaded item photo';img.loading='lazy';
-       galleryPhotoUrl(file.object_path).then(url=>{if(url){img.src=url;img.onclick=()=>window.open(url,'_blank','noopener,noreferrer')}}).catch(()=>{img.alt='Photo unavailable'});
+       galleryPhotoUrl(file.object_path).then(url=>{if(url&&img.isConnected&&authorized){img.src=url;img.onclick=()=>window.open(url,'_blank','noopener,noreferrer');img.tabIndex=0;img.setAttribute('role','button');img.setAttribute('aria-label','Open uploaded photo');img.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();img.click()}}}}).catch(()=>{img.alt='Photo unavailable'});
        description.append(img);
       }
     }
     tr.append(description);
     cell(tr,(p.platform||'')+' / $'+p.price);
-    cell(tr,p.status);cell(tr,date(p.submitted_at));
-    const td=el('td');
+    const state=el('td'),chip=el('span',p.status);chip.className='tc25-status-chip '+p.status;state.append(chip);tr.append(state);cell(tr,date(p.submitted_at));
+    const td=el('td');td.className='tc25-actions';
     if(p.status==='pending'){
      const approve=el('button','Approve');
      if(!photos.length){approve.disabled=true;approve.title='At least one uploaded photo is required before approval';}
-     approve.onclick=async()=>{if(!confirm('Approve this eligible, legitimately owned listing?'))return;approve.disabled=true;try{await moderate(p.id,'approved',null)}catch(e){status(e.message);approve.disabled=false}};
+     approve.onclick=async()=>{
+      if(tc25Busy||!confirm('Approve listing #'+p.id+' after inspecting description, ownership and uploaded photos?'))return;
+      tc25Busy=true;approve.disabled=true;tc25Feedback('Approving listing #'+p.id+'…','info');
+      try{await moderate(p.id,'approved',null);tc25Feedback('Listing #'+p.id+' approved and published.','success')}
+      catch(e){tc25Feedback('Approval failed: '+e.message,'error');approve.disabled=false}
+      finally{tc25Busy=false}
+     };
      const reject=el('button','Decline');
-     reject.onclick=async()=>{const reason=prompt('Reason for declining this listing:');if(reason===null)return;if(!reason.trim())return status('A decline reason is required.');reject.disabled=true;try{await moderate(p.id,'declined',reason.trim().slice(0,500))}catch(e){status(e.message);reject.disabled=false}};
+     reject.className='tc25-danger';reject.onclick=()=>tc25Decline(p);
      td.append(approve,el('span',' '),reject)
     }
     if(p.status!=='removed'){
       const remove=el('button','Remove listing');remove.type='button';
-      remove.style.cssText='margin:8px 0;background:#522838;border-color:#995367';
+      remove.className='tc25-danger';
       remove.onclick=()=>window.tc18RemoveListing?.(p);
       td.append(el('div'),remove);
     }
     tr.append(td)
    });
+   tc25Filters();
   }else{
    const e=values[0].status==='rejected'?values[0].reason?.message:'Unexpected listing response';
    $('listings-status').textContent='Unable to load moderation queue: '+e;
