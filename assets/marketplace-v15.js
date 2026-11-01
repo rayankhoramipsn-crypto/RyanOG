@@ -108,17 +108,22 @@ function details(p){
  $('detail-date').textContent='Posted '+date(p.submitted_at);
  $('accept').checked=false;$('chat-seller').disabled=true;
  const cover=$('detail-cover'),placeholder=$('detail-placeholder'),thumbs=$('thumbs');
+ const fallbackMessage=message=>{
+  // Preview retains the earlier one-line fallback; keep this shared script compatible.
+  const child=placeholder.querySelector('.tc33-fallback-message');
+  if(child)child.textContent=message;else placeholder.textContent=message;
+ };
  cover.removeAttribute('src');cover.style.display='none';placeholder.classList.remove('hidden');
- placeholder.querySelector('span:last-child').textContent='Loading listing photos…';
+ fallbackMessage('Loading listing photos…');
  empty(thumbs);
  const images=S.photos.get(String(p.id))||[];
- if(!images.length)placeholder.querySelector('span:last-child').textContent='No gallery photo available';
+ if(!images.length)fallbackMessage('No gallery photo available');
  let loaded=false;
  for(const [i,file] of images.entries()){
   signed(file.object_path).then(url=>{
    if(sequence!==tc33DetailSeq||!url||S.selected?.id!==p.id)return;
    const img=make('img');img.src=url;img.alt='Photo '+(i+1);img.tabIndex=0;
-   img.onerror=()=>{img.remove();if(!loaded)placeholder.querySelector('span:last-child').textContent='Photos unavailable — try again later'};
+   img.onerror=()=>{img.remove();if(!loaded)fallbackMessage('Photos unavailable — try again later')};
    const choose=()=>{
     if(sequence!==tc33DetailSeq)return;
     // Never hide the placeholder before an image has actually loaded.
@@ -128,14 +133,14 @@ function details(p){
     };
     next.onerror=()=>{
      if(sequence!==tc33DetailSeq)return;
-     if(!loaded){cover.style.display='none';placeholder.classList.remove('hidden');placeholder.querySelector('span:last-child').textContent='Photos unavailable — try again later'}
+     if(!loaded){cover.style.display='none';placeholder.classList.remove('hidden');fallbackMessage('Photos unavailable — try again later')}
     };
     next.src=url;
    };
    img.onclick=choose;img.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose()}};
    thumbs.append(img);
    if(i===0)choose();
-  }).catch(()=>{if(sequence===tc33DetailSeq&&!loaded)placeholder.querySelector('span:last-child').textContent='Photos unavailable — try again later'});
+  }).catch(()=>{if(sequence===tc33DetailSeq&&!loaded)fallbackMessage('Photos unavailable — try again later')});
  }
  tc27UpdatePurchaseButton();
  dialog('detail-dialog');
