@@ -218,7 +218,7 @@ try{
    user:{id:'00000000-0000-4000-8000-000000000009',email:'seller@example.test'}
  },true));
  await market.reload({waitUntil:'domcontentloaded'});
- await market.locator('#seller-panel:not(.hidden)').waitFor();
+ await market.waitForFunction(()=>!document.querySelector('#seller-panel')?.classList.contains('hidden'));
  await market.locator('#open-sell').click();
  await market.locator('#sell-dialog[open]').waitFor();
  await market.locator('#title').fill('Gaming headset for sale');
