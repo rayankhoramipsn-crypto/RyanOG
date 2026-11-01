@@ -27,3 +27,5 @@ jobs:
         run: python3 tests/test_marketplace_management_v18.py
       - name: Audit all site routes, assets and backend references
         run: python3 tests/test_site_integrity.py
+      - name: Verify notification-only workflow and no-payment boundaries
+        run: python3 tests/test_v34_notifications.py

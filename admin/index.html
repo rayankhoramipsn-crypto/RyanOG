@@ -20,7 +20,7 @@
 #tc26-admin-chat-count{font-size:12px;margin:7px 0;color:#c7b2e6}
 .tc18-conversation.tc26-last-selected{border-color:#bb93ff;box-shadow:0 0 0 1px #8b69be}
 .tc26-admin-empty{padding:15px;color:#dfcde9}
-</style><script src="../assets/triso-auth-storage.js?v=2"></script>
+</style><link rel="stylesheet" href="../assets/triso-notifications-v34.css?v=34"><script src="../assets/triso-auth-storage.js?v=2"></script>
 <!-- TRISOCMD favicon / mobile home-screen icon -->
 <link rel="icon" type="image/svg+xml" href="../assets/trisocmd-icon.svg">
 <link rel="alternate icon" type="image/png" sizes="64x64" href="../assets/trisocmd-icon-64.png">
@@ -465,4 +465,4 @@ document.addEventListener('visibilitychange',async()=>{if(document.hidden)return
 window.addEventListener('storage',e=>{if(e.key===window.TrisoAuth.key){const next=window.TrisoAuth.read();if((next?.access_token||null)!==(session?.access_token||null)){session=next;authorized=false;init()}}});
 setInterval(async()=>{if(!session?.refresh_token)return;if(session.expires_at&&session.expires_at>Math.floor(Date.now()/1000)+120)return;await refreshSession()},60000);
 init();
-</script><script src="../assets/triso-admin-v18.js?v=27"></script></body></html>
+</script><script src="../assets/triso-admin-v18.js?v=27"></script><script src="../assets/triso-notifications-v34.js?v=34"></script></body></html>
