@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="description" content="Browse TRISOCMD community marketplace gaming listings, view product photos, and message sellers securely. Listings are reviewed before publication.">
 <title>TRISOCMD | Marketplace</title>
-<link rel="stylesheet" href="assets/marketplace-v15.css?v=24">
+<link rel="stylesheet" href="assets/marketplace-v15.css?v=26">
 
 <!-- TRISOCMD brand / share-preview metadata -->
 <link rel="icon" type="image/svg+xml" href="assets/trisocmd-icon.svg">
@@ -221,17 +221,22 @@
  <div class="dialog-header"><h2>TRISOCMD · Conversations</h2><div class="live-indicator" id="chat-connection" role="status">Connecting…</div><button class="close" type="button" onclick="document.getElementById('chat-dialog').close()" aria-label="Close">✕</button></div>
  <div id="chat-guest" class="dialog-content hidden">Sign in to message sellers.</div>
  <div class="chat-shell">
-  <aside id="thread-list" class="thread-list" aria-label="Your conversations"><p class="fine">Loading conversations…</p></aside>
+  <div class="tc26-inbox-column"><div class="tc26-inbox-tools">
+   <label for="tc26-thread-search">Find conversation</label>
+   <input id="tc26-thread-search" type="search" placeholder="Search listing or message..." autocomplete="off">
+   <label class="tc26-unread-toggle"><input id="tc26-unread-only" type="checkbox"> Unread only</label>
+   <p id="tc26-inbox-summary" role="status" aria-live="polite">Loading conversations…</p>
+  </div><aside id="thread-list" class="thread-list" aria-label="Your conversations"><p class="fine">Loading conversations…</p></aside></div>
   <section class="chat-main"><div class="chat-context"><h3 id="chat-topic">Select a conversation</h3><small id="chat-sub">Messages may be reviewed by administrators.</small></div>
   <div id="bubbles" class="chat-messages" role="log" aria-live="polite" aria-label="Messages in conversation"><div class="chat-placeholder">Choose a conversation to read and reply.</div></div>
   <form id="chat-form" class="chat-form hidden"><label for="chat-body" class="fine" style="position:absolute;clip:rect(0,0,0,0)">Message</label><textarea id="chat-body" maxlength="2000" required rows="2" placeholder="Write a message… Enter to send · Shift+Enter for a new line. Never share passwords or codes."></textarea><button class="btn primary" id="chat-send" type="submit">Send ↗</button></form>
-  <div id="chat-state" class="chat-feedback" role="status" aria-live="polite"></div>
+  <div id="chat-state" class="chat-feedback" role="status" aria-live="polite" aria-atomic="true"></div>
   <p class="chat-privacy-note">Only the buyer, seller and authorized moderators can view this conversation. Do not send payment details or account recovery codes.</p>
   </section>
  </div>
 </dialog>
 <script src="assets/triso-auth-storage.js?v=2"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer src="assets/marketplace-v15.js?v=24"></script>
+<script defer src="assets/marketplace-v15.js?v=26"></script>
 </body>
 </html>
