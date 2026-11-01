@@ -649,12 +649,12 @@ $('detail-dialog').addEventListener('close',()=>{tc33DetailSeq++});
 $('chat-seller').addEventListener('click',contact);
 $('request-purchase').addEventListener('click',requestPurchase);
 $('refresh-purchases').addEventListener('click',purchases);
-$('tc35-txid-form').addEventListener('submit',tc35SubmitTxid);
-$('tc35-enable-device').addEventListener('click',async()=>{
+$('tc35-txid-form')?.addEventListener('submit',tc35SubmitTxid);
+$('tc35-enable-device')?.addEventListener('click',async()=>{
  const result=await window.TrisoNotifications?.enableDeviceAlerts?.();
  tc35SetOptinMessage(result||'Device alerts require a supported browser and may only work while the site is open.');
 });
-$('tc35-email-optin').addEventListener('change',async e=>{
+$('tc35-email-optin')?.addEventListener('change',async e=>{
  const control=e.currentTarget,enabled=control.checked;control.disabled=true;
  try{await window.TrisoNotifications?.saveEmailOptin?.(enabled);tc35SetOptinMessage(enabled?'Email preference saved. Delivery starts once a verified email sender is configured.':'Email notifications disabled.');}
  catch(err){control.checked=!enabled;tc35SetOptinMessage('Could not save email preference: '+err.message)}
