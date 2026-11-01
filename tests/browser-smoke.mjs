@@ -252,9 +252,29 @@ try{
  await market.locator('.item-card button').first().click();
  await market.locator('#detail-dialog[open]').waitFor();
  assert(await market.locator('#request-purchase').isDisabled());
+ assert.equal(await market.locator('#detail-dialog .purchase-action #accept').count(),1,'rules checkbox must be beside purchase request');
+ assert.match(await market.locator('#tc33-request-hint').textContent(),/Tick the checkbox/);
+ assert(await market.locator('#detail-placeholder').isVisible(),'missing photos must have a visible fallback');
  await market.locator('#accept').check();
  assert(await market.locator('#chat-seller').isEnabled());
  assert(await market.locator('#request-purchase').isEnabled());
+ assert.match(await market.locator('#tc33-request-hint').textContent(),/Ready to continue/);
+ // The media column must remain on screen when the lengthy detail panel is scrolled.
+ await market.evaluate(()=>{
+   const pane=document.querySelector('#detail-dialog .dialog-content');
+   pane.scrollTop=pane.scrollHeight;
+ });
+ const sticky=await market.evaluate(()=>{
+   const pane=document.querySelector('#detail-dialog .dialog-content'),media=document.querySelector('#detail-dialog .tc33-media-column');
+   const frame=pane.getBoundingClientRect(),picture=media.getBoundingClientRect();
+   return {scroll:pane.scrollTop,top:picture.top,frameTop:frame.top,visible:picture.bottom>frame.top+20&&picture.top<frame.bottom};
+ });
+ assert(sticky.scroll>40,'details should have scrollable content on desktop fixture');
+ assert(sticky.visible,'listing image/fallback must stay visible while scrolling');
+ await market.locator('#detail-dialog').evaluate(el=>el.close());
+ await market.locator('.item-card button').first().click();
+ assert.equal(await market.locator('#detail-dialog .dialog-content').evaluate(el=>el.scrollTop),0,'detail must reopen at the top');
+ assert.equal(await market.locator('#accept').isChecked(),false,'new modal opens with unchecked consent');
  await market.keyboard.press('Escape');
  await market.locator('[data-cat="gear"]').first().click();
  assert.equal(await market.locator('#cards .item-card').count(),1,'category filter broken');
@@ -299,6 +319,24 @@ try{
  console.log('OK invalid gallery photos and 3/day limit errors (all mocked)');
  await market.evaluate(()=>{localStorage.removeItem('tc35_auth_session');sessionStorage.removeItem('tc35_auth_session')});
  await market.close();
+
+ // V33: gallery URL failure must show a fallback rather than a blank column.
+ const gallery=await open('/marketplace.html');
+ await gallery.route(origin+'/rest/v1/market_listing_media?**',route=>route.fulfill({
+  status:200,headers:cors,body:JSON.stringify([{listing_id:701,object_path:'smoke/nonexistent-photo.jpg',sort_order:0}])
+ }));
+ await gallery.route(origin+'/storage/v1/object/sign/market-gallery/**',route=>route.fulfill({
+  status:403,headers:cors,body:JSON.stringify({message:'Test image signing unavailable'})
+ }));
+ await gallery.reload({waitUntil:'domcontentloaded'});
+ await gallery.waitForFunction(()=>document.querySelectorAll('#cards .item-card').length===2);
+ await gallery.locator('.item-card').filter({hasText:'Fortnite Demo Listing'}).getByRole('button').first().click();
+ await gallery.locator('#detail-dialog[open]').waitFor();
+ await gallery.locator('#detail-placeholder').getByText('Photos unavailable — try again later').waitFor();
+ assert(await gallery.locator('#detail-placeholder').isVisible(),'gallery error must keep fallback visible');
+ assert(await gallery.locator('#request-purchase').isDisabled());
+ console.log('OK V33 gallery fallback, request consent and stable modal scroll (all mocked)');
+ await gallery.close();
 
  // V27: review-only requests, duplicate prevention, ownership filters; no live writes.
  const orderPage=await open('/marketplace.html');
