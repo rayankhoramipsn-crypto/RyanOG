@@ -123,7 +123,7 @@ try{
  await home.locator('#tc-v23-login-feedback[data-state="error"]:visible').waitFor();
  assert.match(await home.locator('#tc-v23-login-feedback').textContent(),/Invalid login credentials/);
  assert.equal(await home.locator('#tc-v23-login-feedback').getAttribute('role'),'alert');
- assert.equal(await home.locator('#tc-v23-login-feedback').evaluate(el=>getComputedStyle(el).borderTopColor),'rgb(255, 100, 120)');
+ await home.waitForFunction(()=>getComputedStyle(document.querySelector('#tc-v23-login-feedback')).borderTopColor==='rgb(255, 100, 120)',null,{timeout:4000});
  await home.unroute(origin+'/auth/v1/token?**');
  await home.getByRole('button',{name:'Create your account'}).click();
  assert.equal(await home.locator('#tc31-signup-view:visible').count(),1,'signup should have own view');
