@@ -3,7 +3,7 @@
 const API='https://cxtytbjvdlngahytfilr.supabase.co';
 const KEY='sb_publishable_AqZWjpgyZ_h6-EKwOySyGQ_0LE8bcRm';
 const $=id=>document.getElementById(id);
-const S={session:null,admin:false,items:[],photos:new Map(),signed:new Map(),category:'all',sort:'new',query:'',selected:null,threads:[],active:null,lastKey:'',timer:null,rt:null,inboxChannel:null,inboxTimer:null,inboxOwner:null,inboxBusy:null,inboxInitialized:false,inboxConnected:false,readMarks:new Map(),lang:'en',dailyCount:0,pro:false,threadQuery:'',unreadOnly:false};
+const S={session:null,admin:false,items:[],photos:new Map(),signed:new Map(),category:'all',sort:'new',query:'',selected:null,threads:[],active:null,lastKey:'',timer:null,rt:null,inboxChannel:null,inboxTimer:null,inboxOwner:null,inboxBusy:null,inboxInitialized:false,inboxConnected:false,readMarks:new Map(),lang:'en',dailyCount:0,pro:false,threadQuery:'',unreadOnly:false,purchaseRows:[],purchaseBusy:false,purchaseFilter:'all'};
 const i18n={en:{all:'All listings',fortnite:'Fortnite',roblox:'Roblox',steam:'Steam',gear:'Gaming gear',other:'Other',browse:'Explore listings',sell:'Sell an item',messages:'Messages',rules:'Marketplace rules',noresults:'No approved listings match your search.',details:'View details',contact:'Chat with seller',login:'Sign in',logout:'Sign out'},
 fa:{all:'تمام آگهی‌ها',fortnite:'فورتنایت',roblox:'روبلاکس',steam:'استیم',gear:'تجهیزات گیمینگ',other:'سایر',browse:'آگهی‌های مارکت‌پلیس',sell:'ثبت آگهی',messages:'پیام‌ها',rules:'قوانین بازار',noresults:'آگهی تأییدشده‌ای پیدا نشد.',details:'مشاهده جزئیات',contact:'چت با فروشنده',login:'ورود',logout:'خروج'},
 ar:{all:'كل الإعلانات',fortnite:'فورتنايت',roblox:'روبلوكس',steam:'ستيم',gear:'معدات الألعاب',other:'أخرى',browse:'تصفح السوق',sell:'نشر إعلان',messages:'الرسائل',rules:'قواعد السوق',noresults:'لا توجد إعلانات مطابقة.',details:'عرض التفاصيل',contact:'مراسلة البائع',login:'تسجيل الدخول',logout:'تسجيل الخروج'}};
@@ -71,10 +71,26 @@ function card(p){const c=make('article',null,'item-card');const main=make('div',
 function renderItems(){const root=$('cards');empty(root);const rows=filtered();$('count').textContent=rows.length+' listings';if(!rows.length)root.append(make('div',tr('noresults'),'empty'));else rows.forEach(p=>root.append(card(p)));document.querySelectorAll('[data-cat]').forEach(b=>b.classList.toggle('active',b.dataset.cat===S.category))}
 async function readPhotos(ids){if(!ids.length)return;const valid=ids.map(Number).filter(Number.isInteger);if(!valid.length)return;try{const data=await req('/rest/v1/market_listing_media?select=listing_id,object_path,sort_order&listing_id=in.('+valid.join(',')+')&order=sort_order.asc&limit=500');for(const id of valid)S.photos.set(String(id),data.filter(m=>+m.listing_id===id))}catch(e){console.warn('Gallery unavailable',errorText(e))}}
 async function browse(){try{S.items=await rpc('market_browse')||[];await readPhotos(S.items.map(p=>p.id));renderItems()}catch(e){empty($('cards'));$('cards').append(make('div','Listings unavailable: '+errorText(e),'empty'))}}
-function details(p){S.selected=p;$('purchase-status').textContent='';$('detail-title').textContent=p.title;$('detail-platform').textContent=p.platform;$('detail-desc').textContent=p.description;$('detail-price').textContent=money(p.price);$('detail-date').textContent='Posted '+date(p.submitted_at);$('accept').checked=false;$('chat-seller').disabled=true;$('request-purchase').disabled=true;const cover=$('detail-cover'),thumbs=$('thumbs');cover.removeAttribute('src');cover.style.display='none';empty(thumbs);const images=S.photos.get(String(p.id))||[];$('detail-placeholder').classList.toggle('hidden',images.length>0);for(const [i,file] of images.entries()){signed(file.object_path).then(url=>{if(!url||S.selected?.id!==p.id)return;const img=make('img');img.src=url;img.alt='Photo '+(i+1);img.onclick=()=>{cover.src=url;cover.style.display='block'};thumbs.append(img);if(i===0){cover.src=url;cover.style.display='block'}})}dialog('detail-dialog')}
+const tc27OpenStatuses=['requested','awaiting_payment_setup','disputed','payment_reported','payment_verified','delivery_reported'];
+function tc27ActiveRequest(listingId){
+ return S.purchaseRows.find(r=>String(r.listing_id)===String(listingId)&&r.buyer_id===S.session?.user?.id&&tc27OpenStatuses.includes(r.status));
+}
+function tc27PurchaseFeedback(message='',kind='info'){
+ const node=$('purchase-status');node.textContent=message;node.dataset.state=message?kind:'';
+ node.setAttribute('role',kind==='error'?'alert':'status');
+ node.setAttribute('aria-live',kind==='error'?'assertive':'polite');
+}
+function tc27UpdatePurchaseButton(){
+ const btn=$('request-purchase'),p=S.selected,already=p&&tc27ActiveRequest(p.id);
+ if(!btn)return;
+ btn.disabled=!$('accept').checked||S.purchaseBusy||!!already;
+ btn.textContent=already?'Review request already exists':'Request purchase review · No payment';
+ if(already)tc27PurchaseFeedback('Existing request #'+already.id+' is '+already.status.replaceAll('_',' ')+'. No duplicate was created.','info');
+}
+function details(p){S.selected=p;tc27PurchaseFeedback('');$('detail-title').textContent=p.title;$('detail-platform').textContent=p.platform;$('detail-desc').textContent=p.description;$('detail-price').textContent=money(p.price);$('detail-date').textContent='Posted '+date(p.submitted_at);$('accept').checked=false;$('chat-seller').disabled=true;$('request-purchase').disabled=true;tc27UpdatePurchaseButton();const cover=$('detail-cover'),thumbs=$('thumbs');cover.removeAttribute('src');cover.style.display='none';empty(thumbs);const images=S.photos.get(String(p.id))||[];$('detail-placeholder').classList.toggle('hidden',images.length>0);for(const [i,file] of images.entries()){signed(file.object_path).then(url=>{if(!url||S.selected?.id!==p.id)return;const img=make('img');img.src=url;img.alt='Photo '+(i+1);img.onclick=()=>{cover.src=url;cover.style.display='block'};thumbs.append(img);if(i===0){cover.src=url;cover.style.display='block'}})}dialog('detail-dialog')}
 async function contact(){if(!S.selected||!$('accept').checked)return;if(!S.session?.user){close('detail-dialog');dialog('auth-dialog');note('Sign in to contact the seller.');return}const b=$('chat-seller');b.disabled=true;try{const id=await rpc('market_start_chat',{p_listing:S.selected.id});close('detail-dialog');await showChats(id)}catch(e){note(errorText(e))}finally{b.disabled=false}}
 async function login(signup){const email=$('auth-email').value.trim(),password=$('auth-password').value;if(!email||password.length<8){authStatus('Enter email and a password of at least 8 characters.');return}const btn=$('auth-signin');btn.disabled=true;try{const data=await req('/auth/v1/'+(signup?'signup':'token?grant_type=password'),{method:'POST',json:{email,password}});if(!data.access_token){authStatus('Account created. Confirm your email to sign in.','success');return}saveSession(data);S.admin=await adminCheck();close('auth-dialog');sessionUI();authStatus('');startInbox();await Promise.allSettled([mine(),threads(),purchases()]);note('Signed in')}catch(e){authStatus(errorText(e))}finally{btn.disabled=false}}
-function logout(){stopPolling();stopInbox();saveSession(null);S.admin=false;S.active=null;S.threads=[];S.dailyCount=0;S.pro=false;close('chat-dialog');$('purchase-requests-wrap').classList.add('hidden');empty($('purchase-requests'));sessionUI();note('Signed out')}
+function logout(){stopPolling();stopInbox();saveSession(null);S.admin=false;S.active=null;S.threads=[];S.purchaseRows=[];S.purchaseBusy=false;S.dailyCount=0;S.pro=false;close('chat-dialog');$('purchase-requests-wrap').classList.add('hidden');empty($('purchase-requests'));sessionUI();note('Signed out')}
 const mime={'image/jpeg':'jpg','image/png':'png','image/webp':'webp'};
 function checkFiles(files){if(!files.length)throw Error('At least one photo is required.');if(files.length>4)throw Error('Maximum four photos per listing.');for(const f of files)if(!mime[f.type]||f.size>5*1024*1024||f.size===0)throw Error('Use JPG, PNG or WebP photos under 5 MB each.')}
 async function uploadPhoto(id,file,pos){const path=S.session.user.id+'/'+id+'/'+crypto.randomUUID()+'.'+mime[file.type];const response=await fetch(API+'/storage/v1/object/market-gallery/'+path,{method:'POST',headers:{...headers(false),'Content-Type':file.type,'x-upsert':'false'},body:file});if(!response.ok){const data=await response.json().catch(()=>({}));throw Error(data.message||data.error||'Photo upload failed');}await req('/rest/v1/market_listing_media',{method:'POST',json:{listing_id:id,seller_id:S.session.user.id,object_path:path,alt_text:'Seller item photo',sort_order:pos},headers:{Prefer:'return=minimal'}})}
@@ -160,38 +176,54 @@ async function removeMyListing(p){
   await Promise.allSettled([mine(),browse(),purchases()]);
  }catch(e){note('Could not remove this listing: '+errorText(e));}
 }
+function tc27RenderPurchases(){
+ const root=$('purchase-requests'),owner=S.session?.user?.id,filter=S.purchaseFilter;
+ if(!owner)return;
+ const visible=S.purchaseRows.filter(r=>filter==='all'||(filter==='buyer'&&r.buyer_id===owner)||(filter==='seller'&&r.seller_id===owner)
+   ||(filter==='open'&&tc27OpenStatuses.includes(r.status))||(filter==='cancelled'&&r.status==='cancelled'));
+ empty(root);
+ $('tc27-my-count').textContent=visible.length+' of '+S.purchaseRows.length+' requests';
+ if(!visible.length){root.append(make('p',S.purchaseRows.length?'No requests match this filter.':'No purchase requests yet.','fine'));return}
+ for(const p of visible){
+  const card=make('article',null,'request-row tc27-request-card');
+  const role=p.buyer_id===owner?'Buyer':'Seller',state=String(p.status||'requested');
+  card.append(make('strong',role+' · '+p.listing_title+' · '+money(p.price_usd)));
+  card.append(make('span',state.replaceAll('_',' '),'tc27-request-tag '+state));
+  card.append(make('span','Request #'+p.id+' · Listing #'+p.listing_id+' · Preferred: '+p.payment_method+' · '+date(p.created_at),'tc27-request-meta'));
+  if(p.admin_note)card.append(make('p','Administrator note: '+p.admin_note,'fine'));
+  card.append(make('div','Review only — no payment, delivery confirmation or escrow is active.','tc27-request-warning'));
+  root.append(card);
+ }
+}
 async function purchases(){
- if(!S.session?.user){$('purchase-requests-wrap').classList.add('hidden');return}
- const root=$('purchase-requests'),owner=S.session.user.id;
+ if(!S.session?.user){S.purchaseRows=[];$('purchase-requests-wrap').classList.add('hidden');return}
+ const owner=S.session.user.id;
  $('purchase-requests-wrap').classList.remove('hidden');
  try{
   const rows=await req('/rest/v1/market_purchase_requests?select=id,listing_id,listing_title,price_usd,payment_method,status,buyer_id,seller_id,created_at,admin_note&order=created_at.desc&limit=100');
   if(S.session?.user?.id!==owner)return;
-  empty(root);
-  if(!rows.length)root.append(make('p','No purchase requests yet.','fine'));
-  for(const p of rows){
-   const card=make('article',null,'request-row');
-   const role=p.buyer_id===owner?'Buyer':'Seller';
-   card.append(make('strong',role+' · '+p.listing_title+' · '+money(p.price_usd)));
-   card.append(make('span','Status: '+p.status.replaceAll('_',' ')+' · Preferred: '+p.payment_method+' · '+date(p.created_at),'fine'));
-   if(p.admin_note)card.append(make('p','Administrator note: '+p.admin_note,'fine'));
-   root.append(card);
-  }
- }catch(e){root.textContent='Purchase requests unavailable: '+errorText(e)}
+  if(!Array.isArray(rows))throw Error('Unexpected request list from server');
+  S.purchaseRows=rows;tc27RenderPurchases();
+  if(S.selected)tc27UpdatePurchaseButton();
+ }catch(e){$('purchase-requests').textContent='Purchase requests unavailable: '+errorText(e)}
 }
 async function requestPurchase(){
  const p=S.selected;
- if(!p||!$('accept').checked)return;
+ if(!p||!$('accept').checked||S.purchaseBusy)return;
  if(!S.session?.user){close('detail-dialog');dialog('auth-dialog');note('Sign in to request a purchase.');return}
- if(!confirm('Create a purchase review request for '+p.title+' at '+money(p.price)+'? This does not send money or start escrow.'))return;
+ if(p.seller_id===S.session.user.id){tc27PurchaseFeedback('You cannot request to buy your own listing.','error');return}
+ const existing=tc27ActiveRequest(p.id);
+ if(existing){tc27PurchaseFeedback('Request #'+existing.id+' is already open. You do not need another request.','info');tc27UpdatePurchaseButton();return}
+ if(!confirm('Submit a review-only request for '+p.title+' at '+money(p.price)+'? No payment or escrow will be started.'))return;
  const btn=$('request-purchase');
- btn.disabled=true;$('purchase-status').textContent='Submitting request…';
+ S.purchaseBusy=true;btn.disabled=true;tc27PurchaseFeedback('Submitting for administrator review…','info');
  try{
   const id=await rpc('market_request_purchase',{p_listing:Number(p.id),p_method:$('purchase-method').value,p_note:null});
-  $('purchase-status').textContent='Request '+id+' saved for administrator review. This is not a payment confirmation; do not send funds.';
   await purchases();
- }catch(e){$('purchase-status').textContent='Request failed: '+errorText(e)}
- finally{btn.disabled=!$('accept').checked}
+  const match=S.purchaseRows.find(x=>String(x.id)===String(id));
+  tc27PurchaseFeedback('Review request #'+id+(match?' is '+match.status.replaceAll('_',' '):' was recorded')+'. No payment was made. Do not send funds.','success');
+ }catch(e){tc27PurchaseFeedback('Request failed: '+errorText(e),'error')}
+ finally{S.purchaseBusy=false;const active=tc27ActiveRequest(p.id);btn.disabled=!$('accept').checked||!!active;btn.textContent=active?'Review request already exists':'Request purchase review · No payment'}
 }
 async function retry(){
  const files=Array.from($('retry-input').files||[]);
@@ -507,10 +539,11 @@ $('logout').addEventListener('click',logout);
 $('listing-form').addEventListener('submit',submit);
 $('photos').addEventListener('change',previewFiles);
 $('retry-save').addEventListener('click',retry);
-$('accept').addEventListener('change',e=>{$('chat-seller').disabled=!e.target.checked;$('request-purchase').disabled=!e.target.checked});
+$('accept').addEventListener('change',e=>{$('chat-seller').disabled=!e.target.checked;tc27UpdatePurchaseButton()});
 $('chat-seller').addEventListener('click',contact);
 $('request-purchase').addEventListener('click',requestPurchase);
 $('refresh-purchases').addEventListener('click',purchases);
+$('tc27-my-filter')?.addEventListener('change',e=>{S.purchaseFilter=e.target.value;tc27RenderPurchases()});
 $('chat-form').addEventListener('submit',send);
 $('chat-body').addEventListener('keydown',e=>{
  if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){
@@ -528,7 +561,7 @@ window.addEventListener('storage',e=>{
   const next=window.TrisoAuth.read();
   if((S.session?.access_token||null)!==(next?.access_token||null)){
    stopPolling();stopInbox();S.active=null;
-   S.session=next;S.dailyCount=0;S.pro=false;S.threads=[];sessionUI();
+   S.session=next;S.dailyCount=0;S.pro=false;S.threads=[];S.purchaseRows=[];S.purchaseBusy=false;sessionUI();
    if(next){startInbox();Promise.allSettled([mine(),threads(),purchases()]);}else{$('purchase-requests-wrap').classList.add('hidden');empty($('purchase-requests'));}
   }
  }
