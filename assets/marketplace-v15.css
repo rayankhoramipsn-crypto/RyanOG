@@ -91,3 +91,31 @@ h1,h2,h3,p{margin-top:0}h1,h2,h3{line-height:1.16}p{color:#c4bfd2}img{display:bl
 #auth-note[data-state="error"]:not(:empty)::before,#sell-status[data-state="error"]:not(:empty)::before,#retry-note[data-state="error"]:not(:empty)::before,#upload-status[data-state="error"]:not(:empty)::before{content:"!";display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;margin-inline-end:10px;background:#ff7384;color:#2a0810;font-size:14px;font-weight:900}
 #auth-note[data-state="info"]:not(:empty),#sell-status[data-state="info"]:not(:empty),#retry-note[data-state="info"]:not(:empty),#upload-status[data-state="info"]:not(:empty){border-color:#8071aa;background:#27213c;color:#e9ddff}
 #auth-note[data-state="success"]:not(:empty),#sell-status[data-state="success"]:not(:empty),#retry-note[data-state="success"]:not(:empty),#upload-status[data-state="success"]:not(:empty){border-color:#55d49a;background:#143b2c;color:#dfffec}
+
+/* V26 marketplace inbox: accessible search, unread-only filter, responsive chat. */
+.tc26-inbox-column{display:flex;flex-direction:column;min-height:0;background:#161222;border-right:1px solid #453756}
+.tc26-inbox-column .thread-list{flex:1;min-height:0;border-right:0;overflow-y:auto}
+.tc26-inbox-tools{display:grid;gap:7px;padding:14px 13px 10px;border-bottom:1px solid #423251}
+.tc26-inbox-tools>label:first-child{color:#dfd2f8;font-size:12px;font-weight:750}
+#tc26-thread-search{height:42px;padding:9px 12px;font-size:13px;border-color:#675383}
+#tc26-thread-search:focus-visible{outline:2px solid #bba4ff}
+.tc26-unread-toggle{display:flex;align-items:center;gap:9px;color:#f1e9fc;font-size:12px;cursor:pointer}
+.tc26-unread-toggle input{width:18px;height:18px;accent-color:#b798ff;flex:none}
+#tc26-inbox-summary{font-size:11px;color:#b6a6ce;margin:2px 0 0}
+.thread-button.tc26-has-unread{border-color:#6c4f9e;background:#241a36}
+.thread-button.tc26-has-unread .thread-preview{color:#efe3ff;font-weight:700}
+#chat-state.chat-error{color:#ffe4e9!important;background:#4d1c2b!important;border-top:1px solid #ff7288;font-weight:700;padding:10px 14px}
+#chat-send:disabled{opacity:.6}
+@media(max-width:750px){
+ .chat-shell{display:flex;flex-direction:column}
+ .tc26-inbox-column{flex:0 0 auto;min-height:0;border-right:0;border-bottom:1px solid #453756}
+ .tc26-inbox-tools{display:flex;flex-wrap:wrap;align-items:center;gap:9px;padding:9px 12px}
+ .tc26-inbox-tools>label:first-child{display:none}
+ #tc26-thread-search{flex:1 1 165px;max-width:none;min-width:0;width:auto}
+ .tc26-unread-toggle{flex:0 0 auto}
+ #tc26-inbox-summary{flex:1 0 100%;margin:0}
+ .tc26-inbox-column .thread-list{display:flex;overflow-x:auto;overflow-y:hidden;max-height:110px;min-height:72px;gap:8px;padding:9px}
+ .tc26-inbox-column .thread-heading{display:none}
+ .tc26-inbox-column .thread-button{flex:0 0 185px;margin:0}
+ .chat-main{flex:1;min-height:0}
+}
