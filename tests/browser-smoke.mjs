@@ -111,7 +111,10 @@ try{
  await home.evaluate(()=>{localStorage.removeItem('tc35_auth_session');sessionStorage.removeItem('tc35_auth_session')});
  await home.reload({waitUntil:'domcontentloaded'});
  await home.locator('#lang-screen.active').waitFor({timeout:12000});
- await home.evaluate(()=>setLang('en','ltr'));
+ await home.locator('#lang-screen .lang-btn').first().click();
+ await home.locator('#store-screen.active').waitFor();
+ assert.equal(await home.locator('#tc31-panel.active').count(),0,'language selection must not force guest sign-in');
+ await home.locator('#store-screen').getByRole('button',{name:'Account',exact:true}).first().click();
  await home.locator('#tc31-panel.active').waitFor();
  assert.equal(await home.locator('#tc-native-search').getAttribute('name'),'tc35_store_header_lookup');
  assert.equal(await home.locator('#tc39-search').getAttribute('type'),'search');

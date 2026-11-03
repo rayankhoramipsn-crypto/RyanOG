@@ -2458,7 +2458,7 @@ function setLang(lang, dir, origin) {
   applyTranslations();
   if(origin === 'navbar' && !firstEntry)return;
   showScreen('store-screen');
-  if(firstEntry && origin !== 'navbar' && !window.TrisoAuth?.read()?.user)showScreen('tc31-panel');
+  // Language selection opens the public store; Account remains an explicit action.
 }
 
 function applyTranslations() {
