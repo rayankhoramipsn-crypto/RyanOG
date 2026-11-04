@@ -2130,7 +2130,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElement
           </div>
           <div class="form-group-admin">
             <label>BTC Wallet Address</label>
-            <input type="text" id="set-btc-wallet" placeholder="bc1q...">
+            <input type="text" id="set-btc-wallet" placeholder="bc1q..." readonly title="Receiving address is configured in the site release, not browser storage.">
           </div>
         </div>
         <div class="form-row">
@@ -2373,7 +2373,7 @@ let currentDir = 'ltr';
 function loadState() {
   try {
     const s = localStorage.getItem('trisocmd_test_state');
-    if (s) return {...JSON.parse(s), walletLTC: 'ltc1q8lek6ex3sf77q4fvm6cq3u5h7yp8aqd8rhwxnn', wallet: 'ltc1q8lek6ex3sf77q4fvm6cq3u5h7yp8aqd8rhwxnn'};
+    if (s) return {...JSON.parse(s), walletBTC: 'bc1qm4temacqu8ycjgc2u2m3j0nqs4y2kp7wwdkygm', walletLTC: 'ltc1q8lek6ex3sf77q4fvm6cq3u5h7yp8aqd8rhwxnn', wallet: 'ltc1q8lek6ex3sf77q4fvm6cq3u5h7yp8aqd8rhwxnn'};
   } catch(e) {}
   return {
     lang: 'en', dir: 'ltr',
@@ -2382,7 +2382,7 @@ function loadState() {
     reviewChannel: 'https://t.me/trisocmd',
     qualityChannel: 'https://t.me/trisouhq',
     walletLTC: 'ltc1q8lek6ex3sf77q4fvm6cq3u5h7yp8aqd8rhwxnn',
-    walletBTC: 'bc1qp2v6xm44m8my38m9ffvu75mkhzfrf6ex03vkvt',
+    walletBTC: 'bc1qm4temacqu8ycjgc2u2m3j0nqs4y2kp7wwdkygm',
     wallet: 'ltc1q8lek6ex3sf77q4fvm6cq3u5h7yp8aqd8rhwxnn',
     passwordHash: '369cd3d4a9a41c5db6cac6226aa0b0334f2550f68e9781f590e901d984a074ae',
     ltcRate: 42,
@@ -3058,7 +3058,7 @@ function saveSettings() {
   state.telegram = document.getElementById('set-telegram').value || 'https://t.me/trisocmd';
   state.walletLTC = 'ltc1q8lek6ex3sf77q4fvm6cq3u5h7yp8aqd8rhwxnn';
   state.wallet = state.walletLTC;
-  const bwv = document.getElementById('set-btc-wallet'); if(bwv) state.walletBTC = bwv.value;
+  state.walletBTC = 'bc1qm4temacqu8ycjgc2u2m3j0nqs4y2kp7wwdkygm';
   const rcv = document.getElementById('set-review-channel'); if(rcv) state.reviewChannel = rcv.value;
   const qcv = document.getElementById('set-quality-channel'); if(qcv) state.qualityChannel = qcv.value;
   const newpw = document.getElementById('set-password').value;
@@ -3741,12 +3741,14 @@ count();
       <p class="tc443-disclaimer">Manual payment arrangement · No automatic payment confirmation.</p>
    </div>
    <div class="tc43-pay" id="tc43-pay">
- <section aria-label="Manual Litecoin payment" style="margin:16px 0;padding:16px;border:1px solid #7452b8;border-radius:12px">
- <h3>Litecoin · Manual review / پرداخت با بررسی دستی / مراجعة يدوية</h3>
+ <section aria-label="Manual Litecoin and Bitcoin payments" style="margin:16px 0;padding:16px;border:1px solid #7452b8;border-radius:12px">
+ <h3>LTC / BTC · Manual review / پرداخت با بررسی دستی / مراجعة يدوية</h3>
  <p>Network: Litecoin (LTC) mainnet</p>
  <code id="tc-manual-ltc-address" style="display:block;overflow-wrap:anywhere;user-select:all">ltc1q8lek6ex3sf77q4fvm6cq3u5h7yp8aqd8rhwxnn</code>
- <p>Confirm the order, exact LTC amount and destination with @trisooo before transferring. Send the order reference and TXID to support for manual review. No automatic confirmation.</p>
- <p lang="fa" dir="rtl">قبل از انتقال، سفارش، مبلغ دقیق لایت‌کوین و آدرس مقصد را با پشتیبانی تأیید کنید. شناسه سفارش و TXID را برای بررسی دستی بفرستید. تأیید خودکار فعال نیست.</p>
+ <p>Network: Bitcoin (BTC) mainnet</p>
+ <code id="tc-manual-btc-address" style="display:block;overflow-wrap:anywhere;user-select:all">bc1qm4temacqu8ycjgc2u2m3j0nqs4y2kp7wwdkygm</code>
+ <p>Confirm the order, exact amount in the selected currency and destination with @trisooo before transferring. Send the order reference and TXID to support for manual review. No automatic confirmation.</p>
+ <p lang="fa" dir="rtl">قبل از انتقال، سفارش، مبلغ دقیق ارز انتخاب‌شده و آدرس مقصد را با پشتیبانی تأیید کنید. شناسه سفارش و TXID را برای بررسی دستی بفرستید. تأیید خودکار فعال نیست.</p>
  <p lang="ar" dir="rtl">أكد الطلب والمبلغ الدقيق وعنوان الاستلام مع الدعم قبل التحويل. أرسل مرجع الطلب ومعرّف المعاملة للمراجعة اليدوية. لا يوجد تأكيد تلقائي.</p>
  <a href="https://t.me/trisooo" target="_blank" rel="noopener noreferrer">Contact support / پشتیبانی / الدعم ↗</a>
  </section>
