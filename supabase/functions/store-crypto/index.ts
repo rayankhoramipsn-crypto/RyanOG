@@ -27,6 +27,7 @@ export function inspectTx(tx, invoice, hash) {
 }
 Deno.serve(async req=>{
   if(req.method==="OPTIONS") return new Response(null,{headers:cors});
+  if(req.method==="GET") return json({enabled:Deno.env.get("STORE_CRYPTO_ENABLED")==="true"});
   if(req.method!=="POST") return json({error:"POST required"},405);
   if(Deno.env.get("STORE_CRYPTO_ENABLED")!=="true") return json({error:"Checkout is disabled"},503);
   const base=Deno.env.get("SUPABASE_URL"), key=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
