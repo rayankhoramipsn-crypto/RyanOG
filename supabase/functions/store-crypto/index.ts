@@ -46,7 +46,11 @@ Deno.serve(async req=>{
       const rate=await read("https://api.coinbase.com/v2/prices/"+network+"-USD/spot");
       if(rate.data?.base!==network || rate.data?.currency!=="USD" || !(Number(rate.data.amount)>0)) throw Error("Price unavailable");
       const invoice=await rpc("store_issue_crypto",{p_user:user.id,p_order:order_id,p_network:network,p_address:destinations[network],p_rate:rate.data.amount});
-      return json(invoice);
+      return json(Array.isArray(invoice) ? invoice[0] : invoice);
+    }
+    if(action==="resume"){
+      const [invoice]=await read(base+"/rest/v1/store_crypto_invoice?order_id=eq."+order_id,{headers});
+      return invoice ? json({...invoice,order_status:orders[0].status}) : json({error:"No invoice for this order"},404);
     }
     const hash=String(txid||"").trim().toLowerCase();
     if(action!=="verify" || !/^[a-f0-9]{64}$/.test(hash)) return json({error:"Invalid TXID"},400);
