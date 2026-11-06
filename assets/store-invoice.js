@@ -75,10 +75,20 @@
     const labels={paid:tr('Payment confirmed','پرداخت تأیید شد','تم تأكيد الدفع'),pending_confirmations:tr('Waiting for confirmations. Check again later.','در انتظار تأیید شبکه؛ بعداً دوباره بررسی کن','بانتظار تأكيد الشبكة'),payment_review:tr('Payment received; contact support about stock','پرداخت دریافت شد؛ برای موجودی با پشتیبانی تماس بگیر','تم استلام الدفع؛ راجع الدعم بشأن المخزون')};
     info.textContent=labels[r.status] || r.status;
   }));
+  const reference=document.createElement('input'); reference.placeholder='Order ID'; reference.setAttribute('aria-label','Order ID');
+  const resume=button('',()=>run(async(token,v)=>{
+    const i=await request(endpoint,{action:'resume',order_id:reference.value.trim()},token);
+    if(v!==generation)return;
+    invoice=i; coin=i.network; select.value=coin; renderQuote(i); info.textContent=i.order_status;
+    if(i.txid || Date.parse(i.expires_at)<=Date.now()){
+      details.querySelectorAll('canvas,img,table,button').forEach(el=>{if(el!==verify) el.hidden=true});
+      info.textContent=i.txid?i.order_status:tr('Expired. Only check a transfer already sent.','مهلت پرداخت تمام شده؛ فقط تراکنش قبلی را بررسی کنید.','انتهت المهلة؛ تحقق فقط من دفعة سابقة.');
+    }
+  }));
   const reset=()=>{
     generation++; busy=false; invoice=null; coin='LTC'; select.value=coin; select.disabled=false; create.disabled=false; verify.disabled=false; tx.value='';
     create.textContent=tr('Create invoice','ساخت فاکتور','إنشاء فاتورة'); verify.textContent=tr('Check TXID','بررسی تراکنش','تحقق من المعاملة');
-    details.replaceChildren(); info.textContent=''; panel.replaceChildren(legacy,select,create,details,info);
+    resume.textContent=tr('Reopen by order ID','بازیابی با شماره سفارش','استعادة الفاتورة'); reference.value=''; details.replaceChildren(); info.textContent=''; panel.replaceChildren(legacy,select,create,details,info,reference,resume);
   };
   const original=window.tc41OpenCheckout;
   window.tc41OpenCheckout=function(...args){const result=original.apply(this,args);reset();return result};
