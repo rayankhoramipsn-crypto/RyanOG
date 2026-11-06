@@ -27,21 +27,31 @@ export function inspectTx(tx, invoice, hash) {
 }
 Deno.serve(async req=>{
   if(req.method==="OPTIONS") return new Response(null,{headers:cors});
-  if(req.method==="GET") return json({enabled:Deno.env.get("STORE_CRYPTO_ENABLED")==="true"});
+  const pilot = Deno.env.get("STORE_CRYPTO_PILOT") === "true";
+  const enabled = pilot || Deno.env.get("STORE_CRYPTO_ENABLED") === "true";
+  if(req.method==="GET") return json({enabled, pilot});
   if(req.method!=="POST") return json({error:"POST required"},405);
-  if(Deno.env.get("STORE_CRYPTO_ENABLED")!=="true") return json({error:"Checkout is disabled"},503);
+  if(!enabled) return json({error:"Checkout is disabled"},503);
   const base=Deno.env.get("SUPABASE_URL"), key=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const auth=req.headers.get("Authorization");
   if(!auth?.startsWith("Bearer ")) return json({error:"Sign in required"},401);
   const user=await read(base+"/auth/v1/user",{headers:{apikey:Deno.env.get("SUPABASE_ANON_KEY"),Authorization:auth}}).catch(()=>null);
   if(!user?.id) return json({error:"Invalid session"},401);
+  if (pilot && user.app_metadata?.role !== "admin") return json({error:"Operator pilot only"},403);
   const headers={apikey:key,Authorization:"Bearer "+key,"Content-Type":"application/json"};
   const rpc=(name,body)=>read(base+"/rest/v1/rpc/"+name,{method:"POST",headers,body:JSON.stringify(body)});
   try {
     const {action,order_id,network,txid}=await req.json();
     if(!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(order_id)) return json({error:"Invalid order"},400);
-    const orders=await read(base+"/rest/v1/tc42_orders?id=eq."+order_id+"&customer_id=eq."+user.id+"&select=status",{headers});
+    const orders=await read(base+"/rest/v1/tc42_orders?id=eq."+order_id+"&customer_id=eq."+user.id+"&select=status,total_amount,items",{headers});
     if(!orders.length) return json({error:"Order unavailable"},404);
+    if (pilot) {
+      const order = orders[0];
+      const [item] = order.items;
+      if (order.items.length !== 1 || Number(item?.id) !== 5 || Number(item.qty) !== 1 ||
+          Number(order.total_amount) !== 0.25 || (action === "create" && network !== "LTC"))
+        return json({error:"Pilot requires one unit of product 5 at USD 0.25, paid in LTC"},400);
+    }
     if(action==="create" && (network==="BTC"||network==="LTC")){
       const rate=await read("https://api.coinbase.com/v2/prices/"+network+"-USD/spot");
       if(rate.data?.base!==network || rate.data?.currency!=="USD" || !(Number(rate.data.amount)>0)) throw Error("Price unavailable");
