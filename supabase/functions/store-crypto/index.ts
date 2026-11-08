@@ -69,6 +69,13 @@ Deno.serve(async req=>{
       catch{return {network,available:false};}
     }));return json({enabled,pilot,checks});
   }
+  if(req.method==="GET" && new URL(req.url).searchParams.get("catalog")==="store"){
+    try {
+      const fields="id,title,price,stock,status,category,description,description_ar,image_url,min_qty,max_qty";
+      const key=Deno.env.get("SUPABASE_ANON_KEY");
+      return json(await read(base+"/rest/v1/products?status=eq.available&order=id.asc&select="+fields,{headers:{apikey:key,Authorization:"Bearer "+key}}));
+    } catch {return json({error:"Catalog unavailable"},503);}
+  }
   if(req.method==="GET") return json({enabled,pilot});
   if(req.method!=="POST") return json({error:"POST required"},405);
 
@@ -81,7 +88,29 @@ Deno.serve(async req=>{
   const headers={apikey:key,Authorization:"Bearer "+key,"Content-Type":"application/json"};
   const rpc=(name,body)=>read(base+"/rest/v1/rpc/"+name,{method:"POST",headers,body:JSON.stringify(body)});
   try {
-    const {action,order_id,network,txid,items}=await req.json();
+    const {action,order_id,network,txid,items,product_id,product}=await req.json();
+    if (production && action.startsWith("admin_product_")){
+      if(user.app_metadata?.role!=="admin")return json({error:"Admin required"},403);
+      const columns="id,title,price,stock,status,category,description,description_ar,image_url,min_qty,max_qty";
+      const url=base+"/rest/v1/products";
+      if(action==="admin_product_list") return json(await read(url+"?select="+columns+"&order=id.desc&limit=200",{headers}));
+      const edit=action==="admin_product_edit", remove=action==="admin_product_delete";
+      if(!edit && !remove && action!=="admin_product_new")return json({error:"Unknown operation"},400);
+      if((edit||remove)&&!/^\d{1,18}$/.test(String(product_id)))return json({error:"Invalid product"},400);
+      let body;
+      if(!remove){
+        if(!product || typeof product.title!=="string" || !product.title.trim() || product.title.length>300 ||
+           !Number.isFinite(product.price)||product.price<0||!Number.isInteger(product.stock)||product.stock<0 ||
+           !Number.isInteger(product.min_qty)||product.min_qty<1 || (product.max_qty!=null&&(!Number.isInteger(product.max_qty)||product.max_qty<product.min_qty))||
+           !["available","unavailable"].includes(product.status)||
+           (product.image_url && !/^https:\/\//i.test(product.image_url))) return json({error:"Invalid product details"},400);
+        const fields=columns.split(",").filter(k=>k!=="id");
+        body=JSON.stringify(Object.fromEntries(fields.filter(k=>Object.hasOwn(product,k)).map(k=>[k,product[k]])));
+      }
+      const result=await read(url+(edit||remove?"?id=eq."+product_id:""),{method:remove?"DELETE":edit?"PATCH":"POST",headers:{...headers,Prefer:"return=representation"},body});
+      if(!result.length)return json({error:"Product no longer exists"},404);
+      return json(result);
+    }
     if (production && (action==="history" || action==="admin_history")) {
       const ownerOnly = action==="history";
       if (!ownerOnly && user.app_metadata?.role!=="admin") return json({error:"Admin required"},403);
