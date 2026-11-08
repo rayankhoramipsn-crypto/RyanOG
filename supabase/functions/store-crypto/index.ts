@@ -27,21 +27,34 @@ export function inspectTx(tx, invoice, hash) {
 }
 Deno.serve(async req=>{
   if(req.method==="OPTIONS") return new Response(null,{headers:cors});
+  const base=Deno.env.get("SUPABASE_URL");
+  const production=base==="https://zrolxgzndinktsjsthfw.supabase.co";
+  const authBase=production?"https://cxtytbjvdlngahytfilr.supabase.co":base;
+  const authKey=production?"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4dHl0Ymp2ZGxuZ2FoeXRmaWxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI3MDgxNTcsImV4cCI6MjEwODI4NDE1N30.60fpG7raWTl8ueU1ajC0ct3MuN5l9akEdkQcCxYBKH8":Deno.env.get("SUPABASE_ANON_KEY");
   const pilot = Deno.env.get("STORE_CRYPTO_PILOT") === "true";
-  const enabled = pilot || Deno.env.get("STORE_CRYPTO_ENABLED") === "true";
+  const configured = ["STORE_USD_QUOTE_BASE","STORE_CHAIN_API_BASE"].every(name=>Deno.env.get(name)?.startsWith("https://"));
+  const enabled = configured && (pilot || Deno.env.get("STORE_CRYPTO_ENABLED") === "true");
   if(req.method==="GET") return json({enabled, pilot});
   if(req.method!=="POST") return json({error:"POST required"},405);
   if(!enabled) return json({error:"Checkout is disabled"},503);
-  const base=Deno.env.get("SUPABASE_URL"), key=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const key=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const auth=req.headers.get("Authorization");
   if(!auth?.startsWith("Bearer ")) return json({error:"Sign in required"},401);
-  const user=await read(base+"/auth/v1/user",{headers:{apikey:Deno.env.get("SUPABASE_ANON_KEY"),Authorization:auth}}).catch(()=>null);
+  const user=await read(authBase+"/auth/v1/user",{headers:{apikey:authKey,Authorization:auth}}).catch(()=>null);
   if(!user?.id) return json({error:"Invalid session"},401);
   if (pilot && user.app_metadata?.role !== "admin") return json({error:"Operator pilot only"},403);
   const headers={apikey:key,Authorization:"Bearer "+key,"Content-Type":"application/json"};
   const rpc=(name,body)=>read(base+"/rest/v1/rpc/"+name,{method:"POST",headers,body:JSON.stringify(body)});
   try {
-    const {action,order_id,network,txid}=await req.json();
+    const {action,order_id,network,txid,items}=await req.json();
+    if (production && action==="order") {
+      if (!Array.isArray(items) || items.length<1 || items.length>20) return json({error:"Invalid cart"},400);
+      if (pilot && (items.length!==1 || Number(items[0]?.id)!==5 || Number(items[0]?.qty)!==1)) return json({error:"Pilot item only"},400);
+      return json(await rpc("store_checkout_order",{buyer:user.id,items}));
+    }
+    if (production && action==="history") {
+      return json(await read(base+"/rest/v1/tc42_orders?customer_id=eq."+user.id+"&select=id,status,total_amount,items,created_at&order=created_at.desc&limit=50",{headers}));
+    }
     if(!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(order_id)) return json({error:"Invalid order"},400);
     const orders=await read(base+"/rest/v1/tc42_orders?id=eq."+order_id+"&customer_id=eq."+user.id+"&select=status,total_amount,items",{headers});
     if(!orders.length) return json({error:"Order unavailable"},404);
@@ -53,7 +66,7 @@ Deno.serve(async req=>{
         return json({error:"Pilot requires one unit of product 5 at USD 0.25, paid in LTC"},400);
     }
     if(action==="create" && (network==="BTC"||network==="LTC")){
-      const rate=await read("https://api.coinbase.com/v2/prices/"+network+"-USD/spot");
+      const rate=await read(Deno.env.get("STORE_USD_QUOTE_BASE").replace(/\/$/,"")+"/"+network+"-USD/spot");
       if(rate.data?.base!==network || rate.data?.currency!=="USD" || !(Number(rate.data.amount)>0)) throw Error("Price unavailable");
       const invoice=await rpc("store_issue_crypto",{p_user:user.id,p_order:order_id,p_network:network,p_address:destinations[network],p_rate:rate.data.amount});
       return json(Array.isArray(invoice) ? invoice[0] : invoice);
@@ -68,7 +81,7 @@ Deno.serve(async req=>{
     if(!invoice) return json({error:"No invoice"},404);
     if(invoice.txid===hash) return json({status:orders[0].status});
     if(invoice.txid) return json({error:"Invoice already settled"},409);
-    const tx=await read("https://api.blockcypher.com/v1/"+invoice.network.toLowerCase()+"/main/txs/"+hash);
+    const tx=await read(Deno.env.get("STORE_CHAIN_API_BASE").replace(/\/$/,"")+"/"+invoice.network.toLowerCase()+"/main/txs/"+hash);
     if(!inspectTx(tx,invoice,hash)) return json({status:"pending_confirmations"});
     const status=await rpc("store_settle_crypto",{p_user:user.id,p_order:order_id,p_txid:hash});
     return json({status});
