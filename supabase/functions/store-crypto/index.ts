@@ -71,25 +71,31 @@ Deno.serve(async req=>{
   }
   if(req.method==="GET") return json({enabled,pilot});
   if(req.method!=="POST") return json({error:"POST required"},405);
-  if(!enabled) return json({error:"Checkout is disabled"},503);
+
   const key=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const auth=req.headers.get("Authorization");
   if(!auth?.startsWith("Bearer ")) return json({error:"Sign in required"},401);
   const user=await read(authBase+"/auth/v1/user",{headers:{apikey:authKey,Authorization:auth}}).catch(()=>null);
   if(!user?.id) return json({error:"Invalid session"},401);
-  if (pilot && user.app_metadata?.role !== "admin") return json({error:"Operator pilot only"},403);
+
   const headers={apikey:key,Authorization:"Bearer "+key,"Content-Type":"application/json"};
   const rpc=(name,body)=>read(base+"/rest/v1/rpc/"+name,{method:"POST",headers,body:JSON.stringify(body)});
   try {
     const {action,order_id,network,txid,items}=await req.json();
+    if (production && (action==="history" || action==="admin_history")) {
+      const ownerOnly = action==="history";
+      if (!ownerOnly && user.app_metadata?.role!=="admin") return json({error:"Admin required"},403);
+      const ownerQuery=ownerOnly ? "customer_id=eq."+user.id+"&" : "";
+      return json(await read(base+"/rest/v1/tc42_orders?"+ownerQuery+"select=id,status,total_amount,currency,items,created_at&order=created_at.desc&limit=100",{headers}));
+    }
+    if(!enabled) return json({error:"Checkout is disabled"},503);
+    if(pilot && user.app_metadata?.role !== "admin") return json({error:"Operator pilot only"},403);
     if (production && action==="order") {
       if (!Array.isArray(items) || items.length<1 || items.length>20) return json({error:"Invalid cart"},400);
       if (pilot && (items.length!==1 || Number(items[0]?.id)!==5 || Number(items[0]?.qty)!==1)) return json({error:"Pilot item only"},400);
       return json(await rpc("store_checkout_order",{buyer:user.id,items}));
     }
-    if (production && action==="history") {
-      return json(await read(base+"/rest/v1/tc42_orders?customer_id=eq."+user.id+"&select=id,status,total_amount,items,created_at&order=created_at.desc&limit=50",{headers}));
-    }
+
     if(!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(order_id)) return json({error:"Invalid order"},400);
     const orders=await read(base+"/rest/v1/tc42_orders?id=eq."+order_id+"&customer_id=eq."+user.id+"&select=status,total_amount,items",{headers});
     if(!orders.length) return json({error:"Order unavailable"},404);
