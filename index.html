@@ -3958,6 +3958,18 @@ count();
 })();
 </script>
 <section id="tc45-tracking" class="tc45-track" aria-hidden="true"><div class="tc45-track-panel" role="dialog" aria-modal="true" aria-labelledby="tc45-title"><div class="tc45-track-head"><div><small>TRISOCMD / CUSTOMER CENTER</small><h2 id="tc45-title">TRACK YOUR ORDERS.</h2><div class="tc45-tracking-note">Only orders associated with your signed-in account appear here.</div></div><button onclick="tc45CloseTracking()" aria-label="Close tracking">✕</button></div><div id="tc45-tracking-list" role="status">Sign in to view your orders.</div><button class="tc45-track-btn" onclick="tc45RefreshTracking()">↻ REFRESH ORDER STATUS</button><button class="tc45-track-btn" onclick="tc45CloseTracking();tc41ToggleChat(true)">CONTACT SUPPORT ↗</button></div></section>
+<script>
+window.tcStoreHistory=async function(action,previous){
+ const legacy=await previous();
+ if(!['trisocmd.shop','www.trisocmd.shop'].includes(location.hostname))return legacy;
+ const token=await window.tc42AccessToken();
+ if(!token)throw Error('Sign in to view orders.');
+ const response=await fetch('https://zrolxgzndinktsjsthfw.supabase.co/functions/v1/store-crypto',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({action}),signal:AbortSignal.timeout(12000)});
+ if(!response.ok)throw Error('Order history is temporarily unavailable.');
+ const current=await response.json();
+ return [...new Map([...legacy,...current].map(order=>[order.id,order])).values()].sort((a,b)=>Date.parse(b.created_at)-Date.parse(a.created_at));
+};
+</script>
 <script id="tc45-tracking-js">
 (()=>{
  const $=id=>document.getElementById(id);
@@ -3969,7 +3981,7 @@ count();
  window.tc45RefreshTracking=async()=>{
   const root=$('tc45-tracking-list');root.textContent='Loading orders securely…';
   try{
-   const orders=await get('tc42_orders?select=id,created_at,status,total_amount,currency,items&order=created_at.desc&limit=40');root.replaceChildren();
+   const orders=await window.tcStoreHistory('history',()=>get('tc42_orders?select=id,created_at,status,total_amount,currency,items&order=created_at.desc&limit=40'));root.replaceChildren();
    if(!orders.length){root.textContent='No saved orders yet. You can still shop as a guest or place an order via Telegram.';return}
    for(const o of orders){
     const box=document.createElement('article');box.className='tc45-order';
@@ -3981,6 +3993,7 @@ count();
     steps.forEach((_,i)=>{const line=document.createElement('i');if(ix>=i)line.className='done';progress.append(line)});box.append(progress);
     const button=document.createElement('button');button.textContent='VIEW ORDER DETAILS ↗';const detail=document.createElement('div');detail.className='tc45-detail';detail.hidden=true;
     button.onclick=()=>{detail.hidden=!detail.hidden;if(detail.hidden)return;detail.replaceChildren();
+      const ref=document.createElement('p');ref.textContent=o.id;ref.dir='ltr';ref.style.userSelect='all';detail.append(ref);
       const rows=Array.isArray(o.items)?o.items:[];
       if(!rows.length){detail.textContent='Item details unavailable.';return}
       rows.forEach(r=>{const line=document.createElement('div');line.textContent=String(r.title||'Product')+' × '+Number(r.qty||0)+' · $'+Number(r.unit_price||0).toFixed(2)+' each';detail.append(line)})
@@ -4072,7 +4085,7 @@ count();
   const root=$('tc46-order-list');root.textContent='Loading orders…';
   try{
    if(!allowed)await verify();
-   const rows=await request('tc42_orders?select=id,customer_id,created_at,total_amount,status,items&order=created_at.desc&limit=100');
+   const rows=await window.tcStoreHistory('admin_history',()=>request('tc42_orders?select=id,customer_id,created_at,total_amount,status,items&order=created_at.desc&limit=100'));
    root.replaceChildren();
    if(!rows.length)root.textContent='No orders yet.';
    for(const o of rows){
@@ -4081,7 +4094,7 @@ count();
        payment verification/fulfillment is intentionally disabled here. */
     root.append(c.el);
    }
-   say('Loaded '+rows.length+' order records (read-only). Payment verification and fulfillment are not enabled.');
+   say('Loaded '+rows.length+' order records.');
   }catch(e){root.textContent=e.message;say(e.message)}
  };
  window.tc46SetOrderStatus=()=>say('Order status transitions are not configured. No payment has been verified or charged.');
