@@ -1,6 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+if (['trisocmd.shop','www.trisocmd.shop'].includes(location.hostname)) {
+  window.tcProdStore=async function(action,body={}) {
+    const endpoint='https://zrolxgzndinktsjsthfw.supabase.co/functions/v1/store-crypto';
+    let options={signal:AbortSignal.timeout(12000)},url=endpoint;
+    if(action==='catalog') url+='?catalog=store';
+    else {
+      const token=await window.tc42AccessToken?.();
+      if(!token)throw Error('Sign in to manage products.');
+      Object.assign(options,{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({action,...body})});
+    }
+    const res=await fetch(url,options),data=await res.json();
+    if(!res.ok)throw Error(data.error||'Store unavailable');
+    return data;
+  };
+}
+</script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex,nofollow">
@@ -2333,7 +2351,7 @@ async function supaEnsureTable() {
 
 async function supaLoadProducts() {
   try {
-    const rows = await supaFetch('/rest/v1/products?order=id.asc&select=*');
+    const rows = window.tcProdStore ? await window.tcProdStore('catalog') : await supaFetch('/rest/v1/products?order=id.asc&select=*');
     if (!Array.isArray(rows)) return [];
     return rows.map(r => ({
       id:       r.id,
@@ -4011,6 +4029,11 @@ window.tcStoreHistory=async function(action,previous){
  const say=msg=>{$('tc46-admin-msg').textContent=msg};
  let allowed=false,products=[];
  async function request(path,opts={}){
+  if(window.tcProdStore && /^products(?:[?]|$)/.test(path)){
+    const action={GET:'list',POST:'new',PATCH:'edit',DELETE:'delete'}[opts.method || 'GET'];
+    const product_id=path.match(/id=eq\.([0-9]+)/)?.[1];
+    return window.tcProdStore('admin_product_'+action,{product_id,product:opts.body});
+  }
   const token=await window.tc42AccessToken?.();
   if(!token)throw Error('Sign in again to manage the store.');
   const res=await fetch(SUPA_URL+'/rest/v1/'+path,{method:opts.method||'GET',headers:{apikey:SUPA_KEY,Authorization:'Bearer '+token,'Content-Type':'application/json',Prefer:opts.prefer||'return=representation'},body:opts.body===undefined?undefined:JSON.stringify(opts.body)});
