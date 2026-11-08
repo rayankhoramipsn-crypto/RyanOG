@@ -27,7 +27,7 @@ const cors = {
  'access-control-allow-headers':'apikey,authorization,content-type,prefer,x-client-info',
  'content-type':'application/json'
 };
-const browser = await chromium.launch({headless:true,args:['--no-sandbox']});
+const browser = await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{}),args:['--no-sandbox']});
 const context = await browser.newContext({viewport:{width:1365,height:900},reducedMotion:'reduce'});
 const pageErrors=[];
 const failed=[];
@@ -183,7 +183,7 @@ try{
  assert.match(await home.locator('#co-title').textContent(),/Review payment options/);
  // V30: mock the order RPC, not a real order or payment.
  let saveCalls=0;
- await home.route(origin+'/rest/v1/rpc/tc42_create_order',async route=>{
+ await home.route(origin+'/rest/v1/rpc/phase1_create_order',async route=>{
   saveCalls++;
   await new Promise(resolve=>setTimeout(resolve,120));
   return route.fulfill({status:200,headers:cors,body:JSON.stringify('11111111-2222-4333-8444-555555555555')});
@@ -197,12 +197,12 @@ try{
  assert.equal(saveCalls,1,'double click must send only one server order request');
  assert.match(await home.locator('#tc42-order-result').textContent(),/Not paid and not confirmed/);
  assert.equal(await home.locator('#tc42-order-result').getAttribute('data-state'),'success');
- await home.unroute(origin+'/rest/v1/rpc/tc42_create_order');
- await home.route(origin+'/rest/v1/rpc/tc42_create_order',route=>route.fulfill({status:503,headers:cors,body:JSON.stringify({message:'Temporary test failure'})}));
+ await home.unroute(origin+'/rest/v1/rpc/phase1_create_order');
+ await home.route(origin+'/rest/v1/rpc/phase1_create_order',route=>route.fulfill({status:503,headers:cors,body:JSON.stringify({message:'Temporary test failure'})}));
  await home.evaluate(()=>window.tc42SaveOrder());
  assert.equal(await home.locator('#tc42-order-result').getAttribute('data-state'),'error');
  assert.match(await home.locator('#tc42-order-result').textContent(),/check My Orders before retrying/i);
- await home.unroute(origin+'/rest/v1/rpc/tc42_create_order');
+ await home.unroute(origin+'/rest/v1/rpc/phase1_create_order');
  console.log('OK V30 order double-submit guard, saved-not-paid status and retry warning (mocked)');
  // V32: no active invoice controls or client-only payment success.
  assert.equal(await home.locator('#tc43-invoice-btn').isDisabled(),true);

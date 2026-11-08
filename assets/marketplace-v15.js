@@ -293,6 +293,10 @@ function tc27RenderPurchases(){
   const claim=S.txidClaims.find(c=>String(c.request_id)===String(p.id));
   if(claim)card.append(make('div','TXID submitted ('+claim.network+') · Unverified. Listing is NOT sold.','tc27-request-warning'));
   card.append(make('div','Review only — no payment, delivery confirmation or escrow is active.','tc27-request-warning'));
+  if(p.buyer_id===owner && ['requested','awaiting_payment_setup'].includes(p.status)){
+   const orderButton=make('button',({en:'Open order center',fa:'مرکز سفارش‌ها',ar:'مركز الطلبات'})[S.lang]);
+   orderButton.type='button';orderButton.onclick=async()=>{orderButton.disabled=true;try{if(!window.TrisoOrders)throw Error('Order center unavailable');await window.TrisoOrders.market(p.id)}catch(e){note(errorText(e))}finally{orderButton.disabled=false}};card.append(orderButton);
+  }
   root.append(card);
  }
 }

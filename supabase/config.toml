@@ -1,0 +1,6 @@
+project_id = "trisocmd-phase1-local"
+[functions.store-crypto]
+# Public readiness GET; POST explicitly validates user with this project's Auth API.
+verify_jwt = false
+[functions.payment-webhook]
+verify_jwt = false
