@@ -27,7 +27,7 @@ await context.route('**/*',async route=>{
  }
  return route.fulfill({status:200,headers:cors,contentType:'application/json',body:JSON.stringify(value)});
 });
-await context.addInitScript(({buyer,base})=>{if(location.origin!==new URL(base).origin)return;localStorage.setItem('tc35_auth_session',JSON.stringify({access_token:'mock-user-token',refresh_token:'mock-refresh',expires_at:Math.floor(Date.now()/1000)+3600,user:{id:buyer,email:'fixture@example.test'}}));},{buyer,base});
+await context.addInitScript(({buyer,base})=>{if(location.origin!==new URL(base).origin||location.search.includes('anonymous-bootstrap'))return;localStorage.setItem('tc35_auth_session',JSON.stringify({access_token:'mock-user-token',refresh_token:'mock-refresh',expires_at:Math.floor(Date.now()/1000)+3600,user:{id:buyer,email:'fixture@example.test'}}));},{buyer,base});
 try{
  const page=await context.newPage();await page.goto(base+'/index.html',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>!!window.TrisoOrders);
@@ -64,5 +64,16 @@ try{
  await page.waitForTimeout(1200);
  assert.equal(await page.locator('#phase1-order-center article').count(),0);
  console.log('PASS sign-out clears private order DOM');
+ const delayed=await context.newPage();let release;const gate=new Promise(r=>release=r);
+ await delayed.route(api+'/rest/v1/products?order=id.asc&select=*',async route=>{await gate;await route.fulfill({status:200,headers:cors,contentType:'application/json',body:'[]'});});
+ await delayed.goto(base+'/index.html?anonymous-bootstrap=1',{waitUntil:'domcontentloaded'});
+ await delayed.evaluate(()=>{window.TrisoAuth.clear();setLang('en','ltr');});
+ await delayed.locator('#tc31-panel.active').waitFor();release();
+ await delayed.waitForFunction(()=>window.tcPhase1BootstrapComplete===true);
+ assert.equal(await delayed.locator('#tc31-panel.active').count(),1,'late catalog fetch must preserve account navigation');
+ await delayed.getByRole('button',{name:'Create your account'}).click();
+ await delayed.locator('#tc31-signup-view:visible').waitFor();
+ console.log('PASS delayed product bootstrap preserves language/account navigation');
+ await delayed.close();
  assert.deepEqual(errors,[]);
 }finally{await context.close();await browser.close();}

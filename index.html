@@ -2421,6 +2421,7 @@ function t(key) { return (T[currentLang] || T['en'])[key] || key; }
 //  NAVIGATION
 // ═══════════════════════════════════════════
 function showScreen(id) {
+  window.tcPhase1Navigation=(window.tcPhase1Navigation||0)+1;
   document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active'); s.style.display='none'; });
   const target = document.getElementById(id);
   if(!target)return;
@@ -3132,6 +3133,7 @@ function checkRoute() {
 //  INIT
 // ═══════════════════════════════════════════
 (async function init() {
+  const initialNavigation=window.tcPhase1Navigation||0;
   // Close modal on backdrop click
   document.getElementById('product-modal').addEventListener('click', function(e) {
     if (e.target === this) closeProductModal();
@@ -3169,7 +3171,12 @@ function checkRoute() {
   const authCallback=new URLSearchParams(location.hash.slice(1)).get('type')==='recovery'
      ||new URLSearchParams(location.search).get('type')==='recovery';
   const currentAuthMode=document.getElementById('tc31-panel')?.dataset.authMode;
-  showScreen(authCallback||currentAuthMode==='reset'||currentAuthMode==='forgot'?'tc31-panel':'lang-screen');
+  if((window.tcPhase1Navigation||0)===initialNavigation){
+    showScreen(authCallback||currentAuthMode==='reset'||currentAuthMode==='forgot'?'tc31-panel':'lang-screen');
+  }else if(document.getElementById('store-screen')?.classList.contains('active')){
+    renderStore();
+  }
+  window.tcPhase1BootstrapComplete=true;
 
   // Pre-fetch exchange rates in the background so the first checkout is instant
   prefetchRates();

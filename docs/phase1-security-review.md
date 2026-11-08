@@ -71,6 +71,17 @@ Supabase documentation was consulted through the connected documentation tool fo
 Auth headers and Edge Function JWT handling. Hosted advisor checks remain required
 on the actual reconciled target schema before deployment.
 
+## GitHub validation and production monitor finding
+
+The first Phase 1 GitHub workflow passed all repository tests. The older browser
+workflow also passed its local mocked suite, then its separate read-only production
+monitor failed because a delayed product fetch reset the already-entered account
+screen. All six production routes responded HTTP 200, with no captured page errors.
+The branch now preserves navigation during late product bootstrap, with a dedicated
+delayed-response browser regression. The production monitor remains available on
+manual workflow dispatch; PR checks validate branch source rather than an older
+production deployment that this task is explicitly forbidden to update.
+
 ## Remaining operational limits
 
 Crypto adapter and real authenticated provider webhook validation are intentionally
