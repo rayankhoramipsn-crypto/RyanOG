@@ -1,0 +1,17 @@
+name: Check production checkout providers
+on:
+  pull_request:
+    paths: ['supabase/functions/store-crypto/**', '.github/workflows/payment-provider-check.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  readiness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Check rates and chain tips from the deployed invoice service
+        run: |
+          curl --retry 2 --fail --silent --show-error --max-time 30 'https://zrolxgzndinktsjsthfw.supabase.co/functions/v1/store-crypto?check=providers' > readiness.json
+          jq '{enabled,pilot,checks}' readiness.json
+          jq -e '(.checks|length)==2 and all(.checks[]; (.height|type)=="number" and .height>0 and (.usd|type)=="number" and .usd>0)' readiness.json
