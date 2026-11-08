@@ -1,5 +1,6 @@
 (async function initCryptoCheckout() {
-  const endpoint = SUPA_URL + '/functions/v1/store-crypto';
+  const production = location.hostname === 'trisocmd.shop' || location.hostname === 'www.trisocmd.shop';
+  const endpoint = (production ? 'https://zrolxgzndinktsjsthfw.supabase.co' : SUPA_URL) + '/functions/v1/store-crypto';
   const headers = {apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY};
   try {
     const response = await fetch(endpoint, {headers, signal: AbortSignal.timeout(6000)});
@@ -78,7 +79,7 @@
     const items=window.tc42OrderItems;
     const cartKey=JSON.stringify(items);
     if(!pendingOrder || pendingOrder.cartKey!==cartKey || pendingOrder.token!==token){
-      const id=await request(SUPA_URL+'/rest/v1/rpc/tc42_create_order',{p_items:items},token);
+      const id=production ? await request(endpoint,{action:'order',items},token) : await request(SUPA_URL+'/rest/v1/rpc/tc42_create_order',{p_items:items},token);
       if(v!==generation)return;
       pendingOrder={id,cartKey,token};
     }
