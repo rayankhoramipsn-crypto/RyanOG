@@ -1561,7 +1561,8 @@ body,#store-screen{background:radial-gradient(ellipse 75% 22% at 50% 0%,#271338 
 #tc42-order-result.tc30-order-notice[data-state="error"]{background:#531e2d;border-color:#ff7287;color:#ffe3e9;font-weight:700}
 #tc42-order-result.tc30-order-notice[data-state="success"]{background:#173b2b;border-color:#63d49c;color:#dfffeb;font-weight:700}
 #tc42-save-order:disabled{opacity:.58;cursor:wait}
-</style></head>
+</style><link rel="stylesheet" href="assets/phase1-orders.css">
+</head>
 <body><div id="tc50-staging-banner" role="status" style="position:relative;z-index:99999;background:#122330;border-bottom:1px solid #467487;color:#c2eaff;padding:10px 18px;text-align:center;font:600 12px/1.5 system-ui,sans-serif">STAGING PREVIEW · Payments, order processing, and support notifications are not live. Do not send funds.</div>
 <a class="tc49-skip" href="#tc-shop-heading">SKIP TO PRODUCTS</a>
 
@@ -1957,7 +1958,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElement
  </form></div>
  <div id="tc46-orders" class="tc46-pane" hidden><div class="tc46-bar"><strong>ORDER MANAGEMENT</strong><button onclick="tc46LoadOrders()">↻ REFRESH</button></div><div id="tc46-order-list"></div></div>
  <div id="tc46-audit" class="tc46-pane" hidden><div class="tc46-bar"><strong>RECORDED MARKETPLACE ACTIVITY</strong><button onclick="tc46LoadAudit()">↻ REFRESH</button></div><div id="tc46-audit-list"></div></div>
- </section><section class="tc42-admin"><h3>SUPPORT INBOX / LIVE SUPPORT 4.7</h3><p class="tc47-inbox-hint">Messages are saved in Supabase. Refresh the inbox to see new conversations. Telegram notifications require server setup.</p><button type="button" onclick="tc42AdminInbox()">↻ REFRESH CONVERSATIONS</button><button class="tc31-btn tc31-alt" onclick="tc42AdminInbox()">Refresh customer threads</button><div id="tc42-admin-inbox" role="status"></div></section></div><div class="tc31-kicker">SIGNED IN</div><h3 id="tc31-user-email">Player</h3><div class="tc31-grid"><div><h3>Account overview</h3><p class="tc31-muted">Signed in with Supabase Auth. Orders are not yet linked to this account.</p><button class="tc31-btn tc31-alt" onclick="tc31Logout()">Sign out</button></div><div><h3>My orders</h3><div class="tc31-order" id="tc36-orders" role="status">Checking your orders…</div><button class="tc31-btn tc31-alt" onclick="tc45OpenTracking()">Open order tracking ↗</button><button class="tc31-btn tc31-alt" onclick="tc36LoadOrders()">Refresh orders</button><p class="tc31-small">Only new orders associated with your signed-in account will appear. Existing manual checkout orders are not migrated.</p></div></div></div><p id="tc31-status" class="tc31-status" role="status" aria-live="polite"></p></div></section>
+ </section><section class="tc42-admin"><h3>SUPPORT INBOX / LIVE SUPPORT 4.7</h3><p class="tc47-inbox-hint">Messages are saved in Supabase. Refresh the inbox to see new conversations. Telegram notifications require server setup.</p><button type="button" onclick="tc42AdminInbox()">↻ REFRESH CONVERSATIONS</button><button class="tc31-btn tc31-alt" onclick="tc42AdminInbox()">Refresh customer threads</button><div id="tc42-admin-inbox" role="status"></div></section></div><div class="tc31-kicker">SIGNED IN</div><h3 id="tc31-user-email">Player</h3><div class="tc31-grid"><div><h3>Account overview</h3><p class="tc31-muted">Signed in with Supabase Auth. Open the order center to review orders linked to this account.</p><button class="tc31-btn tc31-alt" onclick="tc31Logout()">Sign out</button></div><div><h3>My orders</h3><div class="tc31-order" id="tc36-orders" role="status">Checking your orders…</div><button class="tc31-btn tc31-alt" onclick="tc45OpenTracking()">Open order tracking ↗</button><button class="tc31-btn tc31-alt" onclick="tc36LoadOrders()">Refresh orders</button><p class="tc31-small">Only new orders associated with your signed-in account will appear. Existing manual checkout orders are not migrated.</p></div></div></div><p id="tc31-status" class="tc31-status" role="status" aria-live="polite"></p></div></section>
 <section class="screen" id="tc31-trust">
 <div class="tc33-trust-shell">
   <div class="tc33-trust-top"><span class="tc33-wordmark">TRISO<span>CMD.</span> <small>/ TRUST CENTER</small></span><button onclick="showScreen('store-screen')" id="tc33-back"></button></div>
@@ -2420,6 +2421,7 @@ function t(key) { return (T[currentLang] || T['en'])[key] || key; }
 //  NAVIGATION
 // ═══════════════════════════════════════════
 function showScreen(id) {
+  window.tcPhase1Navigation=(window.tcPhase1Navigation||0)+1;
   document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active'); s.style.display='none'; });
   const target = document.getElementById(id);
   if(!target)return;
@@ -3131,6 +3133,7 @@ function checkRoute() {
 //  INIT
 // ═══════════════════════════════════════════
 (async function init() {
+  const initialNavigation=window.tcPhase1Navigation||0;
   // Close modal on backdrop click
   document.getElementById('product-modal').addEventListener('click', function(e) {
     if (e.target === this) closeProductModal();
@@ -3168,7 +3171,12 @@ function checkRoute() {
   const authCallback=new URLSearchParams(location.hash.slice(1)).get('type')==='recovery'
      ||new URLSearchParams(location.search).get('type')==='recovery';
   const currentAuthMode=document.getElementById('tc31-panel')?.dataset.authMode;
-  showScreen(authCallback||currentAuthMode==='reset'||currentAuthMode==='forgot'?'tc31-panel':'lang-screen');
+  if((window.tcPhase1Navigation||0)===initialNavigation){
+    showScreen(authCallback||currentAuthMode==='reset'||currentAuthMode==='forgot'?'tc31-panel':'lang-screen');
+  }else if(document.getElementById('store-screen')?.classList.contains('active')){
+    renderStore();
+  }
+  window.tcPhase1BootstrapComplete=true;
 
   // Pre-fetch exchange rates in the background so the first checkout is instant
   prefetchRates();
@@ -3875,7 +3883,7 @@ count();
    const valid=items.every(x=>Number.isSafeInteger(Number(x.id))&&Number(x.id)>0&&Number.isSafeInteger(Number(x.qty))&&Number(x.qty)>=1&&Number(x.qty)<=99999);
    if(!valid)throw Error('Cart items contain an invalid product or quantity.');
    // Server independently re-checks ownership, stock, quantities and authoritative price.
-   const id=await req('rpc/tc42_create_order',{method:'POST',body:{p_items:items}});
+   const id=window.TrisoOrders ? await window.TrisoOrders.create(items) : await req('rpc/tc42_create_order',{method:'POST',body:{p_items:items}});
    if(typeof id!=='string'||!/^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(id))throw Error('Server response could not be verified. Check My Orders before trying again.');
    tell('Request saved: #'+id.slice(0,8).toUpperCase()+'. Not paid and not confirmed. Check My Orders for the full record.','success');
    window.tc36LoadOrders?.();
@@ -4148,6 +4156,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script src="assets/triso-notifications-v34.js?v=35" defer></script>
 <script src="assets/trisocmd-lower-v14.js?v=14" defer></script>
 <script src="assets/vendor/qrcode.js" defer></script>
+<script src="assets/phase1-orders.js" defer></script>
 <script src="assets/store-invoice.js" defer></script>
 </body>
 </html>

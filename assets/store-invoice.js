@@ -1,119 +1,67 @@
-(async function initCryptoCheckout() {
-  const production = location.hostname === 'trisocmd.shop' || location.hostname === 'www.trisocmd.shop';
-  const endpoint = (production ? 'https://zrolxgzndinktsjsthfw.supabase.co' : SUPA_URL) + '/functions/v1/store-crypto';
-  const headers = {apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY};
+/* Phase 1: same-project auth; provider disabled by default. Preserve the existing
+ * checkout layout and manual options until the Phase 1 backend reports readiness. */
+(async () => {
+  const panel=document.getElementById('tc43-pay');
+  if(!panel || typeof SUPA_URL==='undefined')return;
+  const endpoint=SUPA_URL+'/functions/v1/store-crypto';
+  let readiness;
   try {
-    const response = await fetch(endpoint, {headers, signal: AbortSignal.timeout(6000)});
-    if (!response.ok || !(await response.json()).enabled) return;
-  } catch { return; }
-
-  const panel = document.getElementById('tc43-pay');
-  const q = id => document.getElementById(id);
-  const legacy=document.createElement('div'); legacy.hidden=true;
-  while(panel.firstChild) legacy.append(panel.firstChild);
-  let expiryTimer;
-  let pendingOrder;
-  let generation = 0;
-  let invoice = null;
-  let coin = 'LTC';
-  let busy = false;
-  const language = () => ['en','fa','ar'].includes(currentLang) ? currentLang : 'en';
-  function tr(en,fa,ar) { return ({en,fa,ar})[language()]; }
-  function button(label, action) {
-    const b = document.createElement('button');
-    b.type = 'button'; b.className = 'tc43-action'; b.textContent = label;
-    b.onclick = action; return b;
+    const r=await fetch(endpoint,{headers:{apikey:SUPA_KEY},signal:AbortSignal.timeout(6000)});
+    if(!r.ok)return;
+    readiness=await r.json();
+    if(readiness.schema_version!==1)return;
+  } catch {return;}
+  const t=(en,fa,ar)=>({en,fa,ar})[typeof currentLang==='string'?currentLang:'en']||en;
+  const status=document.createElement('p');status.setAttribute('role','status');
+  let invoice=null,orderId=null,busy=false,timer,version=0;
+  const ref=document.createElement('input');ref.placeholder=t('Order ID','شماره سفارش','رقم الطلب');ref.setAttribute('aria-label','Order ID');
+  const tx=document.createElement('input');tx.maxLength=64;tx.placeholder='TXID';tx.setAttribute('aria-label','TXID');
+  const network=document.createElement('select');network.setAttribute('aria-label','BTC / LTC');
+  ['LTC','BTC'].forEach(c=>network.add(new Option(c,c)));
+  const details=document.createElement('div');details.style.overflowWrap='anywhere';
+  function button(text,fn){const b=document.createElement('button');b.type='button';b.className='tc43-action';b.textContent=text;b.onclick=()=>run(fn);return b;}
+  async function call(body){
+    const token=await window.tc42AccessToken?.();if(!token)throw Error(t('Sign in first','ابتدا وارد شوید','سجل الدخول أولاً'));
+    const r=await fetch(endpoint,{method:'POST',headers:{apikey:SUPA_KEY,Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(20000)});
+    const d=await r.json();if(!r.ok)throw Error(d.error||'Request failed');return d;
   }
-  const info = document.createElement('p');
-  info.setAttribute('role','status');
-  const details = document.createElement('div');
-  const select = document.createElement('select');
-  select.setAttribute('aria-label','BTC / LTC');
-  for (const c of ['LTC','BTC']) select.add(new Option(c,c));
-  select.onchange = () => { coin = select.value; };
-  const tx = document.createElement('input');
-  tx.maxLength = 64; tx.placeholder = 'TXID'; tx.setAttribute('aria-label','TXID');
-  async function request(url, body, token) {
-    const res = await fetch(url, {method:'POST', headers:{apikey:SUPA_KEY, Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(18000)});
-    const data = await res.json();
-    if (!res.ok) throw Error(data.error || data.message || 'Request failed');
-    return data;
-  }
-  async function copy(value) {
-    if (!invoice || Date.parse(invoice.expires_at)<=Date.now() || invoice.txid) return renderQuote(invoice);
-    try { await navigator.clipboard.writeText(value); info.textContent=tr('Copied','کپی شد','تم النسخ'); } catch { info.textContent=value; }
-  }
-  function renderQuote(i) {
-    clearTimeout(expiryTimer);
-    if(!i) return;
-    if(i.txid || (i.order_status && i.order_status!=='awaiting_payment')) { details.replaceChildren(); return; }
-    if(Date.parse(i.expires_at)<=Date.now()){
-      details.replaceChildren(tx,verify);
-      info.textContent=tr('Invoice expired. Check an existing transfer only.','فاکتور منقضی شده؛ فقط واریز قبلی را بررسی کن.','انتهت الفاتورة. تحقق من دفعة سابقة فقط.');
-      return;
+  async function run(fn){if(busy)return;busy=true;const v=version;panel.querySelectorAll('button').forEach(b=>b.disabled=true);try{await fn(v)}catch(e){if(v===version)status.textContent=e.message}finally{if(v===version){busy=false;controls()}}}
+  function controls(){if(typeof restart!=='undefined')restart.disabled=!invoice||!(Date.parse(invoice.expires_at)<=Date.now()||['cancelled','fulfilled','refunded'].includes(invoice.order_status));create.disabled=!readiness.enabled||!!invoice;verify.disabled=!invoice||!readiness.enabled;resume.disabled=false;network.disabled=!!invoice;}
+  function render(){
+    clearTimeout(timer);details.replaceChildren();if(!invoice)return;
+    const expired=Date.parse(invoice.expires_at)<=Date.now();
+    const p=document.createElement('p');p.textContent=t('Invoice ','فاکتور ','فاتورة ')+invoice.id+' · '+(expired?'expired':invoice.state);details.append(p);
+    // Legacy shared-wallet invoices must be reconciled, never offered for new payment.
+    if(!expired&&(!invoice.order_status||['awaiting_payment','payment_submitted','payment_review'].includes(invoice.order_status))&&!invoice.txid&&invoice.provider!=='legacy-shared-address'&&readiness.enabled&&['awaiting_payment','submitted','confirming','partial'].includes(invoice.state)){
+      const units=BigInt(invoice.units),amount=(units/100000000n)+'.'+(units%100000000n).toString().padStart(8,'0');
+      const line=document.createElement('p');line.dir='ltr';line.textContent=amount+' '+invoice.network+' · '+invoice.address;
+      const expiry=document.createElement('p');expiry.textContent=new Date(invoice.expires_at).toLocaleString();
+      details.append(line,expiry);
+      for(const [label,value] of [[t('Copy address','کپی آدرس','نسخ العنوان'),invoice.address],[t('Copy amount','کپی مبلغ','نسخ المبلغ'),amount]])details.append(button(label,async()=>{if(Date.parse(invoice.expires_at)<=Date.now())return render();await navigator.clipboard.writeText(value)}));
+      const qr=document.createElement('div');qr.style.cssText='display:inline-block;background:white;padding:10px';
+      try{new QRCode(qr,{text:(invoice.network==='BTC'?'bitcoin:':'litecoin:')+invoice.address+'?amount='+amount,width:160,height:160})}catch{qr.hidden=true}details.append(qr);
+      timer=setTimeout(render,Math.max(1,Date.parse(invoice.expires_at)-Date.now()));
     }
-    expiryTimer=setTimeout(()=>{if(invoice===i) renderQuote(i)},Date.parse(i.expires_at)-Date.now());
-    const units=BigInt(i.units);
-    const amount=(units/100000000n).toString()+'.'+(units%100000000n).toString().padStart(8,'0');
-    const uri=(i.network==='BTC'?'bitcoin:':'litecoin:')+i.address+'?amount='+amount;
-    const qr=document.createElement('div');
-    qr.style.cssText='display:inline-block;background:white;padding:12px';
-    try { new QRCode(qr,{text:uri,width:180,height:180,correctLevel:QRCode.CorrectLevel.M}); } catch { qr.hidden=true; }
-    const summary=document.createElement('p'); summary.dir='ltr'; summary.style.overflowWrap='anywhere';
-    summary.textContent=amount+' '+i.network+' · '+i.address;
-    const expires=document.createElement('p');
-    expires.textContent=tr('Pay before ','مهلت واریز ','ادفع قبل ')+new Date(i.expires_at).toLocaleString();
-    details.replaceChildren(summary,qr,expires,button(tr('Copy address','کپی آدرس','نسخ العنوان'),()=>copy(i.address)),button(tr('Copy amount','کپی مبلغ','نسخ المبلغ'),()=>copy(amount)),tx,verify);
+    if(expired)status.textContent=t('Expired. Do not send more funds. Existing transfers require review.','منقضی شده. وجه دیگری ارسال نکنید؛ واریز قبلی نیاز به بررسی دارد.','انتهت المهلة. لا ترسل أموالاً إضافية؛ الدفعات السابقة تحتاج مراجعة.');
+    controls();
   }
-  async function run(fn) {
-    if(busy) return;
-    const version=generation; busy=true; create.disabled=true; verify.disabled=true; select.disabled=true;
-    try {
-      const token=await window.tc42AccessToken?.();
-      if(!token) throw Error(tr('Sign in first','اول وارد حسابت شو','سجل الدخول أولاً'));
-      if(version===generation) await fn(token,version);
-    } catch(e) { if(version===generation) info.textContent=e.message; }
-    finally { if(version===generation){busy=false; create.disabled=!!invoice; select.disabled=!!invoice; verify.disabled=false;} }
-  }
-  const create=button('',()=>run(async(token,v)=>{
-    const items=window.tc42OrderItems;
-    const cartKey=JSON.stringify(items);
-    if(!pendingOrder || pendingOrder.cartKey!==cartKey || pendingOrder.token!==token){
-      const id=production ? await request(endpoint,{action:'order',items},token) : await request(SUPA_URL+'/rest/v1/rpc/tc42_create_order',{p_items:items},token);
-      if(v!==generation)return;
-      pendingOrder={id,cartKey,token};
-    }
-    const id=pendingOrder.id; reference.value=id;
-    const i=await request(endpoint,{action:'create',network:coin,order_id:id},token);
-    if(v!==generation)return;
-    invoice=i; info.textContent=tr('Order ','سفارش ','طلب ')+id; renderQuote(i);
-  }));
-  const verify=button('',()=>run(async(token,v)=>{
-    const hash=tx.value.trim().toLowerCase();
-    if(!/^[0-9a-f]{64}$/.test(hash)) throw Error(tr('Enter a 64-character hexadecimal TXID','شناسه تراکنش باید ۶۴ کاراکتر هگز باشد','أدخل معرّف معاملة من 64 حرفاً سداسياً عشرياً'));
-    const r=await request(endpoint,{action:'verify',order_id:invoice.order_id,txid:hash},token);
-    if(v!==generation)return;
-    const labels={paid:tr('Payment confirmed','پرداخت تأیید شد','تم تأكيد الدفع'),pending_confirmations:tr('Waiting for confirmations. Check again later.','در انتظار تأیید شبکه؛ بعداً دوباره بررسی کن','بانتظار تأكيد الشبكة'),payment_review:tr('Payment received; contact support about stock','پرداخت دریافت شد؛ برای موجودی با پشتیبانی تماس بگیر','تم استلام الدفع؛ راجع الدعم بشأن المخزون')};
-    if(['paid','payment_review','fulfilled'].includes(r.status)){invoice={...invoice,txid:hash,order_status:r.status};renderQuote(invoice);}
-    info.textContent=labels[r.status] || r.status;
-  }));
-  const reference=document.createElement('input'); reference.placeholder='Order ID'; reference.setAttribute('aria-label','Order ID');
-  const resume=button('',()=>run(async(token,v)=>{
-    const i=await request(endpoint,{action:'resume',order_id:reference.value.trim()},token);
-    if(v!==generation)return;
-    invoice=i; coin=i.network; select.value=coin; renderQuote(i); info.textContent=i.order_status;
-    if(i.txid || Date.parse(i.expires_at)<=Date.now()){
-      details.querySelectorAll('canvas,img,table,button').forEach(el=>{if(el!==verify) el.hidden=true});
-      info.textContent=i.txid?i.order_status:tr('Expired. Only check a transfer already sent.','مهلت پرداخت تمام شده؛ فقط تراکنش قبلی را بررسی کنید.','انتهت المهلة؛ تحقق فقط من دفعة سابقة.');
-    }
-  }));
-  const reset=()=>{
-    clearTimeout(expiryTimer); pendingOrder=null;
-    generation++; busy=false; invoice=null; coin='LTC'; select.value=coin; select.disabled=false; create.disabled=false; verify.disabled=false; tx.value='';
-    create.textContent=tr('Create invoice','ساخت فاکتور','إنشاء فاتورة'); verify.textContent=tr('Check TXID','بررسی تراکنش','تحقق من المعاملة');
-    resume.textContent=tr('Reopen by order ID','بازیابی با شماره سفارش','استعادة الفاتورة'); reference.value=''; details.replaceChildren(); info.textContent=''; panel.replaceChildren(legacy,select,create,details,info,reference,resume);
-  };
-  const original=window.tc41OpenCheckout;
-  window.tc41OpenCheckout=function(...args){const result=original.apply(this,args);reset();return result};
-  reset();
+  const create=button(t('Create invoice','ساخت فاکتور','إنشاء فاتورة'),async v=>{
+    if(!orderId){const id=await window.TrisoOrders.create(window.tc42OrderItems);if(v!==version)return;orderId=id;ref.value=id;}
+    const result=await call({action:'create',order_id:orderId,network:network.value});if(v!==version)return;invoice=result;render();
+  });
+  const verify=button(t('Check TXID','بررسی تراکنش','تحقق من المعاملة'),async v=>{
+    const result=await call({action:'verify',order_id:invoice.order_id,txid:tx.value.trim().toLowerCase()});if(v!==version)return;
+    status.textContent=result.status;
+    invoice=await call({action:'resume',order_id:invoice.order_id});if(v===version)render();
+  });
+  const resume=button(t('Reopen invoice','بازیابی فاکتور','استعادة الفاتورة'),async v=>{
+    const result=await call({action:'resume',order_id:ref.value.trim()});if(v!==version)return;invoice=result;orderId=invoice.order_id;render();
+  });
+  const legacy=document.createElement('div');legacy.hidden=true;while(panel.firstChild)legacy.append(panel.firstChild);
+  const restart=button(t('Start a new unpaid order','شروع سفارش پرداخت‌نشده جدید','بدء طلب جديد غير مدفوع'),async()=>{window.TrisoOrders.beginNew(window.tc42OrderItems);reset();});
+  const manual=legacy.querySelector('section[aria-label="Manual Litecoin and Bitcoin payments"]');
+  panel.append(legacy);if(manual)panel.append(manual);
+  panel.append(network,create,details,tx,verify,ref,resume,restart,status);
+  function reset(){version++;busy=false;orderId=null;invoice=null;ref.value='';tx.value='';details.replaceChildren();clearTimeout(timer);status.textContent=readiness.enabled?t('Only pay the exact server invoice. A TXID is an unverified claim.','فقط مبلغ فاکتور سرور را بپردازید. شناسه تراکنش به تنهایی تأیید پرداخت نیست.','ادفع وفق فاتورة الخادم فقط. معرّف المعاملة ليس إثبات دفع.'):t('Crypto processing is not configured. Save an unpaid order or contact support.','پرداخت رمزارزی پیکربندی نشده است. سفارش پرداخت‌نشده ذخیره کنید یا با پشتیبانی تماس بگیرید.','الدفع بالعملات الرقمية غير مهيأ. احفظ طلباً غير مدفوع أو تواصل مع الدعم.');controls();}
+  const original=window.tc41OpenCheckout;if(original)window.tc41OpenCheckout=function(...args){const r=original.apply(this,args);reset();return r;};reset();
 })();

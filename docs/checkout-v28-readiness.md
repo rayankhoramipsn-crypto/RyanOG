@@ -15,7 +15,7 @@
 
 1. Confirm operator eligibility, product transfer rights, required provider and legal compliance before operating any payment or custody program.
 2. Define a distinct, server-signed invoice ID for each order and the currency, network, exact amount, recipient, expiry and ownership; never accept client-supplied prices as authoritative.
-3. Verify payments independently server-side against a trusted source including network, invoice ownership, received total, sufficient confirmations, expiration and uniqueness of the transaction reference.
+3. Verify payments independently server-side against a trusted source including network, invoice ownership, received amount, sufficient confirmations, expiration and TXID uniqueness across the store and marketplace.
 4. Handle duplicate webhooks, retries, partial payments, underpayments, overpayments, cancellations, chain reorganizations, refunds and operational errors idempotently.
 5. Implement authorized, auditable state transitions and maintain reconciliation records independent of user-entered payment claims.
 6. Establish published support, dispute, refund, delivery, payout and incident response procedures before advertising escrow or payout guarantees.

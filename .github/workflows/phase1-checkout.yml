@@ -1,0 +1,28 @@
+name: Phase 1 checkout security and regression tests
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci --no-audit --no-fund
+      - run: npm test
+      - run: npm run check:edge
+      - run: npx playwright install --with-deps chromium
+      - name: Mocked browser regression tests (all payment writes intercepted)
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/triso-http.log 2>&1 &
+          node -e "fetch('http://127.0.0.1:8765').catch(()=>new Promise(r=>setTimeout(r,1000)))"
+          npm run test:browser

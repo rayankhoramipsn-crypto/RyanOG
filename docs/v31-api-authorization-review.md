@@ -14,7 +14,7 @@ Date: 2026-11-01. Scope: staging/main storefront, marketplace, Supabase RLS and 
 
 ## Operationally incomplete — DO NOT mark as enabled
 
-Leaked-password screening in Supabase Auth (reported disabled by the advisor); hosted backend-issued invoices; independent TXID/chain verification; rate locking; signed payment webhooks; dispute/chargeback handling; real escrow/custody and payouts. These need a separate explicit launch authorization, relevant provider contracts, and security/legal review. No public page should claim they currently exist.
+Supabase leaked-password screening in Supabase Auth (reported disabled by the advisor); hosted backend-issued invoices; independent TXID/chain verification; rate locking; signed payment webhooks; dispute/chargeback handling; real escrow/custody and payouts. These need a separate explicit launch authorization, relevant provider contracts, and security/legal review. No public page should claim they currently exist.
 
 ## CI release contract
 

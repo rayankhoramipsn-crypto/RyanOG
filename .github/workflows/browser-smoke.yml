@@ -29,4 +29,5 @@ jobs:
           sleep 2
           node tests/browser-smoke.mjs
       - name: Check live published pages from GitHub-hosted runner (read-only, no auth)
+        if: github.event_name == 'workflow_dispatch'
         run: node tests/live-readonly-smoke.mjs
