@@ -22,6 +22,9 @@ ALTER TABLE public.tc42_orders
 ALTER TABLE public.tc42_orders DROP CONSTRAINT IF EXISTS tc42_orders_status_check;
 ALTER TABLE public.tc42_orders ADD CONSTRAINT tc42_orders_status_check CHECK(status IN
  ('awaiting_payment','payment_submitted','payment_review','paid','fulfillment_pending','fulfilled','cancelled','refunded','disputed'));
+-- Hosted TRISO TEST uses market_status; some baselines use market_listings_status_check.
+-- Remove both known status constraints before replacing them with the Phase 1 status set.
+ALTER TABLE public.market_listings DROP CONSTRAINT IF EXISTS market_status;
 ALTER TABLE public.market_listings DROP CONSTRAINT IF EXISTS market_listings_status_check;
 ALTER TABLE public.market_listings ADD CONSTRAINT market_listings_status_check CHECK(status IN ('pending','approved','declined','removed','sold'));
 CREATE INDEX phase1_seller_orders ON public.tc42_orders(seller_id,created_at DESC);
