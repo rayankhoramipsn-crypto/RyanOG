@@ -267,14 +267,29 @@ async function api(path,options={}){
  return raw?JSON.parse(raw):null;
 }
 async function refreshSession(){
- if(!session?.refresh_token)return false;
  try{
-  const updated=await authRequest('token?grant_type=refresh_token',{refresh_token:session.refresh_token});
-  if(!updated.access_token||!updated.user)throw Error('Session expired');
-  setSession(updated);
-  return true;
- }catch(e){clearSession();status('Admin session expired. Please sign in again.');return false}
+  session=await window.TrisoAuth.refresh(token=>authRequest('token?grant_type=refresh_token',{refresh_token:token}));
+  if(!session)authorized=false;
+  return !!session;
+ }catch(e){
+  session=window.TrisoAuth.read();authorized=false;
+  status(session?'Connection interrupted. Saved login retained; retry when online.':'Admin session expired. Please sign in again.');
+  return false;
+ }
 }
+async function loadAllListings(){
+ const rows=[];
+ // Stable pagination prevents other sellers' pending submissions disappearing
+ // behind 150 newer reviewed rows. RLS remains the authorization boundary.
+ for(let offset=0;;){
+  const page=await api('market_listings?select=id,title,platform,description,price,status,seller_id,submitted_at&order=submitted_at.desc,id.desc&limit=150&offset='+offset);
+  if(!Array.isArray(page))throw Error('Invalid moderation response');
+  rows.push(...page);
+  if(page.length<150)return rows;
+  offset+=page.length;
+ }
+}
+
 async function checkAdmin(){
  if(!session?.access_token)return false;
  try{
@@ -306,10 +321,12 @@ async function galleryPhotoUrl(path){
 async function loadListingGallery(listings){
  const media=new Map();if(!listings.length)return media;
  try{
-  const ids=listings.map(x=>Number(x.id)).filter(Number.isInteger).join(',');
-  if(!ids)return media;
-  const rows=await api('market_listing_media?select=listing_id,object_path,sort_order&listing_id=in.('+ids+')&order=sort_order.asc&limit=500');
-  for(const row of rows){const id=String(row.listing_id);if(!media.has(id))media.set(id,[]);media.get(id).push(row)}
+  const ids=listings.map(x=>Number(x.id)).filter(Number.isInteger);
+  for(let start=0;start<ids.length;start+=75){
+   const batch=ids.slice(start,start+75);
+   const rows=await api('market_listing_media?select=listing_id,object_path,sort_order&listing_id=in.('+batch.join(',')+')&order=sort_order.asc&limit=500');
+   for(const row of rows){const id=String(row.listing_id);if(!media.has(id))media.set(id,[]);media.get(id).push(row)}
+  }
  }catch(e){tc25Feedback('Unable to inspect listing photos: '+e.message+'. Photo-dependent approval is blocked until they load.','error')}
  return media;
 }
@@ -336,7 +353,7 @@ async function load(){
   ['posts','blog_posts?select=id,status&limit=500']
  ];
  try{
-  const values=await Promise.allSettled(entries.map(([,path])=>api(path)));
+  const values=await Promise.allSettled(entries.map(([name,path])=>name==='listings'?loadAllListings():api(path)));
   const read=i=>values[i].status==='fulfilled'&&Array.isArray(values[i].value)?values[i].value:null;
   const listings=read(0),tickets=read(1),orders=read(2),products=read(3),posts=read(4);
   let partial=[];
@@ -458,7 +475,7 @@ $('admin-login-form').addEventListener('submit',async e=>{
  finally{btn.disabled=false}
 });
 $('refresh').addEventListener('click',load);
-$('admin-signout').addEventListener('click',()=>{clearSession();viewAuth(true);status('Signed out of the admin dashboard.')});
+$('admin-signout').addEventListener('click',()=>{const token=session?.access_token;clearSession();viewAuth(true);if(token)fetch(ROOT+'/auth/v1/logout',{method:'POST',headers:{apikey:KEY,Authorization:'Bearer '+token}}).catch(()=>{});status('Signed out of the admin dashboard.')});
 document.addEventListener('visibilitychange',async()=>{if(document.hidden)return;
  if(session?.refresh_token&&(!session.expires_at||session.expires_at<Math.floor(Date.now()/1000)+120))await refreshSession();
  if(authorized&&Date.now()-lastLoad>15000)load();

@@ -7,7 +7,7 @@ const buyer='00000000-0000-4000-8000-000000000001',order='11111111-1111-4111-811
 const row={id:order,customer_id:buyer,status:'awaiting_payment',total_amount:'25.00',currency:'USD',items:[{id:1,title:'Fixture',qty:1,unit_price:25}]};
 const invoice={id:crypto.randomUUID(),order_id:order,chain:'mainnet',network:'LTC',address:'test-only-mocked-address-do-not-pay',units:'100000',provider:'mock',provider_invoice_id:'fixture',state:'awaiting_payment',expires_at:new Date(Date.now()+600000).toISOString()};
 const cors={'access-control-allow-origin':'*','access-control-allow-headers':'*','access-control-allow-methods':'*'};
-const browser=await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{}),args:['--no-sandbox']});
+const browser=await chromium.launch({executablePath:process.env.TRISO_CHROMIUM_PATH||undefined,headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{}),args:['--no-sandbox']});
 const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
 const errors=[];context.on('page',p=>p.on('pageerror',e=>errors.push(e.message)));
 let claims=0,creates=0;

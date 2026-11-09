@@ -11,8 +11,8 @@
   "private": true,
   "description": "TRISOCMD local checkout security and regression tests",
   "scripts": {
-    "test": "node --test tests/phase1-payments.test.mjs && node tests/phase1-database.mjs && python3 -m unittest discover -s tests -p \"test_*.py\"",
-    "test:browser": "node tests/browser-smoke.mjs && node tests/phase1-browser.mjs",
+    "test": "node --test tests/*.test.mjs && node tests/phase1-database.mjs && python3 -m unittest discover -s tests -p \"test_*.py\"",
+    "test:browser": "node tests/browser-smoke.mjs && node tests/phase1-browser.mjs && node tests/completion-browser.mjs",
     "check:edge": "deno check supabase/functions/store-crypto/index.ts supabase/functions/payment-webhook/index.ts"
   }
 }

@@ -15,7 +15,7 @@
      if(!raw)continue;
      try{const s=JSON.parse(raw);if(s&&s.access_token&&s.refresh_token&&s.user){value=s;break}}catch{}
    }
-   if(value&&temporary&&!persist&&remembered())put(localStorage,KEY,JSON.stringify(value));
+   // A session-only login (including recovery) must never be promoted on read.
    return value;
  }
  function write(value,keep=remembered()){
@@ -39,5 +39,34 @@
    const session=read();
    if(session)write(session,v);
  }
- global.TrisoAuth=Object.freeze({read,write,clear,remembered,setRemember,key:KEY});
+
+ let pending=null;
+ async function refresh(exchange,force=false){
+   if(pending)return pending;
+   const run=async()=>{
+     const before=read();
+     if(!before?.refresh_token)return null;
+     if(!force&&Number(before.expires_at)>Date.now()/1000+120)return before;
+     try{
+       const next=await exchange(before.refresh_token);
+       if(!next?.access_token||!next?.refresh_token||!next?.user)throw Error('Invalid refresh response');
+       // Logout or another login during the request wins over a late response.
+       const current=read();
+       if(current?.refresh_token!==before.refresh_token)return current;
+       const keep=!!get(localStorage,KEY)&&remembered();
+       write(next,keep);
+       return read();
+     }catch(error){
+       const current=read();
+       if(current?.refresh_token!==before.refresh_token)return current;
+       if(/invalid.refresh|refresh.token.not.found|already.used|invalid.grant/i.test(error.message||''))clear();
+       throw error;
+     }
+   };
+   // Web Locks serialize token rotation across tabs on the HTTPS origin.
+   pending=(global.navigator?.locks
+     ?global.navigator.locks.request(KEY+':refresh',run):run());
+   try{return await pending}finally{pending=null}
+ }
+ global.TrisoAuth=Object.freeze({read,write,clear,remembered,setRemember,refresh,key:KEY});
 })(window);

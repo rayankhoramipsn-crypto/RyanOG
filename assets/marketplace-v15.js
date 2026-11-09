@@ -39,16 +39,10 @@ function headers(json=true){const h={'apikey':KEY,Authorization:'Bearer '+(S.ses
 async function req(path,opts={}){const json=('json'in opts);const r=await fetch(API+path,{method:opts.method||'GET',headers:{...headers(json),...(opts.headers||{})},body:json?JSON.stringify(opts.json):opts.body});const data=await r.json().catch(()=>null);if(!r.ok)throw Error(data?.message||data?.error_description||data?.msg||data?.error||'Request failed ('+r.status+')');return data}
 const rpc=(name,json={})=>req('/rest/v1/rpc/'+name,{method:'POST',json});
 async function refresh(){
- if(!S.session?.refresh_token)return;
- try{
-  const d=await req('/auth/v1/token?grant_type=refresh_token',{method:'POST',json:{refresh_token:S.session.refresh_token}});
-  if(!d.access_token)throw Error('Session expired');
-  saveSession(d);
- }catch(e){
-  if(/invalid.refresh|refresh.token.not.found|already.used|invalid.grant/i.test(e.message||''))saveSession(null);
-  else console.warn('Session refresh delayed; saved login retained');
- }
+ try{S.session=await window.TrisoAuth.refresh(token=>req('/auth/v1/token?grant_type=refresh_token',{method:'POST',json:{refresh_token:token}}))}
+ catch(e){S.session=window.TrisoAuth.read();console.warn('Session refresh delayed; retry when online')}
 }
+
 async function adminCheck(){if(!S.session?.user)return false;try{return (await rpc('is_admin'))===true}catch{return false}}
 function sessionUI(){
  const on=!!S.session?.user;
@@ -151,7 +145,7 @@ function details(p){
 }
 async function contact(){if(!S.selected||!$('accept').checked)return;if(!S.session?.user){close('detail-dialog');dialog('auth-dialog');note('Sign in to contact the seller.');return}const b=$('chat-seller');b.disabled=true;try{const id=await rpc('market_start_chat',{p_listing:S.selected.id});close('detail-dialog');await showChats(id)}catch(e){note(errorText(e))}finally{b.disabled=false}}
 async function login(signup){const email=$('auth-email').value.trim(),password=$('auth-password').value;if(!email||password.length<8){authStatus('Enter email and a password of at least 8 characters.');return}const btn=$('auth-signin');btn.disabled=true;try{const data=await req('/auth/v1/'+(signup?'signup':'token?grant_type=password'),{method:'POST',json:{email,password}});if(!data.access_token){authStatus('Account created. Confirm your email to sign in.','success');return}saveSession(data);S.admin=await adminCheck();close('auth-dialog');sessionUI();authStatus('');startInbox();await Promise.allSettled([mine(),threads(),purchases()]);note('Signed in')}catch(e){authStatus(errorText(e))}finally{btn.disabled=false}}
-function logout(){stopPolling();stopInbox();saveSession(null);S.admin=false;S.active=null;S.threads=[];S.purchaseRows=[];S.purchaseBusy=false;S.dailyCount=0;S.pro=false;close('chat-dialog');$('purchase-requests-wrap').classList.add('hidden');empty($('purchase-requests'));sessionUI();note('Signed out')}
+function logout(){const token=S.session?.access_token;if(token)fetch(API+'/auth/v1/logout',{method:'POST',headers:{apikey:KEY,Authorization:'Bearer '+token}}).catch(()=>{});stopPolling();stopInbox();saveSession(null);S.admin=false;S.active=null;S.threads=[];S.purchaseRows=[];S.purchaseBusy=false;S.dailyCount=0;S.pro=false;close('chat-dialog');$('purchase-requests-wrap').classList.add('hidden');empty($('purchase-requests'));sessionUI();note('Signed out')}
 const mime={'image/jpeg':'jpg','image/png':'png','image/webp':'webp'};
 function checkFiles(files){if(!files.length)throw Error('At least one photo is required.');if(files.length>4)throw Error('Maximum four photos per listing.');for(const f of files)if(!mime[f.type]||f.size>5*1024*1024||f.size===0)throw Error('Use JPG, PNG or WebP photos under 5 MB each.')}
 async function uploadPhoto(id,file,pos){const path=S.session.user.id+'/'+id+'/'+crypto.randomUUID()+'.'+mime[file.type];const response=await fetch(API+'/storage/v1/object/market-gallery/'+path,{method:'POST',headers:{...headers(false),'Content-Type':file.type,'x-upsert':'false'},body:file});if(!response.ok){const data=await response.json().catch(()=>({}));throw Error(data.message||data.error||'Photo upload failed');}await req('/rest/v1/market_listing_media',{method:'POST',json:{listing_id:id,seller_id:S.session.user.id,object_path:path,alt_text:'Seller item photo',sort_order:pos},headers:{Prefer:'return=minimal'}})}

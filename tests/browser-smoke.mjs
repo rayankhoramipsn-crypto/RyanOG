@@ -27,7 +27,7 @@ const cors = {
  'access-control-allow-headers':'apikey,authorization,content-type,prefer,x-client-info',
  'content-type':'application/json'
 };
-const browser = await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{}),args:['--no-sandbox']});
+const browser = await chromium.launch({executablePath:process.env.TRISO_CHROMIUM_PATH||undefined,headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{}),args:['--no-sandbox']});
 const context = await browser.newContext({viewport:{width:1365,height:900},reducedMotion:'reduce'});
 const pageErrors=[];
 const failed=[];
