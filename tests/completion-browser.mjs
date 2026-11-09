@@ -7,7 +7,7 @@ const cors={'access-control-allow-origin':'*','access-control-allow-headers':'*'
 try{
  const context=await browser.newContext();const errors=[];let offsets=[],deleted=false;
  context.on('page',p=>p.on('pageerror',e=>errors.push(e.message)));
- await context.addInitScript(()=>localStorage.setItem('tc35_auth_session',JSON.stringify({access_token:'mock',refresh_token:'mock-refresh',expires_at:Date.now()/1000+3600,user:{id:'admin-fixture',app_metadata:{role:'admin'}}})));
+ await context.addInitScript(()=>{if(location.hostname!=='127.0.0.1')return;localStorage.setItem('tc35_auth_session',JSON.stringify({access_token:'mock',refresh_token:'mock-refresh',expires_at:Date.now()/1000+3600,user:{id:'admin-fixture',app_metadata:{role:'admin'}}}));});
  await context.route('**/*',async route=>{
   const url=new URL(route.request().url());if(url.origin===new URL(base).origin)return route.continue();
   if(url.origin!==api)return route.abort();
