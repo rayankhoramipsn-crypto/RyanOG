@@ -1255,6 +1255,7 @@ body,#store-screen{background:radial-gradient(ellipse 75% 22% at 50% 0%,#271338 
 <link rel="icon" type="image/svg+xml" href="../assets/trisocmd-icon.svg">
 <link rel="alternate icon" type="image/png" sizes="64x64" href="../assets/trisocmd-icon-64.png">
 <link rel="apple-touch-icon" sizes="180x180" href="../assets/trisocmd-apple-touch.png">
+<link rel="stylesheet" href="../assets/phase1-orders.css">
 </head>
 <body><div id="tc50-staging-banner" role="status" style="position:relative;z-index:99999;background:#122330;border-bottom:1px solid #467487;color:#c2eaff;padding:10px 18px;text-align:center;font:600 12px/1.5 system-ui,sans-serif">STAGING PREVIEW · Payments, order processing, and support notifications are not live. Do not send funds.</div>
 <a class="tc49-skip" href="#tc-shop-heading">SKIP TO PRODUCTS</a>
@@ -3202,13 +3203,37 @@ count();
  }
  function tc42BagItems(){let bag={};try{bag=JSON.parse(localStorage.getItem('tc39-bag')||'{}')||{}}catch(e){}return Object.entries(bag).filter(([id,qty])=>Number(qty)>0).map(([id,qty])=>({id:Number(id),qty:Number(qty)}))}
  window.tc42BagItems=tc42BagItems;
+ let tc30OrderBusy=false;
  window.tc42SaveOrder=async()=>{
-  const status=$('tc42-order-result');status.textContent='Validating prices and saving your order…';
-  try{const items=window.tc42OrderItems||[];if(!items.length)throw Error('Choose a product first.');
-   const id=await req('rpc/tc42_create_order',{method:'POST',body:{p_items:items}});
-   status.textContent='Order saved: '+String(id).slice(0,8)+' · Awaiting payment. This is NOT payment confirmation.';
+  const status=$('tc42-order-result'),button=$('tc42-save-order');
+  if(tc30OrderBusy)return;
+  const tell=(message,kind='info')=>{
+   if(!status)return;
+   status.textContent=message;status.dataset.state=kind;
+   status.setAttribute('role',kind==='error'?'alert':'status');
+   status.setAttribute('aria-live',kind==='error'?'assertive':'polite');
+  };
+  tc30OrderBusy=true;
+  if(button)button.disabled=true;
+  tell('Validating your cart with the server. No payment is being taken.','info');
+  try{
+   const items=window.tc42OrderItems;
+   if(!Array.isArray(items)||items.length<1||items.length>20)throw Error('Select 1–20 products to save a request.');
+   const valid=items.every(x=>Number.isSafeInteger(Number(x.id))&&Number(x.id)>0&&Number.isSafeInteger(Number(x.qty))&&Number(x.qty)>=1&&Number(x.qty)<=99999);
+   if(!valid)throw Error('Cart items contain an invalid product or quantity.');
+   // Server independently re-checks ownership, stock, quantities and authoritative price.
+   if(!window.TrisoOrders)throw Error('Order center is loading. Please retry.');
+   const id=await window.TrisoOrders.create(items);
+   if(typeof id!=='string'||!/^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(id))throw Error('Server response could not be verified. Check My Orders before trying again.');
+   tell('Request saved: #'+id.slice(0,8).toUpperCase()+'. Not paid and not confirmed. Check My Orders for the full record.','success');
    window.tc36LoadOrders?.();
-  }catch(e){status.textContent=e.message+' · Guest? You can continue via Telegram.'}
+  }catch(e){
+   const message=String(e?.message||'Order service unavailable');
+   tell(message+' · If the request may have reached the server, check My Orders before retrying to avoid duplicates.','error');
+  }finally{
+   tc30OrderBusy=false;
+   if(button)button.disabled=false;
+  }
  };
  async function getMyThread(){
   const token=await window.tc42AccessToken?.();if(!token)return null;
@@ -3489,5 +3514,5 @@ function init(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
-</script></body>
+</script><script src="../assets/phase1-orders.js" defer></script><script src="../assets/store-invoice.js" defer></script></body>
 </html>

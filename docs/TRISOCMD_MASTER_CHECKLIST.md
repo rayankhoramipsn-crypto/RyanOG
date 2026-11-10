@@ -1,18 +1,18 @@
 # TRISOCMD master checklist
 
-Updated 2026-11-10 (Asia/Tehran). **INCOMPLETE; not release-ready.**
+Updated 2026-11-11 (Asia/Tehran). **INCOMPLETE; not release-ready.**
 
 Baseline: PR #36 at 3eea77c; all four commits including hosted marketplace status compatibility are preserved.
 VERIFIED LOCAL means local fixtures/mocks only. PARTIAL means implementation exists with gaps. UNVERIFIED means acceptance pending; not necessarily absent. BLOCKED means external configuration or permissions required.
 
 | Phase | Status and evidence |
 |---|---|
-| 1 | PARTIAL: PR #36 retained; 24 provider tests, 25 native PostgreSQL scenarios. Real provider/Auth topology unresolved. |
+| 1 | PARTIAL: PR #36 retained; 24 provider tests, 25 native PostgreSQL scenarios. Local same-project Auth/SQL integration passes; hosted rollout and real provider acceptance pending. |
 | 2 | PARTIAL: admin pagination/gallery batching fixed; mocked cross-seller listing #241 visible; paginated browse/search/price filters and eight DB scenarios added. Migration unapplied; real role/upload/quota E2E pending. |
 | 3 | PARTIAL: 8 session tests; refresh coordinator, offline retention and server logout requests. Real OAuth/chat/admin acceptance pending. |
 | 4 | PARTIAL: 4 email tests; templates and disabled delivery core. Durable outbox adapter/Resend transport and support completion pending. |
 | 5 | PARTIAL: media parsing, blog deletion/RTL/metadata fixed; 4 static article tests. CMS publication wiring and production SEO gate pending. |
-| 6 | PARTIAL: 40 Node tests, 33 DB scenarios, 56 Python tests, four Chromium suites. Firefox blocked; exhaustive real-role/device/security/performance audit unfinished. |
+| 6 | PARTIAL: 40 Node tests, 51 DB scenarios, 56 Python tests, four Chromium suites. Firefox blocked; exhaustive real-role/device/security/performance audit unfinished. |
 
 
 ## PHASE 1 — COMPLETE PAYMENT, CHECKOUT AND ORDER MANAGEMENT
@@ -250,7 +250,7 @@ VERIFIED LOCAL means local fixtures/mocks only. PARTIAL means implementation exi
 - Reconcile support_tickets with tc42_support_threads/messages; finish history/replies/status tests.
 - Wire static journal publication into CMS and deployment; implement product prerendering and complete sitemap.
 - Apply/review the additive marketplace browse migration in an authorized staging rollout; complete seller/profile/edit workflows and live cross-account upload tests. Paginated search/price filters pass local DB/browser tests.
-- Complete legacy current-admin freshness, user/seller management and operational logs.
+- Review/apply the session/admin authorization migration in an authorized staging rollout; complete user/seller management and operational logs.
 - Run isolated real staging signup/confirmation/recovery/OAuth/chat/storage and full buyer/seller/admin workflows.
 
 ## Requested end-to-end acceptance matrix
@@ -281,3 +281,7 @@ VERIFIED LOCAL means local fixtures/mocks only. PARTIAL means implementation exi
 | 22. Pro seller permissions | Real isolated-role E2E pending; local mocks/DB coverage is recorded separately |
 | 23. Cross-account security tests | Real isolated-role E2E pending; local mocks/DB coverage is recorded separately |
 | 24. Logout and session cleanup | Real isolated-role E2E pending; local mocks/DB coverage is recorded separately |
+
+## Supabase integration continuation
+
+Full staging public-schema/ACL/Storage-policy snapshot restored with synthetic historical orders. Phase 1 and browse compatibility pass locally; authorization fixes and 18 embedded full-schema scenarios and 20 real local Supabase scenarios cover buyer/seller/admin isolation, quota concurrency, Pro expiry, moderation, chat, inventory/checkout and revocation. Hosted migrations/functions remain unchanged; see TRISOCMD_SUPABASE_VERIFICATION.md.

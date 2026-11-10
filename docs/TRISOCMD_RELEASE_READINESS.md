@@ -1,13 +1,13 @@
 # TRISOCMD release readiness
 
-**NOT READY. Six-phase scope incomplete.** Updated 2026-11-10 (Asia/Tehran).
+**NOT READY. Six-phase scope incomplete.** Updated 2026-11-11 (Asia/Tehran).
 
 Based on PR #36 at 3eea77c, preserving compatibility fixes. This branch adds auth/moderation/media repairs, offline article tooling and disabled email core. Marketplace browsing now adds an unapplied migration, 20261110201622_marketplace_browse_page.sql. It preserves market_browse(), grants only the new read RPC to anon/authenticated, exposes approved public fields and the existing derived Pro flag, pins search_path, and changes no table grants/RLS. SECURITY DEFINER retains access to private Pro entitlements without exposing profiles. Review/authorize staging rollout separately; until applied, clients show the legacy 100-result limitation. Phase 1 migration/Edge Functions remain inherited and undeployed.
 
 ## Validation
 
 - 40 Node tests (24 payment/provider, 8 session, 4 journal, 4 email).
-- 33 native PostgreSQL scenarios (25 payment and 8 browse) using independent connections; inventory races, TXID uniqueness, transitions, idempotency and grants against reconstructed fixture.
+- 51 native PostgreSQL scenarios (25 payment, 8 browse and 18 full staging-schema) using independent connections; inventory races, TXID uniqueness, transitions, idempotency and grants against reconstructed fixture.
 - 56 Python regressions.
 - Four Chromium suites: route/UI smoke, Phase 1 checkout/orders, completion suite covering 241-row moderation, blog media/deletion/sanitization/RTL at 390/768/1365px and product URL parsing; marketplace suite covers 241-row pagination, server-filter contract, approved deep links, late responses, empty/error/retry states, missing-migration fallback and mobile RTL in main/preview.
 - Local Supabase security advisors reported no issues against the browse fixture; this does not certify either live project.
@@ -32,3 +32,9 @@ Export reviewed published articles to JSON without credentials/private drafts. R
 7. If Phase 1 is separately rolled out, disable providers and use its data-preserving retirement plan. Do not drop orders/claims/invoices/audit history.
 
 No production-readiness or six-phase-completion claim is made.
+
+## Supabase integration batch
+
+See TRISOCMD_SUPABASE_VERIFICATION.md. Full staging public-schema/security fixtures now supplement the archive fixtures. New migration 20261110204751_staging_integration_authorization.sql adds active-session and persisted-admin gates, audit ACL restrictions and null-cart validation. It preserves ownership policies and historical rows. All hosted migrations remain unapplied; the currently deployed staging store-crypto is still the legacy implementation. No production identity migration is attempted.
+
+The 20-scenario real local Supabase Auth/JWT/REST run passes on PostgreSQL 17.11, alongside all existing suites. Hosted Auth settings and deployed runtime acceptance remain unverified; no hosted rollout occurred. Preview pages now use the canonical order module, including its idempotent submission path.

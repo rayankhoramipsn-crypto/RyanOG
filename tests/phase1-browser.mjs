@@ -76,4 +76,12 @@ try{
  console.log('PASS delayed product bootstrap preserves language/account navigation');
  await delayed.close();
  assert.deepEqual(errors,[]);
+ const preview=await context.newPage();await preview.goto(base+'/preview/index.html',{waitUntil:'domcontentloaded'});
+ await preview.waitForFunction(()=>!!window.TrisoOrders);
+ const beforePreview=creates;
+ await preview.evaluate(()=>{window.tc42AccessToken=async()=> 'mock-user-token';window.tc42OrderItems=[{id:1,qty:1}];return Promise.all([window.tc42SaveOrder(),window.tc42SaveOrder()])});
+ assert.equal(creates,beforePreview+1);
+ assert.equal(await preview.locator('#tc42-order-result').getAttribute('data-state'),'success');
+ assert.deepEqual(errors,[]);
+ console.log('PASS preview uses canonical idempotent checkout after legacy validator grant is revoked');
 }finally{await context.close();await browser.close();}

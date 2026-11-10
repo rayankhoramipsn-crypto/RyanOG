@@ -3886,7 +3886,8 @@ count();
    const valid=items.every(x=>Number.isSafeInteger(Number(x.id))&&Number(x.id)>0&&Number.isSafeInteger(Number(x.qty))&&Number(x.qty)>=1&&Number(x.qty)<=99999);
    if(!valid)throw Error('Cart items contain an invalid product or quantity.');
    // Server independently re-checks ownership, stock, quantities and authoritative price.
-   const id=window.TrisoOrders ? await window.TrisoOrders.create(items) : await req('rpc/tc42_create_order',{method:'POST',body:{p_items:items}});
+   if(!window.TrisoOrders)throw Error('Order center is loading. Please retry.');
+   const id=await window.TrisoOrders.create(items);
    if(typeof id!=='string'||!/^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(id))throw Error('Server response could not be verified. Check My Orders before trying again.');
    tell('Request saved: #'+id.slice(0,8).toUpperCase()+'. Not paid and not confirmed. Check My Orders for the full record.','success');
    window.tc36LoadOrders?.();
