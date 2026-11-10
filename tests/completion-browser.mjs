@@ -16,7 +16,7 @@ try{
   if(url.pathname.endsWith('/rpc/is_admin'))data=true;
   if(url.pathname.endsWith('/market_listings')){
    const offset=Number(url.searchParams.get('offset')||0);offsets.push(offset);
-   data=offset===0?Array.from({length:150},(_,i)=>({id:i+1,title:'Reviewed '+i,price:10,status:'approved',seller_id:'other-seller',submitted_at:'2026-01-01'})):[{id:151,title:'Older pending from another seller',price:25,status:'pending',seller_id:'different-seller',submitted_at:'2025-01-01'}];
+   data=offset===0?Array.from({length:150},(_,i)=>({id:i+1,title:'Reviewed '+i,price:10,status:'approved',seller_id:'other-seller',submitted_at:'2026-01-01'})):Array.from({length:91},(_,i)=>({id:151+i,title:i===90?'Older pending from another seller':'Reviewed '+(151+i),price:25,status:'pending',seller_id:'different-seller',submitted_at:'2025-01-01'}));
   }
   if(url.pathname.endsWith('/blog_posts')){
    if(route.request().method()==='DELETE')deleted=true;
@@ -24,8 +24,8 @@ try{
   }
   return route.fulfill({status:200,headers:cors,contentType:'application/json',body:JSON.stringify(data)});
  });
- const page=await context.newPage();await page.goto(base+'/admin/');await page.getByText('#151 · Older pending from another seller',{exact:true}).waitFor();
- assert.deepEqual(offsets,[0,150]);console.log('PASS admin queue includes older cross-seller pending submission beyond first 150');
+ const page=await context.newPage();await page.goto(base+'/admin/');await page.getByText('#241 · Older pending from another seller',{exact:true}).waitFor();
+ assert.deepEqual(offsets,[0,150]);console.log('PASS admin queue includes older cross-seller pending submission in a 241-row moderation queue');
  for(const width of [390,768,1365]){
   await page.setViewportSize({width,height:900});await page.goto(base+'/blog/?slug=fixture');
   await page.locator('#article-title').filter({hasText:'Journal fixture'}).waitFor();

@@ -3,10 +3,10 @@
 const API='https://cxtytbjvdlngahytfilr.supabase.co';
 const KEY='sb_publishable_AqZWjpgyZ_h6-EKwOySyGQ_0LE8bcRm';
 const $=id=>document.getElementById(id);
-const S={session:null,admin:false,items:[],photos:new Map(),signed:new Map(),category:'all',sort:'new',query:'',selected:null,threads:[],active:null,lastKey:'',timer:null,rt:null,inboxChannel:null,inboxTimer:null,inboxOwner:null,inboxBusy:null,inboxInitialized:false,inboxConnected:false,readMarks:new Map(),lang:'en',dailyCount:0,pro:false,threadQuery:'',unreadOnly:false,purchaseRows:[],txidClaims:[],purchaseBusy:false,purchaseFilter:'all'};
-const i18n={en:{all:'All listings',fortnite:'Fortnite',roblox:'Roblox',steam:'Steam',gear:'Gaming gear',other:'Other',browse:'Explore listings',sell:'Sell an item',messages:'Messages',rules:'Marketplace rules',noresults:'No approved listings match your search.',details:'View details',contact:'Chat with seller',login:'Sign in',logout:'Sign out'},
-fa:{all:'تمام آگهی‌ها',fortnite:'فورتنایت',roblox:'روبلاکس',steam:'استیم',gear:'تجهیزات گیمینگ',other:'سایر',browse:'آگهی‌های مارکت‌پلیس',sell:'ثبت آگهی',messages:'پیام‌ها',rules:'قوانین بازار',noresults:'آگهی تأییدشده‌ای پیدا نشد.',details:'مشاهده جزئیات',contact:'چت با فروشنده',login:'ورود',logout:'خروج'},
-ar:{all:'كل الإعلانات',fortnite:'فورتنايت',roblox:'روبلوكس',steam:'ستيم',gear:'معدات الألعاب',other:'أخرى',browse:'تصفح السوق',sell:'نشر إعلان',messages:'الرسائل',rules:'قواعد السوق',noresults:'لا توجد إعلانات مطابقة.',details:'عرض التفاصيل',contact:'مراسلة البائع',login:'تسجيل الدخول',logout:'تسجيل الخروج'}};
+const S={session:null,admin:false,items:[],photos:new Map(),signed:new Map(),category:'all',sort:'new',query:'',minPrice:null,maxPrice:null,browseOffset:0,browseMore:false,browseBusy:false,browseSequence:0,browseLegacy:false,selected:null,threads:[],active:null,lastKey:'',timer:null,rt:null,inboxChannel:null,inboxTimer:null,inboxOwner:null,inboxBusy:null,inboxInitialized:false,inboxConnected:false,readMarks:new Map(),lang:'en',dailyCount:0,pro:false,threadQuery:'',unreadOnly:false,purchaseRows:[],txidClaims:[],purchaseBusy:false,purchaseFilter:'all'};
+const i18n={en:{minPrice:'Minimum price (USD)',maxPrice:'Maximum price (USD)',previous:'Previous',next:'Next',all:'All listings',fortnite:'Fortnite',roblox:'Roblox',steam:'Steam',gear:'Gaming gear',other:'Other',browse:'Explore listings',sell:'Sell an item',messages:'Messages',rules:'Marketplace rules',noresults:'No approved listings match your search.',details:'View details',contact:'Chat with seller',login:'Sign in',logout:'Sign out'},
+fa:{minPrice:'حداقل قیمت (دلار)',maxPrice:'حداکثر قیمت (دلار)',previous:'قبلی',next:'بعدی',all:'تمام آگهی‌ها',fortnite:'فورتنایت',roblox:'روبلاکس',steam:'استیم',gear:'تجهیزات گیمینگ',other:'سایر',browse:'آگهی‌های مارکت‌پلیس',sell:'ثبت آگهی',messages:'پیام‌ها',rules:'قوانین بازار',noresults:'آگهی تأییدشده‌ای پیدا نشد.',details:'مشاهده جزئیات',contact:'چت با فروشنده',login:'ورود',logout:'خروج'},
+ar:{minPrice:'السعر الأدنى (دولار)',maxPrice:'السعر الأقصى (دولار)',previous:'السابق',next:'التالي',all:'كل الإعلانات',fortnite:'فورتنايت',roblox:'روبلوكس',steam:'ستيم',gear:'معدات الألعاب',other:'أخرى',browse:'تصفح السوق',sell:'نشر إعلان',messages:'الرسائل',rules:'قواعد السوق',noresults:'لا توجد إعلانات مطابقة.',details:'عرض التفاصيل',contact:'مراسلة البائع',login:'تسجيل الدخول',logout:'تسجيل الخروج'}};
 const tr=k=>i18n[S.lang]?.[k]||i18n.en[k]||k;
 const make=(tag,text,cls)=>{const e=document.createElement(tag);if(text!=null)e.textContent=String(text);if(cls)e.className=cls;return e};
 const empty=e=>e.replaceChildren();
@@ -36,7 +36,7 @@ function dialog(id){const d=$(id);if(!d.open)d.showModal()}
 function close(id){if($(id).open)$(id).close()}
 function saveSession(session){if(session){window.TrisoAuth.write(session);S.session=window.TrisoAuth.read()||session;}else{window.TrisoAuth.clear();S.session=null}}
 function headers(json=true){const h={'apikey':KEY,Authorization:'Bearer '+(S.session?.access_token||KEY)};if(json)h['Content-Type']='application/json';return h}
-async function req(path,opts={}){const json=('json'in opts);const r=await fetch(API+path,{method:opts.method||'GET',headers:{...headers(json),...(opts.headers||{})},body:json?JSON.stringify(opts.json):opts.body});const data=await r.json().catch(()=>null);if(!r.ok)throw Error(data?.message||data?.error_description||data?.msg||data?.error||'Request failed ('+r.status+')');return data}
+async function req(path,opts={}){const json=('json'in opts);const r=await fetch(API+path,{method:opts.method||'GET',headers:{...headers(json),...(opts.headers||{})},body:json?JSON.stringify(opts.json):opts.body});const data=await r.json().catch(()=>null);if(!r.ok)throw Object.assign(Error(data?.message||data?.error_description||data?.msg||data?.error||'Request failed ('+r.status+')'),{code:data?.code});return data}
 const rpc=(name,json={})=>req('/rest/v1/rpc/'+name,{method:'POST',json});
 async function refresh(){
  try{S.session=await window.TrisoAuth.refresh(token=>req('/auth/v1/token?grant_type=refresh_token',{method:'POST',json:{refresh_token:token}}))}
@@ -59,13 +59,65 @@ function sessionUI(){
 }
 function translate(){document.documentElement.lang=S.lang;document.documentElement.dir=['fa','ar'].includes(S.lang)?'rtl':'ltr';$('language').value=S.lang;document.querySelectorAll('[data-t]').forEach(e=>{e.textContent=tr(e.dataset.t)});$('search').placeholder=S.lang==='fa'?'جست‌وجوی اکانت، تجهیزات و بازی...':S.lang==='ar'?'ابحث عن الحسابات والألعاب...':'Search accounts, games, gear...';sessionUI();renderItems()}
 function categoryOf(p){const v=((p.platform||'')+' '+(p.title||'')).toLowerCase();if(/fortnite|فورتنایت/.test(v))return 'fortnite';if(/roblox|روبلاکس/.test(v))return 'roblox';if(/steam|استیم/.test(v))return 'steam';if(/gear|mouse|keyboard|headset|controller|monitor|کیبورد|هدست|موس|تجهیز/.test(v))return 'gear';return 'other'}
-function filtered(){let rows=S.items.filter(p=>(S.category==='all'||categoryOf(p)===S.category)&&[p.platform,p.title,p.description].join(' ').toLowerCase().includes(S.query));if(S.sort==='low')rows.sort((a,b)=>+a.price-+b.price);else if(S.sort==='high')rows.sort((a,b)=>+b.price-+a.price);else rows.sort((a,b)=>Number(b.is_pro)-Number(a.is_pro)||new Date(b.submitted_at)-new Date(a.submitted_at));return rows}
+function filtered(){let rows=S.items.filter(p=>(S.minPrice===null||+p.price>=S.minPrice)&&(S.maxPrice===null||+p.price<=S.maxPrice)&&(S.category==='all'||categoryOf(p)===S.category)&&[p.platform,p.title,p.description].join(' ').toLowerCase().includes(S.query));if(S.sort==='low')rows.sort((a,b)=>+a.price-+b.price);else if(S.sort==='high')rows.sort((a,b)=>+b.price-+a.price);else rows.sort((a,b)=>Number(b.is_pro)-Number(a.is_pro)||new Date(b.submitted_at)-new Date(a.submitted_at));return rows}
 async function signed(path){if(!path)return null;const cached=S.signed.get(path);if(cached&&cached.until>Date.now())return cached.url;try{const safe=path.split('/').map(encodeURIComponent).join('/');const d=await req('/storage/v1/object/sign/market-gallery/'+safe,{method:'POST',json:{expiresIn:3600}});const u=d.signedURL||d.signedUrl;if(!u)return null;const url=u.startsWith('http')?u:API+'/storage/v1'+(u.startsWith('/')?u:'/'+u);S.signed.set(path,{url,until:Date.now()+2400000});return url}catch{return null}}
 function art(p){const wrap=make('div',null,'item-cover');wrap.append(make('span',categoryOf(p).toUpperCase(),'placeholder'));wrap.append(make('span',p.is_pro?'PRO SELLER':'APPROVED','flag'));const photos=S.photos.get(String(p.id))||[];if(photos.length)signed(photos[0].object_path).then(url=>{if(url&&wrap.isConnected){const img=make('img');img.src=url;img.alt=p.title;img.loading='lazy';img.onerror=()=>img.remove();wrap.prepend(img)}});return wrap}
 function card(p){const c=make('article',null,'item-card');const main=make('div',null,'item-main'),foot=make('div',null,'item-foot');const b=make('button',tr('details'),'btn small primary');b.type='button';b.onclick=()=>details(p);foot.append(make('span',money(p.price),'item-price'),b);main.append(make('div',p.platform,'item-category'),make('h3',p.title,'item-title'),make('p',p.description,'item-desc'),foot);c.append(art(p),main);return c}
-function renderItems(){const root=$('cards');empty(root);const rows=filtered();$('count').textContent=rows.length+' listings';if(!rows.length)root.append(make('div',tr('noresults'),'empty'));else rows.forEach(p=>root.append(card(p)));document.querySelectorAll('[data-cat]').forEach(b=>b.classList.toggle('active',b.dataset.cat===S.category))}
-async function readPhotos(ids){if(!ids.length)return;const valid=ids.map(Number).filter(Number.isInteger);if(!valid.length)return;try{const data=await req('/rest/v1/market_listing_media?select=listing_id,object_path,sort_order&listing_id=in.('+valid.join(',')+')&order=sort_order.asc&limit=500');for(const id of valid)S.photos.set(String(id),data.filter(m=>+m.listing_id===id))}catch(e){console.warn('Gallery unavailable',errorText(e))}}
-async function browse(){try{S.items=await rpc('market_browse')||[];await readPhotos(S.items.map(p=>p.id));renderItems()}catch(e){empty($('cards'));$('cards').append(make('div','Listings unavailable: '+errorText(e),'empty'))}}
+function renderItems(){const root=$('cards');empty(root);const rows=filtered();$('count').textContent=rows.length?(S.browseOffset+1)+'–'+(S.browseOffset+rows.length)+' listings':'0 listings';browseControls();if(!rows.length)root.append(make('div',tr('noresults'),'empty'));else rows.forEach(p=>root.append(card(p)));document.querySelectorAll('[data-cat]').forEach(b=>b.classList.toggle('active',b.dataset.cat===S.category))}
+async function readPhotos(ids){
+ const valid=[...new Set(ids.map(Number).filter(Number.isSafeInteger))];
+ for(let offset=0;offset<valid.length;offset+=75){
+  const batch=valid.slice(offset,offset+75);
+  try{const data=await req('/rest/v1/market_listing_media?select=listing_id,object_path,sort_order&listing_id=in.('+batch.join(',')+')&order=sort_order.asc&limit=500');for(const id of batch)S.photos.set(String(id),data.filter(m=>+m.listing_id===id))}
+  catch(e){console.warn('Gallery unavailable',errorText(e))}
+ }
+}
+function browseControls(){
+ $('browse-prev').disabled=S.browseBusy||S.browseOffset===0||S.browseLegacy;
+ $('browse-next').disabled=S.browseBusy||!S.browseMore||S.browseLegacy;
+ $('cards').setAttribute('aria-busy',String(S.browseBusy));
+}
+async function browse(offset=0){
+ const sequence=++S.browseSequence;
+ S.browseBusy=true;browseControls();
+ $('browse-status').textContent='Loading listings…';
+ empty($('cards'));
+ try{
+  const filters={p_offset:offset,p_query:S.query,p_category:S.category,p_sort:S.sort,p_min_price:S.minPrice,p_max_price:S.maxPrice};
+  let data;
+  try{data=await rpc('market_browse_page',filters)}catch(e){
+   // Only missing-function errors permit compatibility fallback, never network,
+   // authorization or validation failures. Do not silently advertise full search.
+   if(e.code!=='PGRST202'&&e.code!=='42883')throw e;
+   data={items:await rpc('market_browse')||[],has_more:false,legacy:true};
+  }
+  if(sequence!==S.browseSequence)return;
+  await readPhotos(data.items.map(p=>p.id));
+  if(sequence!==S.browseSequence)return;
+  S.items=data.items;S.browseOffset=offset;S.browseMore=data.has_more===true;S.browseLegacy=!!data.legacy;
+  $('browse-status').textContent=S.browseLegacy?'Limited results: expanded browsing is temporarily unavailable; search covers only the first 100 listings.':'';
+  renderItems();
+ }catch(e){
+  if(sequence!==S.browseSequence)return;
+  S.items=[];S.browseMore=false;renderItems();
+  empty($('cards'));const retry=make('button','Retry','btn');retry.type='button';retry.onclick=()=>browse(offset);
+  $('cards').append(make('div','Listings unavailable: '+errorText(e),'empty'),retry);
+  $('browse-status').textContent='Listings unavailable. Retry to load results.';
+ }finally{if(sequence===S.browseSequence){S.browseBusy=false;browseControls()}}
+}
+let browseTimer;
+function scheduleBrowse(delay=0){
+ clearTimeout(browseTimer);++S.browseSequence;S.items=[];S.browseBusy=true;browseControls();empty($('cards'));$('count').textContent='…';
+ const min=$('price-min'),max=$('price-max');
+ max.setCustomValidity('');
+ if(min.value!==''&&max.value!==''&&+min.value>+max.value)max.setCustomValidity('Maximum price must be at least the minimum price.');
+ if(!min.checkValidity()||!max.checkValidity()){
+  S.browseBusy=false;S.browseMore=false;S.browseOffset=0;browseControls();
+  $('count').textContent='0 listings';$('browse-status').textContent='Enter a valid price range.';return;
+ }
+ S.minPrice=min.value===''?null:Number(min.value);S.maxPrice=max.value===''?null:Number(max.value);
+ $('browse-status').textContent='Loading listings…';browseTimer=setTimeout(()=>browse(),delay);
+}
 const tc27OpenStatuses=['requested','awaiting_payment_setup','disputed','payment_reported','payment_verified','delivery_reported'];
 function tc27ActiveRequest(listingId){
  return S.purchaseRows.find(r=>String(r.listing_id)===String(listingId)&&r.buyer_id===S.session?.user?.id&&tc27OpenStatuses.includes(r.status));
@@ -624,10 +676,14 @@ async function init(){
  if(checkbox){checkbox.checked=window.TrisoAuth.remembered();checkbox.addEventListener('change',()=>window.TrisoAuth.setRemember(checkbox.checked))}
  if(S.session?.refresh_token&&(!S.session.expires_at||S.session.expires_at*1000<Date.now()+120000))await refresh();
 S.lang=['en','fa','ar'].includes(localStorage.getItem('tc_market_lang'))?localStorage.getItem('tc_market_lang'):'en';S.admin=await adminCheck();translate();await browse();if(S.session?.user){startInbox();await Promise.allSettled([mine(),threads(),purchases()]);tc35LoadPreference();}
-const hash=Number(new URLSearchParams(location.search).get('listing'));if(hash){const found=S.items.find(x=>+x.id===hash);if(found)details(found)}}
-document.querySelectorAll('[data-cat]').forEach(b=>b.addEventListener('click',()=>{S.category=b.dataset.cat;renderItems();$('listing-section').scrollIntoView({block:'start'})}));
-$('search').addEventListener('input',e=>{S.query=e.target.value.trim().toLowerCase();renderItems()});
-$('sort').addEventListener('change',e=>{S.sort=e.target.value;renderItems()});
+const hash=Number(new URLSearchParams(location.search).get('listing'));if(hash){let found=S.items.find(x=>+x.id===hash);if(!found&&!S.browseLegacy){try{const page=await rpc('market_browse_page',{p_listing:hash});found=page.items[0];if(found)await readPhotos([found.id])}catch(e){note(errorText(e))}}if(found)details(found)}}
+document.querySelectorAll('[data-cat]').forEach(b=>b.addEventListener('click',()=>{S.category=b.dataset.cat;scheduleBrowse();$('listing-section').scrollIntoView({block:'start'})}));
+$('search').addEventListener('input',e=>{S.query=e.target.value.trim().toLowerCase();scheduleBrowse(250)});
+$('sort').addEventListener('change',e=>{S.sort=e.target.value;scheduleBrowse()});
+$('price-min').addEventListener('input',()=>scheduleBrowse(250));
+$('price-max').addEventListener('input',()=>scheduleBrowse(250));
+$('browse-prev').onclick=()=>browse(Math.max(0,S.browseOffset-24));
+$('browse-next').onclick=()=>browse(S.browseOffset+24);
 $('language').addEventListener('change',e=>{S.lang=e.target.value;localStorage.setItem('tc_market_lang',S.lang);translate()});
 $('nav-login').addEventListener('click',()=>S.session?.user?dialog('sell-dialog'):dialog('auth-dialog'));
 $('open-sell').addEventListener('click',()=>dialog(S.session?.user?'sell-dialog':'auth-dialog'));

@@ -8,11 +8,11 @@ VERIFIED LOCAL means local fixtures/mocks only. PARTIAL means implementation exi
 | Phase | Status and evidence |
 |---|---|
 | 1 | PARTIAL: PR #36 retained; 24 provider tests, 25 native PostgreSQL scenarios. Real provider/Auth topology unresolved. |
-| 2 | PARTIAL: admin pagination/gallery batching fixed; mocked cross-seller listing #151 visible. Real role/upload/quota E2E pending. |
+| 2 | PARTIAL: admin pagination/gallery batching fixed; mocked cross-seller listing #241 visible; paginated browse/search/price filters and eight DB scenarios added. Migration unapplied; real role/upload/quota E2E pending. |
 | 3 | PARTIAL: 8 session tests; refresh coordinator, offline retention and server logout requests. Real OAuth/chat/admin acceptance pending. |
 | 4 | PARTIAL: 4 email tests; templates and disabled delivery core. Durable outbox adapter/Resend transport and support completion pending. |
 | 5 | PARTIAL: media parsing, blog deletion/RTL/metadata fixed; 4 static article tests. CMS publication wiring and production SEO gate pending. |
-| 6 | PARTIAL: 40 Node tests, 25 DB scenarios, 56 Python tests, three Chromium suites. Firefox blocked; exhaustive real-role/device/security/performance audit unfinished. |
+| 6 | PARTIAL: 40 Node tests, 33 DB scenarios, 56 Python tests, four Chromium suites. Firefox blocked; exhaustive real-role/device/security/performance audit unfinished. |
 
 
 ## PHASE 1 — COMPLETE PAYMENT, CHECKOUT AND ORDER MANAGEMENT
@@ -65,16 +65,16 @@ VERIFIED LOCAL means local fixtures/mocks only. PARTIAL means implementation exi
 | Seller Pro privileges and unlimited listings | UNVERIFIED — acceptance pending; see phase evidence |
 | Four percent commission records | UNVERIFIED — acceptance pending; see phase evidence |
 | Pro seller prioritization | UNVERIFIED — acceptance pending; see phase evidence |
-| Listing search | UNVERIFIED — acceptance pending; see phase evidence |
-| Category and price filters | UNVERIFIED — acceptance pending; see phase evidence |
-| Sorting | UNVERIFIED — acceptance pending; see phase evidence |
+| Listing search | VERIFIED LOCAL — paginated RPC and main/preview 241-listing fixtures; migration/live acceptance pending |
+| Category and price filters | VERIFIED LOCAL — paginated RPC and main/preview 241-listing fixtures; migration/live acceptance pending |
+| Sorting | VERIFIED LOCAL — paginated RPC and main/preview 241-listing fixtures; migration/live acceptance pending |
 | New arrivals | UNVERIFIED — acceptance pending; see phase evidence |
 | Featured items | UNVERIFIED — acceptance pending; see phase evidence |
 | Seller profiles | UNVERIFIED — acceptance pending; see phase evidence |
 | Listing status synchronization | UNVERIFIED — acceptance pending; see phase evidence |
 | Sold-out inventory protection | UNVERIFIED — acceptance pending; see phase evidence |
 | Responsive product cards | UNVERIFIED — acceptance pending; see phase evidence |
-| Loading, empty and error states | UNVERIFIED — acceptance pending; see phase evidence |
+| Loading, empty and error states | VERIFIED LOCAL — paginated RPC and main/preview 241-listing fixtures; migration/live acceptance pending |
 
 ## PHASE 3 — AUTHENTICATION, CHAT AND ADMIN
 
@@ -249,7 +249,7 @@ VERIFIED LOCAL means local fixtures/mocks only. PARTIAL means implementation exi
 - Implement durable email leasing, Resend transport, retries and event wiring. Integrate Auth templates/hooks separately.
 - Reconcile support_tickets with tc42_support_threads/messages; finish history/replies/status tests.
 - Wire static journal publication into CMS and deployment; implement product prerendering and complete sitemap.
-- Complete marketplace pagination beyond market_browse limit 100, price filters, seller/profile/edit workflows and live cross-account upload tests.
+- Apply/review the additive marketplace browse migration in an authorized staging rollout; complete seller/profile/edit workflows and live cross-account upload tests. Paginated search/price filters pass local DB/browser tests.
 - Complete legacy current-admin freshness, user/seller management and operational logs.
 - Run isolated real staging signup/confirmation/recovery/OAuth/chat/storage and full buyer/seller/admin workflows.
 

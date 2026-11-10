@@ -68,7 +68,7 @@
    </aside>
    <div>
      <div class="search-row">
-       <div class="search-box"><input id="search" type="search" autocomplete="off" aria-label="Search listings" placeholder="Search accounts, games, gear..."></div>
+       <div class="search-box"><input id="search" maxlength="200" type="search" autocomplete="off" aria-label="Search listings" placeholder="Search accounts, games, gear..."></div>
        <label for="sort" class="fine">Sort</label>
        <select id="sort" aria-label="Sort listings">
          <option value="new">Recommended / Newest</option>
@@ -76,8 +76,14 @@
          <option value="high">Price: high to low</option>
        </select>
      </div>
+     <div class="price-filters">
+       <label><span data-t="minPrice">Minimum price (USD)</span><input id="price-min" type="number" min="0" step="0.01" inputmode="decimal"></label>
+       <label><span data-t="maxPrice">Maximum price (USD)</span><input id="price-max" type="number" min="0" step="0.01" inputmode="decimal"></label>
+     </div>
+     <p id="browse-status" class="fine" role="status"></p>
      <div class="results-top"><h2>THE MARKET.</h2><span id="count" role="status">Loading listings…</span></div>
      <div id="cards" class="cards" aria-live="polite"><div class="empty">Loading approved offers…</div></div>
+     <nav class="browse-pages" aria-label="Listing pages"><button id="browse-prev" data-t="previous" class="btn" type="button" disabled>Previous</button><button id="browse-next" data-t="next" class="btn" type="button" disabled>Next</button></nav>
    </div>
  </div>
  <div class="container">

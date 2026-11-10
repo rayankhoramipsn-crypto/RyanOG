@@ -40,7 +40,8 @@ await context.route(origin+'/**', async route=>{
  }
  const path=url.pathname;
  let result=[];
- if(path.endsWith('/rpc/market_browse'))result=fixtureListings;
+ if(path.endsWith('/rpc/market_browse_page'))result={items:fixtureListings,has_more:false};
+ else if(path.endsWith('/rpc/market_browse'))result=fixtureListings;
  else if(path.endsWith('/rpc/is_admin'))result=false;
  else if(path.endsWith('/rpc/market_inbox'))result=[];
  else if(path.endsWith('/auth/v1/user'))result={id:'00000000-0000-4000-8000-000000000001',email:'smoke@example.test'};
@@ -54,7 +55,7 @@ await context.route(origin+'/**', async route=>{
  else if(path.includes('/market_listings'))result=[];
  // No write action is allowed by this test. The only POSTs above are
  // read-only RPCs; all other write requests receive a 403 failure.
- const safeReadRPC=path.endsWith('/rpc/is_admin')||path.endsWith('/rpc/market_browse')||path.endsWith('/rpc/market_inbox');
+ const safeReadRPC=path.endsWith('/rpc/market_browse_page')||path.endsWith('/rpc/is_admin')||path.endsWith('/rpc/market_browse')||path.endsWith('/rpc/market_inbox');
  if(!['GET','HEAD'].includes(request.method())&&!safeReadRPC){
   failed.push('unexpected network mutation blocked: '+request.method()+' '+path);
   return route.fulfill({status:403,headers:cors,body:JSON.stringify({message:'Test never performs writes'})});
@@ -290,10 +291,12 @@ try{
  assert.equal(await market.locator('#accept').isChecked(),false,'new modal opens with unchecked consent');
  await market.keyboard.press('Escape');
  await market.locator('[data-cat="gear"]').first().click();
+ await market.waitForFunction(()=>document.querySelector('#cards').getAttribute('aria-busy')==='false');
  assert.equal(await market.locator('#cards .item-card').count(),1,'category filter broken');
  await market.locator('#search').click();
  assert.equal(await market.locator('#search').getAttribute('readonly'),null,'search must become editable on actual focus');
  await market.locator('#search').fill('not-a-product');
+ await market.waitForFunction(()=>document.querySelector('#cards').getAttribute('aria-busy')==='false');
  assert.equal(await market.locator('#cards .item-card').count(),0,'marketplace search broken');
  console.log('OK listing detail, policy gating, category filter and search');
 
