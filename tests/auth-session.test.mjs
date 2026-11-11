@@ -18,3 +18,5 @@ test('logout during refresh cannot resurrect login',async()=>{const {auth}=harne
 test('new login wins over previous refresh',async()=>{const {auth}=harness();auth.write(session());await auth.refresh(async()=>{auth.write(session('other'));return session('late')});assert.equal(auth.read().access_token,'other')});
 test('fresh session avoids rotation',async()=>{const {auth}=harness();auth.write(session('fresh',9999999999));await auth.refresh(()=>{throw Error('must not run')})});
 test('refresh preserves session-only preference',async()=>{const h=harness();h.auth.write(session(),false);await h.auth.refresh(async()=>session('next'));assert.equal(h.localStorage.getItem(h.auth.key),null);assert.equal(h.auth.read().access_token,'next')});
+
+test('refresh cannot persist a response for another account',async()=>{const h=harness();h.auth.write(session());await assert.rejects(h.auth.refresh(async()=>({...session('wrong'),user:{id:'other'}})),/Session identity mismatch/);assert.equal(h.auth.read().user.id,'buyer');assert.equal(h.auth.read().access_token,'old')});

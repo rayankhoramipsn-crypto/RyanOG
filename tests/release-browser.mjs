@@ -17,6 +17,7 @@ try{
   const m=await page.evaluate(()=>({nodes:document.querySelectorAll('*').length,domContentLoaded:Math.round(performance.getEntriesByType('navigation')[0]?.domContentLoadedEventEnd||0),overflow:document.documentElement.scrollWidth-innerWidth}));metrics.push({path,...m});assert(m.nodes<20000,'Excessive DOM size');assert(m.overflow<=5,path+' overflows at 390px');
  }
  await writeFile('work/phase6-accessibility.json',JSON.stringify({issues,metrics,errors},null,2));for(const issue of issues)console.log('A11Y '+JSON.stringify(issue));assert.deepEqual(errors,[]);assert.equal(issues.length,0,'Critical/serious WCAG failures; see work/phase6-accessibility.json');console.log('PASS eight public/admin routes: no critical/serious axe WCAG violations, 390px overflow or uncaught errors; fixture DOM budgets recorded');
+ await page.close();
  // Minimal same-origin pages isolate the actual shared auth helper from app refresh calls.
  const first=await context.newPage(),second=await context.newPage();for(const p of [first,second]){await p.goto(base+'/404.html');await p.addScriptTag({path:'assets/triso-auth-storage.js'})}
  const s={access_token:'old',refresh_token:'old',expires_at:1,user:{id:buyer}};await first.evaluate(s=>TrisoAuth.write(s,true),s);let rotations=0;

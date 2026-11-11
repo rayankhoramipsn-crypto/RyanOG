@@ -12,7 +12,7 @@ VERIFIED LOCAL means isolated fixtures/local services; hosted acceptance remains
 | 3 | PARTIAL: Session unit tests, real cross-tab Web Locks, six local Auth/Mailpit flows and actual private Realtime tests pass; hosted OAuth/Auth/chat acceptance remains pending. |
 | 4 | VERIFIED LOCAL: private alerts, durable email/push outbox, signed webhooks and canonical support workflows; live sender/push/hosted rollout blocked. See TRISOCMD_COMMUNICATIONS_VERIFICATION.md. |
 | 5 | VERIFIED LOCAL: product/spec/media/editor workflows, public CMS export, crawlable build, sitemap/robots and RTL; authorized hosted rollout, editorial content and indexing release gate pending. See TRISOCMD_CONTENT_VERIFICATION.md. |
-| 6 | PARTIAL: 61 Node tests, 85 DB scenarios, 56 Python tests, eight Chromium suites; 13 native marketplace/Storage cases. 57 fresh native Supabase and six local Auth/Mailpit cases verified; hosted/provider/CI/Firefox acceptance remains blocked. |
+| 6 | PARTIAL: 62 Node tests, 85 DB scenarios, 56 Python tests, eight Chromium suites; 13 native marketplace/Storage cases. 57 fresh native Supabase and six local Auth/Mailpit cases verified; hosted/provider/CI/Firefox acceptance remains blocked. |
 
 
 ## PHASE 1 — COMPLETE PAYMENT, CHECKOUT AND ORDER MANAGEMENT

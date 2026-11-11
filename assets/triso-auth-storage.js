@@ -50,6 +50,7 @@
      try{
        const next=await exchange(before.refresh_token);
        if(!next?.access_token||!next?.refresh_token||!next?.user)throw Error('Invalid refresh response');
+       if(!before.user?.id||next.user.id!==before.user.id)throw Error('Session identity mismatch');
        // Logout or another login during the request wins over a late response.
        const current=read();
        if(current?.refresh_token!==before.refresh_token)return current;

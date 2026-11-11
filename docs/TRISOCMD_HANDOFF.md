@@ -11,7 +11,7 @@ Read TRISOCMD_MASTER_CHECKLIST.md, TRISOCMD_BUG_AUDIT.md, TRISOCMD_EXTERNAL_DEPE
 Priority continuation:
 1. Read the consolidated TRISOCMD_RELEASE_READINESS.md. Production remains NO-GO: all six feature migrations are absent from hosted staging; production schema/Auth is a separate unresolved target. Do not merge/deploy or enable providers.
 2. Phase 6 has now verified a fresh native local Supabase copy against matching hosted baseline fingerprints, six-migration transaction rollback, operational payment retirement, 57 native scenarios and six real local Auth/Mailpit flows. Keep these distinct from hosted provider/Google/realtime acceptance.
-3. Resolve queued GitHub Actions execution and authorized hosted staging rollout/acceptance. Do not treat queued CI as green. Real provider/sender/VAPID/scheduler/OAuth and editorial content gates are listed in TRISOCMD_EXTERNAL_DEPENDENCIES.md.
+3. Review final PR checks and authorized hosted staging rollout/acceptance. Do not treat queued CI as green. Real provider/sender/VAPID/scheduler/OAuth and editorial content gates are listed in TRISOCMD_EXTERNAL_DEPENDENCIES.md.
 4. After approval, follow the exact migration/Edge/frontend/configuration order in release readiness; preserve PR #36 and all historical data. Do not blindly db-push the incomplete baseline migration history or repair history to force it.
 
 Validation commands in TRISOCMD_RELEASE_READINESS.md. Work logs are local ignored work/ files. Tests use fake identities and simulated payments; they prove no real delivery/payment outcome.
@@ -28,6 +28,6 @@ Communications milestone: 50 Node, 78 PostgreSQL, 56 Python, six Chromium suites
 
 Storefront/content milestone: 58 Node, 83 PostgreSQL, 56 Python, seven Chromium suites, four Edge checks and six dedicated native Auth/JWT/Storage content scenarios. Sixth additive migration hardens content permissions/validation and adds public admin-only image uploads. Current public CMS snapshot builds eight content pages; noindex stays enabled. No hosted writes, merge or deployment.
 
-Phase 6 (2026-11-12): bounded streamed payment/checkout bodies, malformed payload/identity rejection, monotonic notification reads, product accessibility and Playwright security patch fixed. 61 Node, 85 embedded DB, 56 Python, eight Chromium suites/four Edge checks; fresh native 57 scenarios plus six real local Auth/Mailpit cases. SQL baseline fingerprints match hosted staging; no missing identities/TXID collisions. Local advisors and dependency audit pass; hosted advisories remain separate. NO-GO pending the recorded external gates.
+Phase 6 (2026-11-12): bounded streamed payment/checkout bodies, malformed payload/identity rejection, monotonic notification reads, product accessibility and Playwright security patch fixed. 62 Node, 85 embedded DB, 56 Python, eight Chromium suites/four Edge checks; fresh native 57 scenarios plus six real local Auth/Mailpit cases. SQL baseline fingerprints match hosted staging; no missing identities/TXID collisions. Local advisors and dependency audit pass; hosted advisories remain separate. NO-GO pending the recorded external gates.
 
 Actual local Realtime WebSocket delivery/reconnect/history, cross-account denial and post-session-revocation denial now pass as well; CI includes the native Realtime service. Hosted WebSocket acceptance remains pending.

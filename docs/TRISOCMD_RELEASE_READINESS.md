@@ -4,7 +4,7 @@ Updated 2026-11-12 (Asia/Tehran). **NO-GO for production.** Code is ready for st
 
 ## Verified evidence
 
-- 61 Node tests, 85 embedded PostgreSQL scenarios (25 payment, 8 browse, 52 full staging schema), 56 Python regressions and four Deno Edge entrypoints.
+- 62 Node tests, 85 embedded PostgreSQL scenarios (25 payment, 8 browse, 52 full staging schema), 56 Python regressions and four Deno Edge entrypoints.
 - Eight Chromium suites cover storefront/content, marketplace/admin, checkout, notifications/support, session races and accessibility. Provider/browser backend writes are intercepted.
 - Fresh PostgreSQL 17 local Supabase: 57 scenarios with real Auth/JWT/REST and binary Storage. Six migrations apply together, roll back atomically to the unchanged 27-table/56-policy baseline, then apply successfully. Operational payment retirement denies writes while preserving ten historical data/audit tables.
 - Two actual local WebSocket scenarios verify participant-only chat delivery, reconnect/history and post-session-revocation denial. Hosted WebSocket acceptance remains separate.
@@ -61,7 +61,7 @@ After a committed rollout, preserve additive schema and hardened policies. Roll 
 
 ## Remaining release gates
 
-- GitHub Actions runs remain queued without allocated jobs; no CI pass is claimed until actual jobs finish.
+- Require green CI for the final review revision; initial queued runs are not evidence of success. Latest execution evidence is recorded on PR #37.
 - Hosted six-migration/Edge/frontend rollout and real staging acceptance require authorization. Separate production schema/Auth reconciliation and target selection remain unresolved.
 - No independently verified live crypto provider, PayPal integration, Resend sender/delivery, Web Push, scheduler, Google OAuth or hosted email/realtime operation. Their exact prerequisites are in the external-dependencies document.
 - Actual reviewed product media/specifications and published articles are absent from the staging snapshot (three products, including demos; no published articles). No production catalog, indexing, full device/browser or field-performance acceptance is claimed. Firefox remains download-policy blocked.
