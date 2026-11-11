@@ -1,6 +1,6 @@
 # TRISOCMD master checklist
 
-Updated 2026-11-11 (Asia/Tehran). **INCOMPLETE; not release-ready.**
+Updated 2026-11-12 (Asia/Tehran). **INCOMPLETE; not release-ready.**
 
 Baseline: PR #36 at 3eea77c; all four commits including hosted marketplace status compatibility are preserved.
 VERIFIED LOCAL means isolated fixtures/local services; hosted acceptance remains separate. PARTIAL means implementation exists with gaps. UNVERIFIED means acceptance pending; not necessarily absent. BLOCKED means external configuration or permissions required.
@@ -9,10 +9,10 @@ VERIFIED LOCAL means isolated fixtures/local services; hosted acceptance remains
 |---|---|
 | 1 | PARTIAL: PR #36 retained; 24 provider tests, 25 native PostgreSQL scenarios. Local same-project Auth/SQL integration passes; hosted rollout and real provider acceptance pending. |
 | 2 | PARTIAL: admin pagination/gallery batching fixed; mocked cross-seller listing #241 visible; paginated browse/search/price filters and eight DB scenarios added. Migration unapplied; real role/upload/quota E2E pending. |
-| 3 | PARTIAL: 8 session tests; refresh coordinator, offline retention and server logout requests. Real OAuth/chat/admin acceptance pending. |
+| 3 | PARTIAL: Session unit tests, real cross-tab Web Locks, six local Auth/Mailpit flows and actual private Realtime tests pass; hosted OAuth/Auth/chat acceptance remains pending. |
 | 4 | VERIFIED LOCAL: private alerts, durable email/push outbox, signed webhooks and canonical support workflows; live sender/push/hosted rollout blocked. See TRISOCMD_COMMUNICATIONS_VERIFICATION.md. |
 | 5 | VERIFIED LOCAL: product/spec/media/editor workflows, public CMS export, crawlable build, sitemap/robots and RTL; authorized hosted rollout, editorial content and indexing release gate pending. See TRISOCMD_CONTENT_VERIFICATION.md. |
-| 6 | PARTIAL: 58 Node tests, 83 DB scenarios, 56 Python tests, seven Chromium suites; 13 native marketplace/Storage cases. Firefox blocked; exhaustive real-role/device/security/performance audit unfinished. |
+| 6 | PARTIAL: 61 Node tests, 85 DB scenarios, 56 Python tests, eight Chromium suites; 13 native marketplace/Storage cases. 57 fresh native Supabase and six local Auth/Mailpit cases verified; hosted/provider/CI/Firefox acceptance remains blocked. |
 
 
 ## PHASE 1 — COMPLETE PAYMENT, CHECKOUT AND ORDER MANAGEMENT
@@ -215,33 +215,33 @@ VERIFIED LOCAL means isolated fixtures/local services; hosted acceptance remains
 
 | Requirement | Status |
 |---|---|
-| Broken buttons | UNVERIFIED — acceptance pending; see phase evidence |
-| Broken links | UNVERIFIED — acceptance pending; see phase evidence |
-| Failed API calls | UNVERIFIED — acceptance pending; see phase evidence |
-| Auth loops | UNVERIFIED — acceptance pending; see phase evidence |
-| Session expiration issues | UNVERIFIED — acceptance pending; see phase evidence |
-| Missing marketplace items | UNVERIFIED — acceptance pending; see phase evidence |
-| Broken admin actions | UNVERIFIED — acceptance pending; see phase evidence |
-| Incorrect payment status | UNVERIFIED — acceptance pending; see phase evidence |
-| Duplicate orders | UNVERIFIED — acceptance pending; see phase evidence |
-| Duplicate TXIDs | UNVERIFIED — acceptance pending; see phase evidence |
-| Duplicate notifications | UNVERIFIED — acceptance pending; see phase evidence |
-| Inventory race conditions | UNVERIFIED — acceptance pending; see phase evidence |
-| Chat realtime failures | UNVERIFIED — acceptance pending; see phase evidence |
-| Unsafe file uploads | UNVERIFIED — acceptance pending; see phase evidence |
-| Missing database permissions | UNVERIFIED — acceptance pending; see phase evidence |
-| Privacy leaks | UNVERIFIED — acceptance pending; see phase evidence |
-| Unauthorized access | UNVERIFIED — acceptance pending; see phase evidence |
-| XSS and injection risks | UNVERIFIED — acceptance pending; see phase evidence |
-| CSRF where applicable | UNVERIFIED — acceptance pending; see phase evidence |
-| Broken mobile layouts | UNVERIFIED — acceptance pending; see phase evidence |
-| RTL errors | UNVERIFIED — acceptance pending; see phase evidence |
-| Accessibility problems | UNVERIFIED — acceptance pending; see phase evidence |
-| Browser console errors | UNVERIFIED — acceptance pending; see phase evidence |
-| Unexpected uncaught exceptions | UNVERIFIED — acceptance pending; see phase evidence |
-| Loading-state bugs | UNVERIFIED — acceptance pending; see phase evidence |
-| Broken images | UNVERIFIED — acceptance pending; see phase evidence |
-| Performance bottlenecks | UNVERIFIED — acceptance pending; see phase evidence |
+| Broken buttons | VERIFIED LOCAL — bounded regression/role/fixture evidence; hosted acceptance pending |
+| Broken links | VERIFIED LOCAL — bounded regression/role/fixture evidence; hosted acceptance pending |
+| Failed API calls | VERIFIED LOCAL — bounded regression/role/fixture evidence; hosted acceptance pending |
+| Auth loops | VERIFIED LOCAL — bounded regression/role/fixture evidence; hosted acceptance pending |
+| Session expiration issues | VERIFIED LOCAL — bounded regression/role/fixture evidence; hosted acceptance pending |
+| Missing marketplace items | VERIFIED LOCAL — bounded regression/role/fixture evidence; hosted acceptance pending |
+| Broken admin actions | VERIFIED LOCAL — bounded regression/role/fixture evidence; hosted acceptance pending |
+| Incorrect payment status | VERIFIED LOCAL — bounded regression/role/fixture evidence; hosted acceptance pending |
+| Duplicate orders | VERIFIED LOCAL — bounded regression/role/fixture evidence; hosted acceptance pending |
+| Duplicate TXIDs | VERIFIED LOCAL — bounded regression/role/fixture evidence; hosted acceptance pending |
+| Duplicate notifications | VERIFIED LOCAL — bounded regression/role/fixture evidence; hosted acceptance pending |
+| Inventory race conditions | VERIFIED LOCAL — bounded regression/role/fixture evidence; hosted acceptance pending |
+| Chat realtime failures | VERIFIED LOCAL — actual WebSocket delivery/reconnect/history, cross-account and revoked-session denial; hosted acceptance pending |
+| Unsafe file uploads | VERIFIED LOCAL — bounded regression/role/fixture evidence; hosted acceptance pending |
+| Missing database permissions | VERIFIED LOCAL — bounded regression/role/fixture evidence; hosted acceptance pending |
+| Privacy leaks | VERIFIED LOCAL — bounded regression/role/fixture evidence; hosted acceptance pending |
+| Unauthorized access | VERIFIED LOCAL — bounded regression/role/fixture evidence; hosted acceptance pending |
+| XSS and injection risks | VERIFIED LOCAL — bounded regression/role/fixture evidence; hosted acceptance pending |
+| CSRF where applicable | VERIFIED LOCAL — bounded regression/role/fixture evidence; hosted acceptance pending |
+| Broken mobile layouts | VERIFIED LOCAL — bounded regression/role/fixture evidence; hosted acceptance pending |
+| RTL errors | VERIFIED LOCAL — bounded regression/role/fixture evidence; hosted acceptance pending |
+| Accessibility problems | VERIFIED LOCAL — no critical/serious axe findings in eight tested route states; full conformance unclaimed |
+| Browser console errors | VERIFIED LOCAL — bounded regression/role/fixture evidence; hosted acceptance pending |
+| Unexpected uncaught exceptions | VERIFIED LOCAL — bounded regression/role/fixture evidence; hosted acceptance pending |
+| Loading-state bugs | VERIFIED LOCAL — bounded regression/role/fixture evidence; hosted acceptance pending |
+| Broken images | VERIFIED LOCAL — bounded regression/role/fixture evidence; hosted acceptance pending |
+| Performance bottlenecks | PARTIAL — fixture DOM/overflow/navigation metrics recorded; production field/device acceptance pending |
 
 ## Residual implementation work
 
@@ -257,30 +257,30 @@ VERIFIED LOCAL means isolated fixtures/local services; hosted acceptance remains
 
 | Workflow | Status |
 |---|---|
-| 1. Visitor browses store | Real isolated-role E2E pending; local mocks/DB coverage is recorded separately |
-| 2. Customer registers | Real isolated-role E2E pending; local mocks/DB coverage is recorded separately |
-| 3. Email confirmation | Real isolated-role E2E pending; local mocks/DB coverage is recorded separately |
-| 4. Login and Remember Me | Real isolated-role E2E pending; local mocks/DB coverage is recorded separately |
-| 5. Password recovery | Real isolated-role E2E pending; local mocks/DB coverage is recorded separately |
-| 6. Google OAuth | Real isolated-role E2E pending; local mocks/DB coverage is recorded separately |
-| 7. Seller creates listing | Real isolated-role E2E pending; local mocks/DB coverage is recorded separately |
-| 8. Admin approves listing | Real isolated-role E2E pending; local mocks/DB coverage is recorded separately |
-| 9. Buyer searches and opens listing | Real isolated-role E2E pending; local mocks/DB coverage is recorded separately |
-| 10. Buyer messages seller | Real isolated-role E2E pending; local mocks/DB coverage is recorded separately |
-| 11. Buyer submits purchase request | Real isolated-role E2E pending; local mocks/DB coverage is recorded separately |
-| 12. Checkout creates an invoice | Real isolated-role E2E pending; local mocks/DB coverage is recorded separately |
-| 13. Payment claim submitted | Real isolated-role E2E pending; local mocks/DB coverage is recorded separately |
-| 14. Verified simulated transaction | Real isolated-role E2E pending; local mocks/DB coverage is recorded separately |
-| 15. Seller notification | Real isolated-role E2E pending; local mocks/DB coverage is recorded separately |
-| 16. Stock transition | Real isolated-role E2E pending; local mocks/DB coverage is recorded separately |
-| 17. Order fulfillment | Real isolated-role E2E pending; local mocks/DB coverage is recorded separately |
-| 18. Cancellation | Real isolated-role E2E pending; local mocks/DB coverage is recorded separately |
-| 19. Dispute | Real isolated-role E2E pending; local mocks/DB coverage is recorded separately |
-| 20. Support ticket | Real isolated-role E2E pending; local mocks/DB coverage is recorded separately |
-| 21. Admin moderation | Real isolated-role E2E pending; local mocks/DB coverage is recorded separately |
-| 22. Pro seller permissions | Real isolated-role E2E pending; local mocks/DB coverage is recorded separately |
-| 23. Cross-account security tests | Real isolated-role E2E pending; local mocks/DB coverage is recorded separately |
-| 24. Logout and session cleanup | Real isolated-role E2E pending; local mocks/DB coverage is recorded separately |
+| 1. Visitor browses store | VERIFIED LOCAL — native SQL/JWT/REST/Storage and/or isolated browser coverage; hosted acceptance pending |
+| 2. Customer registers | VERIFIED LOCAL — real signup, confirmation-required denial and Mailpit capture |
+| 3. Email confirmation | VERIFIED LOCAL — actual captured local confirmation link; hosted delivery pending |
+| 4. Login and Remember Me | VERIFIED LOCAL — native SQL/JWT/REST/Storage and/or isolated browser coverage; hosted acceptance pending |
+| 5. Password recovery | VERIFIED LOCAL — real captured recovery, password change and old-password rejection |
+| 6. Google OAuth | BLOCKED — provider unconfigured; only safe rejection tested |
+| 7. Seller creates listing | VERIFIED LOCAL — native SQL/JWT/REST/Storage and/or isolated browser coverage; hosted acceptance pending |
+| 8. Admin approves listing | VERIFIED LOCAL — native SQL/JWT/REST/Storage and/or isolated browser coverage; hosted acceptance pending |
+| 9. Buyer searches and opens listing | VERIFIED LOCAL — native SQL/JWT/REST/Storage and/or isolated browser coverage; hosted acceptance pending |
+| 10. Buyer messages seller | VERIFIED LOCAL — native SQL/JWT/REST/Storage and/or isolated browser coverage; hosted acceptance pending |
+| 11. Buyer submits purchase request | VERIFIED LOCAL — native SQL/JWT/REST/Storage and/or isolated browser coverage; hosted acceptance pending |
+| 12. Checkout creates an invoice | VERIFIED LOCAL — synthetic trusted invoice/SQL only; real provider blocked |
+| 13. Payment claim submitted | VERIFIED LOCAL — native SQL/JWT/REST/Storage and/or isolated browser coverage; hosted acceptance pending |
+| 14. Verified simulated transaction | VERIFIED LOCAL — native SQL/JWT/REST/Storage and/or isolated browser coverage; hosted acceptance pending |
+| 15. Seller notification | VERIFIED LOCAL — native SQL/JWT/REST/Storage and/or isolated browser coverage; hosted acceptance pending |
+| 16. Stock transition | VERIFIED LOCAL — native SQL/JWT/REST/Storage and/or isolated browser coverage; hosted acceptance pending |
+| 17. Order fulfillment | VERIFIED LOCAL — native SQL/JWT/REST/Storage and/or isolated browser coverage; hosted acceptance pending |
+| 18. Cancellation | VERIFIED LOCAL — native SQL/JWT/REST/Storage and/or isolated browser coverage; hosted acceptance pending |
+| 19. Dispute | VERIFIED LOCAL — native SQL/JWT/REST/Storage and/or isolated browser coverage; hosted acceptance pending |
+| 20. Support ticket | VERIFIED LOCAL — native SQL/JWT/REST/Storage and/or isolated browser coverage; hosted acceptance pending |
+| 21. Admin moderation | VERIFIED LOCAL — native SQL/JWT/REST/Storage and/or isolated browser coverage; hosted acceptance pending |
+| 22. Pro seller permissions | VERIFIED LOCAL — native SQL/JWT/REST/Storage and/or isolated browser coverage; hosted acceptance pending |
+| 23. Cross-account security tests | VERIFIED LOCAL — native SQL/JWT/REST/Storage and/or isolated browser coverage; hosted acceptance pending |
+| 24. Logout and session cleanup | VERIFIED LOCAL — native SQL/JWT/REST/Storage and/or isolated browser coverage; hosted acceptance pending |
 
 ## Supabase integration continuation
 
@@ -291,3 +291,5 @@ Marketplace/admin continuation: additive workflow migration, 241-row cross-selle
 Communications continuation: VERIFIED LOCAL — event/recipient/channel deduplication, server unread watermarks/preferences, foreground permission controls, generic Web Push architecture, fenced/retry-safe email leases, signed delivery events and redacted admin logs. Existing support model now covers ticket/reply retries, private history, staff assignment/status and order-linked disputes. 17 native local scenarios use real Auth/JWT/REST and intercepted Resend. Live delivery/hosted realtime remain BLOCKED / UNVERIFIED; see TRISOCMD_COMMUNICATIONS_VERIFICATION.md.
 
 Storefront/content continuation: see TRISOCMD_CONTENT_VERIFICATION.md. Read-only staging public snapshot has three products and no published articles; eight static content pages build without hosted writes. Sixth migration preserves history, hardens content roles and creates an admin-uploaded public marketing-image bucket. New gallery/spec/editor/search/RTL and script-free SEO tests pass; no production-readiness claim.
+
+Phase 6 review (2026-11-12): hosted baseline matches local columns/constraints/policies/functions fingerprints; all six migrations and rollback pass together. 57 real native scenarios plus six local Auth/Mailpit flows pass. New payload, notification read race, accessibility, Playwright advisory and security-scanner failure fixes are tested. Production remains NO-GO; read the consolidated release-readiness and external-dependency documents. CI queued is not a passing result.

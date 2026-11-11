@@ -3,14 +3,14 @@ const base=process.env.TRISO_TEST_BASE||'http://127.0.0.1:8765',api='https://cxt
 const browser=await chromium.launch({executablePath:process.env.TRISO_CHROMIUM_PATH||undefined,args:['--no-sandbox']});
 const cors={'access-control-allow-origin':'*','access-control-allow-headers':'*','access-control-allow-methods':'*'};
 try{
- const context=await browser.newContext();const errors=[],createKeys=[];let read=0,failCreate=true,preferences={email_enabled:false,browser_enabled:false},tickets=[],replies=[];
+ const context=await browser.newContext();const errors=[],createKeys=[];let read=0,staleReadOnce=false,failCreate=true,preferences={email_enabled:false,browser_enabled:false},tickets=[],replies=[];
  const notices=[{id:1,kind:'support_reply',title:'Private support update',created_at:'2026-01-01',support_id:'11111111-1111-4111-8111-111111111111'}];
  context.on('page',p=>p.on('pageerror',e=>errors.push(e.message)));
  await context.addInitScript(({buyer})=>{if(location.hostname!=='127.0.0.1')return;localStorage.setItem('tc35_auth_session',JSON.stringify({access_token:'buyer-token',refresh_token:'mock',expires_at:Date.now()/1000+3600,user:{id:buyer,email:'fixture@example.test'}}));window.__notices=[];window.supabase={createClient:()=>({realtime:{setAuth(){}},channel:()=>({on(){return this},subscribe(fn){window.__reconnect=fn;return this}}),removeChannel:async()=>{}})};window.Notification=class{static permission='granted';static async requestPermission(){return 'granted'}constructor(title,options){window.__notices.push({title,...options})}close(){}}},{buyer});
  await context.route('**/*',async route=>{
   const r=route.request(),u=new URL(r.url());if(u.origin===new URL(base).origin)return route.continue();if(u.origin!==api)return route.abort();if(r.method()==='OPTIONS')return route.fulfill({status:204,headers:cors});
   const token=r.headers().authorization||'',isBuyer=token.includes('buyer-token'),isStaff=token.includes('staff-token');let data=[],status=200;
-  if(u.pathname.endsWith('/rpc/notification_page')){const p=r.postDataJSON();const items=isBuyer?notices.filter(n=>!p.p_before||n.id<p.p_before):[];data={items,last_read_id:read,unread:isBuyer?notices.filter(n=>n.id>read).length:0}}
+  if(u.pathname.endsWith('/rpc/notification_page')){const p=r.postDataJSON();const items=isBuyer?notices.filter(n=>!p.p_before||n.id<p.p_before):[];const watermark=staleReadOnce?0:read;staleReadOnce=false;data={items,last_read_id:watermark,unread:isBuyer?notices.filter(n=>n.id>watermark).length:0}}
   if(u.pathname.endsWith('/rpc/notification_read')){read=Math.max(read,r.postDataJSON().p_id);data=null}
   if(u.pathname.endsWith('/market_alert_preferences')){if(r.method()==='POST'){preferences={...preferences,...r.postDataJSON()};data=null}else data=[preferences]}
   if(u.pathname.endsWith('/rpc/market_browse_page'))data={items:[],has_more:false};
@@ -27,7 +27,7 @@ try{
   return route.fulfill({status,headers:cors,contentType:'application/json',body:JSON.stringify(data)});
  });
  const page=await context.newPage();page.setDefaultTimeout(12000);await page.goto(base+'/marketplace.html');await page.locator('.tc34-notice-badge:visible').waitFor();
- await page.locator('.tc34-notice-button').click();await page.locator('.tc34-notice-badge').waitFor({state:'hidden'});assert.equal(read,1);
+ await page.locator('.tc34-notice-button').click();await page.locator('.tc34-notice-badge').waitFor({state:'hidden'});assert.equal(read,1);await page.locator('.tc34-notice-close').click();staleReadOnce=true;const staleResponse=page.waitForResponse(r=>r.url().endsWith('/rpc/notification_page'));await page.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await(await staleResponse).finished();await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));assert.equal(await page.locator('.tc34-notice-badge:visible').count(),0,'stale history cannot resurrect an acknowledged unread count');await page.locator('.tc34-notice-button').click();
  await page.locator('.tc34-notice-permission').click();await page.locator('.tc34-notice-help').filter({hasText:'Foreground device alerts enabled'}).waitFor();assert(preferences.browser_enabled);await page.locator('.tc34-notice-permission').click();await page.locator('.tc34-notice-help').filter({hasText:'Foreground device alerts disabled'}).waitFor();assert.equal(preferences.browser_enabled,false);await page.locator('.tc34-notice-permission').click();await page.locator('.tc34-notice-help').filter({hasText:'Foreground device alerts enabled'}).waitFor();
  await page.locator('.tc34-background').click();await page.locator('.tc34-notice-help').filter({hasText:'Background delivery is not configured'}).waitFor();
  await page.locator('.tc34-notice-close').click();notices.push({id:2,kind:'support_reply',title:'Private new reply',created_at:'2026-01-02'});await page.evaluate(()=>{window.__reconnect('CHANNEL_ERROR');window.__reconnect('SUBSCRIBED')});await page.waitForFunction(()=>window.__notices.length===1);assert.equal((await page.evaluate(()=>window.__notices))[0].body,'Open TRISOCMD to view your update.');

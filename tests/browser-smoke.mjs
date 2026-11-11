@@ -305,10 +305,11 @@ try{
    access_token:'seller-mock',refresh_token:'seller-refresh',expires_at:Math.floor(Date.now()/1000)+3600,
    user:{id:'00000000-0000-4000-8000-000000000009',email:'seller@example.test'}
  },true));
+ let notificationSeen=0;await market.route(origin+'/rest/v1/rpc/notification_read',route=>{notificationSeen=Math.max(notificationSeen,route.request().postDataJSON().p_id);return route.fulfill({status:200,headers:cors,body:'null'})});
  await market.route(origin+'/rest/v1/rpc/notification_page',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify({items:[{
   id:104,kind:'purchase_requested',title:'New purchase review request',listing_id:701,
   request_id:'11111111-1111-4111-8111-111111111111',conversation_id:null,created_at:'2026-11-02T00:01:00Z'
- }],last_read_id:0,unread:1})}));
+ }],last_read_id:notificationSeen,unread:notificationSeen<104?1:0})}));
  await market.reload({waitUntil:'domcontentloaded'});
  await market.waitForFunction(()=>!document.querySelector('#seller-panel')?.classList.contains('hidden'));
  await market.locator('.tc34-notice-button:visible').waitFor();

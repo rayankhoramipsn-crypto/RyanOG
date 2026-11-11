@@ -1,6 +1,6 @@
 # TRISOCMD continuation handoff
 
-Updated 2026-11-11 (Asia/Tehran). Work stops when this task ends; no background execution is promised.
+Updated 2026-11-12 (Asia/Tehran). Work stops when this task ends; no background execution is promised.
 
 Branch: feature/trisocmd-completion, based on feature/phase1-checkout / PR #36 head 3eea77c. Preserve PR #36 and its compatibility changes. Do not merge or deploy. No production, staging data, credentials, DNS or financial system was modified.
 
@@ -9,15 +9,10 @@ Completed additions: shared refresh serialization/offline retention/logout-race 
 Read TRISOCMD_MASTER_CHECKLIST.md, TRISOCMD_BUG_AUDIT.md, TRISOCMD_EXTERNAL_DEPENDENCIES.md and TRISOCMD_RELEASE_READINESS.md before continuing. Scope is incomplete. Do not present this PR as completion of all six phases.
 
 Priority continuation:
-1. Full staging public-schema snapshot and isolated migration/permission suite added; see TRISOCMD_SUPABASE_VERIFICATION.md. Staging canonical orders already reference local Auth (zero missing identities). Keep production history separate. Hosted rollout/Auth configuration and real staging acceptance remain pending.
-2. Marketplace: owner edits/review, profiles, Pro expiry controls, canonical intake lifecycle, full seller/order/admin history, chat paging/read watermarks/idempotent send and private binary Storage authorization now implemented and tested locally. See TRISOCMD_MARKETPLACE_VERIFICATION.md. All six feature migrations remain unapplied to hosted projects; hosted acceptance remains pending.
-3. Auth: add real cross-tab Web Locks browser race tests; test expired/revoked tokens and all preview/account surfaces. Real signup/email/OAuth requires staging sender/redirects, not production accounts.
-4. Chat: local participant isolation, read watermark, idempotent retries, history paging and revocation tests pass; verify real hosted WebSocket delivery/reconnect after authorized staging rollout. Admin oversight remains read-only.
-5. Support: canonical reconciliation, preserved legacy bodies, owner/staff history, replies/status/assignment and order-linked dispute tickets now pass isolated tests. Hosted rollout/acceptance pending; see TRISOCMD_COMMUNICATIONS_VERIFICATION.md.
-6. Communications: durable leased outbox, Resend transport, signed webhooks, monitoring, private synchronized alerts and Web Push architecture implemented/tested. Email/push remain disabled: no verified live sender, provider/VAPID secrets or scheduler. Auth SMTP/templates are separate. See TRISOCMD_COMMUNICATIONS_VERIFICATION.md.
-7. Content: public CMS export is connected to the fresh static build and existing main-only workflow; product/article/category pages, metadata, sitemap/robots and editor/upload/RTL repairs pass isolated tests. Read-only staging snapshot: three products, zero published articles. Author actual content/media and authorize hosted migration/upload/indexing acceptance next. See TRISOCMD_CONTENT_VERIFICATION.md. Journal generator refuses existing output dirs to prevent stale removed posts.
-8. Security: legacy admin claim freshness and active-session gates now have an unapplied migration and local tests; inspect all exposed grants, functions, storage, RLS. Advisor warnings are recorded; do not weaken policies to clear warnings.
-9. Run all 24 requested real-role workflows, Firefox/Chrome, accessibility and performance checks before acceptance. Firefox downloads currently policy-blocked.
+1. Read the consolidated TRISOCMD_RELEASE_READINESS.md. Production remains NO-GO: all six feature migrations are absent from hosted staging; production schema/Auth is a separate unresolved target. Do not merge/deploy or enable providers.
+2. Phase 6 has now verified a fresh native local Supabase copy against matching hosted baseline fingerprints, six-migration transaction rollback, operational payment retirement, 57 native scenarios and six real local Auth/Mailpit flows. Keep these distinct from hosted provider/Google/realtime acceptance.
+3. Resolve queued GitHub Actions execution and authorized hosted staging rollout/acceptance. Do not treat queued CI as green. Real provider/sender/VAPID/scheduler/OAuth and editorial content gates are listed in TRISOCMD_EXTERNAL_DEPENDENCIES.md.
+4. After approval, follow the exact migration/Edge/frontend/configuration order in release readiness; preserve PR #36 and all historical data. Do not blindly db-push the incomplete baseline migration history or repair history to force it.
 
 Validation commands in TRISOCMD_RELEASE_READINESS.md. Work logs are local ignored work/ files. Tests use fake identities and simulated payments; they prove no real delivery/payment outcome.
 
@@ -32,3 +27,7 @@ Marketplace milestone: see TRISOCMD_MARKETPLACE_VERIFICATION.md. Native binary S
 Communications milestone: 50 Node, 78 PostgreSQL, 56 Python, six Chromium suites and four Edge checks; 17 dedicated native local communications scenarios, with Resend intercepted. Fifth additive migration preserves historical support data. No hosted migration, provider activation or deployment. See TRISOCMD_COMMUNICATIONS_VERIFICATION.md for retry-window safety, role evidence and exact external blockers.
 
 Storefront/content milestone: 58 Node, 83 PostgreSQL, 56 Python, seven Chromium suites, four Edge checks and six dedicated native Auth/JWT/Storage content scenarios. Sixth additive migration hardens content permissions/validation and adds public admin-only image uploads. Current public CMS snapshot builds eight content pages; noindex stays enabled. No hosted writes, merge or deployment.
+
+Phase 6 (2026-11-12): bounded streamed payment/checkout bodies, malformed payload/identity rejection, monotonic notification reads, product accessibility and Playwright security patch fixed. 61 Node, 85 embedded DB, 56 Python, eight Chromium suites/four Edge checks; fresh native 57 scenarios plus six real local Auth/Mailpit cases. SQL baseline fingerprints match hosted staging; no missing identities/TXID collisions. Local advisors and dependency audit pass; hosted advisories remain separate. NO-GO pending the recorded external gates.
+
+Actual local Realtime WebSocket delivery/reconnect/history, cross-account denial and post-session-revocation denial now pass as well; CI includes the native Realtime service. Hosted WebSocket acceptance remains pending.

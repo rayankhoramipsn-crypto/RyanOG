@@ -1,19 +1,22 @@
-# TRISOCMD external dependencies
+# TRISOCMD external configuration gates
 
-No secrets requested in chat; no customer data exported; no remote writes, deployments, paid resources or live payments.
+Updated 2026-11-12 (Asia/Tehran). No hosted writes, secret changes, customer data exports, live delivery, merge or deployment. See TRISOCMD_RELEASE_READINESS.md for the ordered rollout.
 
-| Dependency | State / required action |
+| Integration | Exact requirement / observed limit |
 |---|---|
-| Supabase | Staging cxtytbjvdlngahytfilr has marketplace/blog/support. Production zrolxgzndinktsjsthfw has six store/admin tables. Reconcile identity/schema and validate a complete disposable schema. PR #36 fixture is not a production clone. |
-| BTC/LTC | Provider disabled. Authorized adapter, addresses/networks, independent chain verification, signatures, refunds/reorg handling and sandbox acceptance required. |
-| PayPal | PR #36 internal sandbox transport only. Merchant eligibility/credentials, capture/webhook/refund integration pending. |
-| Escrow/Pro | Three-day escrow remains specification only. No custody, payout, release or paid Pro claim. |
-| Resend | Sender/credentials unverified. email.mjs is an injectable core, not deployed worker. Need atomic leasing, retry/backoff/limits, provider transport, monitoring and Auth template/hook integration. |
-| OAuth/Auth email | Real isolated signup/confirmation/recovery/Google OAuth not run. Configure staging redirects and sender; no browser secrets. |
-| Web Push | No delivery service; optional background push disabled/unimplemented. |
-| Firefox | Install attempted; cdn.playwright.dev and playwright.download.prss.microsoft.com returned HTTP 403 Domain forbidden. System Chromium succeeded. Approve download domains or supply browser before Firefox acceptance. |
-| Docs network | Direct Supabase changelog request blocked. Supabase documentation connector used for sessions. |
-| SEO | Deployment requires noindex/staging marker. CMS export/static build is wired and defaults noindex. Public staging snapshot has three products/no published articles. Hosted rollout, actual content/media and production indexing/release review remain required. |
-| Password security | Leaked-password protection disabled in both projects; operator configuration/plan check required. |
+| Hosted Supabase | Authorize six migrations and four Edge deployments on staging after baseline/identity/backup checks. Production has a separate schema/Auth topology and is not an approved target for these staging migrations. Current frontend still targets staging. |
+| Crypto | `configuredProvider()` intentionally returns disabled, regardless of old flags. Select an authorized BTC/LTC provider and implement/review its fixed-endpoint adapter, unique invoice addresses, integer amounts, independent chain evidence, signatures/replay handling and sandbox receipt reconciliation before approval to enable. Mock evidence/SQL tests do not establish live settlement. |
+| PayPal | Existing code is an internal official sandbox transport only. Requires authorized merchant/client ID/secret, merchant ID, webhook ID, eligibility review, approved canonical-order/capture/webhook wiring and independent sandbox settlement acceptance. No live route/processing is enabled. |
+| Optional email | Durable outbox/worker/templates/signatures/retries are implemented and tested. Require verified `trisocmd.shop` sending domain/DNS for exactly `support@trisocmd.shop`, `RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, confirmed recipient rules, signed webhook endpoint and actual delivery receipts. Keep `EMAIL_DELIVERY_ENABLED=false` and `EMAIL_SENDER_VERIFIED=false` until verified/approved. |
+| Web Push | Require hosted notification-only service worker over HTTPS, reviewed VAPID public/private pair, Edge deployment and real-device subscription/delivery/revocation acceptance. Keep `WEB_PUSH_ENABLED=false`; no live push success claimed. |
+| Scheduler | Provision a private scheduler POSTing `delivery-worker` with a random `DELIVERY_WORKER_SECRET` of at least 32 characters; each invocation handles at most five email and five push jobs. Configure independently reviewed invoice-expiration/verification scheduling when a trusted provider exists. No schedules installed. |
+| Supabase Auth | Configure correct project site URL and exact allowed callback/recovery URLs for reviewed main/preview routes, production SMTP sender/templates, password policy and leaked-password protection (hosted advisor still reports disabled). Real local Mailpit signup/confirmation/recovery/refresh/logout passed; hosted Auth config and email delivery are not verified. |
+| Google OAuth | Configure authorized Google client ID/secret, consent screen/domain, Supabase provider callback and reviewed site redirects. Local disabled-provider rejection passes; real Google login has not been verified. Do not request secrets in chat. |
+| Storage | Migration four enforces private gallery MIME/5 MB limits; migration six creates the admin-only-upload, public `content-media` marketing bucket. Real local uploads/role denials pass. Hosted rollout/upload acceptance and reviewed public marketing assets remain pending. Never use that public bucket for confidential documents. |
+| Realtime | Hosted baseline publishes marketplace conversations/messages. Apply notification publication changes and verify authenticated WebSocket delivery, private RLS, read counters, reconnect and revocation on hosted staging. Browser reconnection mocks and local SQL tests are not live hosted WebSocket verification. Actual local WebSocket participant isolation, reconnect/history and post-revocation denial also pass. |
+| CMS / SEO | Optional GitHub repository variables `TRISO_CONTENT_API_URL` and `TRISO_CONTENT_PUBLIC_KEY` must be public/anon only; otherwise build uses the reviewed public snapshot. Author actual product media/specs/articles. Keep staging noindex/robots denial; domain/indexing release is a separate approval. |
+| GitHub CI | Four PR runs are queued without jobs; runner availability/repository Actions state must permit execution. No specific billing/runner cause is established. CI code includes full regressions, accessibility/session races, fresh native Supabase and local Auth/Mailpit tests. |
+| Firefox | Previous installation attempt failed with HTTP 403 Domain forbidden at browser-download hosts. Supply an approved browser/download path for Firefox acceptance. Chromium passes; Firefox acceptance is not claimed. |
+| Network / local infrastructure | Supabase changelog/direct hosted HTTP are blocked by environment policy; authorized read-only connector schema checks succeeded. Managed Docker's stale proxy broke localhost health probes; actual local API/SQL/Storage/Auth tests passed independently. No remote TLS/proxy bypass was used. |
 
-Later approval boundary: merge/deployment, live payment activation, paid services and irreversible DB changes. No approval requested now because remaining implementation and staging validation must be completed first.
+Paid Pro billing, three-day escrow custody/payout and live refunds are not verified integrations. Administrative Pro entitlement/expiry and dispute/order records are locally tested; no financial service is activated by that fact.

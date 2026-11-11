@@ -27,6 +27,7 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci --no-audit --no-fund
+      - run: npm audit --audit-level=high
       - run: npx playwright install --with-deps chromium
       - name: Node, PostgreSQL, Python and Edge checks
         run: npm test && npm run check:edge
@@ -45,11 +46,13 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci --no-audit --no-fund
+      - run: npm audit --audit-level=high
       - name: Start fresh disposable local Supabase (never linked)
         run: |
           mkdir -p work/ci-supabase
           npx supabase init --workdir work/ci-supabase --yes
-          npx supabase start --workdir work/ci-supabase --exclude realtime,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor >work/supabase-start.log 2>&1
+          node tests/prepare-release-auth.mjs work/ci-supabase
+          npx supabase start --workdir work/ci-supabase --exclude imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor >work/supabase-start.log 2>&1
           npx supabase status --workdir work/ci-supabase --output json >work/supabase-status.json
       - name: Real local JWT and binary Storage integration
         env:
@@ -57,3 +60,11 @@ jobs:
           TRISO_STORAGE_TESTS: '1'
           RUN_ADVISORS: '1'
         run: npm run test:integration
+      - name: Real local signup, confirmation, recovery, refresh and logout
+        env:
+          TRISO_INTEGRATION_CONFIG: work/supabase-status.json
+        run: npm run test:release:auth
+      - name: Actual local Realtime participant isolation and session revocation
+        env:
+          TRISO_INTEGRATION_CONFIG: work/supabase-status.json
+        run: npm run test:release:realtime

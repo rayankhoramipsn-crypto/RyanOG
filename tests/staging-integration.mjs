@@ -43,6 +43,10 @@ try{
  }else await db.query(await readFile(new URL('./fixtures/staging-platform.sql',import.meta.url),'utf8'));
  await db.query(await readFile(new URL('./fixtures/staging-public.sql',import.meta.url),'utf8'));
  await db.query(await readFile(new URL('./fixtures/staging-storage.sql',import.meta.url),'utf8'));
+ await db.query(await readFile(new URL('./fixtures/staging-realtime.sql',import.meta.url),'utf8'));
+ const preflight=await readFile(new URL('../docs/release-preflight.sql',import.meta.url),'utf8');
+ const fingerprintSql=preflight.slice(preflight.indexOf("SELECT 'columns'"),preflight.indexOf('SELECT count(*) AS public_tables_without_rls'));
+ await mkdir('work',{recursive:true});await writeFile('work/phase6-schema-fingerprint.json',JSON.stringify((await db.query(fingerprintSql)).rows));
  await check('restore all 27 staging tables, 56 policies, real grants and triggers',async()=>{
   assert.equal(await one(db,"select count(*)::int from pg_tables where schemaname='public'"),27);
   assert.equal(await one(db,"select count(*)::int from pg_policies where schemaname='public'"),56);
@@ -64,6 +68,11 @@ try{
  // Seed historical rows before migrating, verifying preservation afterward.
  const historic=await one(db,"insert into tc42_orders(customer_id,total_amount,items) values($1,8,'[{\"id\":1,\"qty\":1}]') returning id",[identities.buyer.id]);
  const history=await one(db,"insert into orders(user_id,total_amount) values($1,8) returning id",[identities.buyer.id]);
+ await check('all six migrations roll back atomically without changing baseline history',async()=>{
+  await db.query('begin');
+  try{for(const file of ['20261108214609_phase1_checkout.sql','20261110201622_marketplace_browse_page.sql','20261110204751_staging_integration_authorization.sql','20261111181536_marketplace_workflows.sql','20261111185818_notifications_email_support.sql','20261111200640_storefront_content.sql']){const source=await readFile(new URL('../supabase/migrations/'+file,import.meta.url),'utf8');await db.query(source.replace(/^BEGIN;$/m,'').replace(/^COMMIT;$/m,''))}assert(await one(db,"select exists(select 1 from information_schema.columns where table_schema='public' and table_name='products' and column_name='description_fa')"))}finally{await db.query('rollback')}
+  assert.equal(await one(db,"select count(*)::int from pg_tables where schemaname='public'"),27);assert.equal(await one(db,"select count(*)::int from pg_policies where schemaname='public'"),56);assert.equal(await one(db,'select total_amount from tc42_orders where id=$1',[historic]),'8.00');assert.equal(await one(db,"select to_regprocedure('public.triso_active_user()') is null"),true);
+ });
  await check('apply all pending migrations without discarding historical orders',async()=>{
   for(const file of ['20261108214609_phase1_checkout.sql','20261110201622_marketplace_browse_page.sql','20261110204751_staging_integration_authorization.sql','20261111181536_marketplace_workflows.sql','20261111185818_notifications_email_support.sql','20261111200640_storefront_content.sql'])await db.query(await readFile(new URL('../supabase/migrations/'+file,import.meta.url),'utf8'));
   assert.equal(await one(db,'select total_amount from tc42_orders where id=$1',[historic]),'8.00');assert.equal(await one(db,'select total_amount from orders where id=$1',[history]),'8.00');
@@ -214,10 +223,21 @@ try{
   for(const [sql,args] of [["select market_send_message($1,'revoked')",[conversation]],["select phase1_create_order($1,$2)",[JSON.stringify([{id:1,qty:1}]),crypto.randomUUID()]],["select phase1_market_order($1)",[request]],["select market_request_purchase($1,'LTC',null)",[listing]],["select phase1_submit_claim($1,'BANK','manual fixture')",[o]]])await assert.rejects(as('buyer',c=>c.query(sql,args)),/Active session/);
   if(local){assert.deepEqual(await api('/rest/v1/tc42_orders'),[]);await assert.rejects(rpc('market_send_message',{p_conversation:conversation,p_body:'revoked'}))}
  });
+ await check('operational payment retirement blocks writes while preserving every historical row',async()=>{
+  const tables=['products','tc42_orders','orders','market_listings','market_messages','tc42_support_threads','tc42_support_messages','store_order_events','store_payment_claims','store_crypto_invoice'];
+  const countRows=async()=>{const rows=[];for(const t of tables)rows.push(await one(db,'select count(*)::int from '+t));return rows};const counts=await countRows();
+  assert.equal(await one(db,"select has_function_privilege('authenticated','public.phase1_create_order(jsonb,uuid)','EXECUTE')"),true);
+  await db.query(await readFile(new URL('../docs/phase1-retire.sql',import.meta.url),'utf8'));
+  await assert.rejects(as('other',c=>c.query('select phase1_create_order($1,$2)',[JSON.stringify([{id:1,qty:1}]),crypto.randomUUID()])),/permission denied/);
+  await assert.rejects(as('service',c=>c.query('select phase1_expire_invoices()')),/permission denied/);
+  assert.deepEqual(await countRows(),counts);
+  if(local)await assert.rejects(rpc('phase1_create_order',{p_items:[{id:1,qty:1}],p_key:crypto.randomUUID()},'other'),/permission denied/);
+ });
  if(process.env.RUN_ADVISORS==='1'){
   await mkdir('work',{recursive:true});
-  try{const r=await promisify(execFile)('node_modules/.bin/supabase',['db','advisors','--db-url',local?.DB_URL||'postgresql://postgres:test-only@127.0.0.1:15441/postgres?sslmode=disable','--type','security'],{timeout:30000,maxBuffer:1024*1024});await writeFile('work/staging-integration-advisors.log',r.stdout+r.stderr);console.log('Local advisors completed')}
-  catch(e){await writeFile('work/staging-integration-advisors.log',(e.stdout||'')+(e.stderr||'')+e.message);console.log('Local advisors could not complete')}
+  const advisorUrl=new URL(local?.DB_URL||'postgresql://postgres:test-only@127.0.0.1:15441/postgres');advisorUrl.searchParams.set('sslmode','disable');
+  try{const r=await promisify(execFile)('node_modules/.bin/supabase',['db','advisors','--db-url',advisorUrl.href,'--type','security'],{timeout:30000,maxBuffer:1024*1024});await writeFile('work/staging-integration-advisors.log',r.stdout+r.stderr);console.log('Local advisors completed')}
+  catch(e){await writeFile('work/staging-integration-advisors.log',(e.stdout||'')+(e.stderr||'')+e.message);throw Error('Local security advisors failed; see ignored work/staging-integration-advisors.log')}
  }
  console.log(`PASS ${count} full staging-schema scenarios (${local?'real local Supabase Auth/JWT/REST':'embedded PostgreSQL; platform stand-ins'})`);
 }finally{if(db)await db.end();if(embedded)await embedded.stop().catch(()=>{});await rm(dir,{recursive:true,force:true})}

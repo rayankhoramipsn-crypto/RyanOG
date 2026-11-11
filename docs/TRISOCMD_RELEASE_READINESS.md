@@ -1,52 +1,67 @@
 # TRISOCMD release readiness
 
-**NOT READY. Six-phase scope incomplete.** Updated 2026-11-11 (Asia/Tehran).
+Updated 2026-11-12 (Asia/Tehran). **NO-GO for production.** Code is ready for staged release review within the limits below; hosted rollout and live integrations are not accepted. PR #37 retains PR #36 (`3eea77c`) as its dependency. No hosted writes, merge, deployment or provider activation occurred.
 
-Based on PR #36 at 3eea77c, preserving compatibility fixes. This branch adds auth/moderation/media repairs, offline article tooling and disabled email core. Marketplace browsing now adds an unapplied migration, 20261110201622_marketplace_browse_page.sql. It preserves market_browse(), grants only the new read RPC to anon/authenticated, exposes approved public fields and the existing derived Pro flag, pins search_path, and changes no table grants/RLS. SECURITY DEFINER retains access to private Pro entitlements without exposing profiles. Review/authorize staging rollout separately; until applied, clients show the legacy 100-result limitation. Phase 1 migration/Edge Functions remain inherited and undeployed.
+## Verified evidence
 
-## Validation
+- 61 Node tests, 85 embedded PostgreSQL scenarios (25 payment, 8 browse, 52 full staging schema), 56 Python regressions and four Deno Edge entrypoints.
+- Eight Chromium suites cover storefront/content, marketplace/admin, checkout, notifications/support, session races and accessibility. Provider/browser backend writes are intercepted.
+- Fresh PostgreSQL 17 local Supabase: 57 scenarios with real Auth/JWT/REST and binary Storage. Six migrations apply together, roll back atomically to the unchanged 27-table/56-policy baseline, then apply successfully. Operational payment retirement denies writes while preserving ten historical data/audit tables.
+- Two actual local WebSocket scenarios verify participant-only chat delivery, reconnect/history and post-session-revocation denial. Hosted WebSocket acceptance remains separate.
+- Six additional real local Auth/Mailpit scenarios: unconfirmed signup denial, email confirmation, password recovery/change, cross-account support denial, token rotation/global logout and immediate private-session gating. Google is tested only for safe rejection while unconfigured. Mail stays in disposable local Mailpit.
+- Real Chromium Web Locks serialize cross-tab refresh; logout/new login defeats late refresh; session-only login stays tab-local. Eight anonymous/authenticated-admin route states have no critical/serious axe WCAG findings at 390px. DOM budgets/overflow and navigation timings are recorded in ignored `work/phase6-accessibility.json`; this is fixture testing, not a field-performance or complete WCAG certification.
+- Local SQL security advisors complete successfully with no findings. `npm audit` reports no known dependency vulnerabilities after Playwright's security patch. Hosted advisories are separately recorded below.
 
-- 40 Node tests (24 payment/provider, 8 session, 4 journal, 4 email).
-- 51 native PostgreSQL scenarios (25 payment, 8 browse and 18 full staging-schema) using independent connections; inventory races, TXID uniqueness, transitions, idempotency and grants against reconstructed fixture.
-- 56 Python regressions.
-- Four Chromium suites: route/UI smoke, Phase 1 checkout/orders, completion suite covering 241-row moderation, blog media/deletion/sanitization/RTL at 390/768/1365px and product URL parsing; marketplace suite covers 241-row pagination, server-filter contract, approved deep links, late responses, empty/error/retry states, missing-migration fallback and mobile RTL in main/preview.
-- Local Supabase security advisors reported no issues against the browse fixture; this does not certify either live project.
-- Deno checks pass for inherited Edge Function entrypoints.
-- Browser external mutations intercepted; no real payment/Auth/email/RLS claim.
-- Firefox blocked by download policy. Exhaustive real-role, accessibility and performance acceptance pending.
+Reproduce: `RUN_ADVISORS=1 npm test`, `npm run check:edge`; serve on loopback 8765, then `TRISO_CHROMIUM_PATH=/usr/bin/chromium npm run test:browser`. Native: use a **fresh, never-linked** CLI workdir, `node tests/prepare-release-auth.mjs work/<copy>` before starting, write CLI status JSON into ignored `work/`, then `TRISO_INTEGRATION_CONFIG=work/<status>.json TRISO_STORAGE_TESTS=1 RUN_ADVISORS=1 npm run test:integration` and `npm run test:release:auth` with the same config. Tests refuse non-loopback database/API targets and nonempty schemas.
 
-Reproduce with npm ci, npm test, npm run check:edge. Serve repository using python3 -m http.server 8765 --bind 127.0.0.1, then run TRISO_CHROMIUM_PATH=/usr/bin/chromium npm run test:browser (omit override if Playwright Chromium installed).
+The managed Docker proxy caused localhost-only Auth/Storage health commands to fail. The local copy used `--ignore-health-check` only after diagnosis; actual API, JWT, recovery, database and binary Storage tests independently passed. No remote TLS checks were disabled. Local advisor connections explicitly use `sslmode=disable` for loopback PostgreSQL; failures now fail the test instead of being silently accepted.
 
-## Offline publishing
+## Hosted staging compatibility (read-only)
 
-Export reviewed published articles to JSON without credentials/private drafts. Run node scripts/render-journal.mjs reviewed-posts.json work/journal-output. Target must not exist, preventing deleted pages surviving rebuild. Generates clean article directories, article-only sitemap and robots. Defaults noindex; --indexable is an explicit later release choice. Not yet wired to CMS/deployment; not a complete storefront sitemap.
+`cxtytbjvdlngahytfilr` remains at the 25-entry hosted migration history ending `20261106131852_store_crypto_invoice_reconciliation`. None of the six feature migrations is installed. It has 27 public tables, 56 public policies, all public tables with RLS, zero missing order/listing/support Auth identities and zero historic store/market TXID collisions.
 
-## Release and rollback
+The restored fixture and actual hosted schema match these fingerprints exactly (see `release-preflight.sql`):
 
-1. Finish MASTER_CHECKLIST residual implementation and real isolated staging acceptance.
-2. Reconstruct complete disposable schema and reconcile identities/legacy constraints without deleting history.
-3. Review phase1-setup.md and phase1-retire.sql. Back up before any approved migration.
-4. Verify provider/sender/permissions and repeat tests; keep financial switches disabled.
-5. Obtain explicit merge/deployment approval. Main pushes publish automatically; do not merge to test.
-6. Frontend rollback: revert feature commits through a PR while preserving PR #36 and historical data. The browse migration is additive and leaves the legacy API intact; frontend rollback can retain the new read RPC/index. No migration was applied remotely.
-7. If Phase 1 is separately rolled out, disable providers and use its data-preserving retirement plan. Do not drop orders/claims/invoices/audit history.
+| Component | Count | MD5 of normalized catalog inventory |
+|---|---:|---|
+| Columns | 184 | `03a28dc752050159989ca67326de9053` |
+| Constraints | 138 | `016eb29a5a5b15472dc1e18315b3b99c` |
+| Policies | 56 | `d54a3d2ea41257c7e04f3c9ce549340d` |
+| Functions | 21 | `87082b22af6983676cc61e4079e627be` |
 
-No production-readiness or six-phase-completion claim is made.
+These are drift checks, not cryptographic certification of safety. Storage policies match the committed private-gallery baseline. Hosted Realtime publishes conversations/messages; the notification publication changes remain pending in migration five. Hosted Auth configuration/SMTP/OAuth and WebSocket acceptance are not verified by these SQL checks.
 
-## Supabase integration batch
+Hosted security advisors still report intended public/authenticated SECURITY DEFINER entrypoints, three deny-by-default RLS service tables, and disabled leaked-password protection. The legacy hosted authorization has not acquired the branch's current-session/persisted-admin hardening. Do not treat local clean advisors as a hosted clean bill of health.
 
-See TRISOCMD_SUPABASE_VERIFICATION.md. Full staging public-schema/security fixtures now supplement the archive fixtures. New migration 20261110204751_staging_integration_authorization.sql adds active-session and persisted-admin gates, audit ACL restrictions and null-cart validation. It preserves ownership policies and historical rows. All hosted migrations remain unapplied; the currently deployed staging store-crypto is still the legacy implementation. No production identity migration is attempted.
+## Exact rollout order — instructions only, approval required
 
-The 20-scenario real local Supabase Auth/JWT/REST run passes on PostgreSQL 17.11, alongside all existing suites. Hosted Auth settings and deployed runtime acceptance remain unverified; no hosted rollout occurred. Preview pages now use the canonical order module, including its idempotent submission path.
+1. **Confirm the target.** Run `docs/release-preflight.sql` read-only and inspect hosted migration history. Obtain backups/restore evidence including Auth, Storage metadata/objects and financial/support history. Stop if fingerprints/identity checks drift. These are staging-compatible migrations; do not apply them to the separate production project's different schema/Auth topology.
+2. **Preserve existing migration history.** The repository contains six feature files, not the hosted 25-entry foundation history. Do not blindly run `db push`, `db reset` or migration-history repair. In an approved staging change, use Supabase's hosted `apply_migration` with each complete file as its query/name, in the following order; verify each history entry before proceeding:
 
-## Marketplace/admin continuation
+| Order | Migration |
+|---:|---|
+| 1 | `20261108214609_phase1_checkout.sql` |
+| 2 | `20261110201622_marketplace_browse_page.sql` |
+| 3 | `20261110204751_staging_integration_authorization.sql` |
+| 4 | `20261111181536_marketplace_workflows.sql` |
+| 5 | `20261111185818_notifications_email_support.sql` |
+| 6 | `20261111200640_storefront_content.sql` |
 
-See TRISOCMD_MARKETPLACE_VERIFICATION.md for the fourth unapplied migration and local workflow evidence. Validation now includes owner edits/profiles, cross-seller history, Pro expiry, binary Storage checks, terminal intake synchronization, seller fulfillment and bounded/idempotent chat. CI includes full regressions and a fresh local Supabase JWT/Storage job. Hosted rollout/live realtime/Firefox acceptance remains pending.
+3. **Verify SQL before exposing the frontend.** Recheck RLS/grants, `market_set_pro`, disabled legacy `tc42_create_order`, private participant RPCs, upload buckets and admin/support persisted roles. Test synthetic authorized staging roles and actual uploads. Refresh PostgREST's schema cache if necessary. Validate Realtime publications/reconnect using authenticated clients; never expose service credentials.
+4. **Deploy reviewed Edge Functions** only with separate authorization: `supabase functions deploy <name> --project-ref cxtytbjvdlngahytfilr` for `store-crypto`, `payment-webhook`, `delivery-worker`, `delivery-webhook`. Retain repository `verify_jwt=false` only because these handlers perform explicit same-project Auth, worker-secret or cryptographic webhook validation. Runtime Supabase credentials remain server-side. Verify public capability endpoints report disabled providers; prove unauthorized requests fail.
+5. **Configure services independently.** Follow `TRISOCMD_EXTERNAL_DEPENDENCIES.md`. Keep email/push/payment delivery disabled until each corresponding sandbox or device test and approval succeeds. Do not install delivery/payment schedules before verifying configuration and draining/reconciling old jobs/invoices.
+6. **Build/review Pages artifact.** `node scripts/build-site.mjs --out <fresh-dir> --content content/published.json`. Optionally configure public-only CMS repository variables for automatic snapshot refresh. Verify product/article/category routes, sitemap, robots, source selection and noindex. Current frontend targets staging; production requires an explicitly reviewed target/Auth plan. Do not remove staging markers/noindex as part of this task.
+7. **Release dependency order.** Review PR #36 first; preserve its commits when reviewing/retargeting PR #37. Merge/Pages deployment requires explicit approval. The existing workflow publishes on `main` pushes/manual dispatch; do not use a merge or deployment to test. After an approved rollout, run real staging acceptance before a separately approved production release.
 
-## Communications continuation
+## Rollback and stop conditions
 
-See TRISOCMD_COMMUNICATIONS_VERIFICATION.md for the fifth additive migration, canonical support reconciliation, delivery controls and exact external prerequisites. Current isolated validation: 50 Node, 78 PostgreSQL, 56 Python, six Chromium suites, four Deno entrypoints and 17 dedicated native communications scenarios. Live email/push remain disabled and unverified; authorized hosted rollout, sender/domain/secrets, scheduler, VAPID and real-device acceptance remain required.
+The isolated suite tests rollback of the entire six-migration transaction and data-preserving operational retirement using `docs/phase1-retire.sql`. That script stops payment RPCs; it is not a universal schema downgrade or an automatic refund mechanism. Before retirement, stop provider workers/schedules and review outstanding invoices/delivery receipts. Reconcile accepted payments with trusted provider evidence; retain idempotency/TXID/reservation/audit history.
 
-## Storefront/content continuation
+After a committed rollout, preserve additive schema and hardened policies. Roll back frontend only to a version compatible with all six migrations (for example `a969b0a`), retain security patches where applicable, and use reviewed backup/ACL restoration if needed. Never restore legacy shared-wallet settlement or JWT-only admin privileges, drop customer/history tables, truncate queues, or replay migrations/history repairs to force compatibility.
 
-See TRISOCMD_CONTENT_VERIFICATION.md. Current validation: 58 Node, 83 PostgreSQL, 56 Python, seven Chromium suites, four Edge checks and six dedicated native content/Storage scenarios. Public staging CMS compatibility was checked read-only (three products, no published articles); eight crawlable content pages build with noindex preserved. Hosted sixth-migration/upload acceptance, authored content/media and authorized indexing/release review remain pending.
+## Remaining release gates
+
+- GitHub Actions runs remain queued without allocated jobs; no CI pass is claimed until actual jobs finish.
+- Hosted six-migration/Edge/frontend rollout and real staging acceptance require authorization. Separate production schema/Auth reconciliation and target selection remain unresolved.
+- No independently verified live crypto provider, PayPal integration, Resend sender/delivery, Web Push, scheduler, Google OAuth or hosted email/realtime operation. Their exact prerequisites are in the external-dependencies document.
+- Actual reviewed product media/specifications and published articles are absent from the staging snapshot (three products, including demos; no published articles). No production catalog, indexing, full device/browser or field-performance acceptance is claimed. Firefox remains download-policy blocked.
