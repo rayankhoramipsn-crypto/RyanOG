@@ -14,7 +14,7 @@
 
 ## Migration and source evidence
 
-Sixth additive migration `20261111200640_storefront_content.sql` adds Persian descriptions, current persisted-admin policies for blog/media, write-time content/media validators and the dedicated public image bucket. Existing content/assets remain intact. No existing table/model is replaced. Local full-schema compatibility, active roles and stale-admin revocation pass; local security advisors report no issues.
+Sixth additive migration `20261111200640_storefront_content.sql` adds Persian descriptions, current persisted-admin policies for blog/media, write-time content/media validators and the dedicated public image bucket. Existing content/assets remain intact. No existing table/model is replaced. Local full-schema compatibility, active roles and stale-admin revocation pass; refreshing revoked content clears draft product/article views, editor fields and private metadata; local security advisors report no issues.
 
 A read-only authorized staging CMS query returned three available products and zero published articles. `content/published.json` contains only those public product/media/spec fields; it includes demo/test listings and is not a production catalog certification. It builds eight content pages. Existing hosted rows were not changed. Rich galleries, articles and specs are additionally exercised with isolated synthetic data.
 
