@@ -4,6 +4,10 @@ on:
     paths:
       - '**/*.html'
       - 'assets/**'
+      - 'scripts/**'
+      - 'content/**'
+      - 'robots.txt'
+      - 'sitemap.xml'
       - 'sw-notifications.js'
       - 'supabase/**'
       - 'tests/**'

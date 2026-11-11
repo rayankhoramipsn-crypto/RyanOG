@@ -11,7 +11,7 @@ Updated 2026-11-10 (Asia/Tehran). Local fixtures/mocked browsers are not live va
 | A05 | Blog/product API URL shadows browser URL constructor | Renamed API_URL in main/preview. Images and approved YouTube parsing pass Chromium tests. |
 | A06 | Missing blog delete and article RTL/metadata | RLS-governed delete with confirmation; metadata/RTL at 390/768/1365px tested. |
 | A07 | Admin/marketplace logout only clears browser | Added authenticated server logout request. Offline revocation is not guaranteed. |
-| A08 | Query-string client-only article URLs | Tested offline static renderer added; CMS/build wiring remains pending. Clean routes are not live. |
+| A08 | Query-string client-only article URLs | Public CMS export, fresh product/article/category build and sitemap are implemented and tested without JavaScript. Hosted clean-route publication/indexing remain pending. |
 | A09 | No outbox delivery worker | Disabled injectable core/templates added; durable lease adapter, Resend transport and actual delivery pending. |
 | A10 | Production/store and staging/marketplace schema/Auth split | Read-only metadata confirms; launch blocker; no remote writes. |
 | A11 | Leaked-password protection disabled | Both projects per advisors; operator action pending. |

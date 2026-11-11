@@ -65,7 +65,7 @@ try{
  assert.equal(await page.locator('#phase1-order-center article').count(),0);
  console.log('PASS sign-out clears private order DOM');
  const delayed=await context.newPage();let release;const gate=new Promise(r=>release=r);
- await delayed.route(api+'/rest/v1/products?order=id.asc&select=*',async route=>{await gate;await route.fulfill({status:200,headers:cors,contentType:'application/json',body:'[]'});});
+ await delayed.route(api+'/rest/v1/products?order=id.asc&select=*&limit=200&offset=0',async route=>{await gate;await route.fulfill({status:200,headers:cors,contentType:'application/json',body:'[]'});});
  await delayed.goto(base+'/index.html?anonymous-bootstrap=1',{waitUntil:'domcontentloaded'});
  await delayed.evaluate(()=>{window.TrisoAuth.clear();setLang('en','ltr');});
  await delayed.locator('#tc31-panel.active').waitFor();release();

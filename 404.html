@@ -375,5 +375,8 @@
       });
     })();
   </script>
-</body>
+<script>
+// Preserve historical dynamic routes when a clean CMS page has not been rebuilt yet.
+(()=>{const path=location.pathname,article=path.match(/^\/(preview\/)?blog\/([a-z0-9]+(?:-[a-z0-9]+)*)\/?$/),product=path.match(/^\/(preview\/)?products\/([a-z0-9]+(?:-[a-z0-9]+)*)\/?$/);if(article)location.replace('/'+(article[1]||'')+'blog/?slug='+encodeURIComponent(article[2]));else if(product)location.replace('/'+(product[1]||'')+'product.html?slug='+encodeURIComponent(product[2]));})();
+</script></body>
 </html>

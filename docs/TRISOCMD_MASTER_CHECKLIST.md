@@ -11,8 +11,8 @@ VERIFIED LOCAL means isolated fixtures/local services; hosted acceptance remains
 | 2 | PARTIAL: admin pagination/gallery batching fixed; mocked cross-seller listing #241 visible; paginated browse/search/price filters and eight DB scenarios added. Migration unapplied; real role/upload/quota E2E pending. |
 | 3 | PARTIAL: 8 session tests; refresh coordinator, offline retention and server logout requests. Real OAuth/chat/admin acceptance pending. |
 | 4 | VERIFIED LOCAL: private alerts, durable email/push outbox, signed webhooks and canonical support workflows; live sender/push/hosted rollout blocked. See TRISOCMD_COMMUNICATIONS_VERIFICATION.md. |
-| 5 | PARTIAL: media parsing, blog deletion/RTL/metadata fixed; 4 static article tests. CMS publication wiring and production SEO gate pending. |
-| 6 | PARTIAL: 50 Node tests, 78 DB scenarios, 56 Python tests, six Chromium suites; 13 native marketplace/Storage cases. Firefox blocked; exhaustive real-role/device/security/performance audit unfinished. |
+| 5 | VERIFIED LOCAL: product/spec/media/editor workflows, public CMS export, crawlable build, sitemap/robots and RTL; authorized hosted rollout, editorial content and indexing release gate pending. See TRISOCMD_CONTENT_VERIFICATION.md. |
+| 6 | PARTIAL: 58 Node tests, 83 DB scenarios, 56 Python tests, seven Chromium suites; 13 native marketplace/Storage cases. Firefox blocked; exhaustive real-role/device/security/performance audit unfinished. |
 
 
 ## PHASE 1 — COMPLETE PAYMENT, CHECKOUT AND ORDER MANAGEMENT
@@ -155,39 +155,39 @@ VERIFIED LOCAL means isolated fixtures/local services; hosted acceptance remains
 | Professional and clean | UNVERIFIED — acceptance pending; see phase evidence |
 | Not generic or overly cyberpunk | UNVERIFIED — acceptance pending; see phase evidence |
 | Consistent components | UNVERIFIED — acceptance pending; see phase evidence |
-| Mobile-first responsive behavior | UNVERIFIED — acceptance pending; see phase evidence |
-| Main navigation | UNVERIFIED — acceptance pending; see phase evidence |
+| Mobile-first responsive behavior | VERIFIED LOCAL — isolated CMS/role/browser/static-build tests; hosted rollout/indexing pending |
+| Main navigation | VERIFIED LOCAL — isolated CMS/role/browser/static-build tests; hosted rollout/indexing pending |
 | Hero | UNVERIFIED — acceptance pending; see phase evidence |
 | Fortnite categories | UNVERIFIED — acceptance pending; see phase evidence |
 | Gaming gear categories | UNVERIFIED — acceptance pending; see phase evidence |
 | Digital products | UNVERIFIED — acceptance pending; see phase evidence |
-| Featured items | UNVERIFIED — acceptance pending; see phase evidence |
-| Best sellers | UNVERIFIED — acceptance pending; see phase evidence |
-| New arrivals | UNVERIFIED — acceptance pending; see phase evidence |
-| Product cards | UNVERIFIED — acceptance pending; see phase evidence |
-| Product search | UNVERIFIED — acceptance pending; see phase evidence |
-| Product detail pages | UNVERIFIED — acceptance pending; see phase evidence |
-| Photo galleries | VERIFIED LOCAL — targeted mocks/parsers; live operation unverified |
-| Specifications | UNVERIFIED — acceptance pending; see phase evidence |
-| Approved YouTube reviews | VERIFIED LOCAL — targeted mocks/parsers; live operation unverified |
-| Category filters | UNVERIFIED — acceptance pending; see phase evidence |
+| Featured items | VERIFIED LOCAL — isolated CMS/role/browser/static-build tests; hosted rollout/indexing pending |
+| Best sellers | VERIFIED LOCAL — isolated CMS/role/browser/static-build tests; hosted rollout/indexing pending |
+| New arrivals | VERIFIED LOCAL — isolated CMS/role/browser/static-build tests; hosted rollout/indexing pending |
+| Product cards | VERIFIED LOCAL — isolated CMS/role/browser/static-build tests; hosted rollout/indexing pending |
+| Product search | VERIFIED LOCAL — isolated CMS/role/browser/static-build tests; hosted rollout/indexing pending |
+| Product detail pages | VERIFIED LOCAL — isolated CMS/role/browser/static-build tests; hosted rollout/indexing pending |
+| Photo galleries | VERIFIED LOCAL — isolated CMS/role/browser/static-build tests; hosted rollout/indexing pending |
+| Specifications | VERIFIED LOCAL — isolated CMS/role/browser/static-build tests; hosted rollout/indexing pending |
+| Approved YouTube reviews | VERIFIED LOCAL — isolated CMS/role/browser/static-build tests; hosted rollout/indexing pending |
+| Category filters | VERIFIED LOCAL — isolated CMS/role/browser/static-build tests; hosted rollout/indexing pending |
 | Reviews where supported | UNVERIFIED — acceptance pending; see phase evidence |
 | Newsletter functionality where configured | UNVERIFIED — acceptance pending; see phase evidence |
 | Footer | UNVERIFIED — acceptance pending; see phase evidence |
 | Contact links | UNVERIFIED — acceptance pending; see phase evidence |
 | Storefront checkout entry points | UNVERIFIED — acceptance pending; see phase evidence |
-| Admin article creation | UNVERIFIED — acceptance pending; see phase evidence |
-| Draft and publish | UNVERIFIED — acceptance pending; see phase evidence |
-| Article editing | UNVERIFIED — acceptance pending; see phase evidence |
-| Article deletion | VERIFIED LOCAL — targeted mocks/parsers; live operation unverified |
-| Cover images | UNVERIFIED — acceptance pending; see phase evidence |
-| Categories | UNVERIFIED — acceptance pending; see phase evidence |
-| Published article pages | UNVERIFIED — acceptance pending; see phase evidence |
-| Article SEO metadata | UNVERIFIED — acceptance pending; see phase evidence |
-| Clean crawlable article URLs | UNVERIFIED — acceptance pending; see phase evidence |
-| Canonical URLs | UNVERIFIED — acceptance pending; see phase evidence |
-| Sitemap integration | UNVERIFIED — acceptance pending; see phase evidence |
-| Sanitized content | UNVERIFIED — acceptance pending; see phase evidence |
+| Admin article creation | VERIFIED LOCAL — isolated CMS/role/browser/static-build tests; hosted rollout/indexing pending |
+| Draft and publish | VERIFIED LOCAL — isolated CMS/role/browser/static-build tests; hosted rollout/indexing pending |
+| Article editing | VERIFIED LOCAL — isolated CMS/role/browser/static-build tests; hosted rollout/indexing pending |
+| Article deletion | VERIFIED LOCAL — isolated CMS/role/browser/static-build tests; hosted rollout/indexing pending |
+| Cover images | VERIFIED LOCAL — isolated CMS/role/browser/static-build tests; hosted rollout/indexing pending |
+| Categories | VERIFIED LOCAL — isolated CMS/role/browser/static-build tests; hosted rollout/indexing pending |
+| Published article pages | VERIFIED LOCAL — isolated CMS/role/browser/static-build tests; hosted rollout/indexing pending |
+| Article SEO metadata | VERIFIED LOCAL — isolated CMS/role/browser/static-build tests; hosted rollout/indexing pending |
+| Clean crawlable article URLs | VERIFIED LOCAL — isolated CMS/role/browser/static-build tests; hosted rollout/indexing pending |
+| Canonical URLs | VERIFIED LOCAL — isolated CMS/role/browser/static-build tests; hosted rollout/indexing pending |
+| Sitemap integration | VERIFIED LOCAL — isolated CMS/role/browser/static-build tests; hosted rollout/indexing pending |
+| Sanitized content | VERIFIED LOCAL — isolated CMS/role/browser/static-build tests; hosted rollout/indexing pending |
 | Help | UNVERIFIED — acceptance pending; see phase evidence |
 | Terms | UNVERIFIED — acceptance pending; see phase evidence |
 | Privacy | UNVERIFIED — acceptance pending; see phase evidence |
@@ -200,9 +200,9 @@ VERIFIED LOCAL means isolated fixtures/local services; hosted acceptance remains
 | Order history | UNVERIFIED — acceptance pending; see phase evidence |
 | Admin pages | UNVERIFIED — acceptance pending; see phase evidence |
 | 404 | UNVERIFIED — acceptance pending; see phase evidence |
-| robots.txt | UNVERIFIED — acceptance pending; see phase evidence |
-| sitemap.xml | UNVERIFIED — acceptance pending; see phase evidence |
-| Canonical URLs | UNVERIFIED — acceptance pending; see phase evidence |
+| robots.txt | VERIFIED LOCAL — isolated CMS/role/browser/static-build tests; hosted rollout/indexing pending |
+| sitemap.xml | VERIFIED LOCAL — isolated CMS/role/browser/static-build tests; hosted rollout/indexing pending |
+| Canonical URLs | VERIFIED LOCAL — isolated CMS/role/browser/static-build tests; hosted rollout/indexing pending |
 | Meta descriptions | UNVERIFIED — acceptance pending; see phase evidence |
 | Open Graph tags | UNVERIFIED — acceptance pending; see phase evidence |
 | Structured data | UNVERIFIED — acceptance pending; see phase evidence |
@@ -248,7 +248,7 @@ VERIFIED LOCAL means isolated fixtures/local services; hosted acceptance remains
 - Complete every UNVERIFIED row; this run does not meet the entire six-phase acceptance criteria.
 - Verify authorized hosted sender/domain, Resend secrets/webhooks, scheduler and VAPID configuration after rollout; delivery infrastructure passes isolated tests and remains disabled. Integrate Auth templates/hooks separately.
 - Verify canonical support migration and owner/staff workflows on authorized hosted staging; isolated preservation, history/replies/status/assignment tests pass.
-- Wire static journal publication into CMS and deployment; implement product prerendering and complete sitemap.
+- Author/review actual product media/specifications and published articles, authorize hosted content migration/upload acceptance and review the indexing release gate. Public export/static build and sitemap wiring now pass isolated tests.
 - Apply/review the additive marketplace browse migration in an authorized staging rollout; verify the implemented seller/profile/edit and binary Storage workflows on authorized hosted staging. Paginated search/price filters pass local DB/browser tests.
 - Review/apply the session/admin authorization migration in an authorized staging rollout; complete user/seller management and operational logs.
 - Run isolated real staging signup/confirmation/recovery/OAuth/chat/storage and full buyer/seller/admin workflows.
@@ -289,3 +289,5 @@ Full staging public-schema/ACL/Storage-policy snapshot restored with synthetic h
 Marketplace/admin continuation: additive workflow migration, 241-row cross-seller queue and own history, actual local PNG authorization/type/size tests, canonical cancellation retries, 4% commission, Pro expiry, chat read watermark/send dedup and mobile RTL are covered. See TRISOCMD_MARKETPLACE_VERIFICATION.md. No hosted migrations or payment activation occurred.
 
 Communications continuation: VERIFIED LOCAL — event/recipient/channel deduplication, server unread watermarks/preferences, foreground permission controls, generic Web Push architecture, fenced/retry-safe email leases, signed delivery events and redacted admin logs. Existing support model now covers ticket/reply retries, private history, staff assignment/status and order-linked disputes. 17 native local scenarios use real Auth/JWT/REST and intercepted Resend. Live delivery/hosted realtime remain BLOCKED / UNVERIFIED; see TRISOCMD_COMMUNICATIONS_VERIFICATION.md.
+
+Storefront/content continuation: see TRISOCMD_CONTENT_VERIFICATION.md. Read-only staging public snapshot has three products and no published articles; eight static content pages build without hosted writes. Sixth migration preserves history, hardens content roles and creates an admin-uploaded public marketing-image bucket. New gallery/spec/editor/search/RTL and script-free SEO tests pass; no production-readiness claim.

@@ -46,3 +46,7 @@ See TRISOCMD_MARKETPLACE_VERIFICATION.md for the fourth unapplied migration and 
 ## Communications continuation
 
 See TRISOCMD_COMMUNICATIONS_VERIFICATION.md for the fifth additive migration, canonical support reconciliation, delivery controls and exact external prerequisites. Current isolated validation: 50 Node, 78 PostgreSQL, 56 Python, six Chromium suites, four Deno entrypoints and 17 dedicated native communications scenarios. Live email/push remain disabled and unverified; authorized hosted rollout, sender/domain/secrets, scheduler, VAPID and real-device acceptance remain required.
+
+## Storefront/content continuation
+
+See TRISOCMD_CONTENT_VERIFICATION.md. Current validation: 58 Node, 83 PostgreSQL, 56 Python, seven Chromium suites, four Edge checks and six dedicated native content/Storage scenarios. Public staging CMS compatibility was checked read-only (three products, no published articles); eight crawlable content pages build with noindex preserved. Hosted sixth-migration/upload acceptance, authored content/media and authorized indexing/release review remain pending.

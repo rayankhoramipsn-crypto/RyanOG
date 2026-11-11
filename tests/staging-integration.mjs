@@ -65,7 +65,7 @@ try{
  const historic=await one(db,"insert into tc42_orders(customer_id,total_amount,items) values($1,8,'[{\"id\":1,\"qty\":1}]') returning id",[identities.buyer.id]);
  const history=await one(db,"insert into orders(user_id,total_amount) values($1,8) returning id",[identities.buyer.id]);
  await check('apply all pending migrations without discarding historical orders',async()=>{
-  for(const file of ['20261108214609_phase1_checkout.sql','20261110201622_marketplace_browse_page.sql','20261110204751_staging_integration_authorization.sql','20261111181536_marketplace_workflows.sql','20261111185818_notifications_email_support.sql'])await db.query(await readFile(new URL('../supabase/migrations/'+file,import.meta.url),'utf8'));
+  for(const file of ['20261108214609_phase1_checkout.sql','20261110201622_marketplace_browse_page.sql','20261110204751_staging_integration_authorization.sql','20261111181536_marketplace_workflows.sql','20261111185818_notifications_email_support.sql','20261111200640_storefront_content.sql'])await db.query(await readFile(new URL('../supabase/migrations/'+file,import.meta.url),'utf8'));
   assert.equal(await one(db,'select total_amount from tc42_orders where id=$1',[historic]),'8.00');assert.equal(await one(db,'select total_amount from orders where id=$1',[history]),'8.00');
  });
  await db.query("insert into products(id,title,price,stock,status) values(1,'Integration product',25.50,30,'available'),(2,'Last product',10,1,'available')");
@@ -189,6 +189,7 @@ try{
  }
  await (await import('./marketplace-workflow-cases.mjs')).marketplaceCases({db,as,one,check,identities,local,api,rpc});
  await (await import('./communications-cases.mjs')).communicationsCases({db,as,one,check,identities,local,api,rpc});
+ await (await import('./content-cases.mjs')).contentCases({db,as,one,check,identities,local});
  await check('expired, banned and deleted identities cannot retain private permissions',async()=>{
   await db.query("update auth.sessions set not_after=now()-interval '1 second' where id=$1",[identities.other.session]);
   assert.equal(await as('other',c=>one(c,'select triso_active_user()')),false);

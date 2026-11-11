@@ -13,7 +13,7 @@ No secrets requested in chat; no customer data exported; no remote writes, deplo
 | Web Push | No delivery service; optional background push disabled/unimplemented. |
 | Firefox | Install attempted; cdn.playwright.dev and playwright.download.prss.microsoft.com returned HTTP 403 Domain forbidden. System Chromium succeeded. Approve download domains or supply browser before Firefox acceptance. |
 | Docs network | Direct Supabase changelog request blocked. Supabase documentation connector used for sessions. |
-| SEO | Deployment requires noindex/staging marker. Offline renderer defaults noindex; CMS/build wiring and production release review required. |
+| SEO | Deployment requires noindex/staging marker. CMS export/static build is wired and defaults noindex. Public staging snapshot has three products/no published articles. Hosted rollout, actual content/media and production indexing/release review remain required. |
 | Password security | Leaked-password protection disabled in both projects; operator configuration/plan check required. |
 
 Later approval boundary: merge/deployment, live payment activation, paid services and irreversible DB changes. No approval requested now because remaining implementation and staging validation must be completed first.

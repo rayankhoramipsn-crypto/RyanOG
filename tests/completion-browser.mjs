@@ -32,7 +32,7 @@ try{
   assert.equal(await page.locator('#article-cover').getAttribute('src'),'https://example.test/photo.png');
   assert.equal(await page.locator('html').getAttribute('dir'),'rtl');
   assert.equal(await page.locator('#article-body script').count(),0);
-  assert.equal(await page.locator('link[rel=canonical]').getAttribute('href'),base+'/blog/?slug=fixture');
+  assert.equal(await page.locator('link[rel=canonical]').getAttribute('href'),'https://trisocmd.shop/blog/fixture/');
   assert(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)<=5);
  }
  page.on('dialog',d=>d.accept());await page.getByRole('button',{name:'Delete Journal fixture',exact:true}).click();
