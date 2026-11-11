@@ -54,7 +54,8 @@ export function createDeliveryWebhook({env,rpc,now=Date.now}){
   const reply=(error,status)=>Response.json({error},{status});if(req.method!=='POST')return reply('POST required',405);
   if(!env('RESEND_WEBHOOK_SECRET'))return reply('webhook_not_configured',503);
   if(Number(req.headers.get('content-length'))>65536)return reply('payload_too_large',413);
-  const body=await req.text();if(new TextEncoder().encode(body).length>65536)return reply('payload_too_large',413);
+  let body='';
+  try{const reader=req.body?.getReader(),chunks=[];let size=0;if(reader){for(;;){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>65536){await reader.cancel();return reply('payload_too_large',413)}chunks.push(value)}}const bytes=new Uint8Array(size);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.byteLength}body=new TextDecoder().decode(bytes)}catch{return reply('invalid_body',400)}
   if(!await verifyDeliverySignature({id:req.headers.get('svix-id'),timestamp:req.headers.get('svix-timestamp'),signature:req.headers.get('svix-signature'),body,secret:env('RESEND_WEBHOOK_SECRET'),now:now()}))return reply('invalid_signature',401);
   let event;try{event=JSON.parse(body)}catch{return reply('invalid_json',400)}
   if(!['email.sent','email.delivered','email.bounced','email.complained','email.failed'].includes(event.type)||typeof event.data?.email_id!=='string'||event.data.email_id.length>200)return reply('invalid_event',400);

@@ -26,7 +26,7 @@ test('webhook verifies raw bytes and replay window before durable deduplication'
 });
 test('signed invalid events and oversized webhook bodies cannot update a delivery',async()=>{
  const h=createDeliveryWebhook({env:()=>secret,rpc:()=>assert.fail('must not update')});const text=JSON.stringify({type:'unknown',data:{email_id:'id'}});const r=await h(new Request('https://fixture/',{method:'POST',headers:{'svix-id':id,'svix-timestamp':timestamp,'svix-signature':signature(text)},body:text}));assert.equal(r.status,400);
- assert.equal((await h(new Request('https://fixture/',{method:'POST',headers:{'content-length':'70000'},body:'x'}))).status,413);
+ assert.equal((await h(new Request('https://fixture/',{method:'POST',headers:{'content-length':'70000'},body:'x'}))).status,413);let cancelled=false;const stream=new ReadableStream({start(c){c.enqueue(new Uint8Array(65537))},cancel(){cancelled=true}});assert.equal((await h(new Request('https://fixture/',{method:'POST',body:stream,duplex:'half'}))).status,413);assert(cancelled);
 });
 test('push endpoints prohibit private hosts, credentials, ports and unknown providers',()=>{
  for(const url of ['https://127.0.0.1/x','https://evil.test/x','https://fcm.googleapis.com.evil.test/x','https://user@fcm.googleapis.com/x','https://fcm.googleapis.com:8443/x'])assert.equal(endpointAllowed(url),false);
