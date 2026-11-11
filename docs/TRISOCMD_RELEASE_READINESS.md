@@ -38,3 +38,7 @@ No production-readiness or six-phase-completion claim is made.
 See TRISOCMD_SUPABASE_VERIFICATION.md. Full staging public-schema/security fixtures now supplement the archive fixtures. New migration 20261110204751_staging_integration_authorization.sql adds active-session and persisted-admin gates, audit ACL restrictions and null-cart validation. It preserves ownership policies and historical rows. All hosted migrations remain unapplied; the currently deployed staging store-crypto is still the legacy implementation. No production identity migration is attempted.
 
 The 20-scenario real local Supabase Auth/JWT/REST run passes on PostgreSQL 17.11, alongside all existing suites. Hosted Auth settings and deployed runtime acceptance remain unverified; no hosted rollout occurred. Preview pages now use the canonical order module, including its idempotent submission path.
+
+## Marketplace/admin continuation
+
+See TRISOCMD_MARKETPLACE_VERIFICATION.md for the fourth unapplied migration and local workflow evidence. Validation now includes owner edits/profiles, cross-seller history, Pro expiry, binary Storage checks, terminal intake synchronization, seller fulfillment and bounded/idempotent chat. CI includes full regressions and a fresh local Supabase JWT/Storage job. Hosted rollout/live realtime/Firefox acceptance remains pending.

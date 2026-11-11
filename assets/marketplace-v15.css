@@ -203,3 +203,5 @@ body:has(#detail-dialog[open]){overflow:hidden}
 #tc35-txid-send:disabled{opacity:.55}
 
 .price-filters{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}.price-filters label{display:grid;gap:4px;flex:1;min-width:120px;font-size:13px}.price-filters input{width:100%;min-width:0}.browse-pages{display:flex;justify-content:center;gap:12px;margin:24px 0}
+
+#edit-dialog input,#edit-dialog textarea,#profile-edit-dialog input:not([type=checkbox]),#profile-edit-dialog textarea{width:100%;box-sizing:border-box;max-width:100%}#edit-dialog label,#profile-edit-dialog label{display:block;margin:12px 0}.submission{flex-wrap:wrap}.bubble{overflow-wrap:anywhere}

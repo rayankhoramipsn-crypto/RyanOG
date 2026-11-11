@@ -38,8 +38,8 @@ class LiveChatV17(unittest.TestCase):
     def test_signed_in_buyer_and_seller_receive_live_updates(self):
         code=(ROOT/"assets/marketplace-v15.js").read_text(encoding="utf-8")
         for phrase in [
-            "rpc('market_inbox')", "rpc('market_mark_read'",
-            "rpc('market_start_chat'", "rpc('market_send_message'",
+            "rpc('market_inbox')", "'market_mark_read_to'",
+            "rpc('market_start_chat'", "'market_send_message_once'",
             "market_messages'", "market_conversations'",
             "on('postgres_changes'", "subscribe(status=>",
             "startInbox()", "stopInbox()", "updateUnreadBadges(",

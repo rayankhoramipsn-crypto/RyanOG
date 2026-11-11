@@ -75,7 +75,7 @@
  async function load(){
    if(loading)return;loading=true;const v=++generation;const owner=window.TrisoAuth?.read()?.user?.id;
    feedback.textContent=t('Loading orders…','در حال بارگذاری سفارش‌ها…','جارٍ تحميل الطلبات…');
-   try{const next=await api('tc42_orders?select=*&order=created_at.desc&limit=100');if(v!==generation||owner!==window.TrisoAuth?.read()?.user?.id)return;rows=next;render();feedback.textContent='';}catch(e){rows=[];list.replaceChildren();feedback.textContent=e.message}finally{loading=false}
+   try{const next=[];for(let offset=0;;offset+=100){const page=await api('tc42_orders?select=*&order=created_at.desc,id.desc&limit=100&offset='+offset);if(v!==generation||owner!==window.TrisoAuth?.read()?.user?.id)return;next.push(...page);if(page.length<100)break;}if(v!==generation||owner!==window.TrisoAuth?.read()?.user?.id)return;rows=next;render();feedback.textContent='';}catch(e){rows=[];list.replaceChildren();feedback.textContent=e.message}finally{loading=false}
  }
  filter.onchange=render;
  async function market(requestId){const id=await api('rpc/phase1_market_order',{p_request:requestId});await load();root.scrollIntoView({behavior:'smooth',block:'start'});return id;}

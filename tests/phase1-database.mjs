@@ -1,5 +1,5 @@
 import EmbeddedPostgres from 'embedded-postgres';
-import { readFile, mkdtemp, rm } from 'node:fs/promises';
+import { readFile, mkdtemp, rm, mkdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { execFile } from 'node:child_process';
@@ -61,8 +61,9 @@ try{
  await check('current admin revocation takes effect without waiting for JWT refresh',async()=>{assert.equal(await as('authenticated',admin,c=>one(c,'SELECT phase1_is_admin()')),true);await db.query("UPDATE auth.users SET raw_app_meta_data='{}' WHERE id=$1",[admin]);assert.equal(await as('authenticated',admin,c=>one(c,'SELECT phase1_is_admin()')),false);});
  await check('new RLS tables and RPC grants have no anonymous mutation path',async()=>{const result=await db.query("SELECT proname,has_function_privilege('anon',p.oid,'EXECUTE') AS anon FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='public' AND p.proname LIKE 'phase1_%'");assert(result.rows.every(r=>r.anon===false));assert.equal(await one(db,"SELECT has_function_privilege('service_role','public.store_settle_crypto(uuid,uuid,text)','EXECUTE')"),false);});
  if(process.env.RUN_ADVISORS==='1'){
-  try{const result=await promisify(execFile)('node_modules/.bin/supabase',['db','advisors','--db-url','postgresql://postgres:test-only@127.0.0.1:15439/postgres?sslmode=disable','--type','security'],{timeout:30000,maxBuffer:1024*1024});await writeFile('/workspace/work/advisors.log',result.stdout+result.stderr);console.log('Advisors completed; see local log');}
-  catch(e){await writeFile('/workspace/work/advisors.log',(e.stdout||'')+(e.stderr||'')+e.message);console.log('Advisors could not complete against fixture; see local log');}
+  await mkdir('work',{recursive:true});
+  try{const result=await promisify(execFile)('node_modules/.bin/supabase',['db','advisors','--db-url','postgresql://postgres:test-only@127.0.0.1:15439/postgres?sslmode=disable','--type','security'],{timeout:30000,maxBuffer:1024*1024});await writeFile('work/phase1-advisors.log',result.stdout+result.stderr);console.log('Advisors completed; see local log');}
+  catch(e){await writeFile('work/phase1-advisors.log',(e.stdout||'')+(e.stderr||'')+e.message);console.log('Advisors could not complete against fixture; see local log');}
  }
  console.log(`PASS ${count} PostgreSQL integration scenarios (real independent connections; fixture schema, no remote writes)`);
 }finally{if(db)await db.end();await pg.stop().catch(()=>{});await rm(dir,{recursive:true,force:true});}

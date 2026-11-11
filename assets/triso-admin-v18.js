@@ -7,6 +7,7 @@ const el=(tag,text,cls)=>{const e=document.createElement(tag);if(text!=null)e.te
 let active=null,chatList=[],orders=[],paymentClaims=[],busy=false,lastRefresh=0,chatQuery='',tc27OrderFilter='open',tc27OrderSearch='',tc27OrderBusy=false,tc27SelectedOrder=null;
 const say=(id,text)=>{const e=get(id);if(e)e.textContent=String(text||'')};
 const safeCall=async(fn)=>{if(typeof authorized==='undefined'||!authorized)throw Error('Verified admin sign-in required');return fn()};
+async function adminRows(path){const owner=window.TrisoAuth.read()?.user?.id,rows=[];for(let offset=0;;offset+=150){const page=await api(path+'&limit=150&offset='+offset);if(!authorized||window.TrisoAuth.read()?.user?.id!==owner)throw Error('Account changed');rows.push(...page);if(page.length<150)return rows}}
 async function rpcV18(name,body){
  return safeCall(()=>api('rpc/'+name,{method:'POST',body:JSON.stringify(body),headers:{Prefer:'return=representation'}}));
 }
@@ -19,6 +20,10 @@ async function removeAdminListing(item){
  }catch(err){status('Could not remove listing: '+err.message)}
 }
 window.tc18RemoveListing=removeAdminListing;
+const proSection=el('section',null,'section-box'),proForm=el('form'),proUser=el('input'),proEnabled=el('input'),proUntil=el('input'),proSave=el('button','Save Seller Pro','btn'),proStatus=el('p');
+proUser.required=true;proUser.pattern='[0-9a-fA-F-]{36}';proUser.placeholder='Seller user UUID';proUser.setAttribute('aria-label','Seller user UUID');proEnabled.type='checkbox';proEnabled.setAttribute('aria-label','Enable Seller Pro');proUntil.type='datetime-local';proUntil.setAttribute('aria-label','Pro expiry (optional)');proStatus.setAttribute('role','status');
+proForm.append(proUser,el('span',' Enable Seller Pro '),proEnabled,el('span',' Expiry (optional) '),proUntil,proSave,proStatus);proSection.append(el('h2','Seller Pro permissions'),el('p','Administrative entitlement only. This does not charge or collect payment.'),proForm);get('dashboard')?.append(proSection);
+proForm.onsubmit=async event=>{event.preventDefault();proSave.disabled=true;try{await rpcV18('market_set_pro_until',{p_user:proUser.value.trim(),p_enabled:proEnabled.checked,p_until:proEnabled.checked&&proUntil.value?new Date(proUntil.value).toISOString():null});proStatus.textContent='Seller Pro permissions saved.'}catch(e){proStatus.textContent=e.message}finally{proSave.disabled=false}};
 function renderChatList(){
  const box=get('tc18-chat-list');if(!box)return;box.replaceChildren();
  const needle=chatQuery.trim().toLowerCase();
@@ -38,7 +43,7 @@ function renderChatList(){
 async function loadConversations(){
  return safeCall(async()=>{
   try{
-   chatList=await api('market_conversations?select=id,listing_id,buyer_id,seller_id,created_at&order=created_at.desc&limit=150');
+   chatList=await adminRows('market_conversations?select=id,listing_id,buyer_id,seller_id,created_at&order=created_at.desc,id.desc');
    say('tc18-chat-status',chatList.length+' conversations · Authorized moderators can review buyer-seller messages.');
    renderChatList();
    if(active){
@@ -56,7 +61,7 @@ async function openChat(c,focus=true){
  get('tc18-chat-context').textContent='Buyer '+c.buyer_id+' · Seller '+c.seller_id+' · Moderator read-only access.';
  const box=get('tc18-chat-messages');box.replaceChildren(el('p','Loading chat messages…'));
  try{
-  const rows=await api('market_messages?select=id,conversation_id,sender_id,body,created_at&conversation_id=eq.'+encodeURIComponent(c.id)+'&order=created_at.asc,id.asc&limit=300');
+  const rows=await adminRows('market_messages?select=id,conversation_id,sender_id,body,created_at&conversation_id=eq.'+encodeURIComponent(c.id)+'&order=created_at.asc,id.asc');
   if(active!==String(c.id))return;
   box.replaceChildren();
   if(!rows.length)box.append(el('p','No messages in this conversation.'));
@@ -140,8 +145,8 @@ get('tc27-admin-order-search')?.addEventListener('input',e=>{tc27OrderSearch=e.t
 async function loadPurchases(){
  return safeCall(async()=>{
   try{
-   orders=await api('market_purchase_requests?select=id,listing_id,listing_title,buyer_id,seller_id,price_usd,payment_method,status,buyer_note,admin_note,created_at&order=created_at.desc&limit=150');
-   try{paymentClaims=await api('market_txid_claims?select=id,request_id,network,txid,status,created_at&order=created_at.desc&limit=150')}
+   orders=await adminRows('market_purchase_requests?select=id,listing_id,listing_title,buyer_id,seller_id,price_usd,payment_method,status,buyer_note,admin_note,created_at&order=created_at.desc,id.desc');
+   try{paymentClaims=await api('market_txid_claims?select=id,request_id,network,txid,status,created_at&order=created_at.desc,id.desc')}
    catch(err){paymentClaims=[];console.warn('Unverified TXID review list unavailable',err)}
    say('tc18-orders-status',orders.length+' requests · Payment collection and escrow are NOT active; do not tell buyers to send funds.');
    renderOrders();

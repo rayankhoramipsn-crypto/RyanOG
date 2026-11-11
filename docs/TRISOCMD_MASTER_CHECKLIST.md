@@ -3,7 +3,7 @@
 Updated 2026-11-11 (Asia/Tehran). **INCOMPLETE; not release-ready.**
 
 Baseline: PR #36 at 3eea77c; all four commits including hosted marketplace status compatibility are preserved.
-VERIFIED LOCAL means local fixtures/mocks only. PARTIAL means implementation exists with gaps. UNVERIFIED means acceptance pending; not necessarily absent. BLOCKED means external configuration or permissions required.
+VERIFIED LOCAL means isolated fixtures/local services; hosted acceptance remains separate. PARTIAL means implementation exists with gaps. UNVERIFIED means acceptance pending; not necessarily absent. BLOCKED means external configuration or permissions required.
 
 | Phase | Status and evidence |
 |---|---|
@@ -12,7 +12,7 @@ VERIFIED LOCAL means local fixtures/mocks only. PARTIAL means implementation exi
 | 3 | PARTIAL: 8 session tests; refresh coordinator, offline retention and server logout requests. Real OAuth/chat/admin acceptance pending. |
 | 4 | PARTIAL: 4 email tests; templates and disabled delivery core. Durable outbox adapter/Resend transport and support completion pending. |
 | 5 | PARTIAL: media parsing, blog deletion/RTL/metadata fixed; 4 static article tests. CMS publication wiring and production SEO gate pending. |
-| 6 | PARTIAL: 40 Node tests, 51 DB scenarios, 56 Python tests, four Chromium suites. Firefox blocked; exhaustive real-role/device/security/performance audit unfinished. |
+| 6 | PARTIAL: 40 Node tests, 63 DB scenarios, 56 Python tests, five Chromium suites; 13 native marketplace/Storage cases. Firefox blocked; exhaustive real-role/device/security/performance audit unfinished. |
 
 
 ## PHASE 1 — COMPLETE PAYMENT, CHECKOUT AND ORDER MANAGEMENT
@@ -50,30 +50,30 @@ VERIFIED LOCAL means local fixtures/mocks only. PARTIAL means implementation exi
 
 | Requirement | Status |
 |---|---|
-| Seller listing creation | UNVERIFIED — acceptance pending; see phase evidence |
-| Mandatory image upload from local gallery | UNVERIFIED — acceptance pending; see phase evidence |
-| Secure Supabase Storage | UNVERIFIED — acceptance pending; see phase evidence |
-| Multiple listing photos where supported | UNVERIFIED — acceptance pending; see phase evidence |
-| Title, price, description and category fields | UNVERIFIED — acceptance pending; see phase evidence |
-| Listing editing and deletion | UNVERIFIED — acceptance pending; see phase evidence |
+| Seller listing creation | VERIFIED LOCAL — isolated role/Storage/DB/browser checks; hosted rollout pending |
+| Mandatory image upload from local gallery | VERIFIED LOCAL — isolated role/Storage/DB/browser checks; hosted rollout pending |
+| Secure Supabase Storage | VERIFIED LOCAL — isolated role/Storage/DB/browser checks; hosted rollout pending |
+| Multiple listing photos where supported | VERIFIED LOCAL — isolated role/Storage/DB/browser checks; hosted rollout pending |
+| Title, price, description and category fields | VERIFIED LOCAL — isolated role/Storage/DB/browser checks; hosted rollout pending |
+| Listing editing and deletion | VERIFIED LOCAL — isolated role/Storage/DB/browser checks; hosted rollout pending |
 | Listing previews | UNVERIFIED — acceptance pending; see phase evidence |
-| Listing approval queue | UNVERIFIED — acceptance pending; see phase evidence |
-| Admin approve/decline/remove actions | UNVERIFIED — acceptance pending; see phase evidence |
+| Listing approval queue | VERIFIED LOCAL — isolated role/Storage/DB/browser checks; hosted rollout pending |
+| Admin approve/decline/remove actions | VERIFIED LOCAL — isolated role/Storage/DB/browser checks; hosted rollout pending |
 | Moderation notes | UNVERIFIED — acceptance pending; see phase evidence |
-| Seller ownership checks | UNVERIFIED — acceptance pending; see phase evidence |
-| Three free listings per day | UNVERIFIED — acceptance pending; see phase evidence |
-| Seller Pro privileges and unlimited listings | UNVERIFIED — acceptance pending; see phase evidence |
-| Four percent commission records | UNVERIFIED — acceptance pending; see phase evidence |
-| Pro seller prioritization | UNVERIFIED — acceptance pending; see phase evidence |
+| Seller ownership checks | VERIFIED LOCAL — isolated role/Storage/DB/browser checks; hosted rollout pending |
+| Three free listings per day | VERIFIED LOCAL — isolated role/Storage/DB/browser checks; hosted rollout pending |
+| Seller Pro privileges and unlimited listings | VERIFIED LOCAL — isolated role/Storage/DB/browser checks; hosted rollout pending |
+| Four percent commission records | VERIFIED LOCAL — isolated role/Storage/DB/browser checks; hosted rollout pending |
+| Pro seller prioritization | VERIFIED LOCAL — isolated role/Storage/DB/browser checks; hosted rollout pending |
 | Listing search | VERIFIED LOCAL — paginated RPC and main/preview 241-listing fixtures; migration/live acceptance pending |
 | Category and price filters | VERIFIED LOCAL — paginated RPC and main/preview 241-listing fixtures; migration/live acceptance pending |
 | Sorting | VERIFIED LOCAL — paginated RPC and main/preview 241-listing fixtures; migration/live acceptance pending |
 | New arrivals | UNVERIFIED — acceptance pending; see phase evidence |
 | Featured items | UNVERIFIED — acceptance pending; see phase evidence |
-| Seller profiles | UNVERIFIED — acceptance pending; see phase evidence |
-| Listing status synchronization | UNVERIFIED — acceptance pending; see phase evidence |
-| Sold-out inventory protection | UNVERIFIED — acceptance pending; see phase evidence |
-| Responsive product cards | UNVERIFIED — acceptance pending; see phase evidence |
+| Seller profiles | VERIFIED LOCAL — isolated role/Storage/DB/browser checks; hosted rollout pending |
+| Listing status synchronization | VERIFIED LOCAL — isolated role/Storage/DB/browser checks; hosted rollout pending |
+| Sold-out inventory protection | VERIFIED LOCAL — isolated role/Storage/DB/browser checks; hosted rollout pending |
+| Responsive product cards | VERIFIED LOCAL — isolated role/Storage/DB/browser checks; hosted rollout pending |
 | Loading, empty and error states | VERIFIED LOCAL — paginated RPC and main/preview 241-listing fixtures; migration/live acceptance pending |
 
 ## PHASE 3 — AUTHENTICATION, CHAT AND ADMIN
@@ -249,7 +249,7 @@ VERIFIED LOCAL means local fixtures/mocks only. PARTIAL means implementation exi
 - Implement durable email leasing, Resend transport, retries and event wiring. Integrate Auth templates/hooks separately.
 - Reconcile support_tickets with tc42_support_threads/messages; finish history/replies/status tests.
 - Wire static journal publication into CMS and deployment; implement product prerendering and complete sitemap.
-- Apply/review the additive marketplace browse migration in an authorized staging rollout; complete seller/profile/edit workflows and live cross-account upload tests. Paginated search/price filters pass local DB/browser tests.
+- Apply/review the additive marketplace browse migration in an authorized staging rollout; verify the implemented seller/profile/edit and binary Storage workflows on authorized hosted staging. Paginated search/price filters pass local DB/browser tests.
 - Review/apply the session/admin authorization migration in an authorized staging rollout; complete user/seller management and operational logs.
 - Run isolated real staging signup/confirmation/recovery/OAuth/chat/storage and full buyer/seller/admin workflows.
 
@@ -285,3 +285,5 @@ VERIFIED LOCAL means local fixtures/mocks only. PARTIAL means implementation exi
 ## Supabase integration continuation
 
 Full staging public-schema/ACL/Storage-policy snapshot restored with synthetic historical orders. Phase 1 and browse compatibility pass locally; authorization fixes and 18 embedded full-schema scenarios and 20 real local Supabase scenarios cover buyer/seller/admin isolation, quota concurrency, Pro expiry, moderation, chat, inventory/checkout and revocation. Hosted migrations/functions remain unchanged; see TRISOCMD_SUPABASE_VERIFICATION.md.
+
+Marketplace/admin continuation: additive workflow migration, 241-row cross-seller queue and own history, actual local PNG authorization/type/size tests, canonical cancellation retries, 4% commission, Pro expiry, chat read watermark/send dedup and mobile RTL are covered. See TRISOCMD_MARKETPLACE_VERIFICATION.md. No hosted migrations or payment activation occurred.

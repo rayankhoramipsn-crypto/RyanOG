@@ -12,8 +12,9 @@
   "description": "TRISOCMD local checkout security and regression tests",
   "scripts": {
     "test": "node --test tests/*.test.mjs && node tests/phase1-database.mjs && node tests/marketplace-database.mjs && node tests/staging-integration.mjs && python3 -m unittest discover -s tests -p \"test_*.py\"",
-    "test:browser": "node tests/browser-smoke.mjs && node tests/phase1-browser.mjs && node tests/completion-browser.mjs && node tests/marketplace-browser.mjs",
+    "test:browser": "node tests/browser-smoke.mjs && node tests/phase1-browser.mjs && node tests/completion-browser.mjs && node tests/marketplace-browser.mjs && node tests/marketplace-management-browser.mjs",
     "check:edge": "deno check supabase/functions/store-crypto/index.ts supabase/functions/payment-webhook/index.ts",
-    "test:integration": "node tests/staging-integration.mjs"
+    "test:integration": "node tests/staging-integration.mjs",
+    "test:marketplace:local": "node tests/marketplace-local.mjs"
   }
 }

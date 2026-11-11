@@ -121,7 +121,7 @@
      <div class="section-box">
        <div class="section-heading"><h2>My listings</h2><div class="hero-actions" style="margin:0"><button id="seller-messages" class="btn small secondary" type="button">✉ Buyer messages</button><button class="btn small secondary" type="button" onclick="document.getElementById('open-sell').click()">New listing</button></div></div>
        <p class="fine">Pending listings are visible only to you and moderators; approved listings appear publicly.</p>
-       <div id="mine"></div>
+       <button id="seller-profile-edit" type="button" class="btn small" data-t="sellerProfile">Seller profile</button><div id="mine"></div>
      </div>
    </section>
    <section class="seller-section hidden" id="purchase-requests-wrap">
@@ -161,7 +161,7 @@
  <div class="dialog-content">
   <div class="detail-grid">
    <div class="tc33-media-column"><div class="tc33-media-stage"><img id="detail-cover" class="detail-photo" alt="Listing photo"><div id="detail-placeholder" class="tc33-photo-fallback" role="status"><span class="tc33-image-icon" aria-hidden="true">◇</span><strong>Listing gallery</strong><span class="tc33-fallback-message">Image not available yet</span></div></div><div id="thumbs" class="detail-gallery" aria-label="Listing photos"></div></div>
-   <div class="tc33-detail-column"><span id="detail-platform" class="eyebrow"></span><h2 id="detail-title"></h2><span class="fine" id="detail-date"></span><div class="detail-price" id="detail-price"></div>
+   <div class="tc33-detail-column"><span id="detail-platform" class="eyebrow"></span><h2 id="detail-title"></h2><span class="fine" id="detail-date"></span><div class="detail-price" id="detail-price"></div><button id="view-seller-profile" type="button" class="btn small" data-t="sellerProfile">Seller profile</button>
       <p id="detail-desc"></p>
       <div class="secure-info">⚑ Only administrator-approved listings appear publicly. Approval does not guarantee ownership, authenticity, delivery or safety. TRISOCMD does not currently accept or hold marketplace payments.</div>
       <details class="tc33-terms">
@@ -275,5 +275,8 @@
 <script defer src="assets/marketplace-v15.js?v=35"></script>
 <script defer src="assets/triso-notifications-v34.js?v=35"></script>
 <script src="assets/phase1-orders.js" defer></script>
+<dialog id="edit-dialog"><div class="dialog-header"><h2 data-t="editListing">Edit listing</h2><button type="button" class="close" data-close="edit-dialog" aria-label="Close">×</button></div><form id="edit-form" class="dialog-content"><label>Title<input id="edit-title" required minlength="5" maxlength="120"></label><label>Category<input id="edit-platform" required minlength="2" maxlength="50"></label><label>Description<textarea id="edit-description" required minlength="20" maxlength="3000"></textarea></label><label>Price (USD)<input id="edit-price" type="number" min="1" max="1000000" step="0.01" required></label><p class="fine">Changes require administrator approval again.</p><p id="edit-status" role="alert"></p><button id="edit-save" class="btn primary">Save for review</button></form></dialog>
+<dialog id="profile-edit-dialog"><div class="dialog-header"><h2 data-t="sellerProfile">Seller profile</h2><button type="button" class="close" data-close="profile-edit-dialog" aria-label="Close">×</button></div><form id="profile-form" class="dialog-content"><label>Display name<input id="profile-name" minlength="3" maxlength="60" required></label><label>Bio<textarea id="profile-bio" maxlength="500"></textarea></label><label><input type="checkbox" id="profile-public">Show this profile with approved listings</label><p id="profile-status" role="alert"></p><button id="profile-save" class="btn primary">Save profile</button></form></dialog>
+<dialog id="profile-dialog"><div class="dialog-header"><h2 id="public-seller-name"></h2><button type="button" class="close" data-close="profile-dialog" aria-label="Close">×</button></div><div class="dialog-content"><p id="public-seller-bio"></p><span id="public-seller-pro"></span></div></dialog>
 </body>
 </html>

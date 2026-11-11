@@ -43,7 +43,7 @@ await context.route(origin+'/**', async route=>{
  if(path.endsWith('/rpc/market_browse_page'))result={items:fixtureListings,has_more:false};
  else if(path.endsWith('/rpc/market_browse'))result=fixtureListings;
  else if(path.endsWith('/rpc/is_admin'))result=false;
- else if(path.endsWith('/rpc/market_inbox'))result=[];
+ else if(path.endsWith('/rpc/market_inbox_page'))result=[];
  else if(path.endsWith('/auth/v1/user'))result={id:'00000000-0000-4000-8000-000000000001',email:'smoke@example.test'};
  else if(path.endsWith('/rest/v1/products'))result=fixtureProducts;
  else if(path.includes('/products'))result=url.searchParams.has('id')?fixtureProducts:fixtureProducts;
@@ -55,7 +55,7 @@ await context.route(origin+'/**', async route=>{
  else if(path.includes('/market_listings'))result=[];
  // No write action is allowed by this test. The only POSTs above are
  // read-only RPCs; all other write requests receive a 403 failure.
- const safeReadRPC=path.endsWith('/rpc/market_browse_page')||path.endsWith('/rpc/is_admin')||path.endsWith('/rpc/market_browse')||path.endsWith('/rpc/market_inbox');
+ const safeReadRPC=path.endsWith('/rpc/market_browse_page')||path.endsWith('/rpc/is_admin')||path.endsWith('/rpc/market_browse')||path.endsWith('/rpc/market_inbox_page');
  if(!['GET','HEAD'].includes(request.method())&&!safeReadRPC){
   failed.push('unexpected network mutation blocked: '+request.method()+' '+path);
   return route.fulfill({status:403,headers:cors,body:JSON.stringify({message:'Test never performs writes'})});
@@ -440,13 +440,13 @@ try{
  ];
  const serverMessages=[{id:9001,sender_id:chatRows[0].seller_id,body:'Is the headset available?',created_at:'2026-11-01T10:00:00Z'}];
  let sendAttempts=0;
- await chatPage.route(origin+'/rest/v1/rpc/market_inbox',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify(chatRows)}));
- await chatPage.route(origin+'/rest/v1/rpc/market_mark_read',route=>{
+ await chatPage.route(origin+'/rest/v1/rpc/market_inbox_page',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify(chatRows)}));
+ await chatPage.route(origin+'/rest/v1/rpc/market_mark_read_to',route=>{
    chatRows[0].unread_count=0;
    return route.fulfill({status:200,headers:cors,body:'null'});
  });
  await chatPage.route(origin+'/rest/v1/market_messages?**',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify(serverMessages)}));
- await chatPage.route(origin+'/rest/v1/rpc/market_send_message',route=>{
+ await chatPage.route(origin+'/rest/v1/rpc/market_send_message_once',route=>{
    const payload=JSON.parse(route.request().postData());
    assert.equal(payload.p_conversation,801);
    assert.equal(payload.p_body,'I am interested in the headset.');
