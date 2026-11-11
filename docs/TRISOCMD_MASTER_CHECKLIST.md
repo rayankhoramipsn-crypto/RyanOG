@@ -10,9 +10,9 @@ VERIFIED LOCAL means isolated fixtures/local services; hosted acceptance remains
 | 1 | PARTIAL: PR #36 retained; 24 provider tests, 25 native PostgreSQL scenarios. Local same-project Auth/SQL integration passes; hosted rollout and real provider acceptance pending. |
 | 2 | PARTIAL: admin pagination/gallery batching fixed; mocked cross-seller listing #241 visible; paginated browse/search/price filters and eight DB scenarios added. Migration unapplied; real role/upload/quota E2E pending. |
 | 3 | PARTIAL: 8 session tests; refresh coordinator, offline retention and server logout requests. Real OAuth/chat/admin acceptance pending. |
-| 4 | PARTIAL: 4 email tests; templates and disabled delivery core. Durable outbox adapter/Resend transport and support completion pending. |
+| 4 | VERIFIED LOCAL: private alerts, durable email/push outbox, signed webhooks and canonical support workflows; live sender/push/hosted rollout blocked. See TRISOCMD_COMMUNICATIONS_VERIFICATION.md. |
 | 5 | PARTIAL: media parsing, blog deletion/RTL/metadata fixed; 4 static article tests. CMS publication wiring and production SEO gate pending. |
-| 6 | PARTIAL: 40 Node tests, 63 DB scenarios, 56 Python tests, five Chromium suites; 13 native marketplace/Storage cases. Firefox blocked; exhaustive real-role/device/security/performance audit unfinished. |
+| 6 | PARTIAL: 50 Node tests, 78 DB scenarios, 56 Python tests, six Chromium suites; 13 native marketplace/Storage cases. Firefox blocked; exhaustive real-role/device/security/performance audit unfinished. |
 
 
 ## PHASE 1 — COMPLETE PAYMENT, CHECKOUT AND ORDER MANAGEMENT
@@ -117,29 +117,29 @@ VERIFIED LOCAL means isolated fixtures/local services; hosted acceptance remains
 
 | Requirement | Status |
 |---|---|
-| In-site notifications | UNVERIFIED — acceptance pending; see phase evidence |
-| Browser foreground notifications | UNVERIFIED — acceptance pending; see phase evidence |
+| In-site notifications | VERIFIED LOCAL — isolated role/SQL/browser coverage; hosted rollout pending |
+| Browser foreground notifications | VERIFIED LOCAL — isolated role/SQL/browser coverage; hosted rollout pending |
 | Optional background Web Push with a genuine configured delivery service | BLOCKED / UNVERIFIED — service configuration and E2E required |
-| Notification permission controls | UNVERIFIED — acceptance pending; see phase evidence |
-| Notification preferences | UNVERIFIED — acceptance pending; see phase evidence |
-| Duplicate-event prevention | UNVERIFIED — acceptance pending; see phase evidence |
-| Seller order notifications | UNVERIFIED — acceptance pending; see phase evidence |
-| Buyer payment notifications | UNVERIFIED — acceptance pending; see phase evidence |
-| New-message alerts | UNVERIFIED — acceptance pending; see phase evidence |
-| Listing moderation notifications | UNVERIFIED — acceptance pending; see phase evidence |
-| Order cancellation and dispute updates | UNVERIFIED — acceptance pending; see phase evidence |
+| Notification permission controls | VERIFIED LOCAL — isolated role/SQL/browser coverage; hosted rollout pending |
+| Notification preferences | VERIFIED LOCAL — isolated role/SQL/browser coverage; hosted rollout pending |
+| Duplicate-event prevention | VERIFIED LOCAL — isolated role/SQL/browser coverage; hosted rollout pending |
+| Seller order notifications | VERIFIED LOCAL — isolated role/SQL/browser coverage; hosted rollout pending |
+| Buyer payment notifications | VERIFIED LOCAL — isolated role/SQL/browser coverage; hosted rollout pending |
+| New-message alerts | VERIFIED LOCAL — isolated role/SQL/browser coverage; hosted rollout pending |
+| Listing moderation notifications | VERIFIED LOCAL — isolated role/SQL/browser coverage; hosted rollout pending |
+| Order cancellation and dispute updates | VERIFIED LOCAL — isolated role/SQL/browser coverage; hosted rollout pending |
 | Registration confirmation | BLOCKED / UNVERIFIED — service configuration and E2E required |
 | Password reset | UNVERIFIED — acceptance pending; see phase evidence |
-| Order confirmation | UNVERIFIED — acceptance pending; see phase evidence |
-| Payment status | UNVERIFIED — acceptance pending; see phase evidence |
-| Seller purchase notices | UNVERIFIED — acceptance pending; see phase evidence |
-| Listing approval/decline | UNVERIFIED — acceptance pending; see phase evidence |
-| Support replies | UNVERIFIED — acceptance pending; see phase evidence |
-| Customer contact form | UNVERIFIED — acceptance pending; see phase evidence |
-| Support tickets | UNVERIFIED — acceptance pending; see phase evidence |
-| Ticket history | UNVERIFIED — acceptance pending; see phase evidence |
-| Admin replies | UNVERIFIED — acceptance pending; see phase evidence |
-| Ticket statuses | UNVERIFIED — acceptance pending; see phase evidence |
+| Order confirmation | VERIFIED LOCAL — templates/queue/worker tested; live sending disabled and unverified |
+| Payment status | VERIFIED LOCAL — templates/queue/worker tested; live sending disabled and unverified |
+| Seller purchase notices | VERIFIED LOCAL — templates/queue/worker tested; live sending disabled and unverified |
+| Listing approval/decline | VERIFIED LOCAL — templates/queue/worker tested; live sending disabled and unverified |
+| Support replies | VERIFIED LOCAL — templates/queue/worker tested; live sending disabled and unverified |
+| Customer contact form | VERIFIED LOCAL — isolated role/SQL/browser coverage; hosted rollout pending |
+| Support tickets | VERIFIED LOCAL — isolated role/SQL/browser coverage; hosted rollout pending |
+| Ticket history | VERIFIED LOCAL — isolated role/SQL/browser coverage; hosted rollout pending |
+| Admin replies | VERIFIED LOCAL — isolated role/SQL/browser coverage; hosted rollout pending |
+| Ticket statuses | VERIFIED LOCAL — isolated role/SQL/browser coverage; hosted rollout pending |
 | Help Center | UNVERIFIED — acceptance pending; see phase evidence |
 | FAQ | UNVERIFIED — acceptance pending; see phase evidence |
 | Dispute and refund information | UNVERIFIED — acceptance pending; see phase evidence |
@@ -246,8 +246,8 @@ VERIFIED LOCAL means isolated fixtures/local services; hosted acceptance remains
 ## Residual implementation work
 
 - Complete every UNVERIFIED row; this run does not meet the entire six-phase acceptance criteria.
-- Implement durable email leasing, Resend transport, retries and event wiring. Integrate Auth templates/hooks separately.
-- Reconcile support_tickets with tc42_support_threads/messages; finish history/replies/status tests.
+- Verify authorized hosted sender/domain, Resend secrets/webhooks, scheduler and VAPID configuration after rollout; delivery infrastructure passes isolated tests and remains disabled. Integrate Auth templates/hooks separately.
+- Verify canonical support migration and owner/staff workflows on authorized hosted staging; isolated preservation, history/replies/status/assignment tests pass.
 - Wire static journal publication into CMS and deployment; implement product prerendering and complete sitemap.
 - Apply/review the additive marketplace browse migration in an authorized staging rollout; verify the implemented seller/profile/edit and binary Storage workflows on authorized hosted staging. Paginated search/price filters pass local DB/browser tests.
 - Review/apply the session/admin authorization migration in an authorized staging rollout; complete user/seller management and operational logs.
@@ -287,3 +287,5 @@ VERIFIED LOCAL means isolated fixtures/local services; hosted acceptance remains
 Full staging public-schema/ACL/Storage-policy snapshot restored with synthetic historical orders. Phase 1 and browse compatibility pass locally; authorization fixes and 18 embedded full-schema scenarios and 20 real local Supabase scenarios cover buyer/seller/admin isolation, quota concurrency, Pro expiry, moderation, chat, inventory/checkout and revocation. Hosted migrations/functions remain unchanged; see TRISOCMD_SUPABASE_VERIFICATION.md.
 
 Marketplace/admin continuation: additive workflow migration, 241-row cross-seller queue and own history, actual local PNG authorization/type/size tests, canonical cancellation retries, 4% commission, Pro expiry, chat read watermark/send dedup and mobile RTL are covered. See TRISOCMD_MARKETPLACE_VERIFICATION.md. No hosted migrations or payment activation occurred.
+
+Communications continuation: VERIFIED LOCAL — event/recipient/channel deduplication, server unread watermarks/preferences, foreground permission controls, generic Web Push architecture, fenced/retry-safe email leases, signed delivery events and redacted admin logs. Existing support model now covers ticket/reply retries, private history, staff assignment/status and order-linked disputes. 17 native local scenarios use real Auth/JWT/REST and intercepted Resend. Live delivery/hosted realtime remain BLOCKED / UNVERIFIED; see TRISOCMD_COMMUNICATIONS_VERIFICATION.md.

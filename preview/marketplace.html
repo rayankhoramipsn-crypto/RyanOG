@@ -12,7 +12,7 @@
 <link rel="alternate icon" type="image/png" sizes="64x64" href="../assets/trisocmd-icon-64.png">
 <link rel="apple-touch-icon" sizes="180x180" href="../assets/trisocmd-apple-touch.png">
 <link rel="stylesheet" href="../assets/phase1-orders.css">
-</head>
+<link rel="stylesheet" href="../assets/triso-support.css"></head>
 <body>
 <header class="topbar">
  <div class="container nav">
@@ -225,5 +225,5 @@
 <script src="../assets/phase1-orders.js" defer></script><dialog id="edit-dialog"><div class="dialog-header"><h2 data-t="editListing">Edit listing</h2><button type="button" class="close" data-close="edit-dialog" aria-label="Close">×</button></div><form id="edit-form" class="dialog-content"><label>Title<input id="edit-title" required minlength="5" maxlength="120"></label><label>Category<input id="edit-platform" required minlength="2" maxlength="50"></label><label>Description<textarea id="edit-description" required minlength="20" maxlength="3000"></textarea></label><label>Price (USD)<input id="edit-price" type="number" min="1" max="1000000" step="0.01" required></label><p class="fine">Changes require administrator approval again.</p><p id="edit-status" role="alert"></p><button id="edit-save" class="btn primary">Save for review</button></form></dialog>
 <dialog id="profile-edit-dialog"><div class="dialog-header"><h2 data-t="sellerProfile">Seller profile</h2><button type="button" class="close" data-close="profile-edit-dialog" aria-label="Close">×</button></div><form id="profile-form" class="dialog-content"><label>Display name<input id="profile-name" minlength="3" maxlength="60" required></label><label>Bio<textarea id="profile-bio" maxlength="500"></textarea></label><label><input type="checkbox" id="profile-public">Show this profile with approved listings</label><p id="profile-status" role="alert"></p><button id="profile-save" class="btn primary">Save profile</button></form></dialog>
 <dialog id="profile-dialog"><div class="dialog-header"><h2 id="public-seller-name"></h2><button type="button" class="close" data-close="profile-dialog" aria-label="Close">×</button></div><div class="dialog-content"><p id="public-seller-bio"></p><span id="public-seller-pro"></span></div></dialog>
-</body>
+<script src="../assets/triso-support.js" defer></script></body>
 </html>

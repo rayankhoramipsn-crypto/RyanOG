@@ -2,6 +2,7 @@
   "name": "ryanog-main",
   "version": "1.0.0",
   "devDependencies": {
+    "@types/web-push": "3.6.4",
     "deno": "2.5.6",
     "embedded-postgres": "18.6.0-beta.19",
     "pg": "8.23.0",
@@ -12,9 +13,13 @@
   "description": "TRISOCMD local checkout security and regression tests",
   "scripts": {
     "test": "node --test tests/*.test.mjs && node tests/phase1-database.mjs && node tests/marketplace-database.mjs && node tests/staging-integration.mjs && python3 -m unittest discover -s tests -p \"test_*.py\"",
-    "test:browser": "node tests/browser-smoke.mjs && node tests/phase1-browser.mjs && node tests/completion-browser.mjs && node tests/marketplace-browser.mjs && node tests/marketplace-management-browser.mjs",
-    "check:edge": "deno check supabase/functions/store-crypto/index.ts supabase/functions/payment-webhook/index.ts",
+    "test:browser": "node tests/browser-smoke.mjs && node tests/phase1-browser.mjs && node tests/completion-browser.mjs && node tests/marketplace-browser.mjs && node tests/marketplace-management-browser.mjs && node tests/communications-browser.mjs",
+    "check:edge": "deno check supabase/functions/store-crypto/index.ts supabase/functions/payment-webhook/index.ts supabase/functions/delivery-worker/index.ts supabase/functions/delivery-webhook/index.ts",
     "test:integration": "node tests/staging-integration.mjs",
-    "test:marketplace:local": "node tests/marketplace-local.mjs"
+    "test:marketplace:local": "node tests/marketplace-local.mjs",
+    "test:communications:local": "node tests/communications-local.mjs"
+  },
+  "dependencies": {
+    "web-push": "3.6.7"
   }
 }

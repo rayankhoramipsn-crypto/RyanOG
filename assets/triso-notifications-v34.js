@@ -1,134 +1,42 @@
-/* TRISOCMD V34: private, read-only in-site notification inbox.
- * OS alerts work only while the site is open; no claim of background push.
- * Purchase requests do not prove payment or mark listings sold.
- */
-(()=>{
- 'use strict';
- const api='https://cxtytbjvdlngahytfilr.supabase.co';
- const key='sb_publishable_AqZWjpgyZ_h6-EKwOySyGQ_0LE8bcRm';
- const isAdminPage=location.pathname.includes('/admin/');
- const root=document.createElement('div');
- root.className='tc34-notice-root';root.hidden=true;
- root.innerHTML='<button type="button" class="tc34-notice-button" aria-expanded="false" aria-controls="tc34-notice-panel">🔔 Alerts <span class="tc34-notice-badge" hidden>0</span></button>'+
-  '<div id="tc34-notice-panel" class="tc34-notice-panel" hidden><div class="tc34-notice-top"><strong>Notifications</strong><button type="button" class="tc34-notice-close" aria-label="Close notifications">✕</button></div>'+
-  '<p class="tc34-notice-sub">Messages and purchase review requests. A request is not proof of payment.</p>'+
-  '<ul class="tc34-notice-list"><li>Sign in to see notifications.</li></ul>'+
-  '<div class="tc34-notice-bottom"><button type="button" class="tc34-notice-permission">Enable device alerts while site is open</button><label class="tc35-email-pref"><input type="checkbox" class="tc35-email-toggle"> Email notifications (opt-in)</label><span class="tc34-notice-help" role="status"></span></div></div>';
- const host=isAdminPage?document.querySelector('header'):(document.querySelector('.topbar .navtools')||document.querySelector('#store-screen .tc-native-navtools'));
- if(!host)return;
- host.append(root);
- const trigger=root.querySelector('.tc34-notice-button'),panel=root.querySelector('.tc34-notice-panel');
- const badge=root.querySelector('.tc34-notice-badge'),list=root.querySelector('.tc34-notice-list');
- const perm=root.querySelector('.tc34-notice-permission'),help=root.querySelector('.tc34-notice-help'),emailToggle=root.querySelector('.tc35-email-toggle');
- let owner=null,rows=[],latest=0,known=0,booted=false,fetching=false,shown=false;
- async function readEmailOptin(){
-  const session=remembered();if(!session?.user)return false;
-  const r=await fetch(api+'/rest/v1/market_alert_preferences?select=email_enabled&user_id=eq.'+encodeURIComponent(session.user.id),{
-   headers:{apikey:key,Authorization:'Bearer '+session.access_token}
-  });
-  if(!r.ok)throw Error('Could not load email preference');
-  const rows=await r.json();return rows[0]?.email_enabled===true;
- }
- async function saveEmailOptin(enabled){
-  const session=remembered();if(!session?.user)throw Error('Sign in to save email preferences');
-  const r=await fetch(api+'/rest/v1/market_alert_preferences?on_conflict=user_id',{
-   method:'POST',headers:{apikey:key,Authorization:'Bearer '+session.access_token,
-      'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},
-   body:JSON.stringify({user_id:session.user.id,email_enabled:!!enabled})
-  });
-  if(!r.ok){const data=await r.json().catch(()=>({}));throw Error(data.message||'Could not save email preference')}
-  emailToggle.checked=!!enabled;return true;
- }
- async function enableDeviceAlerts(){
-  if(!('Notification' in window)||!window.isSecureContext)return 'This browser cannot show device alerts here. In-site alerts still work.';
-  if(Notification.permission==='denied')return 'Device alerts are blocked in your browser settings.';
-  if(Notification.permission==='granted')return 'Device alerts are already on while the site is open.';
-  const result=await Notification.requestPermission();
-  return result==='granted'?'Device alerts enabled while the site is open.':'In-site alerts remain available.';
- }
- window.TrisoNotifications={readEmailOptin,saveEmailOptin,enableDeviceAlerts};
- const remembered=()=>window.TrisoAuth?.read?.();
- const href=row=>{
-  if(isAdminPage)return row.kind==='message'?'#tc18-chat-list':'#tc18-order-list';
-  return row.kind==='message'?'marketplace.html#inbox':'marketplace.html#purchase-requests-wrap';
- };
- const since=()=>{try{return Number(localStorage.getItem('tc34_seen_'+owner))||0}catch{return 0}};
- const saveSeen=n=>{try{localStorage.setItem('tc34_seen_'+owner,String(n))}catch{}};
- function render(){
-  const seen=since(),unread=rows.filter(x=>Number(x.id)>seen).length;
-  badge.hidden=!unread;badge.textContent=unread>99?'99+':String(unread);
-  list.replaceChildren();
-  if(!rows.length){const li=document.createElement('li');li.textContent='No notifications yet.';list.append(li);return}
-  for(const row of rows){
-   const li=document.createElement('li'),a=document.createElement('a');
-   a.href=href(row);a.className='tc34-notice-link';if(Number(row.id)>seen)a.classList.add('tc34-new');
-   const title=document.createElement('strong');title.textContent=String(row.title||'Marketplace update');
-   const detail=document.createElement('span');detail.textContent=(row.listing_id?'Listing #'+row.listing_id+' · ':'')+new Date(row.created_at).toLocaleString();
-   a.append(title,detail);li.append(a);list.append(li);
-  }
- }
- function pop(item){
-  if(!('Notification' in window)||Notification.permission!=='granted')return;
-  // No personal message contents, seller identifiers or payment instructions are exposed.
-  try{
-   const notification=new Notification('TRISOCMD: '+(item.kind==='message'?'New message':'Purchase review update'),{
-    body:'Open TRISOCMD to see the update.',tag:'triso-notice-'+item.id
-   });
-   notification.onclick=()=>{window.focus();notification.close()};
-  }catch{}
- }
- async function scan(){
-  if(fetching||document.hidden)return;
-  const session=remembered();
-  const allowed=!!session?.user&&(!isAdminPage||!document.querySelector('#dashboard')?.classList.contains('hidden'));
-  if(!allowed){
-   root.hidden=false;owner=null;rows=[];known=0;latest=0;booted=false;
-   help.textContent='Sign in to view notifications.';
-   emailToggle.disabled=true;
-   panel.hidden=true;trigger.setAttribute('aria-expanded','false');shown=false;
-   return;
-  }
-  if(owner!==session.user.id){
-   owner=session.user.id;known=0;booted=false;rows=[];root.hidden=false;
-   emailToggle.disabled=false;
-   readEmailOptin().then(v=>{if(owner===session.user.id)emailToggle.checked=v}).catch(()=>{});
-  }
-  fetching=true;
-  try{
-   const response=await fetch(api+'/rest/v1/market_notifications?select=id,kind,title,listing_id,request_id,conversation_id,created_at&order=id.desc&limit=40',{
-    headers:{apikey:key,Authorization:'Bearer '+session.access_token}
-   });
-   if(!response.ok)throw Error('Notifications temporarily unavailable');
-   const data=await response.json();
-   if(!Array.isArray(data)||session.user.id!==owner)return;
-   rows=data;latest=rows.reduce((max,r)=>Math.max(max,Number(r.id)||0),0);
-   if(booted&&latest>known){
-    const additions=rows.filter(r=>Number(r.id)>known).slice(0,2);
-    additions.forEach(pop);
-   }
-   known=Math.max(known,latest);booted=true;render();
-   if(!panel.hidden)saveSeen(latest);
-  }catch(e){if(!booted){list.textContent='Notifications unavailable. Refresh or sign in again.';help.textContent=e.message}}
-  finally{fetching=false}
- }
- trigger.addEventListener('click',()=>{
-  const open=panel.hidden;panel.hidden=!open;shown=open;trigger.setAttribute('aria-expanded',String(open));
-  if(open){if(owner)saveSeen(latest);render();scan().catch(()=>{})}
- });
- root.querySelector('.tc34-notice-close').addEventListener('click',()=>{
-  panel.hidden=true;shown=false;trigger.setAttribute('aria-expanded','false');
- });
- perm.addEventListener('click',async()=>{help.textContent=await enableDeviceAlerts()});
- emailToggle.addEventListener('change',async()=>{
-  const selected=emailToggle.checked;
-  emailToggle.disabled=true;
-  try{
-   await saveEmailOptin(selected);
-   help.textContent=selected?'Email preference saved. Email delivery requires verified sending setup.':'Email updates turned off.';
-  }catch(e){emailToggle.checked=!selected;help.textContent=e.message}
-  finally{emailToggle.disabled=false}
- });
- document.addEventListener('visibilitychange',()=>{if(!document.hidden)scan().catch(()=>{})});
- window.addEventListener('storage',e=>{if(e.key?.startsWith('tc34_seen_'))render()});
- scan().catch(()=>{});setInterval(()=>scan().catch(()=>{}),8500);
+/* Private notification history, explicit browser permission, synchronized read watermarks. */
+(()=>{'use strict';
+const api='https://cxtytbjvdlngahytfilr.supabase.co',key='sb_publishable_AqZWjpgyZ_h6-EKwOySyGQ_0LE8bcRm';
+const isAdminPage=location.pathname.includes('/admin/'),root=document.createElement('div');root.className='tc34-notice-root';root.hidden=true;
+root.innerHTML='<button type="button" class="tc34-notice-button" aria-expanded="false" aria-controls="tc34-notice-panel">🔔 Alerts <span class="tc34-notice-badge" hidden>0</span></button><div id="tc34-notice-panel" class="tc34-notice-panel" hidden><div class="tc34-notice-top"><strong>Notifications</strong><button type="button" class="tc34-notice-close" aria-label="Close notifications">✕</button></div><p class="tc34-notice-sub">Private account updates. A request is not proof of payment.</p><ul class="tc34-notice-list"></ul><button type="button" class="tc34-older">Older notifications</button><div class="tc34-notice-bottom"><button type="button" class="tc34-notice-permission">Enable device alerts while site is open</button><button type="button" class="tc34-background">Enable background alerts</button><button type="button" class="tc34-disable-push">Disable background alerts</button><label class="tc35-email-pref"><input type="checkbox" class="tc35-email-toggle"> Email notifications (opt-in)</label><span class="tc34-notice-help" role="status"></span></div></div>';
+const host=isAdminPage?document.querySelector('header'):(document.querySelector('.topbar .navtools')||document.querySelector('#store-screen .tc-native-navtools'));if(!host)return;host.append(root);
+const $=s=>root.querySelector(s),trigger=$('.tc34-notice-button'),panel=$('.tc34-notice-panel'),badge=$('.tc34-notice-badge'),list=$('.tc34-notice-list'),help=$('.tc34-notice-help'),emailToggle=$('.tc35-email-toggle'),older=$('.tc34-older');
+const remembered=()=>window.TrisoAuth?.read?.();let owner=null,rows=[],latest=0,known=0,booted=false,fetching=false,generation=0,seen=0,unread=0,hasMore=false,prefs={},legacy=false,channel=null,pushCleanup=Promise.resolve();
+async function request(path,body){const session=remembered();if(!session?.access_token)throw Error('Sign in to view notifications');const r=await fetch(api+'/rest/v1/'+path,{method:body===undefined?'GET':'POST',headers:{apikey:key,Authorization:'Bearer '+session.access_token,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(15000)});const d=await r.json().catch(()=>null);if(!r.ok)throw Object.assign(Error(d?.message||'Notifications unavailable'),{code:d?.code,status:r.status});return d}
+const rpc=(name,body={})=>request('rpc/'+name,body);
+async function readEmailOptin(){const session=remembered();if(!session?.user)return false;const data=await request('market_alert_preferences?select=*&user_id=eq.'+session.user.id);if(remembered()?.user?.id===session.user.id)prefs=data[0]||{};return data[0]?.email_enabled===true}
+async function preference(values){const who=remembered()?.user?.id;if(!who)throw Error('Sign in first');await request('market_alert_preferences?on_conflict=user_id',{user_id:who,language:['en','fa','ar'].includes(document.documentElement.lang)?document.documentElement.lang:'en',...values});if(owner===who)prefs={...prefs,...values}}
+async function saveEmailOptin(enabled){const who=owner;await preference({email_enabled:!!enabled});if(owner!==who)throw Error('Account changed');emailToggle.checked=!!enabled;return true}
+async function enableDeviceAlerts(){const who=owner;if(!('Notification' in window)||!window.isSecureContext)return 'This browser cannot show device alerts here. In-site alerts still work.';if(Notification.permission==='denied')return 'Device alerts are blocked in your browser settings.';const permission=Notification.permission==='granted'?'granted':await Notification.requestPermission();if(permission!=='granted')return 'In-site alerts remain available.';if(owner!==who)throw Error('Account changed');await preference({browser_enabled:true});return 'Foreground device alerts enabled.'}
+window.TrisoNotifications={readEmailOptin,saveEmailOptin,enableDeviceAlerts};
+function since(){try{return Number(localStorage.getItem('tc34_seen_'+owner))||0}catch{return 0}}
+function saveSeen(n){try{localStorage.setItem('tc34_seen_'+owner,String(n))}catch{}}
+function href(row){if(row.support_id)return (location.pathname.includes('/preview/')?'/preview/help/':'/help/')+'?ticket='+encodeURIComponent(row.support_id);if(isAdminPage)return row.kind==='message'?'#tc18-chat-list':'#phase1-order-center';return (location.pathname.includes('/preview/')?'/preview/marketplace.html':'/marketplace.html')+(row.kind==='message'?'#inbox':'#purchase-requests-wrap')}
+function render(){badge.hidden=!unread;badge.textContent=unread>99?'99+':String(unread);list.replaceChildren();if(!rows.length){const li=document.createElement('li');li.textContent='No notifications yet.';list.append(li)}for(const row of rows){const li=document.createElement('li'),a=document.createElement('a'),title=document.createElement('strong'),detail=document.createElement('span');a.className='tc34-notice-link';a.href=href(row);if(Number(row.id)>seen)a.classList.add('tc34-new');title.textContent=row.title;detail.textContent=(row.listing_id?'Listing #'+row.listing_id+' · ':'')+new Date(row.created_at).toLocaleString();a.append(title,detail);li.append(a);list.append(li)}older.hidden=!hasMore}
+async function pop(item){if(!prefs.browser_enabled||!('Notification' in window)||Notification.permission!=='granted'||document.hidden)return;
+ // No personal message contents, seller identifiers or payment instructions are exposed.
+ const who=owner,show=()=>{if(owner!==who)return;const k='tc34_popup_'+who;try{if(Number(localStorage.getItem(k))>=Number(item.id))return;localStorage.setItem(k,String(item.id));const n=new Notification('TRISOCMD update',{body:'Open TRISOCMD to view your update.',tag:'triso-notice-'+item.id});n.onclick=()=>{window.focus();n.close()}}catch{}};
+ if(navigator.locks)await navigator.locks.request('triso-notifications-'+who,show);else show();
+}
+function reset(){if(owner&&navigator.serviceWorker)pushCleanup=pushCleanup.then(async()=>{const r=await navigator.serviceWorker.getRegistration('/');const sub=await r?.pushManager.getSubscription();if(sub)await sub.unsubscribe()}).catch(()=>{});generation++;root.hidden=false;owner=null;rows=[];known=latest=seen=unread=0;booted=false;fetching=false;prefs={};panel.hidden=true;trigger.setAttribute('aria-expanded','false');emailToggle.checked=false;emailToggle.disabled=true;help.textContent='Sign in to view notifications.';render();if(channel){window.__trisoNoticeRealtime?.removeChannel(channel).catch(()=>{});channel=null}}
+async function mark(){const who=owner,id=latest;if(!who||!id)return;try{if(!legacy)await rpc('notification_read',{p_id:id});if(owner!==who)return;seen=Math.max(seen,id);saveSeen(seen);unread=rows.filter(r=>Number(r.id)>seen).length;render()}catch(error){if(owner===who)help.textContent='Read status could not synchronize. Retry when online.'}}
+async function scan(before=null){const session=remembered();if(!session?.user){if(owner)reset();return}if(owner!==session.user.id){reset();owner=session.user.id;emailToggle.disabled=false;readEmailOptin().then(v=>{if(owner===session.user.id){emailToggle.checked=v;$('.tc34-notice-permission').textContent=prefs.browser_enabled?'Disable foreground device alerts':'Enable device alerts while site is open'}}).catch(()=>{});connect()}
+ if(fetching||document.hidden)return;const stamp=generation,who=owner;fetching=true;
+ try{let data;try{data=await rpc('notification_page',{p_before:before,p_limit:40});legacy=false}catch(error){if(error.code!=='PGRST202')throw error;const items=await request('market_notifications?select=id,kind,title,listing_id,request_id,conversation_id,created_at&order=id.desc&limit=40'+(before?'&id=lt.'+before:''));legacy=true;data={items,last_read_id:since(),unread:items.filter(r=>Number(r.id)>since()).length}}
+ if(stamp!==generation||remembered()?.user?.id!==who)return;const items=data.items||[];hasMore=items.length===40;rows=before?[...rows,...items]:items;seen=Number(data.last_read_id)||0;unread=Number(data.unread)||0;latest=rows.reduce((n,r)=>Math.max(n,Number(r.id)),0);
+ if(booted&&!before&&latest>known)rows.filter(r=>Number(r.id)>known).slice(0,2).reverse().forEach(pop);known=Math.max(known,latest);booted=true;render();if(!panel.hidden)await mark();help.textContent=legacy?'Read synchronization is unavailable; history uses this device.':'';
+ }catch(error){if(stamp===generation){if([401,403].includes(error.status)){rows=[];unread=0;render()}help.textContent=error.message;if(!booted)list.textContent='Notifications unavailable. Retry when online.'}}finally{if(stamp===generation)fetching=false}}
+function connect(){if(!window.supabase?.createClient)return;try{const client=window.__trisoNoticeRealtime||(window.__trisoNoticeRealtime=window.supabase.createClient(api,key,{auth:{persistSession:false,autoRefreshToken:false}}));client.realtime.setAuth(remembered().access_token);channel=client.channel('triso-alerts-'+owner).on('postgres_changes',{event:'INSERT',schema:'public',table:'market_notifications'},()=>scan()).on('postgres_changes',{event:'*',schema:'public',table:'market_notification_reads'},()=>scan()).subscribe(state=>{if(state==='SUBSCRIBED')scan()})}catch{}}
+async function pushEnabled(){const r=await fetch(api+'/functions/v1/delivery-worker',{headers:{apikey:key},signal:AbortSignal.timeout(10000)});if(!r.ok)throw Error('Background delivery is not configured');const d=await r.json();if(!d.push_enabled||!d.push_public_key)throw Error('Background delivery is not configured');return d}
+$('.tc34-background').onclick=async()=>{const who=owner;try{if(!owner||!('serviceWorker' in navigator)||!('PushManager' in window))throw Error('Sign in with a supported secure browser');await pushCleanup;const config=await pushEnabled();if(Notification.permission!=='granted'&&await Notification.requestPermission()!=='granted')throw Error('Browser permission was not granted');const registration=await navigator.serviceWorker.register('/sw-notifications.js',{scope:'/'});await navigator.serviceWorker.ready;const bytes=Uint8Array.from(atob(config.push_public_key.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0));const subscription=await registration.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:bytes});if(owner!==who){await subscription.unsubscribe();throw Error('Account changed')}const value=subscription.toJSON();await rpc('push_register',{p_endpoint:value.endpoint,p_p256dh:value.keys.p256dh,p_auth:value.keys.auth});if(owner!==who)throw Error('Account changed');await preference({push_enabled:true});help.textContent='Background alert subscription saved. Delivery depends on the configured backend.'}catch(error){help.textContent=error.message}};
+$('.tc34-disable-push').onclick=async()=>{try{const registration=await navigator.serviceWorker?.getRegistration('/');const s=await registration?.pushManager.getSubscription();if(s){await rpc('push_remove',{p_endpoint:s.endpoint});await s.unsubscribe()}await preference({push_enabled:false});help.textContent='Background alerts disabled.'}catch(error){help.textContent=error.message}};
+trigger.onclick=async()=>{panel.hidden=!panel.hidden;trigger.setAttribute('aria-expanded',String(!panel.hidden));if(!panel.hidden){await mark();render();scan()}};
+$('.tc34-notice-close').onclick=()=>{panel.hidden=true;trigger.setAttribute('aria-expanded','false')};$('.tc34-notice-permission').onclick=async()=>{try{if(prefs.browser_enabled){await preference({browser_enabled:false});help.textContent='Foreground device alerts disabled.'}else help.textContent=await enableDeviceAlerts();$('.tc34-notice-permission').textContent=prefs.browser_enabled?'Disable foreground device alerts':'Enable device alerts while site is open'}catch(error){help.textContent=error.message}};
+emailToggle.onchange=async()=>{const enabled=emailToggle.checked,stamp=generation;emailToggle.disabled=true;try{await saveEmailOptin(enabled);if(stamp===generation)help.textContent=enabled?'Email preference saved; delivery requires verified sender configuration.':'Email updates disabled.'}catch(error){if(stamp===generation){emailToggle.checked=!enabled;help.textContent=error.message}}finally{if(stamp===generation)emailToggle.disabled=false}};
+older.onclick=()=>scan(rows.at(-1)?.id);document.addEventListener('visibilitychange',()=>{if(!document.hidden)scan()});window.addEventListener('storage',event=>{if(event.key===window.TrisoAuth?.key){reset();scan()}else if(event.key?.startsWith('tc34_seen_'))scan()});
+setInterval(()=>{if((remembered()?.user?.id||null)!==owner){reset();scan()}},1000);scan();setInterval(()=>scan(),8500);
 })();

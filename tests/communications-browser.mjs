@@ -1,0 +1,45 @@
+import {chromium} from 'playwright';import assert from 'node:assert/strict';
+const base=process.env.TRISO_TEST_BASE||'http://127.0.0.1:8765',api='https://cxtytbjvdlngahytfilr.supabase.co',buyer='00000000-0000-4000-8000-000000000001',staff='00000000-0000-4000-8000-000000000002',other='00000000-0000-4000-8000-000000000003';
+const browser=await chromium.launch({executablePath:process.env.TRISO_CHROMIUM_PATH||undefined,args:['--no-sandbox']});
+const cors={'access-control-allow-origin':'*','access-control-allow-headers':'*','access-control-allow-methods':'*'};
+try{
+ const context=await browser.newContext();const errors=[],createKeys=[];let read=0,failCreate=true,preferences={email_enabled:false,browser_enabled:false},tickets=[],replies=[];
+ const notices=[{id:1,kind:'support_reply',title:'Private support update',created_at:'2026-01-01',support_id:'11111111-1111-4111-8111-111111111111'}];
+ context.on('page',p=>p.on('pageerror',e=>errors.push(e.message)));
+ await context.addInitScript(({buyer})=>{if(location.hostname!=='127.0.0.1')return;localStorage.setItem('tc35_auth_session',JSON.stringify({access_token:'buyer-token',refresh_token:'mock',expires_at:Date.now()/1000+3600,user:{id:buyer,email:'fixture@example.test'}}));window.__notices=[];window.supabase={createClient:()=>({realtime:{setAuth(){}},channel:()=>({on(){return this},subscribe(fn){window.__reconnect=fn;return this}}),removeChannel:async()=>{}})};window.Notification=class{static permission='granted';static async requestPermission(){return 'granted'}constructor(title,options){window.__notices.push({title,...options})}close(){}}},{buyer});
+ await context.route('**/*',async route=>{
+  const r=route.request(),u=new URL(r.url());if(u.origin===new URL(base).origin)return route.continue();if(u.origin!==api)return route.abort();if(r.method()==='OPTIONS')return route.fulfill({status:204,headers:cors});
+  const token=r.headers().authorization||'',isBuyer=token.includes('buyer-token'),isStaff=token.includes('staff-token');let data=[],status=200;
+  if(u.pathname.endsWith('/rpc/notification_page')){const p=r.postDataJSON();const items=isBuyer?notices.filter(n=>!p.p_before||n.id<p.p_before):[];data={items,last_read_id:read,unread:isBuyer?notices.filter(n=>n.id>read).length:0}}
+  if(u.pathname.endsWith('/rpc/notification_read')){read=Math.max(read,r.postDataJSON().p_id);data=null}
+  if(u.pathname.endsWith('/market_alert_preferences')){if(r.method()==='POST'){preferences={...preferences,...r.postDataJSON()};data=null}else data=[preferences]}
+  if(u.pathname.endsWith('/rpc/market_browse_page'))data={items:[],has_more:false};
+  if(u.pathname.endsWith('/rpc/is_admin'))data=false;
+  if(u.pathname.endsWith('/rpc/support_is_staff'))data=isStaff;
+  if(u.pathname.endsWith('/tc42_support_threads'))data=isBuyer||isStaff?tickets:[];
+  if(u.pathname.endsWith('/rpc/support_create')){const p=r.postDataJSON();createKeys.push(p.p_key);if(!tickets.length){tickets=[{id:'11111111-1111-4111-8111-111111111111',subject:p.p_subject,status:'open',customer_id:buyer,updated_at:'2026-01-01'}];replies=[{id:1,sender_id:buyer,body:p.p_body}]}
+   if(failCreate){failCreate=false;status=503;data={message:'Uncertain network result'}}else data=tickets[0].id;
+  }
+  if(u.pathname.endsWith('/rpc/support_history'))data=isBuyer||isStaff?[...replies].reverse():[];
+  if(u.pathname.endsWith('/rpc/support_reply')){const p=r.postDataJSON();replies.push({id:replies.length+1,sender_id:isStaff?staff:buyer,body:p.p_body});data=replies.length}
+  if(u.pathname.endsWith('/rpc/support_manage')){tickets[0].status=r.postDataJSON().p_status;tickets[0].assigned_to=r.postDataJSON().p_assignee;data=null}
+  if(u.pathname.endsWith('/functions/v1/delivery-worker'))data={push_enabled:false,email_enabled:false};
+  return route.fulfill({status,headers:cors,contentType:'application/json',body:JSON.stringify(data)});
+ });
+ const page=await context.newPage();page.setDefaultTimeout(12000);await page.goto(base+'/marketplace.html');await page.locator('.tc34-notice-badge:visible').waitFor();
+ await page.locator('.tc34-notice-button').click();await page.locator('.tc34-notice-badge').waitFor({state:'hidden'});assert.equal(read,1);
+ await page.locator('.tc34-notice-permission').click();await page.locator('.tc34-notice-help').filter({hasText:'Foreground device alerts enabled'}).waitFor();assert(preferences.browser_enabled);await page.locator('.tc34-notice-permission').click();await page.locator('.tc34-notice-help').filter({hasText:'Foreground device alerts disabled'}).waitFor();assert.equal(preferences.browser_enabled,false);await page.locator('.tc34-notice-permission').click();await page.locator('.tc34-notice-help').filter({hasText:'Foreground device alerts enabled'}).waitFor();
+ await page.locator('.tc34-background').click();await page.locator('.tc34-notice-help').filter({hasText:'Background delivery is not configured'}).waitFor();
+ await page.locator('.tc34-notice-close').click();notices.push({id:2,kind:'support_reply',title:'Private new reply',created_at:'2026-01-02'});await page.evaluate(()=>{window.__reconnect('CHANNEL_ERROR');window.__reconnect('SUBSCRIBED')});await page.waitForFunction(()=>window.__notices.length===1);assert.equal((await page.evaluate(()=>window.__notices))[0].body,'Open TRISOCMD to view your update.');
+ const second=await context.newPage();await second.goto(base+'/marketplace.html');await second.locator('.tc34-notice-badge:visible').waitFor();await second.locator('.tc34-notice-button').click();await second.locator('.tc34-notice-badge').waitFor({state:'hidden'});assert.equal(read,2);
+ await page.bringToFront();await page.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await page.locator('.tc34-notice-badge').waitFor({state:'hidden'});
+ console.log('PASS server read synchronization across tabs, permission opt-in, generic foreground alerts and disabled unconfigured push');
+ await page.goto(base+'/help/');const support=page.locator('#triso-support-module');await support.getByLabel('Subject',{exact:true}).fill('Customer question');await support.getByLabel('Message',{exact:true}).fill('Private customer message');await page.evaluate(()=>window.dispatchEvent(new StorageEvent('storage',{key:'tc34_seen_fixture',newValue:'1'})));assert.equal(await support.getByLabel('Message',{exact:true}).inputValue(),'Private customer message');await support.getByRole('button',{name:'Open ticket',exact:true}).click();await support.getByText('Uncertain network result',{exact:true}).waitFor();assert.equal(await support.getByLabel('Message',{exact:true}).inputValue(),'Private customer message');
+ await support.getByRole('button',{name:'Open ticket',exact:true}).click();await support.getByText('Ticket saved. No payment or refund was processed.',{exact:true}).waitFor();assert.equal(createKeys[0],createKeys[1]);assert.equal(tickets.length,1);
+ await support.getByLabel('Reply',{exact:true}).fill('Customer reply');await support.getByRole('button',{name:'Send reply',exact:true}).click();await support.getByText('Customer: Customer reply',{exact:true}).waitFor();
+ for(const language of ['fa','ar']){await page.setViewportSize({width:390,height:850});await page.evaluate(lang=>{document.documentElement.lang=lang;document.documentElement.dir='rtl'},language);assert(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)<=5)}
+ await page.evaluate(({staff})=>{window.TrisoAuth.write({access_token:'staff-token',refresh_token:'mock-staff',expires_at:Date.now()/1000+3600,user:{id:staff}},true);window.dispatchEvent(new Event('storage'))},{staff});await support.getByRole('button',{name:'Refresh support',exact:true}).click();await support.getByRole('button',{name:'Customer question · open',exact:true}).click();await support.getByLabel('Ticket status',{exact:true}).selectOption('resolved');await support.getByLabel('Assigned staff UUID',{exact:true}).fill(staff);await support.getByRole('button',{name:'Save ticket status',exact:true}).click();await support.getByRole('button',{name:'Customer question · resolved',exact:true}).waitFor();assert.equal(tickets[0].assigned_to,staff);
+ await page.evaluate(({other})=>{window.TrisoAuth.write({access_token:'other-token',refresh_token:'mock-other',expires_at:Date.now()/1000+3600,user:{id:other}},true);window.dispatchEvent(new Event('storage'))},{other});await page.waitForFunction(()=>!document.querySelector('#triso-support-module').textContent.includes('Private customer message'));assert.equal(await support.getByLabel('Subject',{exact:true}).inputValue(),'');assert.deepEqual(errors,[]);
+ console.log('PASS idempotent ticket retries, retained network-failure draft, replies, staff assignment/status, private-view clearing and mobile FA/AR RTL');
+ await context.close();
+}finally{await browser.close()}

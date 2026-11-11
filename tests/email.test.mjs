@@ -18,3 +18,10 @@ test('provider failure queues retry without claiming delivery',async()=>{
  const result=await processEmailBatch({enabled:true,senderVerified:true,from:'support@trisocmd.shop',store:{lease:async()=>[{id:1,lease:'a',kind:'order',url:'https://trisocmd.shop/'}],retry:async()=>retry++,sent:async()=>assert.fail('must not mark sent')},send:async()=>{throw Error('offline')}});
  assert.equal(result.sent,0);assert.equal(retry,1);
 });
+test('recipient is refreshed under the current lease before optional delivery',async()=>{
+ let target;await processEmailBatch({enabled:true,senderVerified:true,from:'support@trisocmd.shop',store:{lease:async()=>[{id:4,lease:'current',user_id:'u',optional:true,to:'stale@example.test',kind:'support_reply',url:'https://trisocmd.shop/help/'}],prepare:async()=>({to:'verified-new@example.test'}),optedIn:async()=>true,sent:async()=>{},retry:async()=>assert.fail('unexpected failure')},send:async x=>{target=x.to;return {id:'accepted'}}});assert.equal(target,'verified-new@example.test');
+});
+
+test('all buyer, seller, moderation, payment and support templates render safe dark HTML',()=>{
+ for(const kind of ['order','seller_order','payment','message','listing_pending','listing_approved','listing_declined','support_reply','cancelled','disputed']){const r=renderEmail({kind,message:'Update <private>',url:'https://trisocmd.shop/help/',language:'ar'});assert(r.subject);assert(r.html.includes('background:#09090f'));assert(r.html.includes('dir="rtl"'));assert(!r.html.includes('<private>'))}
+});

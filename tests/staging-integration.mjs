@@ -16,7 +16,7 @@ const loopback=url=>{if(!['127.0.0.1','localhost','[::1]'].includes(new URL(url)
 if(local){loopback(local.DB_URL);loopback(local.API_URL)}
 const dir=await mkdtemp(tmpdir()+'/triso-staging-');
 const embedded=local?null:new EmbeddedPostgres({databaseDir:dir+'/db',port:Number(process.env.TRISO_TEST_DB_PORT||15441),user:'postgres',password:'test-only',persistent:false,onLog:()=>{},onError:()=>{}});
-let db,count=0;const identities={};const names=['buyer','seller','other','admin'];
+let db,count=0;const identities={};const names=['buyer','seller','other','admin','support'];
 const one=async(c,sql,args=[])=>Object.values((await c.query(sql,args)).rows[0])[0];
 async function check(name,fn){await fn();count++;console.log('PASS '+name)}
 async function as(name,fn,claims={}){
@@ -50,21 +50,22 @@ try{
  for(const name of names){
   if(local){
    const password=crypto.randomUUID()+'aA1!';const email=name+'@integration.example.test';
-   const created=await api('/auth/v1/admin/users',{service:true,body:{email,password,email_confirm:true,app_metadata:name==='admin'?{role:'admin'}:{}}});
+   const created=await api('/auth/v1/admin/users',{service:true,body:{email,password,email_confirm:true,app_metadata:name==='admin'?{role:'admin'}:name==='support'?{role:'support'}:{}}});
    const session=await api('/auth/v1/token?grant_type=password',{body:{email,password}});
    const claims=JSON.parse(Buffer.from(session.access_token.split('.')[1],'base64url').toString());
    identities[name]={id:created.id,session:claims.session_id,token:session.access_token,app_metadata:created.app_metadata};
   }else{
-   const id=crypto.randomUUID(),session=crypto.randomUUID();const app_metadata=name==='admin'?{role:'admin'}:{};
+   const id=crypto.randomUUID(),session=crypto.randomUUID();const app_metadata=name==='admin'?{role:'admin'}:name==='support'?{role:'support'}:{};
    identities[name]={id,session,app_metadata};await db.query('insert into auth.users(id,raw_app_meta_data) values($1,$2)',[id,app_metadata]);await db.query('insert into auth.sessions(id,user_id) values($1,$2)',[session,id]);
   }
  }
  if(local)await db.query("insert into storage.buckets(id,name,public) values('market-gallery','market-gallery',false)");
+ await db.query("insert into support_tickets(user_id,subject,message) values($1,'Legacy ticket',$2)",[identities.buyer.id,'x'.repeat(3000)]);
  // Seed historical rows before migrating, verifying preservation afterward.
  const historic=await one(db,"insert into tc42_orders(customer_id,total_amount,items) values($1,8,'[{\"id\":1,\"qty\":1}]') returning id",[identities.buyer.id]);
  const history=await one(db,"insert into orders(user_id,total_amount) values($1,8) returning id",[identities.buyer.id]);
  await check('apply all pending migrations without discarding historical orders',async()=>{
-  for(const file of ['20261108214609_phase1_checkout.sql','20261110201622_marketplace_browse_page.sql','20261110204751_staging_integration_authorization.sql','20261111181536_marketplace_workflows.sql'])await db.query(await readFile(new URL('../supabase/migrations/'+file,import.meta.url),'utf8'));
+  for(const file of ['20261108214609_phase1_checkout.sql','20261110201622_marketplace_browse_page.sql','20261110204751_staging_integration_authorization.sql','20261111181536_marketplace_workflows.sql','20261111185818_notifications_email_support.sql'])await db.query(await readFile(new URL('../supabase/migrations/'+file,import.meta.url),'utf8'));
   assert.equal(await one(db,'select total_amount from tc42_orders where id=$1',[historic]),'8.00');assert.equal(await one(db,'select total_amount from orders where id=$1',[history]),'8.00');
  });
  await db.query("insert into products(id,title,price,stock,status) values(1,'Integration product',25.50,30,'available'),(2,'Last product',10,1,'available')");
@@ -187,6 +188,7 @@ try{
   });
  }
  await (await import('./marketplace-workflow-cases.mjs')).marketplaceCases({db,as,one,check,identities,local,api,rpc});
+ await (await import('./communications-cases.mjs')).communicationsCases({db,as,one,check,identities,local,api,rpc});
  await check('expired, banned and deleted identities cannot retain private permissions',async()=>{
   await db.query("update auth.sessions set not_after=now()-interval '1 second' where id=$1",[identities.other.session]);
   assert.equal(await as('other',c=>one(c,'select triso_active_user()')),false);

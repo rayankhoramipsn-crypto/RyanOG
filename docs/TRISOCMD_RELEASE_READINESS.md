@@ -42,3 +42,7 @@ The 20-scenario real local Supabase Auth/JWT/REST run passes on PostgreSQL 17.11
 ## Marketplace/admin continuation
 
 See TRISOCMD_MARKETPLACE_VERIFICATION.md for the fourth unapplied migration and local workflow evidence. Validation now includes owner edits/profiles, cross-seller history, Pro expiry, binary Storage checks, terminal intake synchronization, seller fulfillment and bounded/idempotent chat. CI includes full regressions and a fresh local Supabase JWT/Storage job. Hosted rollout/live realtime/Firefox acceptance remains pending.
+
+## Communications continuation
+
+See TRISOCMD_COMMUNICATIONS_VERIFICATION.md for the fifth additive migration, canonical support reconciliation, delivery controls and exact external prerequisites. Current isolated validation: 50 Node, 78 PostgreSQL, 56 Python, six Chromium suites, four Deno entrypoints and 17 dedicated native communications scenarios. Live email/push remain disabled and unverified; authorized hosted rollout, sender/domain/secrets, scheduler, VAPID and real-device acceptance remain required.
