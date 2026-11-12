@@ -8,6 +8,9 @@ UNION ALL SELECT 'functions',count(*),md5(string_agg(p.proname||':'||pg_get_func
 SELECT count(*) AS public_tables_without_rls FROM pg_tables WHERE schemaname='public' AND NOT rowsecurity;
 SELECT count(*) AS orders_with_missing_auth FROM public.tc42_orders o WHERE NOT EXISTS(SELECT 1 FROM auth.users u WHERE u.id=o.customer_id);
 SELECT count(*) AS listings_with_missing_auth FROM public.market_listings l WHERE NOT EXISTS(SELECT 1 FROM auth.users u WHERE u.id=l.seller_id);
+SELECT count(*) AS support_threads_with_missing_auth FROM public.tc42_support_threads t WHERE NOT EXISTS(SELECT 1 FROM auth.users u WHERE u.id=t.customer_id);
+SELECT count(*) AS legacy_tickets_with_missing_auth FROM public.support_tickets t WHERE NOT EXISTS(SELECT 1 FROM auth.users u WHERE u.id=t.user_id);
+SELECT count(*) AS empty_legacy_support FROM public.support_tickets WHERE char_length(trim(subject))=0 OR char_length(trim(message))=0;
 SELECT count(*) AS cross_system_duplicate_txids FROM public.store_crypto_invoice i JOIN public.market_txid_claims c ON lower(i.txid)=lower(c.txid);
 SELECT pubname,tablename FROM pg_publication_tables WHERE schemaname='public' ORDER BY pubname,tablename;
 SELECT id,public,file_size_limit,allowed_mime_types FROM storage.buckets ORDER BY id;

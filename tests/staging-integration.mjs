@@ -3,6 +3,7 @@
 // TRISO_INTEGRATION_CONFIG: a disposable local Supabase CLI status JSON file;
 // this runs real Auth/JWT/REST workflows too. Never accepts a remote hostname.
 import EmbeddedPostgres from 'embedded-postgres';
+import {migrationPayload} from '../scripts/prepare-staging-rollout.mjs';
 import pg from 'pg';
 import {createStoreHandler} from '../supabase/functions/_shared/store-handler.mjs';
 import assert from 'node:assert/strict';
@@ -68,9 +69,9 @@ try{
  // Seed historical rows before migrating, verifying preservation afterward.
  const historic=await one(db,"insert into tc42_orders(customer_id,total_amount,items) values($1,8,'[{\"id\":1,\"qty\":1}]') returning id",[identities.buyer.id]);
  const history=await one(db,"insert into orders(user_id,total_amount) values($1,8) returning id",[identities.buyer.id]);
- await check('all six migrations roll back atomically without changing baseline history',async()=>{
+ await check('all six prepared migration payloads roll back atomically without changing baseline history',async()=>{
   await db.query('begin');
-  try{for(const file of ['20261108214609_phase1_checkout.sql','20261110201622_marketplace_browse_page.sql','20261110204751_staging_integration_authorization.sql','20261111181536_marketplace_workflows.sql','20261111185818_notifications_email_support.sql','20261111200640_storefront_content.sql']){const source=await readFile(new URL('../supabase/migrations/'+file,import.meta.url),'utf8');await db.query(source.replace(/^BEGIN;$/m,'').replace(/^COMMIT;$/m,''))}assert(await one(db,"select exists(select 1 from information_schema.columns where table_schema='public' and table_name='products' and column_name='description_fa')"))}finally{await db.query('rollback')}
+  try{for(const file of ['20261108214609_phase1_checkout.sql','20261110201622_marketplace_browse_page.sql','20261110204751_staging_integration_authorization.sql','20261111181536_marketplace_workflows.sql','20261111185818_notifications_email_support.sql','20261111200640_storefront_content.sql']){const source=await readFile(new URL('../supabase/migrations/'+file,import.meta.url),'utf8');await db.query(migrationPayload(file,source).query)}assert(await one(db,"select exists(select 1 from information_schema.columns where table_schema='public' and table_name='products' and column_name='description_fa')"))}finally{await db.query('rollback')}
   assert.equal(await one(db,"select count(*)::int from pg_tables where schemaname='public'"),27);assert.equal(await one(db,"select count(*)::int from pg_policies where schemaname='public'"),56);assert.equal(await one(db,'select total_amount from tc42_orders where id=$1',[historic]),'8.00');assert.equal(await one(db,"select to_regprocedure('public.triso_active_user()') is null"),true);
  });
  await check('apply all pending migrations without discarding historical orders',async()=>{

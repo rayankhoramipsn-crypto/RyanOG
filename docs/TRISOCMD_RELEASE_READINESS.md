@@ -36,7 +36,7 @@ Hosted security advisors still report intended public/authenticated SECURITY DEF
 ## Exact rollout order — instructions only, approval required
 
 1. **Confirm the target.** Run `docs/release-preflight.sql` read-only and inspect hosted migration history. Obtain backups/restore evidence including Auth, Storage metadata/objects and financial/support history. Stop if fingerprints/identity checks drift. These are staging-compatible migrations; do not apply them to the separate production project's different schema/Auth topology.
-2. **Preserve existing migration history.** The repository contains six feature files, not the hosted 25-entry foundation history. Do not blindly run `db push`, `db reset` or migration-history repair. In an approved staging change, use Supabase's hosted `apply_migration` with each complete file as its query/name, in the following order; verify each history entry before proceeding:
+2. **Preserve existing migration history.** The repository contains six feature files, not the hosted 25-entry foundation history. Do not blindly run `db push`, `db reset` or migration-history repair. In an approved staging change, use Supabase's hosted `apply_migration` using the frozen JSON payloads from `scripts/prepare-staging-rollout.mjs`, in the following order; verify each history entry before proceeding. The payload omits only outer transaction wrappers, lets the tool own its transaction, and records the source version/name; retain the returned hosted-version mapping. See TRISOCMD_STAGING_PREFLIGHT.md for the backup gate and exact commands:
 
 | Order | Migration |
 |---:|---|
@@ -65,3 +65,7 @@ After a committed rollout, preserve additive schema and hardened policies. Roll 
 - Hosted six-migration/Edge/frontend rollout and real staging acceptance require authorization. Separate production schema/Auth reconciliation and target selection remain unresolved.
 - No independently verified live crypto provider, PayPal integration, Resend sender/delivery, Web Push, scheduler, Google OAuth or hosted email/realtime operation. Their exact prerequisites are in the external-dependencies document.
 - Actual reviewed product media/specifications and published articles are absent from the staging snapshot (three products, including demos; no published articles). No production catalog, indexing, full device/browser or field-performance acceptance is claimed. Firefox remains download-policy blocked.
+
+## Hosted staging preparation
+
+See TRISOCMD_STAGING_PREFLIGHT.md (2026-11-12). Read-only fingerprints/history/identities and existing records pass; current Free-plan backup/PITR availability and a hosted-data restore are unverified. The CLI backup inventory is blocked by missing scoped credentials. Structural compatibility is not clearance for hosted writes. A tested, checksum-pinned local packet generator prepares six transaction-safe migration payloads and four Edge bundles without executing them.
