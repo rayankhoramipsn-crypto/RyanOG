@@ -1,0 +1,58 @@
+{
+  "posts": [],
+  "version": 1,
+  "products": [
+    {
+      "id": 1,
+      "slug": null,
+      "media": [],
+      "price": 25,
+      "specs": [],
+      "stock": 10,
+      "title": "DEMO · Digital Gift Card",
+      "status": "available",
+      "category": "Digital Goods",
+      "image_url": null,
+      "seo_title": null,
+      "updated_at": "2026-10-23T14:10:06.63236+00:00",
+      "description": "Preview-only sample listing. Not available for real purchase.",
+      "description_ar": null,
+      "seo_description": null
+    },
+    {
+      "id": 2,
+      "slug": null,
+      "media": [],
+      "price": 59,
+      "specs": [],
+      "stock": 10,
+      "title": "DEMO · Mechanical Keyboard",
+      "status": "available",
+      "category": "Gaming Accessories",
+      "image_url": null,
+      "seo_title": null,
+      "updated_at": "2026-10-23T14:10:06.63236+00:00",
+      "description": "Preview-only sample listing. Not available for real purchase.",
+      "description_ar": null,
+      "seo_description": null
+    },
+    {
+      "id": 5,
+      "slug": null,
+      "media": [],
+      "price": 0.25,
+      "specs": [],
+      "stock": 1,
+      "title": "ننت",
+      "status": "available",
+      "category": "1",
+      "image_url": null,
+      "seo_title": null,
+      "updated_at": "2026-11-04T16:45:39.919318+00:00",
+      "description": "",
+      "description_ar": "",
+      "seo_description": null
+    }
+  ],
+  "source": "staging public CMS cxtytbjvdlngahytfilr (read-only)"
+}

@@ -11,7 +11,8 @@
 <link rel="icon" type="image/svg+xml" href="../assets/trisocmd-icon.svg">
 <link rel="alternate icon" type="image/png" sizes="64x64" href="../assets/trisocmd-icon-64.png">
 <link rel="apple-touch-icon" sizes="180x180" href="../assets/trisocmd-apple-touch.png">
-</head>
+<link rel="stylesheet" href="../assets/phase1-orders.css">
+<link rel="stylesheet" href="../assets/triso-support.css"></head>
 <body>
 <header class="topbar">
  <div class="container nav">
@@ -68,7 +69,7 @@
    </aside>
    <div>
      <div class="search-row">
-       <div class="search-box"><input id="search" type="search" autocomplete="off" aria-label="Search listings" placeholder="Search accounts, games, gear..."></div>
+       <div class="search-box"><input id="search" maxlength="200" type="search" autocomplete="off" aria-label="Search listings" placeholder="Search accounts, games, gear..."></div>
        <label for="sort" class="fine">Sort</label>
        <select id="sort" aria-label="Sort listings">
          <option value="new">Recommended / Newest</option>
@@ -76,8 +77,14 @@
          <option value="high">Price: high to low</option>
        </select>
      </div>
+     <div class="price-filters">
+       <label><span data-t="minPrice">Minimum price (USD)</span><input id="price-min" type="number" min="0" step="0.01" inputmode="decimal"></label>
+       <label><span data-t="maxPrice">Maximum price (USD)</span><input id="price-max" type="number" min="0" step="0.01" inputmode="decimal"></label>
+     </div>
+     <p id="browse-status" class="fine" role="status"></p>
      <div class="results-top"><h2>THE MARKET.</h2><span id="count" role="status">Loading listings…</span></div>
      <div id="cards" class="cards" aria-live="polite"><div class="empty">Loading approved offers…</div></div>
+     <nav class="browse-pages" aria-label="Listing pages"><button id="browse-prev" data-t="previous" class="btn" type="button" disabled>Previous</button><button id="browse-next" data-t="next" class="btn" type="button" disabled>Next</button></nav>
    </div>
  </div>
  <div class="container">
@@ -96,7 +103,7 @@
      <div class="section-box">
        <div class="section-heading"><h2>My listings</h2><div class="hero-actions" style="margin:0"><button id="seller-messages" class="btn small secondary" type="button">✉ Buyer messages</button><button class="btn small secondary" type="button" onclick="document.getElementById('open-sell').click()">New listing</button></div></div>
        <p class="fine">Pending listings are visible only to you and moderators; approved listings appear publicly.</p>
-       <div id="mine"></div>
+       <button id="seller-profile-edit" type="button" class="btn small" data-t="sellerProfile">Seller profile</button><div id="mine"></div>
      </div>
    </section>
    <section class="seller-section hidden" id="purchase-requests-wrap">
@@ -121,7 +128,7 @@
  <div class="dialog-content">
   <div class="detail-grid">
    <div><img id="detail-cover" class="detail-photo" alt="Listing photo"><div id="detail-placeholder" class="item-cover">No gallery photo</div><div id="thumbs" class="detail-gallery"></div></div>
-   <div><span id="detail-platform" class="eyebrow"></span><h2 id="detail-title"></h2><span class="fine" id="detail-date"></span><div class="detail-price" id="detail-price"></div>
+   <div><span id="detail-platform" class="eyebrow"></span><h2 id="detail-title"></h2><span class="fine" id="detail-date"></span><div class="detail-price" id="detail-price"></div><button id="view-seller-profile" type="button" class="btn small" data-t="sellerProfile">Seller profile</button>
       <p id="detail-desc"></p>
       <div class="secure-info">⚑ Only administrator-approved listings appear publicly. Approval does not guarantee ownership, authenticity, delivery or safety. TRISOCMD does not currently accept or hold marketplace payments.</div>
       <label class="policy-accept"><input id="accept" type="checkbox" required><span>I have read the <a href="#" onclick="event.preventDefault();document.getElementById('rules-dialog').showModal()">marketplace rules</a>. I understand that payments to sellers directly are not permitted for marketplace-managed sales; any future payment would go to the officially configured marketplace recipient, and only verified completion would permit a seller payout. The marketplace currently does not process, hold or protect funds, so I will not send money or account credentials.</span></label>
@@ -215,5 +222,8 @@
 <script src="../assets/triso-auth-storage.js?v=2"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="../assets/marketplace-v15.js?v=18"></script>
-</body>
+<script src="../assets/phase1-orders.js" defer></script><dialog id="edit-dialog"><div class="dialog-header"><h2 data-t="editListing">Edit listing</h2><button type="button" class="close" data-close="edit-dialog" aria-label="Close">×</button></div><form id="edit-form" class="dialog-content"><label>Title<input id="edit-title" required minlength="5" maxlength="120"></label><label>Category<input id="edit-platform" required minlength="2" maxlength="50"></label><label>Description<textarea id="edit-description" required minlength="20" maxlength="3000"></textarea></label><label>Price (USD)<input id="edit-price" type="number" min="1" max="1000000" step="0.01" required></label><p class="fine">Changes require administrator approval again.</p><p id="edit-status" role="alert"></p><button id="edit-save" class="btn primary">Save for review</button></form></dialog>
+<dialog id="profile-edit-dialog"><div class="dialog-header"><h2 data-t="sellerProfile">Seller profile</h2><button type="button" class="close" data-close="profile-edit-dialog" aria-label="Close">×</button></div><form id="profile-form" class="dialog-content"><label>Display name<input id="profile-name" minlength="3" maxlength="60" required></label><label>Bio<textarea id="profile-bio" maxlength="500"></textarea></label><label><input type="checkbox" id="profile-public">Show this profile with approved listings</label><p id="profile-status" role="alert"></p><button id="profile-save" class="btn primary">Save profile</button></form></dialog>
+<dialog id="profile-dialog"><div class="dialog-header"><h2 id="public-seller-name"></h2><button type="button" class="close" data-close="profile-dialog" aria-label="Close">×</button></div><div class="dialog-content"><p id="public-seller-bio"></p><span id="public-seller-pro"></span></div></dialog>
+<script src="../assets/triso-support.js" defer></script></body>
 </html>

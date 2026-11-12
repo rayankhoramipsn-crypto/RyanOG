@@ -27,7 +27,7 @@ const cors = {
  'access-control-allow-headers':'apikey,authorization,content-type,prefer,x-client-info',
  'content-type':'application/json'
 };
-const browser = await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{}),args:['--no-sandbox']});
+const browser = await chromium.launch({executablePath:process.env.TRISO_CHROMIUM_PATH||undefined,headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{}),args:['--no-sandbox']});
 const context = await browser.newContext({viewport:{width:1365,height:900},reducedMotion:'reduce'});
 const pageErrors=[];
 const failed=[];
@@ -40,9 +40,10 @@ await context.route(origin+'/**', async route=>{
  }
  const path=url.pathname;
  let result=[];
- if(path.endsWith('/rpc/market_browse'))result=fixtureListings;
+ if(path.endsWith('/rpc/market_browse_page'))result={items:fixtureListings,has_more:false};
+ else if(path.endsWith('/rpc/market_browse'))result=fixtureListings;
  else if(path.endsWith('/rpc/is_admin'))result=false;
- else if(path.endsWith('/rpc/market_inbox'))result=[];
+ else if(path.endsWith('/rpc/market_inbox_page'))result=[];
  else if(path.endsWith('/auth/v1/user'))result={id:'00000000-0000-4000-8000-000000000001',email:'smoke@example.test'};
  else if(path.endsWith('/rest/v1/products'))result=fixtureProducts;
  else if(path.includes('/products'))result=url.searchParams.has('id')?fixtureProducts:fixtureProducts;
@@ -54,7 +55,7 @@ await context.route(origin+'/**', async route=>{
  else if(path.includes('/market_listings'))result=[];
  // No write action is allowed by this test. The only POSTs above are
  // read-only RPCs; all other write requests receive a 403 failure.
- const safeReadRPC=path.endsWith('/rpc/is_admin')||path.endsWith('/rpc/market_browse')||path.endsWith('/rpc/market_inbox');
+ const safeReadRPC=['support_is_staff','notification_page','notification_read','support_history'].some(name=>path.endsWith('/rpc/'+name))||path.endsWith('/rpc/market_browse_page')||path.endsWith('/rpc/is_admin')||path.endsWith('/rpc/market_browse')||path.endsWith('/rpc/market_inbox_page');
  if(!['GET','HEAD'].includes(request.method())&&!safeReadRPC){
   failed.push('unexpected network mutation blocked: '+request.method()+' '+path);
   return route.fulfill({status:403,headers:cors,body:JSON.stringify({message:'Test never performs writes'})});
@@ -290,10 +291,12 @@ try{
  assert.equal(await market.locator('#accept').isChecked(),false,'new modal opens with unchecked consent');
  await market.keyboard.press('Escape');
  await market.locator('[data-cat="gear"]').first().click();
+ await market.waitForFunction(()=>document.querySelector('#cards').getAttribute('aria-busy')==='false');
  assert.equal(await market.locator('#cards .item-card').count(),1,'category filter broken');
  await market.locator('#search').click();
  assert.equal(await market.locator('#search').getAttribute('readonly'),null,'search must become editable on actual focus');
  await market.locator('#search').fill('not-a-product');
+ await market.waitForFunction(()=>document.querySelector('#cards').getAttribute('aria-busy')==='false');
  assert.equal(await market.locator('#cards .item-card').count(),0,'marketplace search broken');
  console.log('OK listing detail, policy gating, category filter and search');
 
@@ -302,10 +305,11 @@ try{
    access_token:'seller-mock',refresh_token:'seller-refresh',expires_at:Math.floor(Date.now()/1000)+3600,
    user:{id:'00000000-0000-4000-8000-000000000009',email:'seller@example.test'}
  },true));
- await market.route(origin+'/rest/v1/market_notifications?**',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify([{
+ let notificationSeen=0;await market.route(origin+'/rest/v1/rpc/notification_read',route=>{notificationSeen=Math.max(notificationSeen,route.request().postDataJSON().p_id);return route.fulfill({status:200,headers:cors,body:'null'})});
+ await market.route(origin+'/rest/v1/rpc/notification_page',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify({items:[{
   id:104,kind:'purchase_requested',title:'New purchase review request',listing_id:701,
   request_id:'11111111-1111-4111-8111-111111111111',conversation_id:null,created_at:'2026-11-02T00:01:00Z'
- }])}));
+ }],last_read_id:notificationSeen,unread:notificationSeen<104?1:0})}));
  await market.reload({waitUntil:'domcontentloaded'});
  await market.waitForFunction(()=>!document.querySelector('#seller-panel')?.classList.contains('hidden'));
  await market.locator('.tc34-notice-button:visible').waitFor();
@@ -313,6 +317,7 @@ try{
  await market.locator('.tc34-notice-button').click();
  await market.locator('.tc34-notice-link').getByText('New purchase review request').waitFor();
  assert.match(await market.locator('.tc34-notice-list').textContent(),/Listing #701/);
+ await market.locator('.tc34-notice-badge').waitFor({state:'hidden'});
  assert.equal(await market.locator('.tc34-notice-badge:visible').count(),0,'opening bell marks notices viewed');
  console.log('OK V34 in-site notification center (read-only mock)');
 
@@ -437,13 +442,13 @@ try{
  ];
  const serverMessages=[{id:9001,sender_id:chatRows[0].seller_id,body:'Is the headset available?',created_at:'2026-11-01T10:00:00Z'}];
  let sendAttempts=0;
- await chatPage.route(origin+'/rest/v1/rpc/market_inbox',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify(chatRows)}));
- await chatPage.route(origin+'/rest/v1/rpc/market_mark_read',route=>{
+ await chatPage.route(origin+'/rest/v1/rpc/market_inbox_page',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify(chatRows)}));
+ await chatPage.route(origin+'/rest/v1/rpc/market_mark_read_to',route=>{
    chatRows[0].unread_count=0;
    return route.fulfill({status:200,headers:cors,body:'null'});
  });
  await chatPage.route(origin+'/rest/v1/market_messages?**',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify(serverMessages)}));
- await chatPage.route(origin+'/rest/v1/rpc/market_send_message',route=>{
+ await chatPage.route(origin+'/rest/v1/rpc/market_send_message_once',route=>{
    const payload=JSON.parse(route.request().postData());
    assert.equal(payload.p_conversation,801);
    assert.equal(payload.p_body,'I am interested in the headset.');

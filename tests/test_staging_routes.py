@@ -63,14 +63,14 @@ class StagingRoutes(unittest.TestCase):
     def test_safe_youtube_embed(self):
         product = (ROOT / "product.html").read_text(encoding="utf-8")
         videos = (ROOT / "videos/index.html").read_text(encoding="utf-8")
-        for source in (product, videos):
+        for source in (product + (ROOT.parent / "assets/triso-content.js").read_text(encoding="utf-8"), videos):
             self.assertIn("youtube-nocookie.com/embed/", source)
             self.assertIn("{11}", source)
             self.assertNotIn("innerHTML=", source)
 
     def test_editor_uses_admin_and_text_nodes(self):
         blog = (ROOT / "blog/index.html").read_text(encoding="utf-8")
-        self.assertIn("app_metadata?.role==='admin'", blog)
+        self.assertIn("rpc/is_admin", blog)
         self.assertIn("textContent=p.body", blog)
         self.assertIn("blog_posts", blog)
 

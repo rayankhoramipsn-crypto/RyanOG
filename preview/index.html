@@ -1255,8 +1255,9 @@ body,#store-screen{background:radial-gradient(ellipse 75% 22% at 50% 0%,#271338 
 <link rel="icon" type="image/svg+xml" href="../assets/trisocmd-icon.svg">
 <link rel="alternate icon" type="image/png" sizes="64x64" href="../assets/trisocmd-icon-64.png">
 <link rel="apple-touch-icon" sizes="180x180" href="../assets/trisocmd-apple-touch.png">
-</head>
-<body><div id="tc50-staging-banner" role="status" style="position:relative;z-index:99999;background:#122330;border-bottom:1px solid #467487;color:#c2eaff;padding:10px 18px;text-align:center;font:600 12px/1.5 system-ui,sans-serif">STAGING PREVIEW · Payments, order processing, and support notifications are not live. Do not send funds.</div>
+<link rel="stylesheet" href="../assets/phase1-orders.css">
+<link rel="stylesheet" href="../assets/triso-support.css"><link rel="stylesheet" href="../assets/triso-content.css"></head>
+<body><a class="content-skip" href="#tc-shop-heading">Skip to products</a><div id="tc50-staging-banner" role="status" style="position:relative;z-index:99999;background:#122330;border-bottom:1px solid #467487;color:#c2eaff;padding:10px 18px;text-align:center;font:600 12px/1.5 system-ui,sans-serif">STAGING PREVIEW · Payments, order processing, and support notifications are not live. Do not send funds.</div>
 <a class="tc49-skip" href="#tc-shop-heading">SKIP TO PRODUCTS</a>
 
 <!-- TOAST -->
@@ -1377,7 +1378,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElement
   <section class="tc-categories" id="tc-discover" aria-label="Explore categories"><div class="tc-section-kicker">EXPLORE / 001</div><div class="tc-section-top"><h2>BUILT FOR <i>PLAYERS.</i></h2><p>More than a store. A place for everything around the game.</p></div><div class="tc-category-grid"><a href="#tc-shop-heading" class="tc-category tc-cat-one"><span class="tc-category-num">01 / DIGITAL</span><div class="tc-cat-visual">F<span>✦</span></div><div class="tc-category-bottom"><div><strong>FORTNITE</strong><small>EXPLORE THE STORE</small></div><span class="tc-cat-arrow">↗</span></div></a><div class="tc-category tc-cat-two"><span class="tc-category-num">02 / HARDWARE · COMING SOON</span><div class="tc-cat-visual tc-gear-visual">⌘</div><div class="tc-category-bottom"><div><strong>GAMING GEAR</strong><small>SETUP ESSENTIALS</small></div><span class="tc-cat-arrow">↗</span></div></div><a href="blog/" class="tc-category tc-cat-three"><span class="tc-category-num">03 / EDITORIAL</span><div class="tc-cat-visual tc-journal-visual">//</div><div class="tc-category-bottom"><div><strong>THE JOURNAL</strong><small>STORIES & GUIDES</small></div><span class="tc-cat-arrow">↗</span></div></a></div></section>
   <div class="tc-shop-heading" id="tc-shop-heading"><div><span class="tc-section-kicker">THE MARKET / 002</span><h2>THE <i>DROP.</i></h2><p>Browse what's available right now.</p></div><span class="tc-shop-aside">CURATED FOR YOUR NEXT SESSION ↘</span></div>
   <div class="product-section">
-    <div class="tc39-toolbar" role="search"><input id="tc39-search" aria-label="Search products" placeholder="SEARCH THE COLLECTION..." oninput="tc39Filter()"><select id="tc39-category" aria-label="Category" onchange="tc39Filter()"><option value="">All categories</option></select><select id="tc39-sort" aria-label="Sort" onchange="tc39Filter()"><option value="featured">Featured</option><option value="low">Price: Low to High</option><option value="high">Price: High to Low</option></select><button class="tc39-cart-button" onclick="tc39CartOpen()">BAG <span id="tc39-count">0</span> ↗</button></div><div class="product-grid" id="product-grid"></div>
+    <div class="tc39-toolbar" role="search"><input id="tc39-search" aria-label="Search products" placeholder="SEARCH THE COLLECTION..." oninput="tc39Filter()"><select id="tc39-category" aria-label="Category" onchange="tc39Filter()"><option value="">All categories</option></select><select id="tc39-sort" aria-label="Sort" onchange="tc39Filter()"><option value="featured">Featured</option><option value="best">Best sellers</option><option value="new">New arrivals</option><option value="low">Price: Low to High</option><option value="high">Price: High to Low</option></select><button class="tc39-cart-button" onclick="tc39CartOpen()">BAG <span id="tc39-count">0</span> ↗</button></div><div class="product-grid" id="product-grid"></div>
     <div class="empty" id="store-empty" style="display:none;">
       <p id="store-empty-text">No products available yet.</p>
     </div>
@@ -1500,8 +1501,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElement
  <form id="tc46-product-form" onsubmit="tc46SaveProduct(event)" hidden>
  <h4 id="tc46-form-title">PRODUCT EDITOR</h4>
  <input id="tc46-pid" type="hidden">
- <div class="tc46-formgrid"><label>Title<input id="tc46-title" maxlength="160" required></label><label>Price USD<input id="tc46-price" type="number" min="0" step="0.01" required></label><label>Stock<input id="tc46-stock" type="number" min="0" max="1000000" step="1" required></label><label>Category<input id="tc46-category" maxlength="80"></label><label>Status<select id="tc46-status"><option value="available">Available</option><option value="unavailable">Unavailable</option></select></label><label>Image HTTPS URL<input id="tc46-image" type="url" placeholder="https://..." maxlength="1500"></label><label>Min quantity<input id="tc46-min" type="number" min="1" max="100000" value="1" required></label><label>Max quantity (optional)<input id="tc46-max" type="number" min="1" max="100000"></label></div>
- <label>Description<textarea id="tc46-description" maxlength="6000" rows="4"></textarea></label><label>Arabic description<textarea id="tc46-description-ar" maxlength="6000" rows="3"></textarea></label>
+ <div class="tc46-formgrid"><label>Title<input id="tc46-title" maxlength="160" required></label><label>Price USD<input id="tc46-price" type="number" min="0" step="0.01" required></label><label>Stock<input id="tc46-stock" type="number" min="0" max="1000000" step="1" required></label><label>Category<input id="tc46-category" maxlength="80"></label><label>Status<select id="tc46-status"><option value="available">Available</option><option value="unavailable">Unavailable</option><option value="draft">Draft</option><option value="inactive">Inactive</option><option value="archived">Archived</option></select></label><label>Image HTTPS URL<input id="tc46-image" type="url" placeholder="https://..." maxlength="1500"></label><label>Min quantity<input id="tc46-min" type="number" min="1" max="100000" value="1" required></label><label>Max quantity (optional)<input id="tc46-max" type="number" min="1" max="100000"></label></div>
+ <label>Product slug<input id="tc46-slug" pattern="[a-z0-9]+(-[a-z0-9]+)*" maxlength="110"></label><label>SEO title<input id="tc46-seo-title" maxlength="180"></label><label>SEO description<textarea id="tc46-seo-description" maxlength="320"></textarea></label><label>Persian description<textarea id="tc46-description-fa" maxlength="6000" dir="rtl"></textarea></label><label>Description<textarea id="tc46-description" maxlength="6000" rows="4"></textarea></label><label>Arabic description<textarea id="tc46-description-ar" maxlength="6000" rows="3"></textarea></label>
  <div class="tc46-actions"><button type="submit">SAVE PRODUCT</button><button type="button" onclick="tc46CancelEdit()">CANCEL</button></div>
  </form></div>
  <div id="tc46-orders" class="tc46-pane" hidden><div class="tc46-bar"><strong>ORDER MANAGEMENT</strong><button onclick="tc46LoadOrders()">↻ REFRESH</button></div><div id="tc46-order-list"></div></div>
@@ -1882,14 +1883,18 @@ async function supaEnsureTable() {
 
 async function supaLoadProducts() {
   try {
-    const rows = await supaFetch('/rest/v1/products?order=id.asc&select=*');
+    const rows=[];for(let offset=0;;offset+=200){const page=await supaFetch('/rest/v1/products?order=id.asc&select=*&limit=200&offset='+offset);if(!Array.isArray(page))throw Error('Invalid product response');rows.push(...page);if(page.length<200)break}
     if (!Array.isArray(rows)) return [];
+    const decorations=await Promise.allSettled(['product_merchandising?select=product_id,featured&order=product_id.asc','product_sales_snapshots?select=product_id,units_sold&order=product_id.asc'].map(async path=>{const list=[];for(let offset=0;;offset+=200){const page=await supaFetch('/rest/v1/'+path+'&limit=200&offset='+offset);list.push(...page);if(page.length<200)return list}}));
+    const featured=new Map((decorations[0].value||[]).map(v=>[String(v.product_id),v.featured===true])),sold=new Map((decorations[1].value||[]).map(v=>[String(v.product_id),Number(v.units_sold)||0]));
     return rows.map(r => ({
       id:       r.id,
       title:    r.title,
       price:    r.price,
       desc:     r.description || '',
       desc_ar:  r.description_ar || '',
+      desc_fa:  r.description_fa || '',
+      slug:r.slug||'',createdAt:r.created_at||'',featured:featured.get(String(r.id))||false,unitsSold:sold.get(String(r.id))||0,
       img:      r.image_url || '📦',
       status:   r.status || 'available',
       stock:    r.stock != null ? r.stock : 1,
@@ -2055,7 +2060,7 @@ function renderStore() {
       ${renderProductImg(p, '200px')}
       <div class="product-body">
         <div class="tc34-product-meta">TRISOCMD <span>✦</span> DIGITAL MARKET</div>
-        <div class="product-title">${tc50Esc(p.title)}</div>
+        <div class="product-title"><a href="product.html?id=${id}" onclick="event.stopPropagation()">${tc50Esc(p.title)}</a></div>
         <div class="product-desc">${tc50Esc(getDesc(p))}</div>
         <div class="product-footer">
           <div class="product-price">$${tc50Num(p.price)} <span>USD</span></div>
@@ -2076,6 +2081,7 @@ function renderProductImg(p, h) {
 
 function getDesc(p) {
   if (currentLang === 'ar' && p.desc_ar) return p.desc_ar;
+  if (currentLang === 'fa' && p.desc_fa) return p.desc_fa;
   return p.desc;
 }
 
@@ -2845,7 +2851,10 @@ async function api(path,body,token){
 }
 function update(){const u=session?.user;const guest=$('tc31-guest'),user=$('tc31-user');if(guest)guest.style.display=u?'none':($('tc31-signup-view')?.style.display==='block'?'none':'grid');if(u&&$('tc31-signup-view'))$('tc31-signup-view').style.display='none';if(user)user.style.display=u?'block':'none';if(u){$('tc31-user-email').textContent=u.email||'Player';window.tc36LoadOrders?.();window.tc40CheckAdmin?.(session.access_token)}else{window.tc40ResetAdmin?.();const el=$('tc36-orders');if(el)el.textContent='Sign in to view orders.';}}
 function save(d){if(d?.access_token&&d?.refresh_token){window.TrisoAuth.write(d);session=window.TrisoAuth.read()||d;}update();}
-async function refresh(){if(!session?.refresh_token)return false;try{save(await api('token?grant_type=refresh_token',{refresh_token:session.refresh_token}));return true}catch(e){const t=(e.message||'').toLowerCase();if(/invalid.refresh|refresh.token.not.found|already.used|invalid.grant/.test(t))clear();else status('Connection interrupted. Your remembered login is saved; retry when online.');return false}}
+async function refresh(force=false){
+ try{session=await window.TrisoAuth.refresh(token=>api('token?grant_type=refresh_token',{refresh_token:token}),force);update();return !!session}
+ catch(e){session=window.TrisoAuth.read();update();status(session?'Connection interrupted. Your remembered login is saved; retry when online.':'Session expired. Please sign in again.');return false}
+}
 function clear(){session=null;window.TrisoAuth.clear();update()}
 async function restore(){
  session=window.TrisoAuth.read();
@@ -2857,7 +2866,7 @@ async function restore(){
    else {
      const res=await fetch(url+'/auth/v1/user',{headers:{apikey:anon,Authorization:'Bearer '+session.access_token}});
      if(res.ok){session.user=await res.json();update()}
-     else if(res.status===401||res.status===403)await refresh();
+     else if(res.status===401||res.status===403)await refresh(true);
      else status('You appear offline. Your login remains remembered.');
    }
  }catch(e){status('Network unavailable; remembered login will be retried.')}
@@ -3019,8 +3028,11 @@ const categories=[...new Set(products.map(p=>String(p.category||'General')))].so
 if(sel){const prior=sel.value;sel.replaceChildren(new Option('All categories',''));categories.forEach(c=>sel.add(new Option(c,c)));sel.value=categories.includes(prior)?prior:''}
 const q=(input?.value||'').trim().toLowerCase(),cat=sel?.value||'';
 const out=products.filter(p=>(!cat||String(p.category||'General')===cat)&&(!q||[p.title,p.desc,p.category].some(x=>String(x||'').toLowerCase().includes(q))));
+if(sort?.value==='featured')out.sort((a,b)=>Number(b.featured)-Number(a.featured));
+if(sort?.value==='best')out.sort((a,b)=>b.unitsSold-a.unitsSold||Number(b.id)-Number(a.id));
 if(sort?.value==='low')out.sort((a,b)=>Number(a.price)-Number(b.price));
 if(sort?.value==='high')out.sort((a,b)=>Number(b.price)-Number(a.price));
+if(sort?.value==='new')out.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)||Number(b.id)-Number(a.id));
 return out;
 };
 window.tc39Filter=function(){renderStore()};
@@ -3199,13 +3211,37 @@ count();
  }
  function tc42BagItems(){let bag={};try{bag=JSON.parse(localStorage.getItem('tc39-bag')||'{}')||{}}catch(e){}return Object.entries(bag).filter(([id,qty])=>Number(qty)>0).map(([id,qty])=>({id:Number(id),qty:Number(qty)}))}
  window.tc42BagItems=tc42BagItems;
+ let tc30OrderBusy=false;
  window.tc42SaveOrder=async()=>{
-  const status=$('tc42-order-result');status.textContent='Validating prices and saving your order…';
-  try{const items=window.tc42OrderItems||[];if(!items.length)throw Error('Choose a product first.');
-   const id=await req('rpc/tc42_create_order',{method:'POST',body:{p_items:items}});
-   status.textContent='Order saved: '+String(id).slice(0,8)+' · Awaiting payment. This is NOT payment confirmation.';
+  const status=$('tc42-order-result'),button=$('tc42-save-order');
+  if(tc30OrderBusy)return;
+  const tell=(message,kind='info')=>{
+   if(!status)return;
+   status.textContent=message;status.dataset.state=kind;
+   status.setAttribute('role',kind==='error'?'alert':'status');
+   status.setAttribute('aria-live',kind==='error'?'assertive':'polite');
+  };
+  tc30OrderBusy=true;
+  if(button)button.disabled=true;
+  tell('Validating your cart with the server. No payment is being taken.','info');
+  try{
+   const items=window.tc42OrderItems;
+   if(!Array.isArray(items)||items.length<1||items.length>20)throw Error('Select 1–20 products to save a request.');
+   const valid=items.every(x=>Number.isSafeInteger(Number(x.id))&&Number(x.id)>0&&Number.isSafeInteger(Number(x.qty))&&Number(x.qty)>=1&&Number(x.qty)<=99999);
+   if(!valid)throw Error('Cart items contain an invalid product or quantity.');
+   // Server independently re-checks ownership, stock, quantities and authoritative price.
+   if(!window.TrisoOrders)throw Error('Order center is loading. Please retry.');
+   const id=await window.TrisoOrders.create(items);
+   if(typeof id!=='string'||!/^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(id))throw Error('Server response could not be verified. Check My Orders before trying again.');
+   tell('Request saved: #'+id.slice(0,8).toUpperCase()+'. Not paid and not confirmed. Check My Orders for the full record.','success');
    window.tc36LoadOrders?.();
-  }catch(e){status.textContent=e.message+' · Guest? You can continue via Telegram.'}
+  }catch(e){
+   const message=String(e?.message||'Order service unavailable');
+   tell(message+' · If the request may have reached the server, check My Orders before retrying to avoid duplicates.','error');
+  }finally{
+   tc30OrderBusy=false;
+   if(button)button.disabled=false;
+  }
  };
  async function getMyThread(){
   const token=await window.tc42AccessToken?.();if(!token)return null;
@@ -3343,11 +3379,11 @@ count();
  const say=msg=>{$('tc46-admin-msg').textContent=msg};
  let allowed=false,products=[];
  async function request(path,opts={}){
-  const token=await window.tc42AccessToken?.();
+  const contentOwner=window.TrisoAuth?.read()?.user?.id,token=await window.tc42AccessToken?.();
   if(!token)throw Error('Sign in again to manage the store.');
   const res=await fetch(SUPA_URL+'/rest/v1/'+path,{method:opts.method||'GET',headers:{apikey:SUPA_KEY,Authorization:'Bearer '+token,'Content-Type':'application/json',Prefer:opts.prefer||'return=representation'},body:opts.body===undefined?undefined:JSON.stringify(opts.body)});
   if(!res.ok){const e=await res.json().catch(()=>({}));throw Error(e.message||e.error||'Server refused request ('+res.status+')')}
-  const raw=await res.text();return raw?JSON.parse(raw):null;
+  const raw=await res.text();if(window.TrisoAuth?.read()?.user?.id!==contentOwner)throw Error('Account changed');return raw?JSON.parse(raw):null;
  }
  async function verify(){
   const isAdmin=await request('rpc/is_admin',{method:'POST',body:{}});
@@ -3369,12 +3405,13 @@ count();
   const root=$('tc46-product-list');root.textContent='Loading products…';
   try{
    if(!allowed)await verify();
-   products=await request('products?select=id,title,price,stock,status,category,description,description_ar,image_url,min_qty,max_qty&order=id.desc&limit=200');
+   products=[];for(let offset=0;;offset+=200){const page=await request('products?select=*&order=id.desc&limit=200&offset='+offset);products.push(...page);if(page.length<200)break}
    root.replaceChildren();
    if(!products.length)root.textContent='No products yet.';
    for(const p of products){
     const c=card(p.title||'Untitled','ID '+p.id+' · $'+Number(p.price).toFixed(2)+' · Stock '+p.stock+' · '+p.status);
     action(c.actions,'EDIT',()=>tc46EditProduct(p.id));
+    const media=document.createElement('a');media.textContent='MEDIA & SPECS';media.href='product.html?id='+encodeURIComponent(p.id);c.actions.append(media);
     action(c.actions,'DELETE',()=>tc46DeleteProduct(p.id),true);
     root.append(c.el);
    }
@@ -3386,8 +3423,8 @@ count();
  window.tc46EditProduct=id=>{
   const p=products.find(x=>String(x.id)===String(id));if(!p)return;
   $('tc46-pid').value=p.id;$('tc46-title').value=p.title||'';$('tc46-price').value=p.price??0;$('tc46-stock').value=p.stock??0;
-  $('tc46-category').value=p.category||'';$('tc46-status').value=p.status==='available'?'available':'unavailable';$('tc46-image').value=p.image_url||'';
-  $('tc46-min').value=p.min_qty??1;$('tc46-max').value=p.max_qty??'';$('tc46-description').value=p.description||'';$('tc46-description-ar').value=p.description_ar||'';
+  $('tc46-category').value=p.category||'';$('tc46-status').value=p.status||'draft';$('tc46-image').value=p.image_url||'';
+  $('tc46-min').value=p.min_qty??1;$('tc46-max').value=p.max_qty??'';$('tc46-description').value=p.description||'';$('tc46-description-ar').value=p.description_ar||'';$('tc46-description-fa').value=p.description_fa||'';$('tc46-slug').value=p.slug||'';$('tc46-seo-title').value=p.seo_title||'';$('tc46-seo-description').value=p.seo_description||'';
   $('tc46-form-title').textContent='EDIT PRODUCT #'+p.id;$('tc46-product-form').hidden=false;$('tc46-product-form').scrollIntoView({behavior:'smooth',block:'nearest'});
  };
  window.tc46CancelEdit=()=>{$('tc46-product-form').hidden=true};
@@ -3397,7 +3434,7 @@ count();
   const image=val('tc46-image').trim();
   if(!Number.isFinite(price)||price<0||!Number.isInteger(stock)||stock<0||!Number.isInteger(min)||min<1||max!==null&&(!Number.isInteger(max)||max<min))return say('Invalid price, stock, or quantity limits.');
   if(image&&(!/^https:\/\//i.test(image)||image.length>1500))return say('Image URL must start with https://');
-  const body={title:val('tc46-title').trim(),price,stock,category:val('tc46-category').trim()||null,status:val('tc46-status'),image_url:image||null,min_qty:min,max_qty:max,description:val('tc46-description'),description_ar:val('tc46-description-ar')};
+  const body={title:val('tc46-title').trim(),price,stock,category:val('tc46-category').trim()||null,status:val('tc46-status'),image_url:image||null,min_qty:min,max_qty:max,description:val('tc46-description'),description_ar:val('tc46-description-ar'),description_fa:val('tc46-description-fa'),slug:val('tc46-slug').trim()||null,seo_title:val('tc46-seo-title').trim()||null,seo_description:val('tc46-seo-description').trim()||null};
   if(!body.title)return say('Product title required');
   const id=val('tc46-pid');
   try{
@@ -3486,5 +3523,5 @@ function init(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
-</script></body>
+</script><script src="../assets/phase1-orders.js" defer></script><script src="../assets/store-invoice.js" defer></script><script src="../assets/triso-support.js" defer></script></body>
 </html>

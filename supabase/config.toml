@@ -4,3 +4,10 @@ project_id = "trisocmd-phase1-local"
 verify_jwt = false
 [functions.payment-webhook]
 verify_jwt = false
+
+[functions.delivery-worker]
+# Public capability GET; POST requires separate constant-time worker-secret validation.
+verify_jwt = false
+[functions.delivery-webhook]
+# Resend/Svix raw-body signature + timestamp + durable event deduplication.
+verify_jwt = false

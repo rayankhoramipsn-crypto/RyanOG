@@ -1,33 +1,70 @@
-name: TRISOCMD read-only browser smoke checks
+name: TRISOCMD regression and marketplace checks
 on:
   pull_request:
     paths:
       - '**/*.html'
       - 'assets/**'
-      - 'tests/browser-smoke.mjs'
+      - 'scripts/**'
+      - 'content/**'
+      - 'robots.txt'
+      - 'sitemap.xml'
+      - 'sw-notifications.js'
+      - 'supabase/**'
+      - 'tests/**'
+      - 'package*.json'
       - '.github/workflows/browser-smoke.yml'
-      - 'tests/live-readonly-smoke.mjs'
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
   browser:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Install isolated headless browser
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm audit --audit-level=high
+      - run: npx playwright install --with-deps chromium
+      - name: Node, PostgreSQL, Python and Edge checks
+        run: npm test && npm run check:edge
+      - name: All isolated browser suites
         run: |
-          npm install --no-save --no-audit --no-fund playwright@1.55.0
-          npx playwright install --with-deps chromium
-      - name: Smoke-test local site and navigation (no database writes)
+          python3 -m http.server 8765 --bind 127.0.0.1 >work-http.log 2>&1 &
+          curl --retry 5 --retry-connrefused --retry-delay 1 -fsS http://127.0.0.1:8765/ > /dev/null
+          npm run test:browser
+  native-storage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm audit --audit-level=high
+      - name: Start fresh disposable local Supabase (never linked)
         run: |
-          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/triso-http.log 2>&1 &
-          sleep 2
-          node tests/browser-smoke.mjs
-      - name: Check live published pages from GitHub-hosted runner (read-only, no auth)
-        if: github.event_name == 'workflow_dispatch'
-        run: node tests/live-readonly-smoke.mjs
+          mkdir -p work/ci-supabase
+          npx supabase init --workdir work/ci-supabase --yes
+          node tests/prepare-release-auth.mjs work/ci-supabase
+          npx supabase start --workdir work/ci-supabase --exclude imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor >work/supabase-start.log 2>&1
+          npx supabase status --workdir work/ci-supabase --output json >work/supabase-status.json
+      - name: Real local JWT and binary Storage integration
+        env:
+          TRISO_INTEGRATION_CONFIG: work/supabase-status.json
+          TRISO_STORAGE_TESTS: '1'
+          RUN_ADVISORS: '1'
+        run: npm run test:integration
+      - name: Real local signup, confirmation, recovery, refresh and logout
+        env:
+          TRISO_INTEGRATION_CONFIG: work/supabase-status.json
+        run: npm run test:release:auth
+      - name: Actual local Realtime participant isolation and session revocation
+        env:
+          TRISO_INTEGRATION_CONFIG: work/supabase-status.json
+        run: npm run test:release:realtime

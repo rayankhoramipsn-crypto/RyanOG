@@ -55,10 +55,19 @@
    try{
      await verify();
      // Query only PENDING rows so recent submissions cannot disappear behind approved items.
-     const items=await request('market_listings?select=id,title,platform,description,price,submitted_at,seller_id,status&status=eq.pending&order=submitted_at.desc&limit=200');
-     if(!Array.isArray(items))throw Error('Invalid moderation response.');
-     const ids=items.map(x=>Number(x.id)).filter(Number.isInteger);
-     const media=ids.length?await request('market_listing_media?select=listing_id,object_path,sort_order&listing_id=in.('+ids.join(',')+')&order=sort_order.asc&limit=500'):[];
+     const items=[];
+     for(let offset=0;;){
+       const page=await request('market_listings?select=id,title,platform,description,price,submitted_at,seller_id,status&status=eq.pending&order=submitted_at.desc,id.desc&limit=200&offset='+offset);
+       if(!Array.isArray(page))throw Error('Invalid moderation response.');
+       items.push(...page);
+       if(page.length<200)break;
+       offset+=page.length;
+     }
+     const ids=items.map(x=>Number(x.id)).filter(Number.isInteger),media=[];
+     for(let start=0;start<ids.length;start+=75){
+       media.push(...await request('market_listing_media?select=listing_id,object_path,sort_order&listing_id=in.('+ids.slice(start,start+75).join(',')+')&order=sort_order.asc&limit=500'));
+     }
+     if(!enabled)return;
      root.hidden=false;
      $('tc-market-count').textContent=String(items.length);
      list.replaceChildren();

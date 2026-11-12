@@ -7,7 +7,7 @@ const buyer='00000000-0000-4000-8000-000000000001',order='11111111-1111-4111-811
 const row={id:order,customer_id:buyer,status:'awaiting_payment',total_amount:'25.00',currency:'USD',items:[{id:1,title:'Fixture',qty:1,unit_price:25}]};
 const invoice={id:crypto.randomUUID(),order_id:order,chain:'mainnet',network:'LTC',address:'test-only-mocked-address-do-not-pay',units:'100000',provider:'mock',provider_invoice_id:'fixture',state:'awaiting_payment',expires_at:new Date(Date.now()+600000).toISOString()};
 const cors={'access-control-allow-origin':'*','access-control-allow-headers':'*','access-control-allow-methods':'*'};
-const browser=await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{}),args:['--no-sandbox']});
+const browser=await chromium.launch({executablePath:process.env.TRISO_CHROMIUM_PATH||undefined,headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{}),args:['--no-sandbox']});
 const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
 const errors=[];context.on('page',p=>p.on('pageerror',e=>errors.push(e.message)));
 let claims=0,creates=0;
@@ -65,7 +65,7 @@ try{
  assert.equal(await page.locator('#phase1-order-center article').count(),0);
  console.log('PASS sign-out clears private order DOM');
  const delayed=await context.newPage();let release;const gate=new Promise(r=>release=r);
- await delayed.route(api+'/rest/v1/products?order=id.asc&select=*',async route=>{await gate;await route.fulfill({status:200,headers:cors,contentType:'application/json',body:'[]'});});
+ await delayed.route(api+'/rest/v1/products?order=id.asc&select=*&limit=200&offset=0',async route=>{await gate;await route.fulfill({status:200,headers:cors,contentType:'application/json',body:'[]'});});
  await delayed.goto(base+'/index.html?anonymous-bootstrap=1',{waitUntil:'domcontentloaded'});
  await delayed.evaluate(()=>{window.TrisoAuth.clear();setLang('en','ltr');});
  await delayed.locator('#tc31-panel.active').waitFor();release();
@@ -76,4 +76,12 @@ try{
  console.log('PASS delayed product bootstrap preserves language/account navigation');
  await delayed.close();
  assert.deepEqual(errors,[]);
+ const preview=await context.newPage();await preview.goto(base+'/preview/index.html',{waitUntil:'domcontentloaded'});
+ await preview.waitForFunction(()=>!!window.TrisoOrders);
+ const beforePreview=creates;
+ await preview.evaluate(()=>{window.tc42AccessToken=async()=> 'mock-user-token';window.tc42OrderItems=[{id:1,qty:1}];return Promise.all([window.tc42SaveOrder(),window.tc42SaveOrder()])});
+ assert.equal(creates,beforePreview+1);
+ assert.equal(await preview.locator('#tc42-order-result').getAttribute('data-state'),'success');
+ assert.deepEqual(errors,[]);
+ console.log('PASS preview uses canonical idempotent checkout after legacy validator grant is revoked');
 }finally{await context.close();await browser.close();}

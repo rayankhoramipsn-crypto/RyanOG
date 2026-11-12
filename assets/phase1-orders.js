@@ -35,6 +35,7 @@
     const card=node('article');card.style.cssText='border:1px solid #355069;padding:14px;margin:12px 0;min-width:0';
     card.append(node('strong',o.id),node('p',o.status.replaceAll('_',' ')+' · '+o.total_amount+' '+o.currency));
     if(o.commission_usd>0)card.append(node('p',t('Marketplace commission (4%): ','کارمزد بازار (۴٪): ','عمولة السوق (4%): ')+o.commission_usd+' USD'));
+    if(o.customer_id===user?.id||o.seller_id===user?.id)card.append(button(t('Order support','پشتیبانی سفارش','دعم الطلب'),()=>window.TrisoSupport?.open({orderId:o.id,dispute:o.status==='disputed'})));
     if(o.delivery_note)card.append(node('p',t('Delivery: ','تحویل: ','التسليم: ')+o.delivery_note));
     const transition=async(status,note=null)=>{await api('rpc/phase1_transition',{p_order:o.id,p_status:status,p_note:note});await load()};
     if(o.customer_id===user?.id){
@@ -75,7 +76,7 @@
  async function load(){
    if(loading)return;loading=true;const v=++generation;const owner=window.TrisoAuth?.read()?.user?.id;
    feedback.textContent=t('Loading orders…','در حال بارگذاری سفارش‌ها…','جارٍ تحميل الطلبات…');
-   try{const next=await api('tc42_orders?select=*&order=created_at.desc&limit=100');if(v!==generation||owner!==window.TrisoAuth?.read()?.user?.id)return;rows=next;render();feedback.textContent='';}catch(e){rows=[];list.replaceChildren();feedback.textContent=e.message}finally{loading=false}
+   try{const next=[];for(let offset=0;;offset+=100){const page=await api('tc42_orders?select=*&order=created_at.desc,id.desc&limit=100&offset='+offset);if(v!==generation||owner!==window.TrisoAuth?.read()?.user?.id)return;next.push(...page);if(page.length<100)break;}if(v!==generation||owner!==window.TrisoAuth?.read()?.user?.id)return;rows=next;render();feedback.textContent='';}catch(e){rows=[];list.replaceChildren();feedback.textContent=e.message}finally{loading=false}
  }
  filter.onchange=render;
  async function market(requestId){const id=await api('rpc/phase1_market_order',{p_request:requestId});await load();root.scrollIntoView({behavior:'smooth',block:'start'});return id;}
