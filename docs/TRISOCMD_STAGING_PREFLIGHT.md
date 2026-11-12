@@ -62,3 +62,7 @@ Each migration payload is a future `supabase.apply_migration` argument object. I
 ## Consolidated approval scope to review
 
 Authorize secure staging backup/export and isolated restore verification first; **only if that gate and the repeated preflight pass**, authorize the six frozen migration payloads, four disabled-provider Edge deployments and tagged staging acceptance tests above. No production, Pages, merge, paid resources, hosted restore or live financial/messaging activation is included. Until recovery evidence is verified, migration execution remains blocked.
+
+## Authorized backup follow-up
+
+Backup/export preparation and a no-cost isolated restore were subsequently authorized. Execution remains blocked by absent hosted DB/private-Storage/CLI credentials and a designated owner recovery-encryption recipient, not by missing backup permission. No customer data was exported through the SQL connector, no backup was created and no restore was claimed. Exact secure owner steps and proof requirements are in TRISOCMD_STAGING_BACKUP.md. Migrations and deployments remain unauthorized.

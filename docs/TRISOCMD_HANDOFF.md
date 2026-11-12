@@ -33,3 +33,5 @@ Phase 6 (2026-11-12): bounded streamed payment/checkout bodies, malformed payloa
 Actual local Realtime WebSocket delivery/reconnect/history, cross-account denial and post-session-revocation denial now pass as well; CI includes the native Realtime service. Hosted WebSocket acceptance remains pending.
 
 Hosted staging preflight: schema/history/identity/record/Storage checks reconfirmed with read-only access. One active persisted admin; two existing requested purchase records must be preserved. Backup/restore evidence is blocked (Free plan; no CLI backups_read token). See TRISOCMD_STAGING_PREFLIGHT.md and the preparation-only packet generator; no hosted migration/deployment is authorized.
+
+Backup prerequisite follow-up: authorized by the owner, but hosted database/private-Storage/CLI credentials and owner recovery-encryption recipient are unconfigured. Safe export through the available SQL-result channel would violate the no-data-in-logs rule. Stop at this access blocker; follow TRISOCMD_STAGING_BACKUP.md. No backup, restore, migration or deployment was performed.
