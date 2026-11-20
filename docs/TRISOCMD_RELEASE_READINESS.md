@@ -69,3 +69,6 @@ After a committed rollout, preserve additive schema and hardened policies. Roll 
 ## Hosted staging preparation
 
 See TRISOCMD_STAGING_PREFLIGHT.md (2026-11-12). Read-only fingerprints/history/identities and existing records pass; current Free-plan backup/PITR availability and a hosted-data restore are unverified. The CLI backup inventory is blocked by missing scoped credentials. Structural compatibility is not clearance for hosted writes. A tested, checksum-pinned local packet generator prepares six transaction-safe migration payloads and four Edge bundles without executing them.
+
+
+Recovery preparation (2026-11-20): owner reports PG17 custom backup/listing/public extraction; full owner-archive recovery and Storage bytes remain unverified. New local-only restore/migration-rollback runner and offline object manifest verifier are tested with synthetic data. See [Windows recovery procedure](TRISOCMD_WINDOWS_RECOVERY.md) and [current readiness/owner actions](TRISOCMD_RELEASE_PREPARATION.md). Historical hosted counts/checks above are dated 2026-11-12; recheck before an approved rollout. No hosted write/deployment/merge or provider activation.

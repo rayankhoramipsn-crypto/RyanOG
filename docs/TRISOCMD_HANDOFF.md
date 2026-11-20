@@ -1,6 +1,6 @@
 # TRISOCMD continuation handoff
 
-Updated 2026-11-12 (Asia/Tehran). Work stops when this task ends; no background execution is promised.
+Updated 2026-11-20 (Asia/Tehran). Work stops when this task ends; no background execution is promised.
 
 Branch: feature/trisocmd-completion, based on feature/phase1-checkout / PR #36 head 3eea77c. Preserve PR #36 and its compatibility changes. Do not merge or deploy. No production, staging data, credentials, DNS or financial system was modified.
 
@@ -35,3 +35,6 @@ Actual local Realtime WebSocket delivery/reconnect/history, cross-account denial
 Hosted staging preflight: schema/history/identity/record/Storage checks reconfirmed with read-only access. One active persisted admin; two existing requested purchase records must be preserved. Backup/restore evidence is blocked (Free plan; no CLI backups_read token). See TRISOCMD_STAGING_PREFLIGHT.md and the preparation-only packet generator; no hosted migration/deployment is authorized.
 
 Backup prerequisite follow-up: authorized by the owner, but hosted database/private-Storage/CLI credentials and owner recovery-encryption recipient are unconfigured. Safe export through the available SQL-result channel would violate the no-data-in-logs rule. Stop at this access blocker; follow TRISOCMD_STAGING_BACKUP.md. No backup, restore, migration or deployment was performed.
+
+
+Recovery preparation (2026-11-20): owner reports PG17 custom backup/listing/public extraction; full owner-archive recovery and Storage bytes remain unverified. New local-only restore/migration-rollback runner and offline object manifest verifier are tested with synthetic data. See [Windows recovery procedure](TRISOCMD_WINDOWS_RECOVERY.md) and [current readiness/owner actions](TRISOCMD_RELEASE_PREPARATION.md). Historical hosted counts/checks above are dated 2026-11-12; recheck before an approved rollout. No hosted write/deployment/merge or provider activation.

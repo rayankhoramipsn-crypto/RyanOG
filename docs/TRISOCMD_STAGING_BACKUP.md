@@ -2,7 +2,11 @@
 
 2026-11-12 (Asia/Tehran). **Backup preparation/export and a free isolated restore are authorized. Hosted migrations, deployments and restores are not.** Target only `TRISO TEST / cxtytbjvdlngahytfilr`.
 
-## Result: blocked by access, not authorization
+## Owner update — 2026-11-20
+
+Owner reports a local PostgreSQL 17 custom-format export; archive listing and public extraction passed. The earlier access-blocked result below is historical. Full restore, Auth/Storage coverage, encryption/retention and separate object recovery remain unverified. Do not upload the archive. Follow [Windows recovery instructions](TRISOCMD_WINDOWS_RECOVERY.md) and [current release status](TRISOCMD_RELEASE_PREPARATION.md). The new runner is tested only on synthetic data; it does not certify the owner's backup or hosted readiness.
+
+## Historical result — 2026-11-12: blocked by access, not authorization
 
 The project is `ACTIVE_HEALTHY`, PostgreSQL `17.11.0.003`. This environment has no configured hosted database connection/password/service profile, privileged private-Storage credential, Supabase CLI access token or designated owner recovery-encryption recipient. Checks inspected presence only; no credential values or customer rows were read into diagnostics. `supabase backups list --project-ref cxtytbjvdlngahytfilr --output json` again failed with “Access token not provided”.
 

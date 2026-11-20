@@ -66,3 +66,6 @@ Authorize secure staging backup/export and isolated restore verification first; 
 ## Authorized backup follow-up
 
 Backup/export preparation and a no-cost isolated restore were subsequently authorized. Execution remains blocked by absent hosted DB/private-Storage/CLI credentials and a designated owner recovery-encryption recipient, not by missing backup permission. No customer data was exported through the SQL connector, no backup was created and no restore was claimed. Exact secure owner steps and proof requirements are in TRISOCMD_STAGING_BACKUP.md. Migrations and deployments remain unauthorized.
+
+
+Recovery preparation (2026-11-20): owner reports PG17 custom backup/listing/public extraction; full owner-archive recovery and Storage bytes remain unverified. New local-only restore/migration-rollback runner and offline object manifest verifier are tested with synthetic data. See [Windows recovery procedure](TRISOCMD_WINDOWS_RECOVERY.md) and [current readiness/owner actions](TRISOCMD_RELEASE_PREPARATION.md). Historical hosted counts/checks above are dated 2026-11-12; recheck before an approved rollout. No hosted write/deployment/merge or provider activation.
