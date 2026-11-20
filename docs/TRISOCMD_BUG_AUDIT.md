@@ -42,3 +42,6 @@ References:
 Fresh native SQL/JWT/Storage, captured local Auth email/recovery/logout, browser Web Locks, six-migration atomic rollback and data-preserving payment retirement pass. Hosted schema fingerprints match the fixture exactly. Hosted stale-claim/legacy-RPC hardening remains unapplied, leaked-password protection remains disabled, providers remain unverified and final CI remains a release gate. No zero-bug or production-readiness claim.
 
 CI follow-up: close the authenticated admin audit page before isolated cross-tab races; its live refresh listener had contaminated the mock session test. Assertions remain unchanged. Refresh persistence also now rejects responses identifying a different account, with a regression proving the original identity/token remain intact.
+
+
+2026-11-20 CI follow-up: browser setup reproduced failure `Playwright does not support chromium on ubuntu26.04-x64` after ubuntu-latest advanced. Pin only the two Playwright jobs to supported Ubuntu 24.04; keep tests/security assertions and native Supabase job intact. New synthetic PG17 recovery and native Auth/Storage/Realtime jobs pass; follow-up browser CI must be verified separately.
