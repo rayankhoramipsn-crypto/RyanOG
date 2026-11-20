@@ -16,10 +16,10 @@ Updated 2026-11-20 (Asia/Tehran). PR #37 remains draft and based on PR #36 (`3ee
 
 ## Verification in this batch
 
-- Passed: 65 Node tests; 85 embedded PostgreSQL scenarios (25 checkout, 8 browse, 52 combined schema); 66 Python tests including 10 recovery/Storage safety regressions; four Deno Edge checks.
+- Passed: 65 Node tests; 85 embedded PostgreSQL scenarios (25 checkout, 8 browse, 52 combined schema); 67 Python tests including 11 recovery/Storage safety regressions; four Deno Edge checks.
 - Passed on actual PostgreSQL 17.11 Docker: full synthetic archive restore with Auth/Storage/history, baseline validation, six actual migration files applied in one local transaction and rolled back with full table-count preservation; corrupt archive rejection and cleanup. Pinned image is used by the new existing-workflow CI step.
 - CI follow-up: new synthetic recovery, Node/SQL/Python/Edge and native Auth/Storage/Realtime checks passed on `673dab9`. Browser installation exposed `ubuntu-latest` advancing to unsupported Ubuntu 26.04; both browser jobs now pin Ubuntu 24.04, retaining the existing Playwright version and all assertions. Verify the follow-up commit’s CI before treating browser acceptance as green.
-- Not run: owner's actual archive/data/object downloads/decryption, Windows Docker Desktop execution, hosted acceptance or any deployment. PowerShell container/parser availability check was blocked by registry download `Forbidden`; instructions were reviewed, not executed on Windows. No tests were weakened or protection schemas skipped.
+- Not run: owner's actual archive/data/object downloads/decryption, Windows Docker Desktop execution, hosted acceptance or any deployment. PowerShell container/parser availability check was blocked by registry download `Forbidden`; instructions were reviewed, not executed on Windows. Raw SQL errors are discarded rather than logged because they can contain customer/Auth values; Storage download output is suppressed. No tests were weakened or protection schemas skipped.
 - Reproduce: `npm test`, `npm run check:edge`, then install the pinned public image from the workflow and run `python3 tests/recovery-local.py` (synthetic fixtures only). The two owner tools must run outside CI against private artifacts. CI status for the eventual new commit must be checked separately; prior green runs are not new-commit evidence.
 
 ## Six migrations: exact reviewed order and prerequisites

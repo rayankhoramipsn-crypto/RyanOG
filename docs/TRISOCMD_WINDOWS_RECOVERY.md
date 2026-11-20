@@ -46,7 +46,7 @@ On success the runner deletes only its own random container and produces private
 - `result.json`: restore/baseline and optional six-migration transaction/rollback result, archive SHA-256, immutable image ID and migration hashes. It still marks source comparison and Storage binary recovery as outstanding.
 - `private-inventory.json`, `private-row-counts.txt`: schema fingerprints, 25-entry history and counts/relationships. Compare with the owner's same-backup-time source inventory/extraction, including **every** public/Auth/Storage table; do not force old record counts if legitimate activity changed them.
 - `private-storage-buckets.json`, `private-storage-objects.json`: bucket configuration and object metadata for separate binary recovery. These contain private names; never publish them.
-- `private-archive-list.txt`, `private-diagnostics.log`: confidential archive/restore diagnostics. Do not paste raw errors or lists into an issue or chat.
+- `private-archive-list.txt`: confidential archive inventory; never publish it. `private-diagnostics.log` records only command families, exit codes and fixed error categories. Raw stdout/stderr failures are discarded because PostgreSQL errors can contain customer/Auth values; inspect extension requirements in the private archive inventory, not raw shared logs.
 
 The six migration scripts run only inside the disposable restored database in one transaction followed by **ROLLBACK**; no migration history is repaired or stamped. Baseline fingerprints and counts must still match afterwards. `result.json` exists only after all requested checks and container cleanup succeed. A `.partial` result, an archive listing alone, public extraction alone or a failed restore is not acceptance. If Docker itself fails during cleanup, remove only the identified drill container after reviewing private diagnostics; never prune unrelated containers/volumes.
 
@@ -70,8 +70,8 @@ foreach ($Bucket in $Buckets) {
     if ($Id -notmatch '^[A-Za-z0-9][A-Za-z0-9._-]*$') { throw 'Bucket key needs private operator review.' }
     $Destination = Join-Path $Files $Id
     New-Item -ItemType Directory -Path $Destination | Out-Null
-    & .\node_modules\.bin\supabase.cmd storage cp --recursive --project-ref cxtytbjvdlngahytfilr ('ss:///' + $Id) $Destination *> (Join-Path $PrivateRoot 'storage-download-private.log')
-    if ($LASTEXITCODE -ne 0) { throw 'Private Storage download failed; stop and inspect locally.' }
+    & .\node_modules\.bin\supabase.cmd storage cp --recursive --project-ref cxtytbjvdlngahytfilr ('ss:///' + $Id) $Destination *> $null
+    if ($LASTEXITCODE -ne 0) { throw 'Private Storage download failed; stop and review authorized access/inventory locally.' }
 }
 py -3 .\scripts\storage-backup-manifest.py --objects (Join-Path $Proof 'private-storage-objects.json') --files $Files --manifest $Manifest
 if ($LASTEXITCODE -ne 0) { throw 'Object inventory/size verification failed.' }

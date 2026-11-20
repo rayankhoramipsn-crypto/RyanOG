@@ -51,6 +51,14 @@ class RecoverySafety(unittest.TestCase):
         with self.assertRaises(restore.DrillError):
             restore.validate_inventory(bad)
 
+    def test_diagnostics_never_echo_database_errors(self):
+        for message in [b'ERROR COPY row: PRIVATE-CUSTOMER-VALUE',
+                        b'ERROR role "PRIVATE-CUSTOMER-VALUE" does not exist',
+                        b'ERROR extension "PRIVATE-CUSTOMER-VALUE" is not available']:
+            category=restore.diagnostic_category(message)
+            self.assertNotIn('PRIVATE',category)
+            self.assertIn(category,['command_error','required_role_missing','required_extension_unavailable'])
+
     def test_invalid_archive_stops_before_docker(self):
         with tempfile.TemporaryDirectory() as d:
             p=Path(d)/'bad.dump';p.write_bytes(b'not-a-backup')

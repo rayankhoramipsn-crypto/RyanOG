@@ -37,6 +37,18 @@ class DrillError(Exception):
     pass
 
 
+def diagnostic_category(stderr):
+    # SQL errors can include COPY rows, identifiers or Auth values. Never persist them.
+    text = stderr.decode('utf-8', errors='replace').lower()
+    if 'extension' in text and ('not available' in text or 'could not open extension' in text):
+        return 'required_extension_unavailable'
+    if 'role' in text and 'does not exist' in text:
+        return 'required_role_missing'
+    if 'unsupported version' in text or 'input file is too short' in text:
+        return 'archive_format_error'
+    return 'command_error' if stderr else 'no_diagnostic'
+
+
 def private_path(value):
     p = Path(value).expanduser().resolve()
     if any((parent / '.git').exists() for parent in [p, *p.parents]):
@@ -133,11 +145,9 @@ def run_drill(backup, output, image, endpoint, check_migrations=False):
         with backup.open('rb') if archive else nullcontext(None) as source:
             p = subprocess.run(docker + args, input=data, stdin=source, stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE, check=False)
-        log.write(p.stderr)
+        log.write(f'{args[0]} exit={p.returncode} category={diagnostic_category(p.stderr)}\n'.encode())
         log.flush()
         if p.returncode and required:
-            log.write(p.stdout)
-            log.flush()
             raise DrillError('Recovery command failed; inspect diagnostics privately. No pass is recorded.')
         return p
 
