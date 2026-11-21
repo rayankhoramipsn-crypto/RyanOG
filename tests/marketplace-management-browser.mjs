@@ -3,7 +3,7 @@ const base=process.env.TRISO_TEST_BASE||'http://127.0.0.1:8765',api='https://cxt
 const browser=await chromium.launch({executablePath:process.env.TRISO_CHROMIUM_PATH||undefined,args:['--no-sandbox']});
 const cors={'access-control-allow-origin':'*','access-control-allow-headers':'*','access-control-allow-methods':'*'};
 try{
- const context=await browser.newContext();const errors=[],offsets=[],sends=[];let profile,deny=false,failSend=true,adminMode=false,proGrant;
+ const context=await browser.newContext();const errors=[],offsets=[],sends=[];let createdListing,attachment,uploaded=false;let profile,deny=false,failSend=true,adminMode=false,proGrant;
  const own=Array.from({length:241},(_,i)=>({id:i+1,title:'Own listing '+(i+1),platform:'Gaming Gear',description:'A valid synthetic seller description',price:15,status:'pending',submitted_at:'2026-01-01'}));
  context.on('page',p=>p.on('pageerror',e=>errors.push(e.message)));
  await context.addInitScript(({owner})=>{if(location.hostname!=='127.0.0.1')return;localStorage.setItem('tc35_auth_session',JSON.stringify({access_token:'mock',refresh_token:'mock-refresh',expires_at:Date.now()/1000+3600,user:{id:owner,email:'seller@example.test'}}))},{owner});
@@ -14,7 +14,11 @@ try{
   if(path.endsWith('/rpc/is_admin'))data=adminMode;
   if(path.endsWith('/rpc/market_set_pro_until')){proGrant=r.postDataJSON();data=null}
   if(path.endsWith('/rpc/market_browse_page'))data={items:[{...own[0],status:'approved'}],has_more:false};
-  if(path.endsWith('/market_listings')){const n=Number(u.searchParams.get('offset')||0);offsets.push(n);data=own.slice(n,n+100)}
+  if(path.endsWith('/rpc/market_submit')){const body=r.postDataJSON();createdListing={id:242,seller_id:owner,title:body.p_title,description:body.p_description,price:body.p_price,platform:body.p_platform,status:'pending',submitted_at:'2026-01-01'};own.push(createdListing);data=242}
+  if(path.includes('/storage/v1/object/market-gallery/')&&r.method()==='POST'){assert(path.includes('/'+owner+'/242/'));assert.equal(r.headers()['content-type'],'image/png');uploaded=true;data={Key:'fixture'}}
+  if(path.endsWith('/market_listing_media')){if(r.method()==='POST'){attachment=r.postDataJSON();assert.equal(attachment.listing_id,242);assert.equal(attachment.seller_id,owner)}data=attachment?[attachment]:[]}
+  if(path.endsWith('/market_listings')&&r.method()==='PATCH'){assert.equal(r.postDataJSON().status,'approved');createdListing.status='approved';data=[createdListing]}
+  else if(path.endsWith('/market_listings')){const n=Number(u.searchParams.get('offset')||0);offsets.push(n);data=own.slice(n,n+Number(u.searchParams.get('limit')||100))}
   if(path.endsWith('/market_seller_public_profiles')){if(r.method()==='POST'){profile=r.postDataJSON();data=null}else data=profile?[profile]:[]}
   if(path.endsWith('/rpc/market_seller_profile'))data=profile?.is_public?profile:null;
   if(path.endsWith('/rpc/market_edit_listing')){const p=r.postDataJSON();Object.assign(own.find(x=>x.id===p.p_listing),{title:p.p_title,description:p.p_description,price:p.p_price,status:'pending'});data=null}
@@ -40,6 +44,11 @@ try{
   await page.waitForFunction(()=>!document.querySelector('#profile-edit-dialog').open);assert.equal(profile.user_id,owner);assert.equal(profile.is_pro,undefined);
   await page.locator('.item-card button').first().click();await page.locator('#view-seller-profile').click();await page.locator('#public-seller-name').filter({hasText:'Public Workflow Seller'}).waitFor();assert.equal(await page.locator('#public-seller-bio img').count(),0);
   await page.locator('[data-close="profile-dialog"]').click();await page.locator('#detail-dialog .close').click();
+  if(!createdListing){
+   await page.locator('#open-sell').click();await page.locator('#title').fill('New synthetic headset');await page.locator('#platform').selectOption('Gaming Gear');await page.locator('#price').fill('25');await page.locator('#description').fill('A complete synthetic headset with valid seller photos.');
+   await page.locator('#photos').setInputFiles({name:'synthetic.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/n8cAAAAASUVORK5CYII=','base64')});
+   await page.locator('#post').click();await page.waitForFunction(()=>!document.querySelector('#sell-dialog').open);assert(uploaded);assert(attachment);assert.equal(createdListing.status,'pending');await page.locator('.submission').filter({hasText:'New synthetic headset'}).waitFor();assert.equal(await page.locator('.item-title').filter({hasText:'New synthetic headset'}).count(),0);
+  }
   await page.setViewportSize({width:390,height:850});for(const lang of ['fa','ar']){await page.locator('#language').selectOption(lang);assert.equal(await page.locator('html').getAttribute('dir'),'rtl');assert(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)<=5)}
  }
  console.log('PASS main/preview seller history #241, edit/review form, public profile and safe RTL rendering');
@@ -48,7 +57,7 @@ try{
  await page.locator('#chat-body').fill('Retry this message');await page.locator('#chat-send').click();await page.locator('#chat-state').filter({hasText:'Message not sent'}).waitFor();await page.locator('#chat-send').click();await page.locator('#chat-state').filter({hasText:'Sent'}).waitFor();assert.equal(sends.length,2);assert.equal(sends[0].p_key,sends[1].p_key);
  deny=true;await page.locator('.thread-button').first().click();await page.locator('#chat-state').filter({hasText:'Permission revoked'}).waitFor();assert.equal(await page.locator('.bubble').count(),0);
  assert.deepEqual(errors,[]);console.log('PASS latest messages beyond 200, earlier history, stable send retry key and permission revocation clearing');
- adminMode=true;await page.goto(base+'/admin/');await page.getByLabel('Seller user UUID').fill(owner);await page.getByLabel('Enable Seller Pro').check();await page.getByLabel('Pro expiry (optional)').fill('2027-01-01T12:00');await page.getByRole('button',{name:'Save Seller Pro',exact:true}).click();await page.getByText('Seller Pro permissions saved.',{exact:true}).waitFor();assert.equal(proGrant.p_user,owner);assert.equal(proGrant.p_enabled,true);assert(proGrant.p_until);assert.deepEqual(errors,[]);console.log('PASS authorized admin Seller Pro form with expiry and no payment activation');
+ adminMode=true;await page.goto(base+'/admin/');await page.locator('#listings tbody tr').filter({hasText:'New synthetic headset'}).waitFor();page.once('dialog',d=>d.accept());const moderation=page.waitForResponse(r=>r.url().includes('/market_listings')&&r.request().method()==='PATCH');await page.locator('#listings tbody tr').filter({hasText:'New synthetic headset'}).getByRole('button',{name:'Approve',exact:true}).click();await moderation;assert.equal(createdListing.status,'approved');console.log('PASS synthetic listing creation, binary photo upload/attachment, pending visibility and admin approval');await page.getByLabel('Seller user UUID').fill(owner);await page.getByLabel('Enable Seller Pro').check();await page.getByLabel('Pro expiry (optional)').fill('2027-01-01T12:00');await page.getByRole('button',{name:'Save Seller Pro',exact:true}).click();await page.getByText('Seller Pro permissions saved.',{exact:true}).waitFor();assert.equal(proGrant.p_user,owner);assert.equal(proGrant.p_enabled,true);assert(proGrant.p_until);assert.deepEqual(errors,[]);console.log('PASS authorized admin Seller Pro form with expiry and no payment activation');
 
  await context.close();
 }finally{await browser.close()}

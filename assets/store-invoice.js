@@ -11,7 +11,7 @@
     readiness=await r.json();
     if(readiness.schema_version!==1)return;
   } catch {return;}
-  const t=(en,fa,ar)=>({en,fa,ar})[typeof currentLang==='string'?currentLang:'en']||en;
+  const t=(en,fa,ar)=>({en,fa,ar})[document.documentElement.lang]||en;
   const status=document.createElement('p');status.setAttribute('role','status');
   let invoice=null,orderId=null,busy=false,timer,version=0;
   const ref=document.createElement('input');ref.placeholder=t('Order ID','شماره سفارش','رقم الطلب');ref.setAttribute('aria-label','Order ID');
@@ -25,12 +25,12 @@
     const r=await fetch(endpoint,{method:'POST',headers:{apikey:SUPA_KEY,Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(20000)});
     const d=await r.json();if(!r.ok)throw Error(d.error||'Request failed');return d;
   }
-  async function run(fn){if(busy)return;busy=true;const v=version;panel.querySelectorAll('button').forEach(b=>b.disabled=true);try{await fn(v)}catch(e){if(v===version)status.textContent=e.message}finally{if(v===version){busy=false;controls()}}}
-  function controls(){if(typeof restart!=='undefined')restart.disabled=!invoice||!(Date.parse(invoice.expires_at)<=Date.now()||['cancelled','fulfilled','refunded'].includes(invoice.order_status));create.disabled=!readiness.enabled||!!invoice;verify.disabled=!invoice||!readiness.enabled;resume.disabled=false;network.disabled=!!invoice;}
+  async function run(fn){if(busy)return;busy=true;const v=version;controls();try{await fn(v)}catch(e){if(v===version)status.textContent=e.message}finally{if(v===version){busy=false;controls()}}}
+  function controls(){if(typeof restart!=='undefined')restart.disabled=busy||!invoice||!(Date.parse(invoice.expires_at)<=Date.now()||['cancelled','fulfilled','refunded'].includes(invoice.order_status));create.disabled=busy||!readiness.enabled||!!invoice;verify.disabled=busy||!invoice||!readiness.enabled;resume.disabled=busy;network.disabled=busy||!!invoice;details.querySelectorAll('button').forEach(b=>b.disabled=busy);}
   function render(){
     clearTimeout(timer);details.replaceChildren();if(!invoice)return;
     const expired=Date.parse(invoice.expires_at)<=Date.now();
-    const p=document.createElement('p');p.textContent=t('Invoice ','فاکتور ','فاتورة ')+invoice.id+' · '+(expired?'expired':invoice.state);details.append(p);
+    const p=document.createElement('p');p.textContent=t('Invoice ','فاکتور ','فاتورة ')+invoice.id+' · '+(expired?t('expired','منقضی','منتهية'):invoice.state);details.append(p);
     // Legacy shared-wallet invoices must be reconciled, never offered for new payment.
     if(!expired&&(!invoice.order_status||['awaiting_payment','payment_submitted','payment_review'].includes(invoice.order_status))&&!invoice.txid&&invoice.provider!=='legacy-shared-address'&&readiness.enabled&&['awaiting_payment','submitted','confirming','partial'].includes(invoice.state)){
       const units=BigInt(invoice.units),amount=(units/100000000n)+'.'+(units%100000000n).toString().padStart(8,'0');
@@ -50,7 +50,8 @@
     const result=await call({action:'create',order_id:orderId,network:network.value});if(v!==version)return;invoice=result;render();
   });
   const verify=button(t('Check TXID','بررسی تراکنش','تحقق من المعاملة'),async v=>{
-    const result=await call({action:'verify',order_id:invoice.order_id,txid:tx.value.trim().toLowerCase()});if(v!==version)return;
+    const txid=tx.value.trim().toLowerCase();if(!/^[a-f0-9]{64}$/.test(txid))throw Error(t('Enter a 64-character hexadecimal TXID.','شناسه تراکنش باید ۶۴ نویسه شانزده‌شانزدهی باشد.','أدخل معرّف معاملة سداسي عشري من ٦٤ خانة.'));
+    const result=await call({action:'verify',order_id:invoice.order_id,txid});if(v!==version)return;
     status.textContent=result.status;
     invoice=await call({action:'resume',order_id:invoice.order_id});if(v===version)render();
   });
@@ -62,6 +63,14 @@
   const manual=legacy.querySelector('section[aria-label="Manual Litecoin and Bitcoin payments"]');
   panel.append(legacy);if(manual)panel.append(manual);
   panel.append(network,create,details,tx,verify,ref,resume,restart,status);
-  function reset(){version++;busy=false;orderId=null;invoice=null;ref.value='';tx.value='';details.replaceChildren();clearTimeout(timer);status.textContent=readiness.enabled?t('Only pay the exact server invoice. A TXID is an unverified claim.','فقط مبلغ فاکتور سرور را بپردازید. شناسه تراکنش به تنهایی تأیید پرداخت نیست.','ادفع وفق فاتورة الخادم فقط. معرّف المعاملة ليس إثبات دفع.'):t('Crypto processing is not configured. Save an unpaid order or contact support.','پرداخت رمزارزی پیکربندی نشده است. سفارش پرداخت‌نشده ذخیره کنید یا با پشتیبانی تماس بگیرید.','الدفع بالعملات الرقمية غير مهيأ. احفظ طلباً غير مدفوع أو تواصل مع الدعم.');controls();}
+  function reset(){version++;busy=false;orderId=null;invoice=null;ref.value='';tx.value='';details.replaceChildren();clearTimeout(timer);instructions();controls();}
+  function instructions(){status.textContent=readiness.enabled?t('Only pay the exact server invoice. A TXID is an unverified claim.','فقط مبلغ فاکتور سرور را بپردازید. شناسه تراکنش به تنهایی تأیید پرداخت نیست.','ادفع وفق فاتورة الخادم فقط. معرّف المعاملة ليس إثبات دفع.'):t('Crypto processing is not configured. Save an unpaid order or contact support.','پرداخت رمزارزی پیکربندی نشده است. سفارش پرداخت‌نشده ذخیره کنید یا با پشتیبانی تماس بگیرید.','الدفع بالعملات الرقمية غير مهيأ. احفظ طلباً غير مدفوع أو تواصل مع الدعم.');}
+  function language(){
+    ref.placeholder=t('Order ID','شماره سفارش','رقم الطلب');ref.setAttribute('aria-label',ref.placeholder);
+    create.textContent=t('Create invoice','ساخت فاکتور','إنشاء فاتورة');verify.textContent=t('Check TXID','بررسی تراکنش','تحقق من المعاملة');
+    resume.textContent=t('Reopen invoice','بازیابی فاکتور','استعادة الفاتورة');restart.textContent=t('Start a new unpaid order','شروع سفارش پرداخت‌نشده جدید','بدء طلب جديد غير مدفوع');
+    if(invoice)render();else if(!busy)instructions();
+  }
+  new MutationObserver(language).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
   const original=window.tc41OpenCheckout;if(original)window.tc41OpenCheckout=function(...args){const r=original.apply(this,args);reset();return r;};reset();
 })();
