@@ -3333,6 +3333,8 @@ const status=(message='',kind='info')=>{
  }
 };
 async function api(path,body,token){
+ // Confirmation must return to this staging origin, just like recovery/OAuth.
+ if(path==='signup'||path==='recover')path+='?redirect_to='+encodeURIComponent(location.origin+location.pathname);
  const res=await fetch(url+'/auth/v1/'+path,{method:'POST',headers:{apikey:anon,'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify(body||{})});
  const d=await res.json().catch(()=>({}));if(!res.ok)throw Error(d.error_description||d.msg||d.message||d.error||'Authentication failed');return d;
 }
@@ -3493,8 +3495,7 @@ window.tc31Reset=async()=>{
   if(location.protocol==='file:')throw Error('Open the live website to reset your password.');
   if(button)button.disabled=true;
   recoveryFeedback('Sending your reset link…');
-  // Keep the already-allowed production origin; the recovery callback is routed
-  // to the dedicated UI below, instead of language/signup onboarding.
+  // Keep recovery on the current origin; its exact URL must be allowed in Auth settings.
   const redirect=location.origin+location.pathname;
   await api('recover?redirect_to='+encodeURIComponent(redirect),{email});
   recoveryFeedback('If an account exists for this email, we sent a reset link. Check inbox and spam.','success');

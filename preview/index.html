@@ -2846,6 +2846,8 @@ const storeKey='tc35_auth_session';
 let session=null;
 const status=t=>{const el=$('tc31-status');if(el)el.textContent=t};
 async function api(path,body,token){
+ // Confirmation must return to this staging origin, just like recovery/OAuth.
+ if(path==='signup'||path==='recover')path+='?redirect_to='+encodeURIComponent(location.origin+location.pathname);
  const res=await fetch(url+'/auth/v1/'+path,{method:'POST',headers:{apikey:anon,'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify(body||{})});
  const d=await res.json().catch(()=>({}));if(!res.ok)throw Error(d.error_description||d.msg||d.message||d.error||'Authentication failed');return d;
 }
