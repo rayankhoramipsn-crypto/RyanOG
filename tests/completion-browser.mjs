@@ -30,7 +30,7 @@ try{
   await page.setViewportSize({width,height:900});await page.goto(base+'/blog/?slug=fixture');
   await page.locator('#article-title').filter({hasText:'Journal fixture'}).waitFor();
   assert.equal(await page.locator('#article-cover').getAttribute('src'),'https://example.test/photo.png');
-  assert.equal(await page.locator('html').getAttribute('dir'),'rtl');
+  assert.equal(await page.locator('#article').getAttribute('dir'),'rtl');assert.equal(await page.locator('#article').getAttribute('lang'),'fa');assert.equal(await page.locator('html').getAttribute('lang'),'en');
   assert.equal(await page.locator('#article-body script').count(),0);
   assert.equal(await page.locator('link[rel=canonical]').getAttribute('href'),'https://trisocmd.shop/blog/fixture/');
   assert(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)<=5);

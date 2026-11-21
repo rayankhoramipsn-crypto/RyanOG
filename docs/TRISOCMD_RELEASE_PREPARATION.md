@@ -1,5 +1,8 @@
 # Staging release preparation status
 
+**Current staging update (2026-11-22):** all six reviewed migrations are installed; four Edge Functions are ACTIVE (store-crypto v6, payment-webhook v1, delivery-worker v2, delivery-webhook v1). Worker v2 enforces a source-level delivery hold. Endpoint HTTP acceptance is network-blocked; no live provider activation or production release is claimed. Hosted transactional SQL-role checks pass. New node-verification/PayPal reconciliation code is local-only and incomplete as an end-to-end payment integration. See [sprint evidence and precise blockers](TRISOCMD_STAGING_SPRINT.md). The preparation/pending-deployment statements below are historical.
+
+
 Updated 2026-11-20 (Asia/Tehran). PR #37 remains draft and based on PR #36 (`3eea77c`); feature branch continues from `d237a3c`. **NO-GO for hosted migration execution and production release.** This task prepares/tests owner-operated recovery; it performs no hosted writes, secret/config changes, deployment, merge or financial/messaging activation.
 
 ## Ready versus unverified

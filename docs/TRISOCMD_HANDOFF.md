@@ -1,5 +1,8 @@
 # TRISOCMD continuation handoff
 
+**Current staging update (2026-11-22):** all six reviewed migrations are installed; four Edge Functions are ACTIVE (store-crypto v6, payment-webhook v1, delivery-worker v2, delivery-webhook v1). Worker v2 enforces a source-level delivery hold. Endpoint HTTP acceptance is network-blocked; no live provider activation or production release is claimed. Hosted transactional SQL-role checks pass. New node-verification/PayPal reconciliation code is local-only and incomplete as an end-to-end payment integration. See [sprint evidence and precise blockers](TRISOCMD_STAGING_SPRINT.md). The preparation/pending-deployment statements below are historical.
+
+
 Updated 2026-11-20 (Asia/Tehran). Work stops when this task ends; no background execution is promised.
 
 Branch: feature/trisocmd-completion, based on feature/phase1-checkout / PR #36 head 3eea77c. Preserve PR #36 and its compatibility changes. Do not merge or deploy. No production, staging data, credentials, DNS or financial system was modified.
