@@ -4,7 +4,7 @@ const browser=await chromium.launch({executablePath:process.env.TRISO_CHROMIUM_P
 const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jq1sAAAAASUVORK5CYII=','base64');
 try{
  const context=await browser.newContext(),errors=[],uploads=[];let writeCount=0,isAdmin=true;
- context.on('page',p=>p.on('pageerror',e=>errors.push(e.message)));
+ context.on('page',p=>p.on('pageerror',e=>{errors.push(e.message);console.error(e.stack)}));
  await context.addInitScript(({admin})=>{if(location.hostname!=='127.0.0.1')return;localStorage.setItem('tc35_auth_session',JSON.stringify({access_token:'content-admin',refresh_token:'fixture',expires_at:Date.now()/1000+3600,user:{id:admin,app_metadata:{role:'admin'}}}))},{admin});
  const products=Array.from({length:241},(_,i)=>({id:i+1,title:i===240?'Older mechanical keyboard':'Product '+(i+1),description:'Product description',description_fa:'توضیحات محصول',description_ar:'وصف المنتج',slug:'product-'+(i+1),category:i===240?'Gaming Gear':'Digital Goods',status:'available',price:i+1,stock:5,created_at:'2026-01-01'}));
  const posts=Array.from({length:241},(_,i)=>({id:'post-'+i,title:i===240?'Older guide':'Article '+i,slug:'article-'+i,excerpt:'Guide excerpt',body:'Plain text <script>unsafe()</script>',category:i===240?'Hardware':'Guides',language:'en',status:'published',published_at:'2020-01-01',created_at:'2020-01-01'}));
@@ -30,14 +30,44 @@ try{
  });
  const page=await context.newPage();page.setDefaultTimeout(15000);
  for(const prefix of ['','/preview']){
+  await page.goto(base+prefix+'/index.html');assert.equal(await page.locator('a[href="#tc-shop-heading"]').filter({hasText:/skip/i}).count(),1);
   await page.goto(base+prefix+'/product.html?id=241');await page.locator('#specs').getByText('Mechanical',{exact:true}).waitFor();assert.equal(await page.locator('#gallery button').count(),2);
   await page.getByRole('button',{name:'Back',exact:true}).click();assert.equal(await page.locator('#hero').getAttribute('src'),'https://images.fixture/second.png');await page.getByRole('button',{name:'Back',exact:true}).press('Home');assert.equal(await page.locator('#hero').getAttribute('src'),'https://images.fixture/first.png');
   assert.equal(await page.locator('#videos iframe').count(),0);await page.getByRole('button',{name:'Review',exact:true}).click();assert((await page.locator('#videos iframe').getAttribute('src')).startsWith('https://www.youtube-nocookie.com/embed/'));
   assert.equal(await page.locator('link[rel=canonical]').getAttribute('href'),'https://trisocmd.shop/products/product-241/');assert((await page.locator('#content-schema').textContent()).includes('InStock'));
   for(const width of [390,768,1365]){await page.setViewportSize({width,height:850});assert(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)<=5)}
-  for(const [lang,text]of [['fa','توضیحات محصول'],['ar','وصف المنتج']]){await page.setViewportSize({width:390,height:850});await page.getByLabel('Language',{exact:true}).selectOption(lang);await page.locator('#description').filter({hasText:text}).waitFor();assert.equal(await page.locator('html').getAttribute('dir'),'rtl');assert(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)<=5)}
+  for(const [lang,text,save,invalid,upload,edit,language]of [
+   ['en','Product description','Save media','Invalid media order','Use a PNG, JPEG or WebP image up to 5 MB.','Edit Switch','Language'],
+   ['fa','توضیحات محصول','ذخیره رسانه','ترتیب رسانه نامعتبر است','از تصویر PNG، JPEG یا WebP تا ۵ مگابایت استفاده کنید.','ویرایش Switch','زبان'],
+   ['ar','وصف المنتج','حفظ الوسائط','ترتيب الوسائط غير صالح','استخدم صورة PNG أو JPEG أو WebP بحجم يصل إلى ٥ ميغابايت.','تعديل Switch','اللغة']]){
+   await page.setViewportSize({width:390,height:850});await page.locator('header select[data-content-aria="Language"]').selectOption(lang);
+   await page.locator('#description').filter({hasText:text}).waitFor();assert.equal(await page.locator('html').getAttribute('dir'),lang==='en'?'ltr':'rtl');
+   await page.locator('#media-admin button').filter({hasText:save}).first().waitFor();await page.getByRole('button',{name:edit,exact:true}).waitFor();
+   assert.equal(await page.locator('header select').getAttribute('aria-label'),language);
+   await page.locator('#media-admin input[type=number]').first().fill('-1');await page.getByRole('button',{name:save,exact:true}).first().click();assert.equal(await page.locator('#notice').textContent(),invalid);
+   await page.locator('#upload-image').click();await page.locator('#notice').filter({hasText:upload}).waitFor();assert.equal(await page.locator('#notice').textContent(),upload);
+   assert(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)<=5);
+  }
  }
- await page.goto(base+'/product.html?slug=241');await page.locator('#title').filter({hasText:'Older mechanical keyboard'}).waitFor();await page.getByLabel('Language',{exact:true}).selectOption('en');await page.getByLabel('Media caption 1',{exact:true}).fill('Updated front');await page.locator('.media-edit').first().getByRole('button',{name:'Save media',exact:true}).click();await page.getByRole('button',{name:'Updated front',exact:true}).waitFor();await page.locator('header').scrollIntoViewIfNeeded();await page.screenshot({path:'work/content-product-390.png',fullPage:false});
+ for(const prefix of ['','/preview']){
+  await page.goto(base+prefix+'/blog/');await page.locator('#admin:not(.hidden)').waitFor();
+  for(const [lang,title,save,preview,validation]of [
+   ['en','Title','Save article','Preview Article 0','Title, valid slug and body are required.'],
+   ['fa','عنوان','ذخیره مقاله','پیش‌نمایش Article 0','عنوان، نامک معتبر و متن لازم است.'],
+   ['ar','العنوان','حفظ المقال','معاينة Article 0','العنوان والاسم الصالح في الرابط والمحتوى مطلوبة.']]){
+   await page.locator('header select').selectOption(lang);assert.equal(await page.locator('html').getAttribute('dir'),lang==='en'?'ltr':'rtl');
+   await page.getByLabel(title,{exact:true}).waitFor();await page.getByRole('button',{name:save,exact:true}).waitFor();await page.getByRole('button',{name:preview,exact:true}).waitFor();
+   await page.locator('.content-skip').focus();await page.locator('.content-skip').press('Enter');assert.equal(await page.evaluate(()=>document.activeElement.id),'content-main');
+   // Exercise custom validation without browser constraint validation stopping submission first.
+   await page.evaluate(()=>document.getElementById('editor').dispatchEvent(new SubmitEvent('submit',{bubbles:true,cancelable:true,submitter:document.querySelector('#editor button[type=submit]')})));
+   assert.equal(await page.locator('#message').textContent(),validation);
+   await page.getByRole('button',{name:preview,exact:true}).click();assert.equal(await page.locator('html').getAttribute('lang'),lang);assert.equal(await page.locator('#article').getAttribute('lang'),'en');await page.locator('#back').click();
+   assert(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)<=5);
+  }
+  await page.locator('header select').selectOption('en');await page.getByRole('button',{name:'Preview Article 0',exact:true}).click();
+  await page.locator('.content-skip').focus();await page.locator('.content-skip').press('Enter');assert.equal(await page.evaluate(()=>document.activeElement.id),'content-main');
+ }
+ await page.goto(base+'/product.html?slug=241');await page.locator('#title').filter({hasText:'Older mechanical keyboard'}).waitFor();await page.locator('header select[data-content-aria="Language"]').selectOption('en');await page.getByLabel('Media caption 1',{exact:true}).fill('Updated front');await page.locator('.media-edit').first().getByRole('button',{name:'Save media',exact:true}).click();await page.getByRole('button',{name:'Updated front',exact:true}).waitFor();await page.locator('header').scrollIntoViewIfNeeded();await page.screenshot({path:'work/content-product-390.png',fullPage:false});
  await page.locator('#media-file').setInputFiles({name:'fake.png',mimeType:'image/png',buffer:Buffer.from('<svg>not a PNG</svg>')});await page.locator('#upload-image').click();await page.locator('#notice').filter({hasText:'contents do not match'}).waitFor();assert.equal(uploads.length,0);
  const valid=await page.evaluate(()=>{const canvas=document.createElement('canvas');canvas.width=canvas.height=2;return canvas.toDataURL('image/png').split(',')[1]});await page.locator('#media-file').setInputFiles({name:'real.png',mimeType:'image/png',buffer:Buffer.from(valid,'base64')});await page.locator('#upload-image').click();await page.locator('#notice').filter({hasText:'Uploaded.'}).waitFor();assert.equal(uploads.length,1);assert(uploads[0].path.includes('/'+admin+'/'));
  products[240].status='draft';isAdmin=false;await page.locator('#retry-content').click();await page.locator('#title').filter({hasText:'Product unavailable.'}).waitFor();assert.equal(await page.locator('#gallery button').count(),0);assert.equal(await page.locator('#description').textContent(),'');assert(await page.locator('#admin').evaluate(e=>e.classList.contains('hidden')));isAdmin=true;products[240].status='available';
