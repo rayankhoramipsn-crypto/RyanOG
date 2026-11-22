@@ -25,6 +25,23 @@ Source now distinguishes typed signup/email confirmation, recovery and OAuth cal
 
 The connector cannot read the current hosted templates. A misconfigured template is therefore **possible, not independently confirmed**. After checking it, use the new resend action and a dedicated staging inbox to verify a newly issued signup link → Sign In success, a new recovery link → new-password form, and Google OAuth → account. Do not share token-bearing URLs, captures or credentials. Existing consumed/expired links cannot be repaired by the frontend. Keep the staging redirect allowlist above. Real hosted email/Google acceptance remains owner-side because the execution network is blocked.
 
+## Desktop layout and Google OAuth follow-up (2026-11-22)
+
+The reproduced 1365px failure was a CSS cascade bug: `#tc31-panel[data-auth-mode="signin"] #tc31-guest` forced `display:grid!important`, overriding the new normal `display:block`; the inherited two-column template then split the 440px wrapper into 217.36px and 200.63px tracks. The only form occupied the first track. The shared guest grid now explicitly has one `minmax(0,1fr)` column. The wrapper has an explicit full available width capped at 440px, also fixing preview flex shrinkage. Password input/toggle alignment now uses the same grid cell with logical alignment instead of a fixed top offset. Language changes close preview's welcome overlay before returning to Auth.
+
+The old Google button blindly navigated to the provider URL, so server setup errors left the website without a useful in-page notice. The new button checks public Auth settings first, reports disabled/unavailable/rate-limit/network/storage failures, and creates S256 PKCE with a tab-scoped verifier. The callback verifies the original path and server user before applying the existing Remember Me preference. Email/recovery SDK verifiers remain separate. These are source fixes, not proof that hosted Google authentication succeeds.
+
+Read-only staging Auth log aggregation found **3 generic “provider is not enabled” errors among 37 entries** in the queried 24-hour window. Those errors did not identify Google; no `invalid_client` or `redirect_uri_mismatch` entries were found. This does **not** certify Google's enablement or client configuration. The connector cannot read/write those settings, and the known HTTPS restriction was not retried.
+
+**Exact owner configuration/acceptance, staging only:**
+
+1. In Google Cloud, verify a **staging-only OAuth client → Web application**. Its Authorized redirect URI must be exactly `https://cxtytbjvdlngahytfilr.supabase.co/auth/v1/callback` (the Supabase callback, not the frontend URL). If configuring Authorized JavaScript origins, use `https://trisocmd-staging-review.rayankhoramipsn.chatgpt.site`, without a path. This implementation uses redirect OAuth, not Google Identity Services JavaScript.
+2. In **TRISO TEST → Authentication → Sign In / Providers → Google**, verify the provider is enabled and the matching Web client ID and secret are saved privately. Do not put the secret in source, chat or frontend configuration; do not disable nonce/security checks. Preserve production settings.
+3. Preserve/verify the staging Site URL and four exact frontend redirect URLs listed above. Frontend `redirect_to` is the current origin/path; Google redirects first to Supabase, then Supabase returns the authorization code to this allowlisted frontend path.
+4. If the Google consent app is in Testing, add only the dedicated staging Google account as a test user and ensure its audience permits that account. Verify the button reaches Google, complete consent, return to the original staging page, and check Account/session persistence with Remember Me both ways. Repeat cancellation once. Do not share codes/tokens or raw network captures.
+
+Focused rendering evidence is generated locally by `TRISO_CHROMIUM_PATH=/usr/bin/chromium node tests/auth-layout-browser.mjs`: original screenshots, contact sheets and measured widths in ignored `work/auth-layout/`. API responses are synthetic, but the actual source styles and normal browser motion/cascade are rendered. Hosted Google login remains UNVERIFIED until the owner flow above passes.
+
 ## One browser acceptance checklist
 
 Open **[staging-check.html](https://trisocmd-staging-review.rayankhoramipsn.chatgpt.site/staging-check.html)** from the owner's permitted browser. Its checklist covers buyer/seller/admin flows; no credentials, jobs or business records are created by its automated checks.

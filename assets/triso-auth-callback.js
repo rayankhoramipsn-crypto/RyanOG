@@ -13,7 +13,8 @@
   const input=pending;pending=null;if(!input)return {handled:false};
   let flow=input.kind;
   try{
-   if(input.error||input.invalid)throw Error();
+   if(input.error){try{global.sessionStorage?.removeItem('tc35_google_pkce')}catch{};throw Error()}
+   if(input.invalid)throw Error();
    if(input.type&&!['signup','email','invite','email_change','recovery','magiclink'].includes(input.type))throw Error();
    if([!!input.hash,!!input.code,!!(input.access||input.refresh)].filter(Boolean).length!==1)throw Error();
    let session;
@@ -21,9 +22,16 @@
     if(!['recovery','signup','email','invite','email_change','magiclink'].includes(input.type))throw Error();
     session=await api('verify',{token_hash:input.hash,type:input.type});
    }else if(input.code){
-    const key='sb-cxtytbjvdlngahytfilr-auth-token-code-verifier';let stored;
-    for(const name of ['sessionStorage','localStorage']){let value;try{value=global[name]?.getItem(key);global[name]?.removeItem(key)}catch{}
-     if(value){if(stored&&stored!==value)throw Error();stored=value}
+    const appKey='tc35_google_pkce',sdkKey='sb-cxtytbjvdlngahytfilr-auth-token-code-verifier';let stored,app;
+    if(!input.type){try{app=global.sessionStorage?.getItem(appKey);global.sessionStorage?.removeItem(appKey)}catch{}}
+    if(app){
+     const context=JSON.parse(app);
+     if(context.redirect!==url.origin+url.pathname)throw Error();
+     stored=JSON.stringify(context.verifier);
+    }else{
+     for(const name of ['sessionStorage','localStorage']){let value;try{value=global[name]?.getItem(sdkKey);global[name]?.removeItem(sdkKey)}catch{}
+      if(value){if(stored&&stored!==value)throw Error();stored=value}
+     }
     }
     if(!stored)throw Error();let verifier;try{verifier=JSON.parse(stored)}catch{verifier=stored}
     if(typeof verifier!=='string')throw Error();

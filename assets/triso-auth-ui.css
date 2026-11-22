@@ -1,7 +1,7 @@
 /* Scoped account entry UI; signed-in dashboard keeps its existing layout. */
 #tc31-panel.tc-auth:not([data-auth-mode="account"]){background:#0d0d12;padding:24px 20px 40px;min-height:100svh;box-sizing:border-box;color:#f1eef7}
 #tc31-panel.tc-auth:not([data-auth-mode="account"])::before,#tc31-panel.tc-auth:not([data-auth-mode="account"])::after{display:none}
-#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-wrap{max-width:440px;margin:0 auto}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-wrap{width:100%;max-width:440px;min-width:0;margin:0 auto}
 #tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-nav{margin-bottom:24px;gap:12px}
 #tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-nav strong{font-size:18px;letter-spacing:-.04em;white-space:nowrap}
 #tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-nav strong span{color:#bba7e8}
@@ -9,7 +9,7 @@
 #tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-kicker{font-size:10px;letter-spacing:.12em;color:#aaa0bc;margin:0 0 8px}
 #tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-heading{font-size:28px;line-height:1.2;letter-spacing:-.025em;margin:0 0 8px;color:#f7f4ff;font-weight:650}
 #tc31-panel.tc-auth:not([data-auth-mode="account"]) #tc-v22-hero-copy{font-size:14px;line-height:1.5;margin:0 0 18px;color:#b9b3c5}
-#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-grid{display:block;margin:0}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-grid{display:grid;grid-template-columns:minmax(0,1fr);min-width:0;margin:0}
 #tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-signup-shell{max-width:none;margin:0}
 #tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-auth-card,#tc31-panel.tc-auth:not([data-auth-mode="account"]) #tc31-forgot-view,#tc31-panel.tc-auth:not([data-auth-mode="account"]) #tc31-recovery-shell{width:100%;box-sizing:border-box;padding:22px;margin:0!important;border:1px solid #34303e;border-radius:16px;background:#16151c;box-shadow:0 12px 36px #0002;text-align:start;transform:none;opacity:1}
 #tc31-panel.tc-auth:not([data-auth-mode="account"]) [hidden]{display:none!important}
@@ -22,9 +22,9 @@
 #tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-auth-card button,#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-auth-card a{font:inherit;font-size:13px}
 #tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-v22-label-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
 #tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-v22-label-row button{padding:6px 0;white-space:normal;text-align:end}
-#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-v22-password-row{position:relative}
-#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-v22-password-row .tc31-input{padding-inline-end:76px;padding-inline-start:12px}
-#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-v22-reveal{position:absolute;inset-inline-end:8px;inset-inline-start:auto;top:6px;min-height:40px;border:0;background:transparent;color:#c9b6ef;padding:8px;font-size:12px;cursor:pointer}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-v22-password-row{position:relative;display:grid;grid-template-columns:minmax(0,1fr);align-items:center}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-v22-password-row .tc31-input{grid-area:1/1;min-width:0;margin-block:4px;padding-inline-end:76px;padding-inline-start:12px}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-v22-reveal{position:relative;inset:auto;grid-area:1/1;justify-self:end;align-self:center;margin-inline-end:8px;min-height:40px;border:0;background:transparent;color:#c9b6ef;padding:8px;font-size:12px;cursor:pointer}
 #tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-remember{display:flex;align-items:center;gap:8px;margin:10px 0 14px;font-size:13px;font-weight:400}
 #tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-remember input{accent-color:#ae8ce0;min-width:16px;min-height:16px;margin:0}
 #tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-btn{min-height:44px;border-radius:8px;padding:11px 14px;background:#b39adf;color:#17101f;font-size:14px;font-weight:650;box-shadow:none;letter-spacing:0}

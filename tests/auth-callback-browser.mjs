@@ -37,7 +37,7 @@ try{
     await page.waitForFunction(()=>document.activeElement.id==='tc31-signup-name');
     assert.equal(await page.evaluate(()=>document.documentElement.dir),dir);
     assert(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)<=1,'no horizontal overflow');
-    const card=await page.locator('#tc31-signup-view .tc-auth-card').boundingBox();assert(card.width<=440&&card.height<760,'compact signup card');
+    const card=await page.locator('#tc31-signup-view .tc-auth-card').boundingBox();assert(card.width>=Math.min(420,width-32)&&card.width<=440&&card.height<760,'auth card must use its full available width');
     assert.equal(await page.locator('label[for=tc31-signup-email]').textContent(),await page.evaluate(()=>TrisoAuthUI.t('Email address')));
     await page.locator('#tc31-signup-password').focus();await page.keyboard.press('Tab');assert.equal(await page.locator('[aria-controls=tc31-signup-password]').evaluate(e=>e===document.activeElement),true,'keyboard reaches reveal');
     if(path==='/index.html'&&width===390)await page.screenshot({path:'/tmp/triso-auth-signup-'+lang+'.png',fullPage:true});

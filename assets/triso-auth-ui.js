@@ -2,6 +2,10 @@
 (function(global){
  'use strict';
  const copy={
+ 'Connecting to Google…':['در حال اتصال به گوگل…','جارٍ الاتصال بـ Google…'],
+ 'Google sign-in is not configured on this site. Please use email sign-in.':['ورود با گوگل در این سایت پیکربندی نشده است. لطفاً با ایمیل وارد شوید.','تسجيل الدخول باستخدام Google غير مُعدّ على هذا الموقع. استخدم البريد الإلكتروني.'],
+ 'Google sign-in settings could not be checked. Please try again.':['تنظیمات ورود با گوگل بررسی نشد. دوباره تلاش کنید.','تعذر التحقق من إعدادات تسجيل الدخول باستخدام Google. حاول مجددًا.'],
+ 'Google sign-in needs browser session storage. Allow it and try again.':['ورود با گوگل به ذخیره‌سازی نشست مرورگر نیاز دارد. آن را مجاز کنید و دوباره تلاش کنید.','يتطلب تسجيل الدخول باستخدام Google تخزين جلسة المتصفح. اسمح به وحاول مجددًا.'],
  'Language':['زبان','اللغة'],
  'Sign in':['ورود','تسجيل الدخول'],
  'Create account':['ایجاد حساب','إنشاء حساب'],
@@ -82,7 +86,7 @@
   set(document.querySelector('#tc31-panel .tc31-heading'),title);
   set(document.getElementById('tc-v22-hero-copy'),'Your account, your gaming marketplace.');
  }
- function language(lang){global.setLang(lang,['fa','ar'].includes(lang)?'rtl':'ltr','navbar');global.showScreen('tc31-panel');paint()}
+ function language(lang){global.setLang(lang,['fa','ar'].includes(lang)?'rtl':'ltr','navbar');global.tc37Close?.();global.showScreen('tc31-panel');paint()}
  function paint(){
   const select=document.getElementById('tc-auth-language');if(select)select.value=['en','fa','ar'].includes(document.documentElement.lang)?document.documentElement.lang:'en';
   document.querySelectorAll('#tc31-panel [data-auth-label]').forEach(el=>el.setAttribute('aria-label',t(el.dataset.authLabel)));

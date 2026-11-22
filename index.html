@@ -1564,6 +1564,7 @@ body,#store-screen{background:radial-gradient(ellipse 75% 22% at 50% 0%,#271338 
 #tc42-save-order:disabled{opacity:.58;cursor:wait}
 </style><link rel="stylesheet" href="assets/phase1-orders.css">
 <link rel="stylesheet" href="assets/triso-support.css"><link rel="stylesheet" href="assets/triso-content.css"><link rel="stylesheet" href="assets/triso-auth-ui.css">
+<script src="assets/triso-auth-oauth.js" defer></script>
 <script src="assets/triso-auth-ui.js" defer></script>
 </head>
 <body><a class="content-skip" href="#tc-shop-heading">Skip to products</a><div id="tc50-staging-banner" role="status" style="position:relative;z-index:99999;background:#122330;border-bottom:1px solid #467487;color:#c2eaff;padding:10px 18px;text-align:center;font:600 12px/1.5 system-ui,sans-serif">STAGING PREVIEW · Payments, order processing, and support notifications are not live. Do not send funds.</div>
@@ -3432,7 +3433,15 @@ window.tc31Email=async mode=>{
   setAuthMode('account',false);save(d);$('tc31-password').value='';status('Signed in successfully. Welcome back.','success');
  }catch(e){status(window.TrisoAuthUI.error(e),'error')}finally{pendingAuth=false;button.disabled=false}
 };
-window.tc31Google=()=>{if(location.protocol==='file:'){status('Google sign-in needs a hosted HTTPS URL.','error');return}const redirect=location.origin+location.pathname;location.href=url+'/auth/v1/authorize?provider=google&redirect_to='+encodeURIComponent(redirect)};
+window.tc31Google=async()=>{
+ if(pendingAuth)return;
+ const buttons=[...document.querySelectorAll('#tc31-panel .tc-auth-google')];
+ try{
+  pendingAuth=true;buttons.forEach(button=>button.disabled=true);status('Connecting to Google…');
+  location.assign(await window.TrisoAuthOAuth.google({url,anon}));
+ }catch(e){status(window.TrisoAuthUI.error(e),'error')}
+ finally{pendingAuth=false;buttons.forEach(button=>button.disabled=false)}
+};
 function recoveryFeedback(message,kind='info'){status(message,kind)}
 window.tc31Reset=async()=>{
  if(pendingAuth)return;
