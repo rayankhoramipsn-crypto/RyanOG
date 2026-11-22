@@ -90,7 +90,7 @@ try{
  await delayed.locator('#tc31-panel.active').waitFor();release();
  await delayed.waitForFunction(()=>window.tcPhase1BootstrapComplete===true);
  assert.equal(await delayed.locator('#tc31-panel.active').count(),1,'late catalog fetch must preserve account navigation');
- await delayed.getByRole('button',{name:'Create your account'}).click();
+ await delayed.getByRole('button',{name:'Create account'}).click();
  await delayed.locator('#tc31-signup-view:visible').waitFor();
  console.log('PASS delayed product bootstrap preserves language/account navigation');
  await delayed.close();

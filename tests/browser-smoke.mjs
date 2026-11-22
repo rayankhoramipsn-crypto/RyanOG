@@ -124,16 +124,16 @@ try{
  assert.equal(await home.locator('#tc31-guest:visible').count(),1,'login mode should be visible');
  assert.equal(await home.locator('#tc31-forgot-view:visible').count(),0,'forgot mode should start hidden');
  // A mocked rejected sign-in must produce an unmistakable red alert.
- await home.route(origin+'/auth/v1/token?**',route=>route.fulfill({status:400,headers:cors,body:JSON.stringify({message:'Invalid login credentials'})}));
+ await home.route(origin+'/auth/v1/token?**',route=>route.fulfill({status:400,headers:cors,body:JSON.stringify({error_code:'invalid_credentials'})}));
  await home.locator('#tc31-email').fill('demo@example.test');
  await home.locator('#tc31-password').fill('not-the-password');
  await home.locator('#tc-v22-login-submit').click();
  await home.locator('#tc-v23-login-feedback[data-state="error"]:visible').waitFor();
- assert.match(await home.locator('#tc-v23-login-feedback').textContent(),/Invalid login credentials/);
+ assert.match(await home.locator('#tc-v23-login-feedback').textContent(),/Email or password is incorrect/);
  assert.equal(await home.locator('#tc-v23-login-feedback').getAttribute('role'),'alert');
- await home.waitForFunction(()=>getComputedStyle(document.querySelector('#tc-v23-login-feedback')).borderTopColor==='rgb(255, 100, 120)',null,{timeout:4000});
+ await home.waitForFunction(()=>getComputedStyle(document.querySelector('#tc-v23-login-feedback')).borderTopColor==='rgb(127, 67, 79)',null,{timeout:4000});
  await home.unroute(origin+'/auth/v1/token?**');
- await home.getByRole('button',{name:'Create your account'}).click();
+ await home.getByRole('button',{name:'Create account'}).click();
  assert.equal(await home.locator('#tc31-signup-view:visible').count(),1,'signup should have own view');
  assert.equal(await home.locator('#tc31-guest:visible').count(),0,'signup should hide login');
  await home.locator('#tc31-signup-name').fill('Example User');
@@ -143,7 +143,7 @@ try{
  await home.evaluate(()=>window.tc31Register()); // JS validation only; browser-native validation is tested separately
  await home.locator('#tc-v23-signup-feedback[data-state="error"]:visible').waitFor();
  assert.match(await home.locator('#tc-v23-signup-feedback').textContent(),/Passwords do not match/);
- await home.locator('#tc31-signup-view').getByRole('button',{name:'Sign in instead'}).click();
+ await home.locator('#tc31-signup-view').getByRole('button',{name:'Sign in',exact:true}).click();
  assert.equal(await home.locator('#tc31-guest:visible').count(),1,'back to sign in should return to login');
  await home.locator('#tc31-login-form').getByRole('button',{name:'Forgot password?'}).click();
  assert.equal(await home.locator('#tc31-forgot-view:visible').count(),1,'forgot password must have dedicated view');

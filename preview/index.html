@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="referrer" content="no-referrer"><script src="../assets/triso-auth-callback.js" referrerpolicy="no-referrer"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex,nofollow">
 <title>TRISOCMD — Fortnite Store, Gaming Gear & Guides</title>
@@ -1256,7 +1257,9 @@ body,#store-screen{background:radial-gradient(ellipse 75% 22% at 50% 0%,#271338 
 <link rel="alternate icon" type="image/png" sizes="64x64" href="../assets/trisocmd-icon-64.png">
 <link rel="apple-touch-icon" sizes="180x180" href="../assets/trisocmd-apple-touch.png">
 <link rel="stylesheet" href="../assets/phase1-orders.css">
-<link rel="stylesheet" href="../assets/triso-support.css"><link rel="stylesheet" href="../assets/triso-content.css"></head>
+<link rel="stylesheet" href="../assets/triso-support.css"><link rel="stylesheet" href="../assets/triso-content.css"><link rel="stylesheet" href="../assets/triso-auth-ui.css">
+<script src="../assets/triso-auth-ui.js" defer></script>
+</head>
 <body><a class="content-skip" href="#tc-shop-heading">Skip to products</a><div id="tc50-staging-banner" role="status" style="position:relative;z-index:99999;background:#122330;border-bottom:1px solid #467487;color:#c2eaff;padding:10px 18px;text-align:center;font:600 12px/1.5 system-ui,sans-serif">STAGING PREVIEW · Payments, order processing, and support notifications are not live. Do not send funds.</div>
 
 
@@ -1479,11 +1482,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElement
 </div>
 
 
-<section class="screen" id="tc31-panel"><div class="tc31-wrap"><div class="tc31-nav"><strong>TRISO<span style="color:#67d9ff">CMD.</span> / ACCOUNT</strong><button onclick="showScreen('store-screen')">← Back to shop</button></div><div class="tc31-kicker">PLAYER PORTAL / 001</div><h1 class="tc31-heading">YOUR SPACE.<br>YOUR GAME.</h1><p class="tc31-muted">Secure account access, your profile and your orders.</p>
-<div id="tc31-guest" class="tc31-grid"><div class="tc31-card"><h3>Sign in</h3><label>Email</label><input id="tc31-email" type="email" class="tc31-input" autocomplete="email" placeholder="player@example.com"><label>Password</label><input id="tc31-password" type="password" class="tc31-input" autocomplete="current-password" placeholder="At least 8 characters"><label class="tc31-remember"><input id="tc31-remember" type="checkbox" checked> Remember me on this device</label>
-<div class="tc31-row"><button class="tc31-btn" onclick="tc31Email('login')">Sign in</button><button class="tc31-btn tc31-alt" onclick="tc31ShowSignup()">Create account ↗</button></div><p class="tc31-small">By creating an account you agree to the store's published policies.</p><button class="tc31-btn tc31-alt" onclick="tc31Reset()">Forgot password?</button></div><div class="tc31-card"><h3>One-click access</h3><p class="tc31-muted">Sign in using your Google account.</p><button class="tc31-btn tc31-alt" onclick="tc31Google()">Continue with Google ↗</button><p class="tc31-small">Google sign-in requires provider setup in Supabase before use.</p><div class="tc31-pill">SUPABASE AUTH</div></div></div>
-<div class="tc31-card" id="tc31-recovery-shell" hidden style="margin:20px 0"><h3>Set a new password</h3><div id="tc31-recovery-form" hidden style="margin-top:16px"><label>New password</label><input id="tc31-new-password" type="password" class="tc31-input" autocomplete="new-password" placeholder="At least 8 characters"><label>Confirm new password</label><input id="tc31-confirm-new-password" type="password" class="tc31-input" autocomplete="new-password" placeholder="Repeat new password"><button class="tc31-btn" onclick="tc31UpdatePassword()">Update password</button></div></div>
-<div id="tc31-signup-view" style="display:none" class="tc31-signup-shell"><div class="tc31-signup-top"><button type="button" class="tc31-btn tc31-alt" onclick="tc31HideSignup()">← Back to sign in</button><span>TRISOCMD / JOIN THE COMMUNITY</span></div><div class="tc31-card tc31-signup-card"><div class="tc31-signup-kicker">CREATE YOUR PLAYER PROFILE / 001</div><h2>YOUR ACCOUNT.<br><em>YOUR WORLD.</em></h2><p class="tc31-muted">One account for your orders, marketplace listings and conversations.</p><form id="tc31-signup-form" onsubmit="event.preventDefault();tc31Register()"><label for="tc31-signup-name">Display name</label><input id="tc31-signup-name" class="tc31-input" type="text" minlength="2" maxlength="40" autocomplete="nickname" placeholder="What should we call you?" required><label for="tc31-signup-email">Email address</label><input id="tc31-signup-email" class="tc31-input" type="email" autocomplete="email" placeholder="you@example.com" required><label for="tc31-signup-password">Password</label><input id="tc31-signup-password" class="tc31-input" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters" required><label for="tc31-signup-confirm">Confirm password</label><input id="tc31-signup-confirm" class="tc31-input" type="password" autocomplete="new-password" minlength="8" placeholder="Repeat your password" required><p class="tc31-small">Use a unique password. You may be asked to confirm your email before signing in.</p><button type="submit" class="tc31-btn tc31-signup-submit">CREATE ACCOUNT ↗</button><p class="tc31-small">By creating an account, you agree to the store's published policies.</p></form><div class="tc31-signup-divider">OR</div><button type="button" class="tc31-btn tc31-alt tc31-google-wide" onclick="tc31Google()">Continue with Google ↗</button><p class="tc31-small">Already have an account? <button type="button" class="tc31-signup-inline" onclick="tc31HideSignup()">Sign in instead</button></p></div></div>
+<section class="screen tc-auth" id="tc31-panel" data-auth-mode="signin"><div class="tc31-wrap"><div class="tc31-nav"><strong>TRISO<span>CMD.</span></strong><select id="tc-auth-language" data-auth-label="Language" aria-label="Language" onchange="TrisoAuthUI.language(this.value)"><option value="en">English</option><option value="fa">فارسی</option><option value="ar">العربية</option></select><button type="button" class="tc-v22-textlink" onclick="showScreen('store-screen')"><span data-auth-copy="Back to shop" >Back to shop</span></button></div><div class="tc31-kicker">TRISOCMD / ACCOUNT</div><h1 class="tc31-heading" tabindex="-1">Sign in</h1><p class="tc31-muted" id="tc-v22-hero-copy">Your account, your gaming marketplace.</p><p id="tc-v22-global-feedback" class="tc-v23-auth-notice" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+<div id="tc31-guest" class="tc31-grid"><form id="tc31-login-form" onsubmit="event.preventDefault();tc31Email('login')"><div class="tc31-card tc-auth-card"><p id="tc-v23-login-feedback" class="tc-v23-auth-notice" role="status" aria-live="polite" aria-atomic="true" hidden></p><label for="tc31-email"><span data-auth-copy="Email address" >Email address</span></label><input id="tc31-email" class="tc31-input" type="email" autocomplete="email" data-auth-placeholder="you@example.com" placeholder="you@example.com" required><div class="tc-v22-label-row"><label data-auth-copy="Password" for="tc31-password">Password</label><button type="button" class="tc-v22-textlink" onclick="tc31ShowForgot()"><span data-auth-copy="Forgot password?" >Forgot password?</span></button></div><div class="tc-v22-password-row"><input id="tc31-password" class="tc31-input" type="password" autocomplete="current-password" data-auth-placeholder="Your password" placeholder="Your password" required><button type="button" class="tc-v22-reveal" aria-controls="tc31-password" aria-pressed="false" data-auth-reveal onclick="tc31TogglePassword(this,'tc31-password')">Show</button></div><label class="tc31-remember"><input id="tc31-remember" type="checkbox" checked><span data-auth-copy="Remember me on this device" >Remember me on this device</span></label><button type="submit" id="tc-v22-login-submit" class="tc31-btn tc-v22-submit "><span data-auth-copy="Sign in" >Sign in</span></button><div class="tc-auth-divider"><span data-auth-copy="or" >or</span></div><button type="button" class="tc31-btn tc31-alt tc-auth-google" onclick="tc31Google()"><span data-auth-copy="Continue with Google" >Continue with Google</span></button><p class="tc-auth-footer"><span data-auth-copy="New here?" >New here?</span> <button type="button" class="tc-v22-textlink" onclick="tc31ShowSignup()"><span data-auth-copy="Create account" >Create account</span></button></p><button type="button" class="tc-v22-textlink" onclick="tc31CallbackMode('verify')"><span data-auth-copy="Resend verification email" >Resend verification email</span></button></div></form></div><section id="tc31-forgot-view" class="tc31-card tc-auth-card" hidden><p data-auth-copy="Enter your account email to receive a secure password reset link." class="tc31-muted">Enter your account email to receive a secure password reset link.</p><form id="tc-v22-forgot-form" onsubmit="event.preventDefault();tc31Reset()"><label for="tc31-forgot-email"><span data-auth-copy="Email address" >Email address</span></label><input id="tc31-forgot-email" class="tc31-input" type="email" autocomplete="email" data-auth-placeholder="you@example.com" placeholder="you@example.com" required><button type="submit" id="tc31-reset-button" class="tc31-btn tc-v22-submit "><span data-auth-copy="Send reset link" >Send reset link</span></button></form><p id="tc31-reset-feedback" class="tc-v23-auth-notice" role="status" aria-live="polite" aria-atomic="true" hidden></p><button type="button" class="tc-v22-back" onclick="tc31HideSignup()"><span data-auth-copy="Back to sign in" >Back to sign in</span></button></section><section id="tc31-recovery-shell" class="tc31-card tc-auth-card" hidden><p data-auth-copy="Choose a new password for your account." class="tc31-muted">Choose a new password for your account.</p><form hidden id="tc31-recovery-form" onsubmit="event.preventDefault();tc31UpdatePassword()"><label for="tc31-new-password"><span data-auth-copy="New password" >New password</span></label><div class="tc-v22-password-row"><input id="tc31-new-password" class="tc31-input" type="password" autocomplete="new-password" minlength="8" data-auth-placeholder="At least 8 characters" placeholder="At least 8 characters" required><button type="button" class="tc-v22-reveal" aria-controls="tc31-new-password" aria-pressed="false" data-auth-reveal onclick="tc31TogglePassword(this,'tc31-new-password')">Show</button></div><label for="tc31-confirm-new-password"><span data-auth-copy="Confirm new password" >Confirm new password</span></label><div class="tc-v22-password-row"><input id="tc31-confirm-new-password" class="tc31-input" type="password" autocomplete="new-password" minlength="8" data-auth-placeholder="Repeat new password" placeholder="Repeat new password" required><button type="button" class="tc-v22-reveal" aria-controls="tc31-confirm-new-password" aria-pressed="false" data-auth-reveal onclick="tc31TogglePassword(this,'tc31-confirm-new-password')">Show</button></div><button type="submit" id="tc31-update-password-button" class="tc31-btn tc-v22-submit "><span data-auth-copy="Save new password" >Save new password</span></button></form><p id="tc-v22-recovery-feedback" class="tc-v23-auth-notice" role="status" aria-live="polite" aria-atomic="true" hidden></p><button type="button" class="tc-v22-back" onclick="tc31ShowForgot()"><span data-auth-copy="Need a new reset link?" >Need a new reset link?</span></button></section><section id="tc31-verification" class="tc31-card tc-auth-card" hidden><p data-auth-copy="Request a new confirmation email. This does not reset your password." class="tc31-muted">Request a new confirmation email. This does not reset your password.</p><form id="tc31-resend-form" onsubmit="event.preventDefault();tc31ResendVerification()"><label for="tc31-resend-email"><span data-auth-copy="Email address" >Email address</span></label><input id="tc31-resend-email" class="tc31-input" type="email" autocomplete="email" data-auth-placeholder="you@example.com" placeholder="you@example.com" required><button type="submit" id="" class="tc31-btn tc-v22-submit "><span data-auth-copy="Resend verification email" >Resend verification email</span></button></form><p id="tc31-resend-feedback" class="tc-v23-auth-notice" role="status" aria-live="polite" aria-atomic="true" hidden></p><button type="button" class="tc-v22-back" onclick="tc31CallbackMode('signin')"><span data-auth-copy="Back to sign in" >Back to sign in</span></button></section><div id="tc31-signup-view" class="tc31-signup-shell" style="display:none"><div class="tc31-card tc-auth-card"><form id="tc31-signup-form" onsubmit="event.preventDefault();tc31Register()"><p id="tc-v23-signup-feedback" class="tc-v23-auth-notice" role="status" aria-live="polite" aria-atomic="true" hidden></p><label for="tc31-signup-name"><span data-auth-copy="Display name" >Display name</span></label><input id="tc31-signup-name" class="tc31-input" type="text" autocomplete="nickname" minlength="2" maxlength="40" data-auth-placeholder="Your display name" placeholder="Your display name" required><label for="tc31-signup-email"><span data-auth-copy="Email address" >Email address</span></label><input id="tc31-signup-email" class="tc31-input" type="email" autocomplete="email" data-auth-placeholder="you@example.com" placeholder="you@example.com" required><label for="tc31-signup-password"><span data-auth-copy="Password" >Password</span></label><div class="tc-v22-password-row"><input id="tc31-signup-password" class="tc31-input" type="password" autocomplete="new-password" minlength="8" data-auth-placeholder="At least 8 characters" placeholder="At least 8 characters" required><button type="button" class="tc-v22-reveal" aria-controls="tc31-signup-password" aria-pressed="false" data-auth-reveal onclick="tc31TogglePassword(this,'tc31-signup-password')">Show</button></div><label for="tc31-signup-confirm"><span data-auth-copy="Confirm password" >Confirm password</span></label><div class="tc-v22-password-row"><input id="tc31-signup-confirm" class="tc31-input" type="password" autocomplete="new-password" minlength="8" data-auth-placeholder="Repeat your password" placeholder="Repeat your password" required><button type="button" class="tc-v22-reveal" aria-controls="tc31-signup-confirm" aria-pressed="false" data-auth-reveal onclick="tc31TogglePassword(this,'tc31-signup-confirm')">Show</button></div><button type="submit" id="" class="tc31-btn tc-v22-submit tc31-signup-submit"><span data-auth-copy="Create account" >Create account</span></button></form><p class="tc31-small"><span data-auth-copy="Verify your email before signing in. Use a unique password." >Verify your email before signing in. Use a unique password.</span></p><div class="tc-auth-divider"><span data-auth-copy="or" >or</span></div><button type="button" class="tc31-btn tc31-alt tc-auth-google" onclick="tc31Google()"><span data-auth-copy="Continue with Google" >Continue with Google</span></button><p class="tc-auth-footer"><span data-auth-copy="Already have an account?" >Already have an account?</span> <button type="button" class="tc-v22-textlink" onclick="tc31HideSignup()"><span data-auth-copy="Sign in" >Sign in</span></button></p></div></div>
 <div id="tc31-user" class="tc31-card" style="display:none"><div id="tc40-admin-status" class="tc40-admin-status" role="status">Checking account permissions…</div><div id="tc40-admin-preview" hidden><div class="tc40-admin-title">ADMIN ACCESS VERIFIED</div><p class="tc31-muted">Your account is recognized by Supabase. Manage products and fulfillment below. Changes require server-verified admin permissions.</p><button class="tc31-btn tc31-alt" onclick="tc40RefreshProducts()">Refresh product overview</button><div id="tc40-inventory" class="tc40-inventory"></div>
 <section class="tc-market-admin-queue" id="tc-market-admin" hidden aria-label="Marketplace approval queue">
 <h3>MARKETPLACE APPROVALS <span id="tc-market-count" style="color:#c6aaff">0</span></h3>
@@ -2707,7 +2707,7 @@ function checkRoute() {
   // Return authenticated customers directly to the storefront.
   let returningMember=false;
   try{const saved=localStorage.getItem('tc35_auth_session')||sessionStorage.getItem('tc35_auth_session');const auth=saved?JSON.parse(saved):null;returningMember=!!(auth?.user&&auth.access_token&&auth.refresh_token)}catch(e){}
-  showScreen(returningMember?'store-screen':'lang-screen');
+  showScreen(window.TrisoAuthCallback?.active?'tc31-panel':returningMember?'store-screen':'lang-screen');
 
   // Pre-fetch exchange rates in the background so the first checkout is instant
   prefetchRates();
@@ -2843,16 +2843,57 @@ function spawnParticles() {
 const url=SUPA_URL,anon=SUPA_KEY;
 const $=id=>document.getElementById(id);
 const storeKey='tc35_auth_session';
-let session=null;
-const status=t=>{const el=$('tc31-status');if(el)el.textContent=t};
+let session=null,authMode='signin',pendingAuth=false;
+const status=(message='',kind='info')=>{
+ const targets={signin:'tc-v23-login-feedback',signup:'tc-v23-signup-feedback',verify:'tc31-resend-feedback',forgot:'tc31-reset-feedback',reset:'tc-v22-recovery-feedback',account:'tc-v22-global-feedback'};
+ const active=targets[authMode]||targets.signin;
+ for(const id of [...Object.values(targets),'tc31-status']){
+  const el=$(id);if(!el)continue;
+  const visible=!!message&&id===active;
+  window.TrisoAuthUI.set(el,visible?message:'');
+  el.hidden=!visible;
+  el.dataset.state=visible?kind:'';
+  el.setAttribute('role',visible&&kind==='error'?'alert':'status');
+  el.setAttribute('aria-live',visible&&kind==='error'?'assertive':'polite');
+ }
+};
 async function api(path,body,token){
  // Confirmation must return to this staging origin, just like recovery/OAuth.
- if(path==='signup'||path==='recover')path+='?redirect_to='+encodeURIComponent(location.origin+location.pathname);
- const res=await fetch(url+'/auth/v1/'+path,{method:'POST',headers:{apikey:anon,'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify(body||{})});
- const d=await res.json().catch(()=>({}));if(!res.ok)throw Error(d.error_description||d.msg||d.message||d.error||'Authentication failed');return d;
+ if(path==='signup'||path==='recover'||path==='resend')path+='?redirect_to='+encodeURIComponent(location.origin+location.pathname);
+ const res=await fetch(url+'/auth/v1/'+path,{method:'POST',headers:{apikey:anon,'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify(body||{}),signal:AbortSignal.timeout(15000)});
+ const d=await res.json().catch(()=>({}));if(!res.ok){const e=Error(d.code||d.error_code||d.error||'request_failed');e.code=d.code||d.error_code||d.error;e.status=res.status;throw e}return d;
 }
-function update(){const u=session?.user;const guest=$('tc31-guest'),user=$('tc31-user');if(guest)guest.style.display=u?'none':($('tc31-signup-view')?.style.display==='block'?'none':'grid');if(u&&$('tc31-signup-view'))$('tc31-signup-view').style.display='none';if(user)user.style.display=u?'block':'none';if(u){$('tc31-user-email').textContent=u.email||'Player';window.tc36LoadOrders?.();window.tc40CheckAdmin?.(session.access_token)}else{window.tc40ResetAdmin?.();const el=$('tc36-orders');if(el)el.textContent='Sign in to view orders.';}}
-function save(d){if(d?.access_token&&d?.refresh_token){window.TrisoAuth.write(d);session=window.TrisoAuth.read()||d;}update();}
+function renderAccountMode(focus=false){
+ const panel=$('tc31-panel');if(!panel)return;
+ panel.dataset.authMode=authMode;
+ panel.classList.toggle('tc31-recovering',authMode==='reset');
+ const isAccount=authMode==='account';
+ $('tc31-guest').style.display=authMode==='signin'?'grid':'none';
+ $('tc31-signup-view').style.display=authMode==='signup'?'block':'none';
+ $('tc31-forgot-view').hidden=authMode!=='forgot';
+ $('tc31-recovery-shell').hidden=authMode!=='reset';
+ $('tc31-recovery-form').hidden=authMode!=='reset';$('tc31-verification').hidden=authMode!=='verify';
+ $('tc31-user').style.display=isAccount?'block':'none';
+ window.TrisoAuthUI.mode(authMode);
+ if(focus){
+  const id={signin:'tc31-email',signup:'tc31-signup-name',forgot:'tc31-forgot-email',verify:'tc31-resend-email',reset:'tc31-new-password'}[authMode];
+  if(id)requestAnimationFrame(() => $(id)?.focus());
+ }
+}
+function setAuthMode(mode,focus=true){authMode=mode;status('');renderAccountMode(focus);}
+function update(){
+ if(!['forgot','reset','signup','verify'].includes(authMode))authMode=session?.user?'account':'signin';
+ renderAccountMode();
+ const u=session?.user;
+ if(u&&authMode==='account'){
+  $('tc31-user-email').textContent=u.email||'Player';
+  window.tc36LoadOrders?.();window.tc40CheckAdmin?.(session.access_token);
+ }else{
+  window.tc40ResetAdmin?.();
+  const el=$('tc36-orders');if(el&&!u)el.textContent='Sign in to view orders.';
+ }
+}
+function save(d){if(d?.access_token&&d?.refresh_token){window.TrisoAuth.write(d);session=window.TrisoAuth.read()||d;if(session?.user&&$('tc37-welcome')?.classList.contains('open'))tc37Close();}update();}
 async function refresh(force=false){
  try{session=await window.TrisoAuth.refresh(token=>api('token?grant_type=refresh_token',{refresh_token:token}),force);update();return !!session}
  catch(e){session=window.TrisoAuth.read();update();status(session?'Connection interrupted. Your remembered login is saved; retry when online.':'Session expired. Please sign in again.');return false}
@@ -2861,7 +2902,8 @@ function clear(){session=null;window.TrisoAuth.clear();update()}
 async function restore(){
  session=window.TrisoAuth.read();
  if(!session?.refresh_token){update();return}
- if($('lang-screen')?.classList.contains('active'))showScreen('store-screen');
+ // Restore the store for returning members rather than showing login onboarding.
+ // Keep the original language selection as the first screen even for returning members.
  if($('tc37-welcome')?.classList.contains('open'))tc37Close();
  try{
    if(!session.expires_at||session.expires_at<Math.floor(Date.now()/1000)+120){await refresh()}
@@ -2927,18 +2969,123 @@ window.tc36LoadOrders=async()=>{
  }catch(e){el.textContent=e.message}
 };
 window.tc42AccessToken=async()=>{if(session?.expires_at&&session.expires_at<Math.floor(Date.now()/1000)+90)await refresh();return session?.access_token||null};
-window.tc31ShowSignup=()=>{const email=$('tc31-email')?.value;if(email)$('tc31-signup-email').value=email;$('tc31-guest').style.display='none';$('tc31-signup-view').style.display='block';status('');$('tc31-signup-name').focus()};
-window.tc31HideSignup=()=>{$('tc31-signup-view').style.display='none';$('tc31-guest').style.display='grid';status('')};
-window.tc31Register=async()=>{try{const name=$('tc31-signup-name').value.trim(),email=$('tc31-signup-email').value.trim(),password=$('tc31-signup-password').value,confirm=$('tc31-signup-confirm').value;if(name.length<2||name.length>40)throw Error('Display name must be 2–40 characters.');if(password.length<8)throw Error('Password must contain at least 8 characters.');if(password!==confirm)throw Error('Passwords do not match.');status('Creating account…');const d=await api('signup',{email,password,data:{display_name:name}});if(d.access_token){save(d);$('tc31-signup-view').style.display='none';status('Account created. Welcome to TRISOCMD.')}else status('Account created. Check your inbox for a confirmation email, then sign in.')}catch(e){status(e.message)}};
-window.tc31Email=async mode=>{try{status('Please wait…');const email=$('tc31-email').value.trim(),password=$('tc31-password').value;if(!email||password.length<8)throw Error('Enter an email and a password of at least 8 characters.');const d=await api(mode==='login'?'token?grant_type=password':'signup',{email,password});if(d.access_token){save(d);status('Signed in. Welcome back.')}else status('If confirmation is required, check your email for a verification link.')}catch(e){status(e.message)}};
-window.tc31Google=()=>{if(location.protocol==='file:'){status('Google sign-in needs a hosted HTTPS URL.');return}const redirect=location.origin+location.pathname;location.href=url+'/auth/v1/authorize?provider=google&redirect_to='+encodeURIComponent(redirect)};
-window.tc31Reset=async()=>{try{const email=$('tc31-email').value.trim();if(!email)throw Error('Enter your email first.');const redirect_to=location.protocol==='file:'?undefined:location.origin+location.pathname;await api('recover',{email,...(redirect_to?{redirect_to}:{})});status('If this email is registered, a recovery link will be sent.')}catch(e){status(e.message)}};
-window.tc31UpdatePassword=async()=>{try{if(!session?.access_token)throw Error('Recovery session missing. Request a new password reset link.');const password=$('tc31-new-password').value,confirm=$('tc31-confirm-new-password').value;if(password.length<8)throw Error('Use at least 8 characters.');if(password!==confirm)throw Error('Passwords do not match.');status('Updating password…');const res=await fetch(url+'/auth/v1/user',{method:'PUT',headers:{apikey:anon,Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:JSON.stringify({password})});const data=await res.json().catch(()=>({}));if(!res.ok)throw Error(data.msg||data.message||data.error_description||'Password update failed');$('tc31-new-password').value='';$('tc31-confirm-new-password').value='';$('tc31-recovery-form').hidden=true;$('tc31-recovery-shell').hidden=true;status('Password updated successfully. You are signed in.');update()}catch(e){status(e.message)}};
-window.tc31Logout=async()=>{const token=session?.access_token;clear();try{if(token)await api('logout',{},token)}catch(e){}status('Signed out.')};
+window.tc31ShowSignup=()=>{const email=$('tc31-email')?.value;if(email)$('tc31-signup-email').value=email;status('');setAuthMode('signup')};
+window.tc31HideSignup=()=>{status('');setAuthMode(session?.user?'account':'signin')};
+window.tc31ShowForgot=()=>{const email=$('tc31-email')?.value?.trim();if(email)$('tc31-forgot-email').value=email;status('');setAuthMode('forgot')};
+window.tc31TogglePassword=(button,id)=>{const input=$(id);if(!input)return;const show=input.type==='password';input.type=show?'text':'password';button.setAttribute('aria-pressed',String(show));window.TrisoAuthUI.paint()};
+window.tc31Register=async()=>{
+ if(pendingAuth)return;
+ const button=$('tc31-signup-form').querySelector('[type=submit]');
+ try{
+  const name=$('tc31-signup-name').value.trim(),email=$('tc31-signup-email').value.trim();
+  const password=$('tc31-signup-password').value,confirm=$('tc31-signup-confirm').value;
+  if(name.length<2||name.length>40)throw Error('Display name must be 2–40 characters.');
+  if(!$('tc31-signup-email').checkValidity())throw Error('Enter a valid email address.');
+  if(password.length<8)throw Error('Password must contain at least 8 characters.');
+  if(password!==confirm){$('tc31-signup-confirm').setAttribute('aria-invalid','true');throw Error('Passwords do not match.')}
+  pendingAuth=true;button.disabled=true;status('Creating your account…');
+  const d=await api('signup',{email,password,data:{display_name:name}});
+  $('tc31-signup-password').value='';$('tc31-signup-confirm').value='';$('tc31-password').value='';$('tc31-email').value=email;
+  // Signup never auto-signs in. An unexpectedly issued session is revoked locally.
+  if(d.access_token)api('logout?scope=local',{},d.access_token).catch(()=>{});
+  setAuthMode('signin');
+  status(d.user?.email_confirmed_at?'Account created. Sign in to continue.':'Account created. Check your inbox to verify your email before signing in.','success');
+ }catch(e){status(window.TrisoAuthUI.error(e),'error')}
+ finally{pendingAuth=false;button.disabled=false}
+};
+window.tc31Email=async mode=>{
+ if(pendingAuth)return;
+ if(mode!=='login'){tc31ShowSignup();return}
+ const button=$('tc-v22-login-submit');
+ try{
+  const input=$('tc31-email'),email=input.value.trim(),password=$('tc31-password').value;
+  if(!input.checkValidity())throw Error('Enter a valid email address.');
+  if(password.length<8)throw Error('Password must contain at least 8 characters.');
+  pendingAuth=true;button.disabled=true;status('Signing in…');
+  const d=await api('token?grant_type=password',{email,password});
+  if(!d.access_token||!d.refresh_token||!d.user?.id)throw Error();
+  setAuthMode('account',false);save(d);$('tc31-password').value='';status('Signed in successfully. Welcome back.','success');
+ }catch(e){status(window.TrisoAuthUI.error(e),'error')}finally{pendingAuth=false;button.disabled=false}
+};
+window.tc31Google=()=>{if(location.protocol==='file:'){status('Google sign-in needs a hosted HTTPS URL.','error');return}const redirect=location.origin+location.pathname;location.href=url+'/auth/v1/authorize?provider=google&redirect_to='+encodeURIComponent(redirect)};
+function recoveryFeedback(message,kind='info'){status(message,kind)}
+window.tc31Reset=async()=>{
+ if(pendingAuth)return;
+ const button=$('tc31-reset-button');
+ try{
+  const input=$('tc31-forgot-email'),email=input.value.trim();
+  if(!email||!input.checkValidity())throw Error('Enter a valid email address.');
+  if(location.protocol==='file:')throw Error('Open the live website to reset your password.');
+  pendingAuth=true;if(button)button.disabled=true;
+  recoveryFeedback('Sending your reset link…');
+  // Keep recovery on the current origin; its exact URL must be allowed in Auth settings.
+  const redirect=location.origin+location.pathname;
+  await api('recover?redirect_to='+encodeURIComponent(redirect),{email});
+  recoveryFeedback('If an account exists for this email, we sent a reset link. Check inbox and spam.','success');
+ }catch(e){recoveryFeedback(window.TrisoAuthUI.error(e),'error')}
+ finally{pendingAuth=false;if(button)button.disabled=false}
+};
+window.tc31UpdatePassword=async()=>{
+ if(pendingAuth)return;
+ const button=$('tc31-update-password-button');
+ try{
+  if(authMode!=='reset'||!session?.access_token)throw Error('This reset link is no longer active. Request a new one.');
+  const password=$('tc31-new-password').value,confirm=$('tc31-confirm-new-password').value;
+  if(password.length<8)throw Error('Password must contain at least 8 characters.');
+  if(password!==confirm){$('tc31-confirm-new-password').setAttribute('aria-invalid','true');throw Error('Passwords do not match.')}
+  pendingAuth=true;if(button)button.disabled=true;
+  status('Updating password…');
+  const res=await fetch(url+'/auth/v1/user',{method:'PUT',headers:{apikey:anon,Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:JSON.stringify({password}),signal:AbortSignal.timeout(15000)});
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok){const e=Error('request_failed');e.status=res.status;e.code=data.code;throw e}
+  const token=session.access_token;
+  $('tc31-new-password').value='';$('tc31-confirm-new-password').value='';
+  session=null;window.TrisoAuth.clear();
+  setAuthMode('signin',false);
+  showScreen('tc31-panel');
+  status('Your password was changed. Sign in with your new password.','success');
+  // Best effort revocation of the temporary recovery session; never block the UI.
+  api('logout',{},token).catch(()=>{});
+ }catch(e){status(window.TrisoAuthUI.error(e),'error')}
+ finally{pendingAuth=false;if(button)button.disabled=false}
+};
+window.tc31Logout=async()=>{const token=session?.access_token;authMode='signin';clear();try{if(token)await api('logout',{},token)}catch(e){}status('Signed out.','success')};
+
+window.tc31CallbackMode=mode=>{if(mode==='verify')$('tc31-resend-email').value=$('tc31-email').value.trim();setAuthMode(mode,true)};
+window.tc31ResendVerification=async()=>{
+ if(pendingAuth)return;
+ const input=$('tc31-resend-email'),button=$('tc31-resend-form').querySelector('button'),feedback=$('tc31-resend-feedback');
+ if(!input.checkValidity()){input.reportValidity();return}pendingAuth=true;button.disabled=true;
+ try{await api('resend',{type:'signup',email:input.value.trim()});status('If an account needs confirmation, a verification email has been sent. Check your inbox and spam.','success')}
+ catch(e){status(window.TrisoAuthUI.error(e),'error')}
+ finally{pendingAuth=false;button.disabled=false}
+};
+async function handleCallback(){
+ const result=await window.TrisoAuthCallback.consume({api,user:async token=>{const r=await fetch(url+'/auth/v1/user',{headers:{apikey:anon,Authorization:'Bearer '+token},signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error();return r.json()}});
+ if(!result.handled)return false;showScreen('tc31-panel');
+ if(result.state==='error'){
+  const confirmation=result.kind==='confirmation';tc31CallbackMode(confirmation?'verify':result.kind==='recovery'?'forgot':'signin');
+  if(confirmation)status('This verification link could not be verified or has expired. Request a new confirmation email.','error');
+  else status(result.kind==='recovery'?'This password recovery link could not be verified. Request a new reset email.':'This sign-in link could not be verified. Please sign in again.','error');
+ }else if(result.state==='confirmed'){
+  tc31CallbackMode('signin');status('Email verified successfully. Sign in to continue.','success');
+ }else if(result.kind==='recovery'){
+  session=result.session;window.TrisoAuth.write(session,false);tc31CallbackMode('reset');status('Verified. Choose a new password below.','success');
+ }else{tc31CallbackMode('account');save(result.session);status('Signed in successfully.','success')}
+ return true;
+}
 async function init(){
+ $('tc31-panel')?.addEventListener('invalid',event=>{
+  const input=event.target;if(!input||!input.matches('input'))return;
+  event.preventDefault();input.setAttribute('aria-invalid','true');input.focus();
+  status('Check the highlighted fields and try again.','error');
+ },true);
+ $('tc31-panel').addEventListener('input',event=>event.target.removeAttribute('aria-invalid'));
  const keep=$('tc31-remember');
  if(keep){keep.checked=window.TrisoAuth.remembered();keep.addEventListener('change',()=>window.TrisoAuth.setRemember(keep.checked))}
- const h=new URLSearchParams(location.hash.slice(1));if(h.has('access_token')){const access_token=h.get('access_token'),refresh_token=h.get('refresh_token');history.replaceState(null,'',location.pathname+location.search);try{const res=await fetch(url+'/auth/v1/user',{headers:{apikey:anon,Authorization:'Bearer '+access_token}});if(!res.ok)throw Error('Google sign-in could not be verified.');const user=await res.json();save({access_token,refresh_token,expires_in:Number(h.get('expires_in'))||3600,user});showScreen('tc31-panel');if(h.get('type')==='recovery'){$('tc31-recovery-shell').hidden=false;$('tc31-recovery-form').hidden=false;status('Set a new password below.')}else status('Signed in successfully.')}catch(e){status(e.message)}}else await restore();}
+ if(await handleCallback())return;
+ await restore();
+}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 window.addEventListener('storage',event=>{
  if(event.key===storeKey||event.key==='tc35_remember_me'){

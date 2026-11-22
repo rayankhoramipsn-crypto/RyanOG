@@ -1,5 +1,7 @@
 # TRISOCMD continuation handoff
 
+**Focused Auth/UI update (2026-11-22):** typed confirmation/recovery/OAuth routing, token-hash/fragment/PKCE handling, URL scrubbing and resend; signup returns to Sign In, clears passwords and never auto-saves signup sessions. Compact shared main/preview EN/FA/AR forms preserve Remember Me and recovery. Validation: 30 targeted Node tests, 42 mocked Chromium scenarios, main/preview signup/recovery diagnostics and zero auth WCAG A/AA violations; staging-only publication is recorded in the PR; no production/configuration/provider changes. Owner must check the exact email-template convention and exercise newly issued links: [hosted acceptance](TRISOCMD_HOSTED_ACCEPTANCE.md#authentication-correction-2026-11-22).
+
 **Current staging update (2026-11-22):** all six reviewed migrations are installed; four Edge Functions are ACTIVE (store-crypto v6, payment-webhook v1, delivery-worker v2, delivery-webhook v1). Worker v2 enforces a source-level delivery hold. Endpoint HTTP acceptance is network-blocked; no live provider activation or production release is claimed. Hosted transactional SQL-role checks pass. New node-verification/PayPal reconciliation code is local-only and incomplete as an end-to-end payment integration. See [sprint evidence and precise blockers](TRISOCMD_STAGING_SPRINT.md). The preparation/pending-deployment statements below are historical.
 
 
