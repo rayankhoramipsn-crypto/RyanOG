@@ -4,6 +4,7 @@
  const root=document.getElementById('tc31-user');if(!root)return;
  const $=id=>document.getElementById(id),auth=()=>global.TrisoAuth?.read(),ui=global.TrisoAuthUI;
  ui.addTranslations({
+ 'Account settings':['تنظیمات حساب','إعدادات الحساب'],'Recent activity':['فعالیت‌های اخیر','النشاط الأخير'],'From your private notification history.':['از تاریخچه اعلان‌های خصوصی شما.','من سجل إشعاراتك الخاصة.'],'Personalize your display name and preferences.':['نام نمایشی و تنظیمات شخصی خود را مدیریت کنید.','خصص اسمك المعروض وتفضيلاتك.'],'Save changes':['ذخیره تغییرات','حفظ التغييرات'],'Saving changes…':['در حال ذخیره تغییرات…','جارٍ حفظ التغييرات…'],'Changes saved.':['تغییرات ذخیره شد.','تم حفظ التغييرات.'],'Close settings':['بستن تنظیمات','إغلاق الإعدادات'],'No recent activity yet. Your account notifications will appear here.':['هنوز فعالیت اخیری نیست. اعلان‌های حساب شما اینجا نمایش داده می‌شوند.','لا يوجد نشاط حديث بعد. ستظهر إشعارات حسابك هنا.'],'Activity unavailable. Open notifications to retry.':['فعالیت‌ها در دسترس نیستند. اعلان‌ها را برای تلاش دوباره باز کنید.','النشاط غير متاح. افتح الإشعارات لإعادة المحاولة.'],
  'Manage your account, orders, and gaming purchases in one place.':['حساب، سفارش‌ها و خریدهای گیمینگ خود را در یک‌جا مدیریت کنید.','أدر حسابك وطلباتك ومشتريات الألعاب في مكان واحد.'],
  'Account navigation':['ناوبری حساب','التنقل في الحساب'],'Menu':['منو','القائمة'],'Gaming marketplace':['بازار گیمینگ','سوق الألعاب'],'Marketplace':['بازار کاربران','السوق'],'Categories':['دسته‌بندی‌ها','الفئات'],'How it works':['راهنمای خرید','كيف يعمل'],'Support':['پشتیبانی','الدعم'],'Search products':['جستجوی محصولات','البحث عن المنتجات'],'Search products…':['جستجوی محصولات…','ابحث عن المنتجات…'],'Search':['جستجو','بحث'],'Notifications':['اعلان‌ها','الإشعارات'],'Shopping bag':['سبد خرید','سلة التسوق'],'Account menu':['منوی حساب','قائمة الحساب'],'Your profile':['پروفایل شما','ملفك الشخصي'],'Sign out':['خروج','تسجيل الخروج'],'Dismiss':['بستن','إغلاق'],'Signed in successfully':['با موفقیت وارد شدید','تم تسجيل الدخول بنجاح'],
  'Welcome back, {name}':['خوش آمدید، {name}','مرحبًا بعودتك، {name}'],'Authentication':['روش ورود','طريقة المصادقة'],'Account type':['نوع حساب','نوع الحساب'],'Member since':['تاریخ عضویت','عضو منذ'],'Account overview':['نمای کلی حساب','نظرة عامة على الحساب'],'A quick look at your account and orders.':['نگاهی به حساب و سفارش‌های شما.','نظرة سريعة على حسابك وطلباتك.'],'Total orders':['کل سفارش‌ها','إجمالي الطلبات'],'Completed':['تکمیل‌شده','مكتملة'],'In progress':['در حال انجام','قيد التنفيذ'],'Action needed':['نیازمند اقدام','تحتاج إلى إجراء'],'Closed':['بسته‌شده','مغلقة'],
@@ -16,6 +17,30 @@
  let owner=null,user=null,allowed=null,staff=null,orders=null,noticeHome=null,roleGeneration=0;
  const noticeRoot=document.querySelector('.tc34-notice-root');if(noticeRoot)noticeHome=noticeRoot.parentElement;
  const globalFeedback=$('tc-v22-global-feedback');if(globalFeedback)$('acct-feedback-host').append(globalFeedback);
+ const settings=document.createElement('dialog');settings.id='acct-settings';settings.className='acct-settings';settings.setAttribute('aria-labelledby','acct-settings-title');
+ settings.innerHTML='<div class="acct-settings-top"><h2 id="acct-settings-title" data-account-copy="Account settings">Account settings</h2><button type="button" class="acct-button" data-account-action="close-settings" data-account-label="Close settings" aria-label="Close settings">×</button></div><p data-account-copy="Personalize your display name and preferences.">Personalize your display name and preferences.</p><p id="acct-settings-email"></p><form id="acct-settings-form"><label for="acct-settings-name" data-account-copy="Display name">Display name</label><input id="acct-settings-name" autocomplete="nickname" required minlength="2" maxlength="40"><button type="submit" class="acct-button acct-primary" data-account-copy="Save changes">Save changes</button><p id="acct-settings-feedback" role="status" aria-live="polite"></p></form><hr><label for="acct-settings-language" data-account-copy="Language">Language</label><select id="acct-settings-language"><option value="en">English</option><option value="fa">فارسی</option><option value="ar">العربية</option></select><label class="acct-settings-remember"><input type="checkbox" id="acct-settings-remember"><span data-account-copy="Remember me on this device">Remember me on this device</span></label><button type="button" class="acct-button" data-account-action="notifications" data-account-copy="Notification settings">Notification settings</button>';
+ root.append(settings);let settingsBusy=false,settingsGeneration=0;
+ function settingsMessage(message,error=false){const el=$('acct-settings-feedback');el.dataset.accountMessage=message;el.textContent=t(message);el.setAttribute('role',error?'alert':'status')}
+ function openSettings(){if(!auth()?.user)return;root.querySelector('.acct-user-menu').open=false;$('acct-settings-name').value=String(auth().user.user_metadata?.display_name||auth().user.user_metadata?.full_name||'');put('acct-settings-email',auth().user.email||'');settingsMessage('');global.TrisoLanguage.syncSelect($('acct-settings-language'));$('acct-settings-remember').checked=global.TrisoAuth.remembered();if(!settings.open)settings.showModal();$('acct-settings-name').focus()}
+ $('acct-settings-name').addEventListener('input',()=>{$('acct-settings-name').removeAttribute('aria-invalid')});
+ $('acct-settings-form').addEventListener('invalid',event=>{event.preventDefault();event.target.setAttribute('aria-invalid','true');settingsMessage('Display name must be 2–40 characters.',true);event.target.focus()},true);
+ $('acct-settings-language').onchange=()=>global.TrisoLanguage.set($('acct-settings-language').value);
+ $('acct-settings-remember').onchange=()=>global.TrisoAuth.setRemember($('acct-settings-remember').checked);
+ $('acct-settings-form').onsubmit=async event=>{
+  event.preventDefault();if(settingsBusy)return;
+  const before=auth(),stamp=settingsGeneration,name=$('acct-settings-name').value.trim(),button=$('acct-settings-form').querySelector('button');
+  if(name.length<2||name.length>40){$('acct-settings-name').setAttribute('aria-invalid','true');settingsMessage('Display name must be 2–40 characters.',true);return}
+  if(!before?.user?.id)return;$('acct-settings-name').removeAttribute('aria-invalid');settingsBusy=true;button.disabled=true;settingsMessage('Saving changes…');
+  try{
+   const token=await global.tc42AccessToken?.();if(auth()?.user?.id!==before.user.id||auth()?.access_token!==token)throw Error();
+   const r=await fetch('https://cxtytbjvdlngahytfilr.supabase.co/auth/v1/user',{method:'PUT',headers:{apikey:SUPA_KEY,Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({data:{display_name:name}}),signal:AbortSignal.timeout(15000)}),data=await r.json().catch(()=>null),next=data?.user||data;
+   if(!r.ok){const e=Error();e.status=r.status;e.code=data?.error_code||data?.code;throw e}
+   if(stamp!==settingsGeneration||auth()?.user?.id!==before.user.id)return;if(auth()?.access_token!==token)throw Error();
+   if(next?.id!==before.user.id)throw Error();let keep=false;try{keep=!!localStorage.getItem(global.TrisoAuth.key)&&global.TrisoAuth.remembered()}catch{}
+   global.TrisoAuth.write({...auth(),user:next},keep);paint();settingsMessage('Changes saved.');
+  }catch(error){if(stamp===settingsGeneration&&auth()?.user?.id===before.user.id)settingsMessage(ui.error(error),true)}
+  finally{settingsBusy=false;button.disabled=false}
+ };
  function mountNotices(){if(!noticeRoot)return;const account=$('tc31-panel').classList.contains('active')&&$('tc31-panel').dataset.authMode==='account';const host=account?$('acct-notice-host'):noticeHome;if(host&&noticeRoot.parentElement!==host)host.append(noticeRoot)}
  function roleText(){if(allowed===null||(allowed===false&&staff===null))return 'Checking permissions…';if(allowed==='error'||staff==='error')return 'Account permissions unavailable';if(allowed===true)return 'Admin account';if(staff===true)return 'Support account';return ({seller:'Seller account'})[user?.app_metadata?.role]||'Customer account'}
  function date(value){const d=new Date(value);return value&&Number.isFinite(d.getTime())?d.toLocaleDateString(document.documentElement.lang,{year:'numeric',month:'short',day:'numeric'}):t('Not available')}
@@ -41,19 +66,20 @@
  function activity(){
   const snapshot=global.TrisoNotifications?.snapshot(),list=$('acct-activity-list');list.replaceChildren();
   const valid=snapshot&&snapshot.owner===owner&&owner,items=valid?snapshot.items.slice(0,3):[];
-  if(!items.length){const li=document.createElement('li');li.className='acct-empty';li.textContent=t(!valid||snapshot.state==='loading'?'Loading notifications…':snapshot.state==='error'?'Notifications unavailable. Open notifications to retry.':'No notifications yet.');list.append(li)}
+  if(!items.length){const li=document.createElement('li');li.className='acct-empty';li.textContent=t(!global.TrisoNotifications?.snapshot?'Activity unavailable. Open notifications to retry.':!valid||snapshot.state==='loading'?'Loading notifications…':snapshot.state==='error'?'Notifications unavailable. Open notifications to retry.':'No recent activity yet. Your account notifications will appear here.');list.append(li)}
   for(const item of items){const li=document.createElement('li'),div=document.createElement('div'),title=document.createElement('strong'),time=document.createElement('time');title.textContent=String(item.title||'');time.textContent=date(item.created_at);if(item.created_at)time.dateTime=item.created_at;div.append(title,time);li.append(div);list.append(li)}
   const unread=valid?Number(snapshot.unread)||0:0;put('acct-unread',unread>99?'99+':String(unread));$('acct-unread').hidden=!unread;
  }
  function paint(){
   root.querySelectorAll('[data-account-copy]').forEach(el=>el.textContent=t(el.dataset.accountCopy));root.querySelectorAll('[data-account-label]').forEach(el=>el.setAttribute('aria-label',t(el.dataset.accountLabel)));root.querySelectorAll('[data-account-placeholder]').forEach(el=>el.placeholder=t(el.dataset.accountPlaceholder));
   $('acct-language').value=['en','fa','ar'].includes(document.documentElement.lang)?document.documentElement.lang:'en';
-  profile();renderOrders();activity();if(!$('acct-success').hidden)welcome();
+  root.querySelectorAll('[data-account-message]').forEach(el=>el.textContent=t(el.dataset.accountMessage));
+  profile();renderOrders();activity();global.TrisoLanguage.syncSelect($('acct-settings-language'));if(!$('acct-success').hidden)welcome();
   const tracking=$('tc45-tracking');if(tracking){tracking.querySelector('h2').textContent=t('Track your orders');tracking.querySelector('.tc45-tracking-note').textContent=t('Only orders associated with your signed-in account appear here.');tracking.querySelector('.tc45-track-head button').setAttribute('aria-label',t('Close tracking'));const buttons=tracking.querySelectorAll('.tc45-track-panel>button');if(buttons[0])buttons[0].textContent=t('Refresh orders');if(buttons[1])buttons[1].textContent=t('Support')}
  }
  function sync(){
   const next=auth()?.user||null,id=next?.id||null;
-  if(id!==owner){owner=id;allowed=null;staff=null;roleGeneration++;orders=null;$('acct-success').hidden=true;root.dataset.admin='false';root.querySelectorAll('details[open]').forEach(el=>el.open=false)}
+  if(id!==owner){settingsGeneration++;if(settings.open)settings.close();$('acct-settings-form').reset();put('acct-settings-email','');settingsMessage('');owner=id;allowed=null;staff=null;roleGeneration++;orders=null;$('acct-success').hidden=true;root.dataset.admin='false';root.querySelectorAll('details[open]').forEach(el=>el.open=false)}
   user=next;if(!owner){root.style.display='none';put('acct-welcome','');global.tc45CloseTracking?.()}
   profile();renderOrders();activity();mountNotices();
  }
@@ -68,7 +94,8 @@
  root.addEventListener('click',event=>{
   const button=event.target.closest('[data-account-action]');if(!button)return;
   const action=button.dataset.accountAction;
-  if(action==='logout')global.tc31Logout();if(action==='tracking')global.tc45OpenTracking();if(action==='refresh')global.TrisoOrders.load();if(action==='cart')global.tc39CartOpen?.();if(action==='trust')global.showScreen('tc31-trust');if(action==='notifications')global.TrisoNotifications?.open();
+  if(action==='settings')openSettings();if(action==='close-settings')settings.close();if(action==='activity'){$('acct-activity-title').tabIndex=-1;$('acct-activity-title').focus();$('acct-activity-title').scrollIntoView({block:'center'});root.querySelector('.acct-user-menu').open=false}
+  if(action==='logout')global.tc31Logout();if(action==='tracking')global.tc45OpenTracking();if(action==='refresh')global.TrisoOrders.load();if(action==='cart')global.tc39CartOpen?.();if(action==='trust')global.showScreen('tc31-trust');if(action==='notifications'){if(settings.open)settings.close();global.TrisoNotifications?.open()}
   if(action==='dismiss')$('acct-success').hidden=true;
   if(action==='profile'){root.querySelector('.acct-profile').scrollIntoView({block:'center',behavior:'smooth'});$('tc31-user-email').tabIndex=-1;$('tc31-user-email').focus();root.querySelector('.acct-user-menu').open=false}
   if(action==='menu'){const open=$('acct-nav-links').classList.toggle('acct-open');button.setAttribute('aria-expanded',String(open));button.setAttribute('aria-controls','acct-nav-links')}

@@ -60,7 +60,7 @@ function sessionUI(){
  $('chat-guest').classList.toggle('hidden',on);
  quotaDisplay();
 }
-function translate(){document.documentElement.lang=S.lang;document.documentElement.dir=['fa','ar'].includes(S.lang)?'rtl':'ltr';$('language').value=S.lang;document.querySelectorAll('[data-t]').forEach(e=>{e.textContent=tr(e.dataset.t)});$('search').placeholder=S.lang==='fa'?'جست‌وجوی اکانت، تجهیزات و بازی...':S.lang==='ar'?'ابحث عن الحسابات والألعاب...':'Search accounts, games, gear...';sessionUI();renderItems()}
+function translate(){document.documentElement.lang=S.lang;document.documentElement.dir=['fa','ar'].includes(S.lang)?'rtl':'ltr';window.TrisoLanguage.syncSelect($('language'));document.querySelectorAll('[data-t]').forEach(e=>{e.textContent=tr(e.dataset.t)});$('search').placeholder=S.lang==='fa'?'جست‌وجوی اکانت، تجهیزات و بازی...':S.lang==='ar'?'ابحث عن الحسابات والألعاب...':'Search accounts, games, gear...';sessionUI();renderItems()}
 function categoryOf(p){const v=((p.platform||'')+' '+(p.title||'')).toLowerCase();if(/fortnite|فورتنایت/.test(v))return 'fortnite';if(/roblox|روبلاکس/.test(v))return 'roblox';if(/steam|استیم/.test(v))return 'steam';if(/gear|mouse|keyboard|headset|controller|monitor|کیبورد|هدست|موس|تجهیز/.test(v))return 'gear';return 'other'}
 function filtered(){let rows=S.items.filter(p=>(S.minPrice===null||+p.price>=S.minPrice)&&(S.maxPrice===null||+p.price<=S.maxPrice)&&(S.category==='all'||categoryOf(p)===S.category)&&[p.platform,p.title,p.description].join(' ').toLowerCase().includes(S.query));if(S.sort==='low')rows.sort((a,b)=>+a.price-+b.price);else if(S.sort==='high')rows.sort((a,b)=>+b.price-+a.price);else rows.sort((a,b)=>Number(b.is_pro)-Number(a.is_pro)||new Date(b.submitted_at)-new Date(a.submitted_at));return rows}
 async function signed(path){if(!path)return null;const cached=S.signed.get(path);if(cached&&cached.until>Date.now())return cached.url;try{const safe=path.split('/').map(encodeURIComponent).join('/');const d=await req('/storage/v1/object/sign/market-gallery/'+safe,{method:'POST',json:{expiresIn:3600}});const u=d.signedURL||d.signedUrl;if(!u)return null;const url=u.startsWith('http')?u:API+'/storage/v1'+(u.startsWith('/')?u:'/'+u);S.signed.set(path,{url,until:Date.now()+2400000});return url}catch{return null}}
@@ -706,7 +706,7 @@ async function init(){
  const checkbox=$('auth-remember');
  if(checkbox){checkbox.checked=window.TrisoAuth.remembered();checkbox.addEventListener('change',()=>window.TrisoAuth.setRemember(checkbox.checked))}
  if(S.session?.refresh_token&&(!S.session.expires_at||S.session.expires_at*1000<Date.now()+120000))await refresh();
-S.lang=['en','fa','ar'].includes(localStorage.getItem('tc_market_lang'))?localStorage.getItem('tc_market_lang'):'en';S.admin=await adminCheck();translate();await browse();if(S.session?.user){startInbox();await Promise.allSettled([mine(),threads(),purchases()]);tc35LoadPreference();}
+S.lang=window.TrisoLanguage.get()||'en';S.admin=await adminCheck();translate();await browse();if(S.session?.user){startInbox();await Promise.allSettled([mine(),threads(),purchases()]);tc35LoadPreference();}
 const hash=Number(new URLSearchParams(location.search).get('listing'));if(hash){let found=S.items.find(x=>+x.id===hash);if(!found&&!S.browseLegacy){try{const page=await rpc('market_browse_page',{p_listing:hash});found=page.items[0];if(found)await readPhotos([found.id])}catch(e){note(errorText(e))}}if(found)details(found)}}
 document.querySelectorAll('[data-cat]').forEach(b=>b.addEventListener('click',()=>{S.category=b.dataset.cat;scheduleBrowse();$('listing-section').scrollIntoView({block:'start'})}));
 $('search').addEventListener('input',e=>{S.query=e.target.value.trim().toLowerCase();scheduleBrowse(250)});
@@ -715,7 +715,8 @@ $('price-min').addEventListener('input',()=>scheduleBrowse(250));
 $('price-max').addEventListener('input',()=>scheduleBrowse(250));
 $('browse-prev').onclick=()=>browse(Math.max(0,S.browseOffset-24));
 $('browse-next').onclick=()=>browse(S.browseOffset+24);
-$('language').addEventListener('change',e=>{S.lang=e.target.value;localStorage.setItem('tc_market_lang',S.lang);translate()});
+$('language').addEventListener('change',e=>window.TrisoLanguage.set(e.target.value));
+window.addEventListener('triso:language',()=>{S.lang=window.TrisoLanguage.get()||'en';translate()});
 $('nav-login').addEventListener('click',()=>S.session?.user?dialog('sell-dialog'):dialog('auth-dialog'));
 $('open-sell').addEventListener('click',()=>dialog(S.session?.user?'sell-dialog':'auth-dialog'));
 $('open-rules').addEventListener('click',()=>dialog('rules-dialog'));

@@ -190,6 +190,8 @@ try{
   return route.fulfill({status:200,headers:cors,body:JSON.stringify('11111111-2222-4333-8444-555555555555')});
  });
  await home.evaluate(()=>{
+  // Match the canonical order loader's actor/token guard with a synthetic identity.
+  TrisoAuth.write({access_token:'mock-signed-in-token',refresh_token:'smoke-refresh',expires_at:Date.now()/1000+3600,user:{id:'00000000-0000-4000-8000-000000000001',email:'smoke@example.test'}},false);
   window.tc42AccessToken=async()=> 'mock-signed-in-token';
   window.tc42OrderItems=[{id:901,qty:1}];
  });
@@ -505,7 +507,7 @@ try{
  console.log('OK mobile marketplace and Persian RTL details');
  await mobile.close();
 
- const missing=await open('/404.html');
+ const missing=await open('/404.html?lang=en');
  await missing.getByRole('heading',{name:'Looks like this page went offline.'}).waitFor();
  assert.equal(await missing.locator('a[href="/"]').count(),3,'404 needs home navigation in logo, header and action');
  assert.equal(await missing.locator('a[href="/marketplace.html"]').count(),2,'404 needs marketplace navigation');
