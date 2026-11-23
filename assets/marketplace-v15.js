@@ -154,7 +154,7 @@ const intentKey='triso_market_listing_intent';
 function intended(){try{const x=JSON.parse(sessionStorage.getItem(intentKey)||'null');return x&&Number.isSafeInteger(x.listing)&&x.listing>0&&['chat','checkout'].includes(x.action)&&Number.isFinite(x.at)&&Date.now()>=x.at&&Date.now()-x.at<900000?x:null}catch{return null}}
 function clearIntent(){try{sessionStorage.removeItem(intentKey)}catch{}}
 function signInFor(action){if(!S.selected)return;try{sessionStorage.setItem(intentKey,JSON.stringify({listing:Number(S.selected.id),action,preview:location.pathname.includes('/preview/'),at:Date.now()}))}catch{}close('detail-dialog');dialog('auth-dialog');authStatus(detailT('Sign in to continue with this listing.'),'info')}
-async function freshListing(id){const data=await rpc('market_browse_page',{p_listing:Number(id),p_limit:1});const listing=data?.items?.find(row=>Number(row.id)===Number(id));if(!listing)throw Error('Listing is no longer available.');return listing}
+async function freshListing(id){const data=await rpc('market_browse_page',{p_listing:Number(id)});const listing=data?.items?.find(row=>Number(row.id)===Number(id));if(!listing)throw Error('Listing is no longer available.');return listing}
 function sameActor(owner,version){if(S.session?.user?.id!==owner||window.TrisoAuth.read()?.user?.id!==owner||version!==S.actionVersion)throw Error('Account changed. Please sign in again.')}
 async function contact(){
  const p=S.selected;if(!p||S.chatBusy)return;if(!S.session?.user){signInFor('chat');return}if(p.seller_id===S.session.user.id){tc27PurchaseFeedback(detailT('You cannot message or buy from yourself.'),'error');return}

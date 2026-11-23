@@ -31,7 +31,8 @@ class MarketplaceV18(unittest.TestCase):
      self.assertEqual(tags.ids.get(id_),1,id_)
     self.assertNotIn('id="purchase-method"',page)
     checkout=(ROOT/"marketplace-checkout.html").read_text(encoding="utf-8")
-    self.assertIn('id="checkout-method" disabled',checkout)
+    self.assertIn('id="checkout-pay" disabled',checkout)
+    self.assertIn('name="method" value="crypto"',checkout)
     for t in ("sellers must not request direct payment",
               "administrator review","not currently accept","No live payments",
               "4%"):

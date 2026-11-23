@@ -40,7 +40,8 @@ await context.route(origin+'/**', async route=>{
  }
  const path=url.pathname;
  let result=[];
- if(path.endsWith('/rpc/market_browse_page'))result={items:fixtureListings,has_more:false};
+ if(path.endsWith('/rpc/market_browse_page')){assert(!('p_limit' in request.postDataJSON()));result={items:fixtureListings,has_more:false};}
+ else if(path.endsWith('/rpc/market_checkout_quote'))return route.fulfill({status:404,headers:cors,body:JSON.stringify({code:'PGRST202'})});
  else if(path.endsWith('/rpc/market_browse'))result=fixtureListings;
  else if(path.endsWith('/rpc/is_admin'))result=false;
  else if(path.endsWith('/rpc/market_inbox_page'))result=[];
@@ -52,7 +53,7 @@ await context.route(origin+'/**', async route=>{
  else if(path.includes('/market_messages'))result=[];
  else if(path.includes('/market_conversations'))result=[];
  else if(path.includes('/market_purchase_requests'))result=[];
- else if(path.includes('/market_listings'))result=[];
+ else if(path.includes('/market_listings'))result=fixtureListings.map(x=>({...x,seller_id:'00000000-0000-4000-8000-000000000087',status:'approved'}));
  // No write action is allowed by this test. The only POSTs above are
  // read-only RPCs; all other write requests receive a 403 failure.
  const safeReadRPC=['market_seller_profile','support_is_staff','notification_page','notification_read','support_history'].some(name=>path.endsWith('/rpc/'+name))||path.endsWith('/rpc/market_browse_page')||path.endsWith('/rpc/is_admin')||path.endsWith('/rpc/market_browse')||path.endsWith('/rpc/market_inbox_page');
@@ -400,7 +401,7 @@ try{
   return route.fulfill({status:200,headers:cors,body:JSON.stringify(orderId)});
  });
  await orderPage.route(origin+'/rest/v1/rpc/phase1_market_order',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify(canonicalId)}));
- await orderPage.route(origin+'/rest/v1/tc42_orders?**',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify([{id:canonicalId,customer_id:buyer,seller_id:'00000000-0000-4000-8000-000000000087',listing_id:701,market_request_id:orderId,total_amount:19.99,commission_usd:0.8,currency:'USD',status:'awaiting_payment',items:[{title:'Fortnite Demo Listing',qty:1}],created_at:'2026-11-01'}])}));
+ await orderPage.route(origin+'/rest/v1/tc42_orders?**',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify([{id:canonicalId,customer_id:buyer,seller_id:'00000000-0000-4000-8000-000000000087',listing_id:701,market_request_id:orderId,total_amount:19.99,commission_usd:0.8,currency:'USD',status:'awaiting_payment',items:[{listing_id:701,title:'Fortnite Demo Listing',qty:1,unit_price:19.99}],created_at:'2026-11-01'}])}));
  await orderPage.evaluate(id=>window.TrisoAuth.write({access_token:'buyer-order-mock',refresh_token:'buyer-order-refresh',expires_at:Math.floor(Date.now()/1000)+3600,user:{id,email:'order-buyer@example.test'}},true),buyer);
  await orderPage.reload({waitUntil:'domcontentloaded'});
  await orderPage.waitForFunction(()=>document.querySelectorAll('#cards .item-card').length===2);
