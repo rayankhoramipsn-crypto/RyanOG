@@ -1257,7 +1257,7 @@ body,#store-screen{background:radial-gradient(ellipse 75% 22% at 50% 0%,#271338 
 <link rel="alternate icon" type="image/png" sizes="64x64" href="../assets/trisocmd-icon-64.png">
 <link rel="apple-touch-icon" sizes="180x180" href="../assets/trisocmd-apple-touch.png">
 <link rel="stylesheet" href="../assets/phase1-orders.css">
-<link rel="stylesheet" href="../assets/triso-support.css"><link rel="stylesheet" href="../assets/triso-content.css?v=account1"><link rel="stylesheet" href="../assets/triso-auth-ui.css">
+<link rel="stylesheet" href="../assets/triso-support.css?v=2"><link rel="stylesheet" href="../assets/triso-content.css?v=account1"><link rel="stylesheet" href="../assets/triso-auth-ui.css">
 <script src="../assets/triso-auth-oauth.js" defer></script>
 <script src="../assets/triso-auth-ui.js?v=settings1" defer></script>
 <link rel="stylesheet" href="../assets/triso-account.css?v=3"><link rel="stylesheet" href="../assets/triso-settings.css?v=2">
@@ -3272,13 +3272,7 @@ count();
   </div>
  </div>
 </section>
-<section id="tc41-chat" class="tc41-chat" aria-label="Support chat">
- <div class="tc41-chat-header"><div><strong>✧ TRISOCMD SUPPORT</strong><small>Secure inbox · Refreshes every 5s when open</small></div><button class="tc41-close" onclick="tc41ToggleChat(false)" aria-label="Close chat">✕</button></div>
- <div class="tc41-chat-messages" id="tc41-messages" aria-live="polite"><div class="tc41-bubble">Welcome! Sign in to send a saved support message. Guests can contact us on Telegram.</div></div>
- <form class="tc41-chat-form" onsubmit="tc41Send(event)"><input id="tc41-message" maxlength="1000" placeholder="Write a message…" aria-label="Support message" required/><button type="submit" aria-label="Add message">➤</button></form>
- <div class="tc41-chat-footer"><a id="tc41-telegram-link" href="https://t.me/trisocmd" target="_blank" rel="noopener noreferrer">OPEN TELEGRAM ↗</a><a href="javascript:void(0)" onclick="tc41CopyChat()">COPY CHAT ↗</a></div>
- <div class="tc41-chat-hint">Sign in to send saved messages after the 4.2 database setup. Guests can use Telegram.</div>
-</section>
+
 <script id="tc41-js">
 (function(){
  let method='site',source='product',orderLines=[],messages=[];
@@ -3649,5 +3643,5 @@ function init(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
-</script><script src="../assets/phase1-orders.js?v=account1" defer></script><script src="../assets/store-invoice.js" defer></script><script src="../assets/triso-support.js" defer></script><script src="../assets/triso-notifications-v34.js?v=38" defer></script><script src="../assets/triso-notification-onboarding.js?v=1" defer></script><script src="../assets/triso-account-model.js" defer></script><script src="../assets/triso-settings.js?v=2" defer></script><script src="../assets/triso-account.js?v=3" defer></script><script src="../assets/marketplace-auth-return.js?v=1" defer></script></body>
+</script><script src="../assets/phase1-orders.js?v=account1" defer></script><script src="../assets/store-invoice.js" defer></script><script src="../assets/triso-support.js?v=2" defer></script><script src="../assets/triso-notifications-v34.js?v=38" defer></script><script src="../assets/triso-notification-onboarding.js?v=1" defer></script><script src="../assets/triso-account-model.js" defer></script><script src="../assets/triso-settings.js?v=2" defer></script><script src="../assets/triso-account.js?v=3" defer></script><script src="../assets/marketplace-auth-return.js?v=1" defer></script></body>
 </html>
