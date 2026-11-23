@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="referrer" content="no-referrer"><script src="assets/triso-auth-callback.js" referrerpolicy="no-referrer"></script><script src="assets/triso-language.js?v=1"></script>
+<meta name="referrer" content="no-referrer"><script src="assets/triso-auth-callback.js?v=settings1" referrerpolicy="no-referrer"></script><script src="assets/triso-language.js?v=1"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex,nofollow">
 <title>TRISOCMD — Fortnite Store, Gaming Gear & Guides</title>
@@ -61,7 +61,7 @@
   .lang-native { font-size:12px; color:var(--text3); }
 
   /* ─── NAV ─── */
-  nav:where(:not(.acct-nav)) {
+  nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)) {
     position:sticky; top:0; z-index:100;
     background:rgba(8,8,8,0.85); backdrop-filter:blur(20px);
     border-bottom:1px solid var(--border);
@@ -308,7 +308,7 @@
     background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,240,255,0.015) 2px,rgba(0,240,255,0.015) 4px);
   }
   .screen { position:relative; z-index:1; }
-  nav:where(:not(.acct-nav)) { border-bottom:1px solid rgba(0,240,255,0.15); }
+  nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)) { border-bottom:1px solid rgba(0,240,255,0.15); }
   .nav-logo { font-family:'Rajdhani',sans-serif; font-size:18px; font-weight:700; letter-spacing:0.15em; color:var(--accent); text-shadow:0 0 20px rgba(0,240,255,0.5); }
   .nav-logo span { color:#ff2d6b; text-shadow:0 0 20px rgba(255,45,107,0.5); }
   .store-hero-label { color:var(--accent); font-family:'Share Tech Mono',monospace; font-size:12px; letter-spacing:0.25em; }
@@ -385,7 +385,7 @@ body::before,
   display:none !important;
 }
 
-nav:where(:not(.acct-nav)),
+nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)),
 .product-card,
 .checkout-card,
 .review-card,
@@ -461,7 +461,7 @@ body{
  padding-top:7rem !important;
 }
 
-nav:where(:not(.acct-nav)){
+nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){
  background:rgba(255,255,255,.05) !important;
  backdrop-filter:blur(30px) saturate(180%) !important;
  border:1px solid rgba(255,255,255,.08) !important;
@@ -725,7 +725,7 @@ display:block !important;
 /* TRISOCMD 2.0 — reversible visual preview; existing commerce logic unchanged */
 :root{--bg:#09090b!important;--bg2:#101116!important;--bg3:#171923!important;--bg4:#202330!important;--border:rgba(148,163,184,.14)!important;--border2:rgba(56,189,248,.45)!important;--text:#f8fafc!important;--text2:#a6b2c6!important;--text3:#79879d!important;--accent:#38bdf8!important;--accent2:#8b5cf6!important;--accent-glow:rgba(56,189,248,.12)!important;--green:#34d399!important;--red:#fb7185!important;--amber:#fbbf24!important;--radius:14px!important;--radius-sm:10px!important;--radius-lg:20px!important}
 body{background:radial-gradient(ellipse 60% 35% at 50% 4%,rgba(56,189,248,.08),transparent 75%),#09090b!important;color:#f8fafc!important;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif!important}
-nav:where(:not(.acct-nav)){background:rgba(9,9,11,.89)!important;backdrop-filter:blur(18px)!important;border-bottom:1px solid rgba(148,163,184,.12)!important;padding-top:16px!important;padding-bottom:16px!important}
+nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){background:rgba(9,9,11,.89)!important;backdrop-filter:blur(18px)!important;border-bottom:1px solid rgba(148,163,184,.12)!important;padding-top:16px!important;padding-bottom:16px!important}
 .nav-logo span{color:#f8fafc!important;text-shadow:none!important;letter-spacing:.055em!important}.nav-logo span span{color:#38bdf8!important}
 .store-hero{max-width:1040px!important;padding:90px 24px 65px!important}.store-hero-label{font-family:Inter,sans-serif!important;font-size:12px!important;letter-spacing:.21em!important;color:#38bdf8!important}.store-hero-title{font-family:Inter,-apple-system,sans-serif!important;font-weight:800!important;letter-spacing:-.055em!important;line-height:1.08!important;font-size:clamp(38px,6vw,76px)!important;background:linear-gradient(115deg,#fff 12%,#c5eaff 58%,#a78bfa 100%)!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important;text-transform:none!important}
 .product-card{clip-path:none!important;border-radius:18px!important;background:linear-gradient(155deg,#1b1e29,#12141b)!important;border:1px solid rgba(148,163,184,.15)!important;box-shadow:0 12px 40px rgba(0,0,0,.14)!important;overflow:hidden!important;transition:transform .25s,border-color .25s,box-shadow .25s!important}
@@ -733,7 +733,7 @@ nav:where(:not(.acct-nav)){background:rgba(9,9,11,.89)!important;backdrop-filter
 .card-section,.lang-btn,.detail-info,.detail-img{border-radius:16px!important}.lang-btn:hover{border-color:#38bdf8!important}
 button{transition:background .2s,border-color .2s,transform .2s!important}button:hover{filter:brightness(1.08)}
 .nav-trust,.nav-lang{border-radius:999px!important}.product-buy-btn{border-radius:10px!important}
-@media(max-width:640px){.store-hero{padding:65px 18px 45px!important}.store-hero-title{font-size:clamp(34px,10vw,48px)!important}nav:where(:not(.acct-nav)){padding:12px 14px!important}}
+@media(max-width:640px){.store-hero{padding:65px 18px 45px!important}.store-hero-title{font-size:clamp(34px,10vw,48px)!important}nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){padding:12px 14px!important}}
 @media(prefers-reduced-motion:reduce){.product-card,button{transition:none!important}}
 </style>
 <style id="trisocmd-editorial-redesign">
@@ -743,7 +743,7 @@ button{transition:background .2s,border-color .2s,transform .2s!important}button
 body{background:var(--tc-bg)!important;color:var(--tc-white);font-family:'DM Sans',sans-serif!important}
 .snowflake{display:none!important}
 #store-screen{background:var(--tc-bg);overflow-x:hidden}
-#store-screen nav:where(:not(.acct-nav)){position:relative;z-index:10;background:rgba(10,12,19,.95)!important;border-bottom:1px solid #252b39!important;padding:20px clamp(20px,5vw,85px)!important;min-height:82px}
+#store-screen nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){position:relative;z-index:10;background:rgba(10,12,19,.95)!important;border-bottom:1px solid #252b39!important;padding:20px clamp(20px,5vw,85px)!important;min-height:82px}
 #store-screen .nav-logo span{font-family:'Barlow Condensed',sans-serif!important;font-size:29px!important;font-weight:900!important;letter-spacing:.04em!important;color:#fff!important;text-shadow:none!important}
 #store-screen .nav-logo span span{color:var(--tc-blue)!important}
 #store-screen .nav-logo svg{width:39px;height:39px;filter:grayscale(1) brightness(2)}
@@ -764,14 +764,14 @@ body{background:var(--tc-bg)!important;color:var(--tc-white);font-family:'DM San
 .tc-editorial{margin:0 clamp(20px,6vw,100px) 70px;padding:65px clamp(25px,5vw,80px);border:1px solid #344257;background:linear-gradient(120deg,#172136,#0b111e 70%);display:grid;grid-template-columns:1fr .8fr;gap:30px;overflow:hidden}.tc-editorial h2{margin:24px 0!important}.tc-editorial p{color:#aab8cb;max-width:400px;line-height:1.7;font-size:13px}.tc-editorial-pill{display:inline-block;margin-top:25px;border:1px solid #536578;padding:12px 15px;color:#c6d8e7;font-size:10px;font-weight:800;letter-spacing:.12em}.tc-editorial-art{position:relative;display:flex;align-items:center;justify-content:center;flex-direction:column;min-height:280px;border:1px solid #40516a;background:repeating-linear-gradient(0deg,transparent,transparent 24px,#ffffff09 25px),radial-gradient(circle,#273b5d,#11192a 70%)}.tc-editorial-art>span{position:absolute;top:15px;left:18px;color:#95b7d6;font-size:10px;letter-spacing:.15em}.tc-editorial-art strong{font:900 180px/.9 'Barlow Condensed',sans-serif;letter-spacing:-.08em;color:#eaf9ff}.tc-editorial-art strong span{color:#8fe6ff}.tc-editorial-art small{position:absolute;bottom:18px;font-size:9px;color:#91a7bd;letter-spacing:.1em}
 .tc-footer{border-top:1px solid #273143;padding:50px clamp(20px,6vw,100px) 28px;display:grid;grid-template-columns:1fr 1fr;gap:40px;background:#0c1019}.tc-footer strong{font:900 45px 'Barlow Condensed',sans-serif;color:#fff}.tc-footer strong span{color:#83e2ff}.tc-footer p{color:#8694a8;font-size:12px;margin-top:5px}.tc-footer-links{display:flex;gap:20px;justify-content:flex-end;align-items:center}.tc-footer-links a,.tc-footer-links button{background:none;border:0;color:#e8f4ff;font-size:11px;font-weight:800;letter-spacing:.1em;text-decoration:none;cursor:pointer}.tc-footer>small{grid-column:1/-1;border-top:1px solid #242d3b;padding-top:20px;color:#69788b;font-size:9px;letter-spacing:.12em}
 @media(max-width:900px){#store-screen .store-hero{grid-template-columns:1fr}.tc-hero-copy{padding:70px 25px 40px}.tc-hero-art{min-height:330px}.tc-art-core{width:230px}.tc-art-core span{font-size:120px}.tc-orbit-one{width:290px;height:290px}.tc-orbit-two{width:420px;height:420px}.tc-category-grid{grid-template-columns:1fr 1fr}.tc-cat-one{grid-column:1/-1}.tc-category{min-height:300px}.tc-hero-foot{padding-top:35px}.tc-editorial{grid-template-columns:1fr}.tc-editorial-art{min-height:240px}}
-@media(max-width:600px){#store-screen nav:where(:not(.acct-nav)){padding:15px!important;gap:8px;flex-wrap:wrap}#store-screen .nav-right{gap:5px}#store-screen .nav-trust{font-size:9px!important;padding:9px!important}#store-screen .nav-logo span{font-size:22px!important}#store-screen .nav-logo svg{width:27px}.tc-ticker{padding:11px 15px;font-size:8px}.tc-ticker-right{display:none}#store-screen .store-hero-title{font-size:clamp(65px,16vw,95px)!important}.tc-hero-copy{padding:65px 20px 40px}.tc-hero-art{min-height:260px}.tc-art-core{width:180px}.tc-art-core span{font-size:95px}.tc-hero-foot{gap:12px;font-size:8px}.tc-categories{padding:55px 18px 25px}.tc-section-top{display:block}.tc-category-grid{grid-template-columns:1fr}.tc-cat-one{grid-column:auto}.tc-category{min-height:265px}.tc-cat-visual{font-size:140px}.tc-gear-visual{font-size:130px}.tc-shop-heading{padding:50px 18px 10px}.tc-shop-aside{display:none}#store-screen .product-section{padding:10px 18px 65px!important}.tc-editorial{margin:0 18px 55px;padding:30px 20px}.tc-editorial-art strong{font-size:125px}.tc-footer{padding:35px 20px 25px;grid-template-columns:1fr}.tc-footer-links{justify-content:flex-start}}
+@media(max-width:600px){#store-screen nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){padding:15px!important;gap:8px;flex-wrap:wrap}#store-screen .nav-right{gap:5px}#store-screen .nav-trust{font-size:9px!important;padding:9px!important}#store-screen .nav-logo span{font-size:22px!important}#store-screen .nav-logo svg{width:27px}.tc-ticker{padding:11px 15px;font-size:8px}.tc-ticker-right{display:none}#store-screen .store-hero-title{font-size:clamp(65px,16vw,95px)!important}.tc-hero-copy{padding:65px 20px 40px}.tc-hero-art{min-height:260px}.tc-art-core{width:180px}.tc-art-core span{font-size:95px}.tc-hero-foot{gap:12px;font-size:8px}.tc-categories{padding:55px 18px 25px}.tc-section-top{display:block}.tc-category-grid{grid-template-columns:1fr}.tc-cat-one{grid-column:auto}.tc-category{min-height:265px}.tc-cat-visual{font-size:140px}.tc-gear-visual{font-size:130px}.tc-shop-heading{padding:50px 18px 10px}.tc-shop-aside{display:none}#store-screen .product-section{padding:10px 18px 65px!important}.tc-editorial{margin:0 18px 55px;padding:30px 20px}.tc-editorial-art strong{font-size:125px}.tc-footer{padding:35px 20px 25px;grid-template-columns:1fr}.tc-footer-links{justify-content:flex-start}}
 @media(prefers-reduced-motion:reduce){.tc-category{transition:none}}
 </style>
 
 <style id="trisocmd-studio-v3">
 :root{--accent:#9deaff!important;--radius-lg:12px}
 html{scroll-behavior:smooth}body{background:#080a10!important}#store-screen{background:#080a10!important}
-#store-screen nav:where(:not(.acct-nav)){position:sticky!important;top:0;z-index:30;background:rgba(9,11,17,.91)!important;backdrop-filter:blur(20px);border-bottom:1px solid #ffffff1a!important}
+#store-screen nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){position:sticky!important;top:0;z-index:30;background:rgba(9,11,17,.91)!important;backdrop-filter:blur(20px);border-bottom:1px solid #ffffff1a!important}
 .tc-nav-link{font:800 10px Inter,sans-serif;letter-spacing:.13em;color:#b9c4d7;text-decoration:none;padding:12px 5px;transition:color .2s}.tc-nav-link:hover{color:#9deaff}
 #store-screen .store-hero{background:radial-gradient(ellipse at 75% 30%,#192344 0%,transparent 54%),linear-gradient(135deg,#080b12,#101322)!important}
 .tc-hero-copy{padding-bottom:65px!important}.tc-hero-desc{font-size:15px!important;max-width:445px!important}
@@ -797,11 +797,11 @@ html{scroll-behavior:smooth}body{background:#080a10!important}#store-screen{back
 <style id="tc32-motion-style">
 .tc32-reveal{opacity:0;transform:translate3d(0,26px,0);transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);transition-delay:var(--tc32-delay,0ms)}
 .tc32-reveal.tc32-visible{opacity:1;transform:translate3d(0,0,0)}
-#store-screen nav:where(:not(.acct-nav)){transition:padding .3s ease,background-color .3s ease,box-shadow .3s ease}
-#store-screen.tc32-scrolled nav:where(:not(.acct-nav)){background:#090e18ee!important;box-shadow:0 12px 35px #0004}
+#store-screen nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){transition:padding .3s ease,background-color .3s ease,box-shadow .3s ease}
+#store-screen.tc32-scrolled nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){background:#090e18ee!important;box-shadow:0 12px 35px #0004}
 .tc-category,.tc-feature-grid>div,.tc31-card{transition:border-color .25s ease,box-shadow .25s ease,transform .25s ease}
 @media(hover:hover){.tc-category:hover,.tc-feature-grid>div:hover,.tc31-card:hover{box-shadow:0 20px 45px #0006;transform:translateY(-4px)}}
-@media(prefers-reduced-motion:reduce){.tc32-reveal{opacity:1!important;transform:none!important;transition:none!important}#store-screen nav:where(:not(.acct-nav)),.tc-category,.tc-feature-grid>div,.tc31-card{transition:none!important}}
+@media(prefers-reduced-motion:reduce){.tc32-reveal{opacity:1!important;transform:none!important;transition:none!important}#store-screen nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)),.tc-category,.tc-feature-grid>div,.tc31-card{transition:none!important}}
 </style>
 
 <style id="tc33-polish">
@@ -904,7 +904,7 @@ body{background:#030407!important}
 <style id="tc38-black-ice">
 :root{--tc38-ice:#a6f2ff}
 #store-screen{background:#020305!important}
-#store-screen nav:where(:not(.acct-nav)){background:rgba(2,4,8,.91)!important;border-bottom:1px solid #182332!important}
+#store-screen nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){background:rgba(2,4,8,.91)!important;border-bottom:1px solid #182332!important}
 #store-screen .store-hero{background:radial-gradient(ellipse 65% 70% at 75% 55%,#0b2033 0%,#05080d 48%,#020305 100%)!important;min-height:740px;isolation:isolate}
 #store-screen .store-hero:before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(450px circle at var(--tc38-x,75%) var(--tc38-y,42%),#83ddff17,transparent 70%);transition:opacity .2s}
 #store-screen .store-hero:after{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.25;background:linear-gradient(90deg,transparent 49.9%,#82dcff16 50%,transparent 50.1%),repeating-linear-gradient(0deg,transparent 0 84px,#87d8ff0c 85px 86px)}
@@ -943,7 +943,7 @@ body{background:#030407!important}
 
 <style id="tc39-premium">
 #detail-screen{background:radial-gradient(ellipse at 16% 35%,#102137 0%,#030509 53%,#020304 100%)!important}
-#detail-screen nav:where(:not(.acct-nav)){background:#030509e8!important;border-bottom:1px solid #25384b}
+#detail-screen nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){background:#030509e8!important;border-bottom:1px solid #25384b}
 #detail-screen .detail-wrap{max-width:1390px!important;gap:clamp(30px,6vw,105px)!important;padding-top:60px!important;align-items:center}
 #detail-screen .detail-img{min-height:clamp(380px,47vw,650px)!important;border:1px solid #344b5d!important;background:radial-gradient(circle at 50% 40%,#1c3e58,#080e16 50%,#030508 100%)!important;box-shadow:0 35px 110px #000b,inset 0 0 90px #6dcaff0d;position:relative;overflow:hidden}
 #detail-screen .detail-img:before{content:"";position:absolute;inset:16px;pointer-events:none;border:1px solid #b1efff20;z-index:2}
@@ -1146,7 +1146,7 @@ button:not(:disabled):hover{filter:brightness(1.13)}
 button:disabled{cursor:not-allowed;opacity:.6}
 input,select,textarea{max-width:100%}
 img{max-width:100%;height:auto}
-nav:where(:not(.acct-nav)) .nav-right{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:clamp(6px,1.1vw,14px)}
+nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)) .nav-right{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:clamp(6px,1.1vw,14px)}
 .tc-nav-link{text-decoration:none}
 .tc49-skip{position:fixed;left:14px;top:-80px;z-index:999999;background:#00e7f6;color:#061018;padding:12px 16px;font-weight:800;border-radius:0 0 10px 10px}
 .tc49-skip:focus{top:0}
@@ -1157,14 +1157,14 @@ nav:where(:not(.acct-nav)) .nav-right{display:flex;flex-wrap:wrap;align-items:ce
 .tc49-quick-help a:hover{background:#123144}
 .tc-footer a:focus-visible,.tc-footer button:focus-visible{outline-color:#00f0ff}
 @media(max-width:960px){
- #store-screen>nav:where(:not(.acct-nav)){align-items:flex-start;gap:12px}
- #store-screen>nav:where(:not(.acct-nav)) .nav-right{width:100%;justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding-bottom:7px;scrollbar-width:thin}
- #store-screen>nav:where(:not(.acct-nav)) .nav-right>*{flex-shrink:0}
+ #store-screen>nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){align-items:flex-start;gap:12px}
+ #store-screen>nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)) .nav-right{width:100%;justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding-bottom:7px;scrollbar-width:thin}
+ #store-screen>nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)) .nav-right>*{flex-shrink:0}
  .tc39-toolbar{display:flex;flex-wrap:wrap;gap:10px}
  .tc39-toolbar input{min-width:180px;flex:1}
 }
 @media(max-width:600px){
- #store-screen>nav:where(:not(.acct-nav)){padding:13px 14px}
+ #store-screen>nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){padding:13px 14px}
  .tc49-quick-help{padding:18px 16px}
  .store-hero{min-height:auto}
  .tc-hero-actions{display:flex;flex-wrap:wrap;gap:10px}
@@ -1210,8 +1210,8 @@ body {background:radial-gradient(ellipse 70% 27% at 50% 0%,rgba(42,65,110,.14),t
 body,button,input,select,textarea{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
 button,a,input,select{ -webkit-tap-highlight-color:transparent}
 :focus-visible{outline:2px solid #8ddfff!important;outline-offset:3px}
-nav:where(:not(.acct-nav)),.tc-market-nav {background:rgba(9,13,23,.88)!important;backdrop-filter:blur(22px) saturate(140%);border-bottom:1px solid rgba(163,196,240,.14)!important}
-nav:where(:not(.acct-nav)){min-height:66px;height:auto}
+nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)),.tc-market-nav {background:rgba(9,13,23,.88)!important;backdrop-filter:blur(22px) saturate(140%);border-bottom:1px solid rgba(163,196,240,.14)!important}
+nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){min-height:66px;height:auto}
 .nav-logo{font-weight:800;letter-spacing:.035em}
 .tc-nav-link,.nav-trust,.nav-lang{transition:color .2s ease,border-color .2s ease}
 .tc-nav-link:hover,.nav-trust:hover,.nav-lang:hover{color:#d8f2ff!important}
@@ -1256,7 +1256,7 @@ nav:where(:not(.acct-nav)){min-height:66px;height:auto}
 .tc-editorial article,.tc-feature,.tc49-quick-help,.tc31-card,.card-section,.stat-card{border-radius:16px!important}
 input:not([type=checkbox]):not([type=radio]),textarea,select{border-radius:9px}
 @media(max-width:760px){
-  nav:where(:not(.acct-nav)){padding:12px 16px!important;gap:10px;flex-wrap:wrap}
+  nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){padding:12px 16px!important;gap:10px;flex-wrap:wrap}
   .tc-categories{padding:58px 18px 35px!important}
   .tc-category-grid{grid-template-columns:1fr!important}
   .tc-category{min-height:245px!important}
@@ -1282,7 +1282,7 @@ input:not([type=checkbox]):not([type=radio]),textarea,select{border-radius:9px}
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 :root{--bg:#080711;--bg2:#0d0a19;--bg3:#131021;--bg4:#191329;--border:rgba(173,111,245,.22);--border2:rgba(190,126,255,.55);--accent:#a35cff;--accent2:#dc43c6;--accent-glow:rgba(145,63,240,.16);--radius:16px;--radius-sm:12px;--radius-lg:20px}
 body,#store-screen{background:radial-gradient(ellipse 75% 22% at 50% 0%,#271338 0%,#080711 75%)!important;color:#f5f0ff;font-family:Inter,system-ui,sans-serif!important}
-#store-screen nav:where(:not(.acct-nav)){height:auto!important;min-height:76px;background:rgba(11,8,21,.91)!important;border-bottom:1px solid #3c2955!important;padding:12px clamp(14px,3vw,45px)!important}
+#store-screen nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){height:auto!important;min-height:76px;background:rgba(11,8,21,.91)!important;border-bottom:1px solid #3c2955!important;padding:12px clamp(14px,3vw,45px)!important}
 .nav-logo span{color:#f4ecff!important;text-shadow:none!important;font-family:Inter,sans-serif!important;font-weight:900!important;letter-spacing:-.04em!important}
 .nav-logo svg polygon{stroke:#a35cff}
 .nav-right{gap:8px!important;flex-wrap:wrap;justify-content:flex-end}
@@ -1352,7 +1352,7 @@ body,#store-screen{background:radial-gradient(ellipse 75% 22% at 50% 0%,#271338 
 /* Unified premium neon storefront: existing functionality is preserved. */
 :root{--accent:#b253ff;--accent2:#e23ed4;--border:rgba(188,100,255,.23);--border2:rgba(204,135,255,.5)}
 #store-screen{background:radial-gradient(ellipse at 15% 10%,#291146 0%,transparent 42%),radial-gradient(ellipse at 90% 22%,#2b1042 0%,transparent 40%),#080611!important}
-#store-screen nav:where(:not(.acct-nav)){box-shadow:0 12px 50px #07040c8c!important}
+#store-screen nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){box-shadow:0 12px 50px #07040c8c!important}
 #store-screen #tc38-hero{background:radial-gradient(ellipse at 4% 45%,#4e14784d,transparent 58%),linear-gradient(120deg,#0c0718,#1d0e2c 72%,#120920)!important;border-color:#6d348d!important;box-shadow:0 20px 90px #0008,inset 0 1px #d48cff2b!important}
 #store-screen #tc38-hero .store-hero-title{font-size:clamp(40px,5vw,88px)!important;font-weight:900!important;letter-spacing:-.065em!important;line-height:1.01!important;color:#f8f4ff!important;text-shadow:0 5px 35px #0008!important}
 #store-screen #tc38-hero .store-hero-title em{font-style:normal!important;background:linear-gradient(95deg,#a6c3ff,#b573ff 42%,#e447db)!important;-webkit-background-clip:text!important;background-clip:text!important;color:transparent!important}
@@ -1565,8 +1565,8 @@ body,#store-screen{background:radial-gradient(ellipse 75% 22% at 50% 0%,#271338 
 </style><link rel="stylesheet" href="assets/phase1-orders.css">
 <link rel="stylesheet" href="assets/triso-support.css"><link rel="stylesheet" href="assets/triso-content.css?v=account1"><link rel="stylesheet" href="assets/triso-auth-ui.css">
 <script src="assets/triso-auth-oauth.js" defer></script>
-<script src="assets/triso-auth-ui.js?v=account1" defer></script>
-<link rel="stylesheet" href="assets/triso-account.css?v=2">
+<script src="assets/triso-auth-ui.js?v=settings1" defer></script>
+<link rel="stylesheet" href="assets/triso-account.css?v=3"><link rel="stylesheet" href="assets/triso-settings.css?v=1">
 </head>
 <body><a class="content-skip" href="#tc-shop-heading">Skip to products</a><div id="tc50-staging-banner" role="status" style="position:relative;z-index:99999;background:#122330;border-bottom:1px solid #467487;color:#c2eaff;padding:10px 18px;text-align:center;font:600 12px/1.5 system-ui,sans-serif">STAGING PREVIEW · Payments, order processing, and support notifications are not live. Do not send funds.</div>
 
@@ -3470,7 +3470,7 @@ window.tc31UpdatePassword=async()=>{
  }catch(e){status(window.TrisoAuthUI.error(e),'error')}
  finally{pendingAuth=false;if(button)button.disabled=false}
 };
-window.tc31Logout=async()=>{const token=session?.access_token;authMode='signin';clear();try{if(token)await api('logout',{},token)}catch(e){}status('Signed out.','success')};
+window.tc31Logout=async()=>{const token=session?.access_token;authMode='signin';clear();try{if(token)await api('logout?scope=local',{},token)}catch(e){}status('Signed out.','success')};
 
 window.tc31CallbackMode=mode=>{if(mode==='verify')$('tc31-resend-email').value=$('tc31-email').value.trim();setAuthMode(mode,true)};
 window.tc31ResendVerification=async()=>{
@@ -3485,9 +3485,11 @@ async function handleCallback(){
  const result=await window.TrisoAuthCallback.consume({api,user:async token=>{const r=await fetch(url+'/auth/v1/user',{headers:{apikey:anon,Authorization:'Bearer '+token},signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error();return r.json()}});
  if(!result.handled)return false;showScreen('tc31-panel');
  if(result.state==='error'){
-  const confirmation=result.kind==='confirmation';tc31CallbackMode(confirmation?'verify':result.kind==='recovery'?'forgot':'signin');
-  if(confirmation)status('This verification link could not be verified or has expired. Request a new confirmation email.','error');
+  const confirmation=result.kind==='confirmation';tc31CallbackMode(confirmation&&result.type!=='email_change'?'verify':result.kind==='recovery'?'forgot':'signin');
+  if(confirmation)status(result.type==='email_change'?'This email-change link is invalid or expired. Sign in and request the change again in Account settings.':'This verification link could not be verified or has expired. Request a new confirmation email.','error');
   else status(result.kind==='recovery'?'This password recovery link could not be verified. Request a new reset email.':'This sign-in link could not be verified. Please sign in again.','error');
+ }else if(result.state==='pending'){
+  tc31CallbackMode('signin');status('Complete both email confirmations, then sign in to check your current email.','info');
  }else if(result.state==='confirmed'){
   tc31CallbackMode('signin');status('Email verified successfully. Sign in to continue.','success');
  }else if(result.kind==='recovery'){
@@ -4058,10 +4060,10 @@ function init(){
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script><script src="assets/trisocmd-native-v13.js?v=13" defer></script>
-<script src="assets/triso-notifications-v34.js?v=36" defer></script>
+<script src="assets/triso-notifications-v34.js?v=37" defer></script>
 <script src="assets/trisocmd-lower-v14.js?v=14" defer></script>
 <script src="assets/vendor/qrcode.js" defer></script>
 <script src="assets/phase1-orders.js?v=account1" defer></script>
 <script src="assets/store-invoice.js" defer></script>
-<script src="assets/triso-support.js" defer></script><script src="assets/triso-account-model.js" defer></script><script src="assets/triso-account.js?v=2" defer></script></body>
+<script src="assets/triso-support.js" defer></script><script src="assets/triso-account-model.js" defer></script><script src="assets/triso-settings.js?v=1" defer></script><script src="assets/triso-account.js?v=3" defer></script></body>
 </html>

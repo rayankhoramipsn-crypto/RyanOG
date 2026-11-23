@@ -79,6 +79,8 @@
  'Network unavailable; remembered login will be retried.':['شبکه در دسترس نیست؛ ورود ذخیره‌شده دوباره بررسی می‌شود.','الشبكة غير متاحة؛ ستتم إعادة محاولة تسجيل الدخول المحفوظ.'],
  'Signed out.':['از حساب خارج شدید.','تم تسجيل الخروج.']
  };
+ copy['Complete both email confirmations, then sign in to check your current email.']=['تأیید هر دو ایمیل را تکمیل کنید؛ سپس برای بررسی ایمیل فعلی وارد شوید.','أكمل تأكيد البريدين، ثم سجّل الدخول للتحقق من بريدك الحالي.'];
+ copy['This email-change link is invalid or expired. Sign in and request the change again in Account settings.']=['پیوند تغییر ایمیل نامعتبر یا منقضی است. وارد شوید و در تنظیمات حساب دوباره درخواست دهید.','رابط تغيير البريد غير صالح أو منتهٍ. سجّل الدخول واطلب التغيير مجددًا من إعدادات الحساب.'];
  const t=message=>copy[message]?.[({fa:0,ar:1})[document.documentElement.lang.split('-')[0]]]||message;
  function set(el,message){if(!el)return;el.dataset.authCopy=message;el.textContent=t(message)}
  function mode(name){
