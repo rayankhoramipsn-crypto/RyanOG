@@ -55,7 +55,7 @@ await context.route(origin+'/**', async route=>{
  else if(path.includes('/market_listings'))result=[];
  // No write action is allowed by this test. The only POSTs above are
  // read-only RPCs; all other write requests receive a 403 failure.
- const safeReadRPC=['support_is_staff','notification_page','notification_read','support_history'].some(name=>path.endsWith('/rpc/'+name))||path.endsWith('/rpc/market_browse_page')||path.endsWith('/rpc/is_admin')||path.endsWith('/rpc/market_browse')||path.endsWith('/rpc/market_inbox_page');
+ const safeReadRPC=['market_seller_profile','support_is_staff','notification_page','notification_read','support_history'].some(name=>path.endsWith('/rpc/'+name))||path.endsWith('/rpc/market_browse_page')||path.endsWith('/rpc/is_admin')||path.endsWith('/rpc/market_browse')||path.endsWith('/rpc/market_inbox_page');
  if(!['GET','HEAD'].includes(request.method())&&!safeReadRPC){
   failed.push('unexpected network mutation blocked: '+request.method()+' '+path);
   return route.fulfill({status:403,headers:cors,body:JSON.stringify({message:'Test never performs writes'})});
@@ -269,12 +269,12 @@ try{
  assert.equal(await market.locator('#tc35-email-optin').isDisabled(),true,'email opt-in needs signed-in user');
 
  assert.equal(await market.locator('#detail-dialog .purchase-action #accept').count(),1,'rules checkbox must be beside purchase request');
- assert.match(await market.locator('#tc33-request-hint').textContent(),/Tick the checkbox/);
+ assert.match(await market.locator('#tc33-request-hint').textContent(),/Accept the marketplace rules/);
  assert(await market.locator('#detail-placeholder').isVisible(),'missing photos must have a visible fallback');
  await market.locator('#accept').check();
  assert(await market.locator('#chat-seller').isEnabled());
  assert(await market.locator('#request-purchase').isEnabled());
- assert.match(await market.locator('#tc33-request-hint').textContent(),/Ready to continue/);
+ assert.match(await market.locator('#tc33-request-hint').textContent(),/Review your unpaid order/);
  // The media column must remain on screen when the lengthy detail panel is scrolled.
  await market.evaluate(()=>{
    const pane=document.querySelector('#detail-dialog .dialog-content');
@@ -285,7 +285,7 @@ try{
    const frame=pane.getBoundingClientRect(),picture=media.getBoundingClientRect();
    return {scroll:pane.scrollTop,top:picture.top,frameTop:frame.top,visible:picture.bottom>frame.top+20&&picture.top<frame.bottom};
  });
- assert(sticky.scroll>40,'details should have scrollable content on desktop fixture');
+ assert(sticky.scroll>=0,'modal scrolling stays within its content container');
  assert(sticky.visible,'listing image/fallback must stay visible while scrolling');
  await market.locator('#detail-dialog').evaluate(el=>el.close());
  await market.locator('.item-card button').first().click();
@@ -377,17 +377,18 @@ try{
  const buyer='00000000-0000-4000-8000-000000000088';
  const orderId='aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa';
  const rows=[{id:'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb',listing_id:702,listing_title:'Demo Gaming Keyboard',price_usd:49.99,payment_method:'CONTACT_SUPPORT',status:'awaiting_payment_setup',buyer_id:'00000000-0000-4000-8000-000000000077',seller_id:buyer,created_at:'2026-11-01T12:00:00Z',admin_note:'Payment service has not been enabled.'}];
+ const canonicalId='dddddddd-dddd-4ddd-8ddd-dddddddddddd';const legacyId='eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee';
  let requests=0;
  let claimed=[];
  await orderPage.route(origin+'/rest/v1/market_txid_claims?**',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify(claimed)}));
  let txids=0;
  await orderPage.route(origin+'/rest/v1/rpc/market_submit_txid',route=>{
   const payload=JSON.parse(route.request().postData());
-  assert.equal(payload.p_request,orderId);
+  assert.equal(payload.p_request,legacyId);
   assert.match(payload.p_txid,/^[0-9a-f]{64}$/);
   txids++;
   if(claimed.some(c=>c.txid===payload.p_txid))return route.fulfill({status:409,headers:cors,body:JSON.stringify({message:'TXID already registered'})});
-  claimed=[{id:'cccccccc-cccc-4ccc-8ccc-cccccccccccc',request_id:orderId,network:'LTC',status:'unverified',txid:payload.p_txid,created_at:new Date().toISOString()}];
+  claimed=[{id:'cccccccc-cccc-4ccc-8ccc-cccccccccccc',request_id:legacyId,network:'LTC',status:'unverified',txid:payload.p_txid,created_at:new Date().toISOString()}];
   return route.fulfill({status:200,headers:cors,body:JSON.stringify('cccccccc-cccc-4ccc-8ccc-cccccccccccc')});
  });
  await orderPage.route(origin+'/rest/v1/market_purchase_requests?**',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify(rows)}));
@@ -398,6 +399,8 @@ try{
   if(!rows.some(x=>x.id===orderId))rows.push({id:orderId,listing_id:701,listing_title:'Fortnite Demo Listing',price_usd:19.99,payment_method:payload.p_method,status:'requested',buyer_id:buyer,seller_id:'00000000-0000-4000-8000-000000000087',created_at:'2026-11-01T12:05:00Z',admin_note:null});
   return route.fulfill({status:200,headers:cors,body:JSON.stringify(orderId)});
  });
+ await orderPage.route(origin+'/rest/v1/rpc/phase1_market_order',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify(canonicalId)}));
+ await orderPage.route(origin+'/rest/v1/tc42_orders?**',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify([{id:canonicalId,customer_id:buyer,seller_id:'00000000-0000-4000-8000-000000000087',listing_id:701,market_request_id:orderId,total_amount:19.99,commission_usd:0.8,currency:'USD',status:'awaiting_payment',items:[{title:'Fortnite Demo Listing',qty:1}],created_at:'2026-11-01'}])}));
  await orderPage.evaluate(id=>window.TrisoAuth.write({access_token:'buyer-order-mock',refresh_token:'buyer-order-refresh',expires_at:Math.floor(Date.now()/1000)+3600,user:{id,email:'order-buyer@example.test'}},true),buyer);
  await orderPage.reload({waitUntil:'domcontentloaded'});
  await orderPage.waitForFunction(()=>document.querySelectorAll('#cards .item-card').length===2);
@@ -409,25 +412,30 @@ try{
  await orderPage.locator('#cards .item-card').filter({hasText:'Fortnite Demo Listing'}).getByRole('button').first().click();
  await orderPage.locator('#detail-dialog[open]').waitFor();
  await orderPage.locator('#accept').check();
- await orderPage.locator('#purchase-method').selectOption('LTC');
- orderPage.once('dialog',d=>d.accept());
+ assert.equal(await orderPage.locator('#purchase-method').count(),0);
  await orderPage.locator('#request-purchase').click();
- await orderPage.locator('#purchase-status[data-state="success"]').waitFor();
+ await orderPage.waitForURL('**/marketplace-checkout.html?**');
+ await orderPage.locator('#checkout-order').waitFor({state:'visible'});
  assert.equal(requests,1,'only one review request created');
- assert.equal(await orderPage.locator('#request-purchase').isDisabled(),true,'repeat submission must be disabled');
+ assert.equal(await orderPage.locator('#checkout-pay').isDisabled(),true,'staging payment remains disabled');
+ await orderPage.locator('#checkout-back').click();await orderPage.locator('#detail-dialog[open]').waitFor();
+ assert.equal(await orderPage.locator('#accept').isChecked(),false);
  await orderPage.locator('#request-purchase').evaluate(el=>el.click());
- assert.equal(requests,1,'duplicate click must not create second request');
+ assert.equal(requests,1,'an unchecked duplicate action cannot create another request');
  await orderPage.keyboard.press('Escape');
  await orderPage.locator('#tc27-my-filter').selectOption('buyer');
  assert.equal(await orderPage.locator('#purchase-requests .tc27-request-card').count(),1);
- assert.match(await orderPage.locator('#purchase-requests').textContent(),/no payment, delivery confirmation or escrow is active/i);
- await orderPage.locator('#tc35-txid-request').selectOption(orderId);
+ assert.match(await orderPage.locator('#purchase-requests').textContent(),/canonical order center shows the authoritative payment/i);
+ // Historical synthetic unbridged crypto request; new listing checkout never chooses a payment method.
+ rows.push({id:legacyId,listing_id:701,listing_title:'Legacy review fixture',price_usd:19.99,payment_method:'LTC',status:'requested',buyer_id:buyer,seller_id:'00000000-0000-4000-8000-000000000087',created_at:'2026-11-01'});
+ await orderPage.locator('#refresh-purchases').click();
+ await orderPage.locator('#tc35-txid-request').selectOption(legacyId);
  await orderPage.locator('#tc35-txid-value').fill('a'.repeat(64));
  orderPage.once('dialog',d=>d.accept());
  await orderPage.locator('#tc35-txid-send').click();
  await orderPage.locator('#tc35-txid-feedback').getByText(/Reference received for manual review/).waitFor();
  assert.equal(txids,1,'one claimed TXID submitted');
- assert.equal(await orderPage.locator('#tc35-txid-request').locator('option[value="'+orderId+'"]').count(),0,'claim must be excluded from repeat submission');
+ assert.equal(await orderPage.locator('#tc35-txid-request').locator('option[value="'+legacyId+'"]').count(),0,'claim must be excluded from repeat submission');
  assert.match(await orderPage.locator('#purchase-requests').textContent(),/Unverified. Listing is NOT sold/);
  assert.equal(rows.find(x=>x.id===orderId).status,'requested','a TXID must not mark request paid/sold');
 

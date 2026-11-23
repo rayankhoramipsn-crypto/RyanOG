@@ -31,7 +31,7 @@ class LiveChatV17(unittest.TestCase):
                 # Production cache versions may advance independently of preview.
                 import re
                 revision = "35" if path == "marketplace.html" else "18"
-                self.assertIn("marketplace-v15.js?v="+revision, source)
+                self.assertIn("marketplace-v15.js?v=37", source)
                 self.assertIn("marketplace-v15.css?v="+revision, source)
                 self.assertIn('type="submit">Send',source)
 

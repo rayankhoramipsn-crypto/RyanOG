@@ -12,7 +12,7 @@
 <link rel="alternate icon" type="image/png" sizes="64x64" href="../assets/trisocmd-icon-64.png">
 <link rel="apple-touch-icon" sizes="180x180" href="../assets/trisocmd-apple-touch.png">
 <link rel="stylesheet" href="../assets/phase1-orders.css">
-<link rel="stylesheet" href="../assets/triso-support.css"></head>
+<link rel="stylesheet" href="../assets/triso-support.css"><link rel="stylesheet" href="../assets/marketplace-details.css?v=1"></head>
 <body>
 <header class="topbar">
  <div class="container nav">
@@ -123,28 +123,20 @@
  </div>
 </main>
 <footer class="footer"><div class="container"><span>© TRISOCMD · Marketplace preview · No live payments</span><div><a href="../index.html">Store</a> · <a href="../help/">Support</a> · <a href="../policies/">Policies</a></div></div></footer>
-<dialog id="detail-dialog" class="dialog" aria-labelledby="detail-title">
- <div class="dialog-header"><h2>Listing details</h2><button class="close" type="button" onclick="document.getElementById('detail-dialog').close()" aria-label="Close">✕</button></div>
- <div class="dialog-content">
-  <div class="detail-grid">
-   <div><img id="detail-cover" class="detail-photo" alt="Listing photo"><div id="detail-placeholder" class="item-cover">No gallery photo</div><div id="thumbs" class="detail-gallery"></div></div>
-   <div><span id="detail-platform" class="eyebrow"></span><h2 id="detail-title"></h2><span class="fine" id="detail-date"></span><div class="detail-price" id="detail-price"></div><button id="view-seller-profile" type="button" class="btn small" data-t="sellerProfile">Seller profile</button>
-      <p id="detail-desc"></p>
-      <div class="secure-info">⚑ Only administrator-approved listings appear publicly. Approval does not guarantee ownership, authenticity, delivery or safety. TRISOCMD does not currently accept or hold marketplace payments.</div>
-      <label class="policy-accept"><input id="accept" type="checkbox" required><span>I have read the <a href="#" onclick="event.preventDefault();document.getElementById('rules-dialog').showModal()">marketplace rules</a>. I understand that payments to sellers directly are not permitted for marketplace-managed sales; any future payment would go to the officially configured marketplace recipient, and only verified completion would permit a seller payout. The marketplace currently does not process, hold or protect funds, so I will not send money or account credentials.</span></label>
-      <button id="chat-seller" class="btn primary block" type="button" style="margin-top:13px" disabled data-t="contact">Chat with seller</button>
-      <div class="purchase-action">
-        <h3>Request to purchase</h3>
-        <p class="fine">If a payment service is activated later, buyers pay the marketplace administrator, not the seller. Seller payout would follow verification, confirmed delivery and any applicable dispute process. Until then, this creates a request only; no money moves.</p>
-        <label for="purchase-method">Preferred payment method (for review)</label>
-        <select id="purchase-method"><option value="CONTACT_SUPPORT">Discuss with support</option><option value="LTC">Litecoin (LTC)</option><option value="BTC">Bitcoin (BTC)</option><option value="BANK">Bank transfer</option></select>
-        <button id="request-purchase" class="btn secondary block" type="button" disabled>Request purchase review · No payment</button>
-        <p id="purchase-status" class="fine" role="status" aria-live="polite"></p>
-      </div>
-   </div>
-  </div>
- </div>
+<dialog id="detail-dialog" class="dialog market-detail" aria-labelledby="listing-details-heading">
+ <div class="dialog-header market-detail-header"><div class="market-detail-heading"><span class="market-detail-mark" aria-hidden="true">T</span><div><p class="market-detail-breadcrumb">TRISOCMD / <span data-detail-copy="Marketplace">Marketplace</span></p><h2 id="listing-details-heading" data-detail-copy="Listing details">Listing details</h2></div></div><select id="detail-language" aria-label="Language"><option value="en">English</option><option value="fa">فارسی</option><option value="ar">العربية</option></select><button class="close" type="button" data-close="detail-dialog" data-detail-label="Close listing" aria-label="Close listing">×</button></div>
+ <div class="dialog-content"><div class="detail-grid">
+  <section class="market-detail-product" aria-labelledby="detail-title"><div class="market-detail-identity"><div><span id="detail-availability" class="market-detail-badge"></span><h3 id="detail-title"></h3><p id="detail-platform" class="market-detail-category"></p><p class="fine" id="detail-date"></p></div><button id="view-seller-profile" type="button" class="market-detail-seller"><span class="market-detail-seller-icon" aria-hidden="true">T</span><span><small data-detail-copy="Seller">Seller</small><strong id="detail-seller-name" data-detail-copy="Seller profile">Seller profile</strong></span></button></div>
+   <div class="tc33-media-column"><div class="tc33-media-stage" tabindex="0" data-detail-label="Listing photos" aria-label="Listing photos"><img id="detail-cover" class="detail-photo" alt=""><div id="detail-placeholder" class="tc33-photo-fallback" role="status"><span aria-hidden="true">◇</span><strong data-detail-copy="Listing gallery">Listing gallery</strong><span class="tc33-fallback-message"></span></div><button id="detail-prev" class="market-gallery-arrow market-gallery-prev" type="button" data-detail-label="Previous photo" aria-label="Previous photo">‹</button><button id="detail-next" class="market-gallery-arrow market-gallery-next" type="button" data-detail-label="Next photo" aria-label="Next photo">›</button><button id="detail-fullscreen" class="market-gallery-fullscreen" type="button" data-detail-label="Open photo fullscreen" aria-label="Open photo fullscreen">⛶</button></div><div id="thumbs" class="detail-gallery" data-detail-label="Listing photos" aria-label="Listing photos"></div><p id="detail-photo-position" class="market-gallery-position" role="status"></p></div>
+   <h4 data-detail-copy="Description">Description</h4><p id="detail-desc"></p>
+  </section>
+  <section class="tc33-detail-column" aria-label="Listing actions" data-detail-label="Listing actions"><button id="chat-seller" class="btn primary block market-chat-primary" type="button" data-detail-copy="Chat with seller">Chat with seller</button><div class="market-chat-buy"><span data-detail-copy="You can also start this purchase from chat.">You can also start this purchase from chat.</span><button id="detail-buy-shortcut" class="btn small secondary" type="button" data-detail-copy="Buy this item">Buy this item</button></div>
+   <div class="purchase-action"><section class="market-detail-rules" aria-labelledby="detail-rules-heading"><h3 id="detail-rules-heading" data-detail-copy="Marketplace rules">Marketplace rules</h3><div class="market-rules-scroll" tabindex="0" aria-labelledby="detail-rules-heading"><ul><li data-detail-copy="This starts an unpaid marketplace review request.">This starts an unpaid marketplace review request.</li><li data-detail-copy="Approval does not guarantee ownership, delivery or buyer protection.">Approval does not guarantee ownership, delivery or buyer protection.</li><li data-detail-copy="No live payments, escrow or seller payouts are active. Never send payment details or credentials in chat.">No live payments, escrow or seller payouts are active. Never send payment details or credentials in chat.</li><li data-detail-copy="Only trade items you own and are permitted to transfer. Disputes require administrator review.">Only trade items you own and are permitted to transfer. Disputes require administrator review.</li></ul></div><a href="#rules-title" data-market-rules data-detail-copy="Read full marketplace rules">Read full marketplace rules</a><label class="policy-accept tc33-consent"><input id="accept" type="checkbox" required><span data-detail-copy="I accept the marketplace rules and understand this is an unpaid request, without escrow or delivery guarantees.">I accept the marketplace rules and understand this is an unpaid request, without escrow or delivery guarantees.</span></label><p id="tc33-request-hint" class="tc33-request-hint" role="status" aria-live="polite"></p></section>
+   <section class="market-detail-purchase" aria-labelledby="detail-purchase-heading"><div class="market-purchase-heading"><h3 id="detail-purchase-heading" data-detail-copy="Purchase this item">Purchase this item</h3><strong class="detail-price" id="detail-price" dir="ltr"></strong></div><button id="request-purchase" class="btn primary block" type="button" disabled data-detail-copy="Continue to checkout">Continue to checkout</button><p class="fine" data-detail-copy="Review your unpaid order on the next step. Payment providers are unavailable on staging.">Review your unpaid order on the next step. Payment providers are unavailable on staging.</p><p id="purchase-status" class="fine tc27-purchase-feedback" role="status" aria-live="polite" aria-atomic="true"></p></section></div>
+  </section>
+ </div></div>
 </dialog>
+<dialog id="listing-lightbox" class="market-lightbox" aria-label="Listing photo fullscreen" data-detail-label="Listing photo fullscreen"><div><button type="button" class="close" data-close="listing-lightbox" aria-label="Close photo" data-detail-label="Close photo">×</button><img id="listing-lightbox-image" alt=""><button id="lightbox-prev" type="button" data-detail-label="Previous photo" aria-label="Previous photo">‹</button><button id="lightbox-next" type="button" data-detail-label="Next photo" aria-label="Next photo">›</button><p id="lightbox-position" role="status"></p></div></dialog>
 <dialog id="rules-dialog" class="dialog" aria-labelledby="rules-title">
  <div class="dialog-header"><h2 id="rules-title">TRISOCMD marketplace policy</h2><button class="close" type="button" onclick="document.getElementById('rules-dialog').close()" aria-label="Close">✕</button></div>
  <div class="dialog-content">
@@ -170,7 +162,7 @@
  <div class="dialog-header"><h2>Welcome to TRISOCMD</h2><button class="close" type="button" onclick="document.getElementById('auth-dialog').close()">✕</button></div>
  <div class="dialog-content">
   <p>Sign in to post listings or message sellers.</p>
-  <div class="form-field"><label for="auth-email">Email</label><input id="auth-email" type="email" autocomplete="email" placeholder="you@example.com"></div>
+  <p><a href="../index.html?market_signin=1" id="market-main-signin" data-detail-copy="Use Google or account sign-in">Use Google or account sign-in</a></p><div class="form-field"><label for="auth-email">Email</label><input id="auth-email" type="email" autocomplete="email" placeholder="you@example.com"></div>
   <div class="form-field" style="margin-top:14px"><label for="auth-password">Password</label><input id="auth-password" type="password" autocomplete="current-password" placeholder="At least 8 characters"></div>
   <p id="auth-note" class="notice" role="status"></p>
   <label class="tc31-remember" style="display:flex;align-items:center;gap:9px;margin:16px 0;color:#d6cbe6"><input type="checkbox" id="auth-remember" checked style="width:18px;height:18px;accent-color:#a986ff"> Remember me on this device</label>
@@ -211,7 +203,7 @@
  <div id="chat-guest" class="dialog-content hidden">Sign in to message sellers.</div>
  <div class="chat-shell">
   <aside id="thread-list" class="thread-list" aria-label="Your conversations"><p class="fine">Loading conversations…</p></aside>
-  <section class="chat-main"><div class="chat-context"><h3 id="chat-topic">Select a conversation</h3><small id="chat-sub">Messages may be reviewed by administrators.</small></div>
+  <section class="chat-main"><div class="chat-context"><button id="chat-buy-item" class="btn small secondary" type="button" hidden data-detail-copy="Buy this item">Buy this item</button><h3 id="chat-topic">Select a conversation</h3><small id="chat-sub">Messages may be reviewed by administrators.</small></div>
   <div id="bubbles" class="chat-messages" role="log" aria-live="polite" aria-label="Messages in conversation"><div class="chat-placeholder">Choose a conversation to read and reply.</div></div>
   <form id="chat-form" class="chat-form hidden"><label for="chat-body" class="fine" style="position:absolute;clip:rect(0,0,0,0)">Message</label><textarea id="chat-body" maxlength="2000" required rows="2" placeholder="Write a message… Enter to send · Shift+Enter for a new line. Never share passwords or codes."></textarea><button class="btn primary" id="chat-send" type="submit">Send ↗</button></form>
   <div id="chat-state" class="chat-feedback" role="status" aria-live="polite"></div>
@@ -221,8 +213,8 @@
 </dialog>
 <script src="../assets/triso-auth-storage.js?v=2"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer src="../assets/marketplace-v15.js?v=18"></script>
-<script src="../assets/phase1-orders.js" defer></script><dialog id="edit-dialog"><div class="dialog-header"><h2 data-t="editListing">Edit listing</h2><button type="button" class="close" data-close="edit-dialog" aria-label="Close">×</button></div><form id="edit-form" class="dialog-content"><label>Title<input id="edit-title" required minlength="5" maxlength="120"></label><label>Category<input id="edit-platform" required minlength="2" maxlength="50"></label><label>Description<textarea id="edit-description" required minlength="20" maxlength="3000"></textarea></label><label>Price (USD)<input id="edit-price" type="number" min="1" max="1000000" step="0.01" required></label><p class="fine">Changes require administrator approval again.</p><p id="edit-status" role="alert"></p><button id="edit-save" class="btn primary">Save for review</button></form></dialog>
+<script defer src="../assets/marketplace-detail-view.js?v=1"></script><script defer src="../assets/marketplace-v15.js?v=37"></script>
+<script src="../assets/phase1-orders.js?v=market-detail1" defer></script><dialog id="edit-dialog"><div class="dialog-header"><h2 data-t="editListing">Edit listing</h2><button type="button" class="close" data-close="edit-dialog" aria-label="Close">×</button></div><form id="edit-form" class="dialog-content"><label>Title<input id="edit-title" required minlength="5" maxlength="120"></label><label>Category<input id="edit-platform" required minlength="2" maxlength="50"></label><label>Description<textarea id="edit-description" required minlength="20" maxlength="3000"></textarea></label><label>Price (USD)<input id="edit-price" type="number" min="1" max="1000000" step="0.01" required></label><p class="fine">Changes require administrator approval again.</p><p id="edit-status" role="alert"></p><button id="edit-save" class="btn primary">Save for review</button></form></dialog>
 <dialog id="profile-edit-dialog"><div class="dialog-header"><h2 data-t="sellerProfile">Seller profile</h2><button type="button" class="close" data-close="profile-edit-dialog" aria-label="Close">×</button></div><form id="profile-form" class="dialog-content"><label>Display name<input id="profile-name" minlength="3" maxlength="60" required></label><label>Bio<textarea id="profile-bio" maxlength="500"></textarea></label><label><input type="checkbox" id="profile-public">Show this profile with approved listings</label><p id="profile-status" role="alert"></p><button id="profile-save" class="btn primary">Save profile</button></form></dialog>
 <dialog id="profile-dialog"><div class="dialog-header"><h2 id="public-seller-name"></h2><button type="button" class="close" data-close="profile-dialog" aria-label="Close">×</button></div><div class="dialog-content"><p id="public-seller-bio"></p><span id="public-seller-pro"></span></div></dialog>
 <script src="../assets/triso-support.js" defer></script></body>

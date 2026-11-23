@@ -18,7 +18,7 @@ class MarketplaceV18(unittest.TestCase):
      self.assertIn("function renderAccountMode",code)
      self.assertIn("window.TrisoAuth?.read()?.user",code)
     else:
-     self.assertIn("returningMember?'store-screen':'lang-screen'",code)
+     self.assertIn("window.TrisoLanguage.has()",code)
      self.assertIn("tc37ShowWelcome",code)
      self.assertIn("auth.refresh_token",code)
  def test_purchase_request_only_and_owner_removal(self):
@@ -26,11 +26,14 @@ class MarketplaceV18(unittest.TestCase):
    with self.subTest(path=path):
     page=(ROOT/path).read_text(encoding="utf-8")
     tags=Tags();tags.feed(page)
-    for id_ in ("purchase-method","request-purchase","purchase-status",
+    for id_ in ("request-purchase","purchase-status",
                 "purchase-requests","purchase-requests-wrap","refresh-purchases"):
      self.assertEqual(tags.ids.get(id_),1,id_)
-    for t in ("payments to sellers directly are not permitted",
-              "administrator oversight","not currently accept","No payment",
+    self.assertNotIn('id="purchase-method"',page)
+    checkout=(ROOT/"marketplace-checkout.html").read_text(encoding="utf-8")
+    self.assertIn('id="checkout-method" disabled',checkout)
+    for t in ("sellers must not request direct payment",
+              "administrator review","not currently accept","No live payments",
               "4%"):
      self.assertIn(t.lower(),page.lower())
   js=(ROOT/"assets/marketplace-v15.js").read_text(encoding="utf-8")

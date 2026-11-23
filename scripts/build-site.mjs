@@ -7,7 +7,7 @@ export async function buildSite({out,content=join(root,'content/published.json')
  const snapshot=JSON.parse(await readFile(content,'utf8')),result=renderStorefront(snapshot,{indexable});
  const output=resolve(out);if(output===root||root.startsWith(output+'/'))throw Error('Output must be a fresh build directory');
  await mkdir(output);
- for(const name of ['sw-notifications.js','index.html','404.html','marketplace.html','product.html','staging-check.html','app.js','luxury-dark.css','snowflake.png','assets','admin','blog','videos','help','policies','preview'])await cp(join(root,name),join(output,name),{recursive:true,errorOnExist:true});
+ for(const name of ['sw-notifications.js','index.html','404.html','marketplace.html','marketplace-checkout.html','product.html','staging-check.html','app.js','luxury-dark.css','snowflake.png','assets','admin','blog','videos','help','policies','preview'])await cp(join(root,name),join(output,name),{recursive:true,errorOnExist:true});
  const blogFile=join(output,'blog/index.html'),blog=await readFile(blogFile,'utf8'),placeholder='<section id="listing" class="grid" aria-label="Published articles" data-content-aria="Published articles"></section>';
  if(!blog.includes(placeholder))throw Error('Blog build placeholder missing');
  const cards=snapshot.posts.filter(p=>result.pages.has('/blog/'+p.slug+'/index.html')).map(p=>'<div class="card"><h2><a href="/blog/'+p.slug+'/">'+escape(p.title)+'</a></h2><p>'+escape(p.excerpt)+'</p></div>').join('');
