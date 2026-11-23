@@ -6,6 +6,7 @@
  function get(storage,key){try{return storage.getItem(key)}catch{return null}}
  function put(storage,key,value){try{storage.setItem(key,value);return true}catch{return false}}
  function del(storage,key){try{storage.removeItem(key)}catch{}}
+ function changed(){global.dispatchEvent?.(new global.Event('triso:session'))}
  function remembered(){return get(localStorage,PREF)!=='false'}
  function read(){
    // Persistent login takes priority; legacy sessionStorage login is upgraded in place.
@@ -25,15 +26,15 @@
      user:value.user};
    const raw=JSON.stringify(saved);
    if(keep){
-     if(!put(localStorage,KEY,raw)){return put(sessionStorage,KEY,raw)}
+     if(!put(localStorage,KEY,raw)){const ok=put(sessionStorage,KEY,raw);if(ok)changed();return ok}
      del(sessionStorage,KEY);
    }else{
      if(!put(sessionStorage,KEY,raw))return false;
      del(localStorage,KEY);
    }
-   return true;
+   changed();return true;
  }
- function clear(){del(localStorage,KEY);del(sessionStorage,KEY)}
+ function clear(){del(localStorage,KEY);del(sessionStorage,KEY);changed()}
  function setRemember(v){
    put(localStorage,PREF,v?'true':'false');
    const session=read();

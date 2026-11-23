@@ -103,7 +103,7 @@
   if(e instanceof TypeError||['TimeoutError','AbortError'].includes(e?.name))return 'Network unavailable. Check your connection and try again.';
   return Object.hasOwn(copy,e?.message)?e.message:'Unable to complete the request. Please try again.';
  }
- global.TrisoAuthUI={t,set,mode,paint,error,language};
+ global.TrisoAuthUI={t,set,mode,paint,error,language,addTranslations:values=>{Object.assign(copy,values);paint()}};
  new MutationObserver(paint).observe(document.documentElement,{attributes:true,attributeFilter:['lang','dir']});
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',paint);else paint();
 })(window);

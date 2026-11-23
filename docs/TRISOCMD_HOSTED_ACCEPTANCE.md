@@ -42,6 +42,14 @@ Read-only staging Auth log aggregation found **3 generic “provider is not enab
 
 Focused rendering evidence is generated locally by `TRISO_CHROMIUM_PATH=/usr/bin/chromium node tests/auth-layout-browser.mjs`: original screenshots, contact sheets and measured widths in ignored `work/auth-layout/`. API responses are synthetic, but the actual source styles and normal browser motion/cascade are rendered. Hosted Google login remains UNVERIFIED until the owner flow above passes.
 
+## Account dashboard acceptance (2026-11-23)
+
+The new main/preview account view reads the existing canonical `tc42_orders` through the shared order center, explicitly scoped to the current buyer/seller, with paginated deduplication and stale-response guards. Dashboard totals partition supported statuses: fulfilled → Completed; payment_submitted/payment_review/paid/fulfillment_pending → In progress; awaiting_payment/disputed → Action needed; cancelled/refunded → Closed. There is no invented Upcoming state or merged legacy order model. Activity is the existing private notification history, not a fabricated account audit log. Notification settings reuse the existing preferences panel; unsupported Deals/general account settings are omitted. Success banners occur only after verified password/OAuth sign-in and disappear on refresh/dismissal.
+
+Read-only hosted metadata confirmed the required eight order fields, enabled order RLS, authenticated SELECT and executable `is_admin`, `support_is_staff`, `notification_page` RPCs with the expected return types. This is contract evidence, not an actual JWT/role journey. No business rows were read for this check. Synthetic browser fixtures cover both main/preview, including 150-order pagination, loading/empty/failure states, stale-data retention, role guards, cross-account late responses, all four viewport sizes, EN/FA/AR and accessibility; artifacts stay in ignored `work/account-dashboard/`.
+
+Owner: use dedicated staging accounts to sign in → confirm your profile/role and canonical order totals → open tracking/change its filter → refresh → open notifications/preferences → test menu/search/category/cart/marketplace links → sign out and confirm the private view clears. Compare buyer/seller totals only with their own canonical orders; an administrator's personal dashboard intentionally excludes other customers' orders. Use the existing admin tools for authorized administration. Verify Google consent/return separately using the exact settings above. Keep payments/payouts and delivery held. Hosted HTTPS/JWT acceptance is still unverified from this execution environment.
+
 ## One browser acceptance checklist
 
 Open **[staging-check.html](https://trisocmd-staging-review.rayankhoramipsn.chatgpt.site/staging-check.html)** from the owner's permitted browser. Its checklist covers buyer/seller/admin flows; no credentials, jobs or business records are created by its automated checks.

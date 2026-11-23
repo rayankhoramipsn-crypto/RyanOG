@@ -11,7 +11,7 @@
  const statuses={all:['all','همه','الكل'],awaiting_payment:['awaiting payment','در انتظار پرداخت','بانتظار الدفع'],payment_submitted:['payment submitted','ادعای پرداخت ارسال شده','تم إرسال ادعاء الدفع'],payment_review:['payment review','بررسی پرداخت','مراجعة الدفع'],paid:['paid','پرداخت‌شده','مدفوع'],fulfillment_pending:['fulfillment pending','در انتظار تحویل','بانتظار التسليم'],fulfilled:['fulfilled','تحویل‌شده','تم التسليم'],cancelled:['cancelled','لغوشده','ملغى'],disputed:['disputed','مورد اختلاف','متنازع عليه'],refunded:['refunded','بازپرداخت‌شده','مسترد']};
  const statusText=s=>statuses[s]?t(...statuses[s]):s.replaceAll('_',' ');
  async function token(){return await window.tc42AccessToken?.()||window.TrisoAuth?.read()?.access_token;}
- async function api(path,body){const jwt=await token();if(!jwt)throw Error(t('Sign in to view orders.','برای مشاهده سفارش‌ها وارد شوید.','سجل الدخول لعرض الطلبات.'));const r=await fetch(base+'/rest/v1/'+path,{method:body===undefined?'GET':'POST',headers:{apikey:key,Authorization:'Bearer '+jwt,'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(15000)});const d=await r.json();if(!r.ok)throw Error(d.message||d.error||'Order service unavailable');return d;}
+ async function api(path,body){const actor=window.TrisoAuth?.read()?.user?.id;const jwt=await token();if(actor!==window.TrisoAuth?.read()?.user?.id||jwt!==window.TrisoAuth?.read()?.access_token)throw Error(t('Account changed. Refresh and try again.','حساب تغییر کرد. صفحه را به‌روزرسانی کنید.','تغير الحساب. حدّث الصفحة وحاول مجددًا.'));if(!jwt)throw Error(t('Sign in to view orders.','برای مشاهده سفارش‌ها وارد شوید.','سجل الدخول لعرض الطلبات.'));const r=await fetch(base+'/rest/v1/'+path,{method:body===undefined?'GET':'POST',headers:{apikey:key,Authorization:'Bearer '+jwt,'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(15000)});const d=await r.json();if(!r.ok)throw Object.assign(Error('Order service unavailable'),{status:r.status});return d;}
  let retry=null;
  async function create(items){
    const owner=window.TrisoAuth?.read()?.user?.id,cart=JSON.stringify(items);
@@ -28,7 +28,11 @@
  const feedback=node('p');feedback.setAttribute('role','status');
  const filter=node('select');bind(filter,'aria-label',()=>t('Order status','وضعیت سفارش','حالة الطلب'));
  ['all','awaiting_payment','payment_submitted','payment_review','paid','fulfillment_pending','fulfilled','cancelled','disputed','refunded'].forEach(s=>filter.append(bind(new Option('',s),'textContent',()=>statusText(s))));
- const list=node('div');let rows=[],loading=false,generation=0;
+ const list=node('div');let rows=[],generation=0,rowOwner=null,loadState='idle',loadError=false,hasData=false,pendingLoad=null;
+ const listeners=new Set();
+ function snapshot(){const owner=window.TrisoAuth?.read()?.user?.id;return {owner,rows:owner&&owner===rowOwner?rows.map(o=>({...o})):[],state:owner===rowOwner?loadState:'idle',error:owner===rowOwner&&loadError,hasData:owner===rowOwner&&hasData}}
+ function publish(){for(const fn of listeners)fn(snapshot())}
+ function resetOrders(){generation++;pendingLoad=null;refresh.disabled=false;rows=[];rowOwner=null;loadState='idle';loadError=false;hasData=false;list.replaceChildren();publish()}
  function button(label,fn){const b=node('button',label);b.type='button';b.onclick=async()=>{b.disabled=true;try{await fn()}catch(e){feedback.textContent=e.message}finally{b.disabled=false}};return b;}
  const refresh=button(()=>t('Refresh orders','به‌روزرسانی سفارش‌ها','تحديث الطلبات'),load);
  root.append(filter,refresh,feedback,list);
@@ -79,20 +83,46 @@
    if(!list.childNodes.length)list.textContent=t('No orders match this filter.','سفارشی مطابق فیلتر نیست.','لا توجد طلبات تطابق التصفية.');
  }
  async function load(){
-   if(loading)return;loading=true;const v=++generation;const owner=window.TrisoAuth?.read()?.user?.id;
-   feedback.textContent=t('Loading orders…','در حال بارگذاری سفارش‌ها…','جارٍ تحميل الطلبات…');
-   try{const next=[];for(let offset=0;;offset+=100){const page=await api('tc42_orders?select=*&order=created_at.desc,id.desc&limit=100&offset='+offset);if(v!==generation||owner!==window.TrisoAuth?.read()?.user?.id)return;next.push(...page);if(page.length<100)break;}if(v!==generation||owner!==window.TrisoAuth?.read()?.user?.id)return;rows=next;render();feedback.textContent='';}catch(e){rows=[];list.replaceChildren();feedback.textContent=e.message}finally{loading=false}
+   const owner=window.TrisoAuth?.read()?.user?.id;
+   if(!owner){resetOrders();feedback.textContent=t('Sign in to view orders.','برای مشاهده سفارش‌ها وارد شوید.','سجل الدخول لعرض الطلبات.');return}
+   if(pendingLoad?.owner===owner)return pendingLoad.promise;
+   const stamp=++generation,flight={owner,promise:null};pendingLoad=flight;
+   if(rowOwner!==owner){rows=[];hasData=false}rowOwner=owner;loadState='loading';loadError=false;
+   feedback.textContent=t('Loading orders…','در حال بارگذاری سفارش‌ها…','جارٍ تحميل الطلبات…');refresh.disabled=true;publish();
+   flight.promise=(async()=>{
+    try{
+     const next=new Map();
+     for(let offset=0;;offset+=100){
+      if(stamp!==generation||owner!==window.TrisoAuth?.read()?.user?.id)return;
+      const query=new URLSearchParams({select:'*',order:'created_at.desc,id.desc',limit:'100',offset:String(offset)});
+      if(!adminPage){if(!/^[0-9a-f-]{36}$/i.test(owner))throw Error('Invalid account');query.set('or','(customer_id.eq.'+owner+',seller_id.eq.'+owner+')')}
+      const page=await api('tc42_orders?'+query);
+      if(stamp!==generation||owner!==window.TrisoAuth?.read()?.user?.id)return;
+      if(!Array.isArray(page))throw Error('Invalid order response');
+      for(const order of page)if(order.id&&(adminPage||order.customer_id===owner||order.seller_id===owner))next.set(String(order.id),order);
+      if(page.length<100)break;
+     }
+     rows=[...next.values()];hasData=true;loadState='ready';render();feedback.textContent='';
+    }catch(error){
+     if(stamp!==generation||owner!==window.TrisoAuth?.read()?.user?.id)return;
+     loadState='error';loadError=true;
+     if([401,403].includes(error.status)){rows=[];hasData=false;list.replaceChildren()}
+     feedback.textContent=t('Orders could not refresh. Please try again.','سفارش‌ها به‌روزرسانی نشدند. دوباره تلاش کنید.','تعذر تحديث الطلبات. حاول مجددًا.');
+    }finally{if(pendingLoad===flight){pendingLoad=null;refresh.disabled=false}if(stamp===generation)publish()}
+   })();return flight.promise;
  }
+
  new MutationObserver(repaint).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
  filter.onchange=render;
  async function market(requestId){const id=await api('rpc/phase1_market_order',{p_request:requestId});await load();root.scrollIntoView({behavior:'smooth',block:'start'});return id;}
- window.TrisoOrders={create,load,market,beginNew};
+ window.TrisoOrders={create,load,market,beginNew,statusText,snapshot,subscribe:fn=>{listeners.add(fn);fn(snapshot());return ()=>listeners.delete(fn)},reset:resetOrders,open:async()=>{const target=document.getElementById('tc45-tracking-list');if(target&&root.parentElement!==target)target.replaceChildren(root);await load()},close:()=>{if(root.parentElement!==host)host.append(root)}};
  const selected=new URLSearchParams(location.search).get('product');
  if(/^[0-9]{1,18}$/.test(selected||'') && typeof window.openProduct==='function'){
   let attempts=0;const timer=setInterval(()=>{attempts++;if(typeof state!=='undefined' && state.products?.some(p=>String(p.id)===selected)){clearInterval(timer);window.openProduct(selected);}else if(attempts>=100)clearInterval(timer);},100);
  }
- window.addEventListener('storage',()=>{rows=[];list.replaceChildren();generation++;});
+ window.addEventListener('storage',()=>{if(rowOwner!==window.TrisoAuth?.read()?.user?.id)resetOrders()});
+ window.addEventListener('triso:session',()=>{if(rowOwner!==window.TrisoAuth?.read()?.user?.id)resetOrders()});
  // Hide data immediately on sign-out or account switch; never retain another account's order DOM.
  let lastOwner=window.TrisoAuth?.read()?.user?.id;
- setInterval(()=>{const owner=window.TrisoAuth?.read()?.user?.id;if(owner!==lastOwner){lastOwner=owner;generation++;rows=[];list.replaceChildren();feedback.textContent=t('Refresh to view orders.','برای مشاهده سفارش‌ها به‌روزرسانی کنید.','حدّث لعرض الطلبات.');}},1000);
+ setInterval(()=>{const owner=window.TrisoAuth?.read()?.user?.id;if(owner!==lastOwner){lastOwner=owner;if(owner===rowOwner)return;resetOrders();feedback.textContent=t('Refresh to view orders.','برای مشاهده سفارش‌ها به‌روزرسانی کنید.','حدّث لعرض الطلبات.');}},1000);
 })();

@@ -1,5 +1,7 @@
 # TRISOCMD master checklist
 
+Account dashboard (2026-11-23): reference-based EN/FA/AR main/preview UI and shared canonical orders/notification integration implemented; rendered and targeted isolated tests pass. Hosted schema/RPC metadata contract verified read-only; actual dedicated-account hosted browser acceptance remains UNVERIFIED. No production, provider activation or migrations.
+
 Focused Auth/UI batch (2026-11-22): confirmation/recovery/OAuth callback distinction and signup → Sign In implemented; compact main/preview EN/FA/AR authentication UI, duplicate-submit guards, safe errors and resend. Targeted synthetic tests verify source behavior; actual hosted email-template/Google acceptance remains UNVERIFIED. See [owner template check](TRISOCMD_HOSTED_ACCEPTANCE.md#authentication-correction-2026-11-22). Production remains NO-GO.
 
 Updated 2026-11-12 (Asia/Tehran). **INCOMPLETE; not release-ready.**
