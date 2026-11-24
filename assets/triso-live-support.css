@@ -1,0 +1,23 @@
+/* Non-modal customer messenger; scoped away from ticket/order/payment layouts. */
+#triso-live-chat,#triso-live-restore{box-sizing:border-box;position:fixed;right:24px;bottom:76px;z-index:100010;color:#f1eaf8;font:14px/1.55 system-ui,-apple-system,sans-serif}
+#triso-live-chat{width:390px;height:min(570px,calc(100dvh - 116px));display:flex;flex-direction:column;background:#100d18;border:1px solid #81529f;border-radius:18px;box-shadow:0 20px 65px #000a;overflow:hidden}
+#triso-live-chat[hidden],#triso-live-restore[hidden],#triso-live-chat [hidden],#tc41-fab[hidden]{display:none!important}
+#triso-live-chat *{box-sizing:border-box}#triso-live-chat header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0;padding:16px 18px;background:linear-gradient(120deg,#30203f,#191221);border-bottom:1px solid #493256}
+#triso-live-chat h2{font-size:17px;line-height:1.3;margin:0;color:#f7f0fd;letter-spacing:0}#triso-live-chat header p{margin:5px 0 0;font-size:12px;color:#c5b3d5}#triso-live-chat .live-controls{display:flex;gap:6px}
+#triso-live-chat button,#triso-live-restore{cursor:pointer;font:inherit;color:#f1e7fa;border:1px solid #745089;background:#362144;border-radius:9px;padding:9px 13px;white-space:normal}
+#triso-live-chat .live-controls button{width:34px;height:34px;padding:0;background:#21162e;border-color:#624275;font-size:23px;line-height:1}
+#triso-live-chat #live-chat-status{flex-shrink:0;margin:0;padding:10px 16px;font-size:12px;color:#d5c3e4;background:#17111f;line-height:1.5;overflow-wrap:anywhere}
+#triso-live-chat #live-chat-messages{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:16px;display:flex;flex-direction:column;gap:12px;scrollbar-width:thin;scrollbar-color:#81529f #15101c}
+#triso-live-chat .live-empty{margin:auto 0;text-align:center;color:#b9a8c9;font-size:13px;line-height:1.8;padding:12px}
+#triso-live-chat .live-message{max-width:88%;align-self:flex-start;background:#22192d;border:1px solid #463050;border-radius:13px 13px 13px 3px;padding:10px 12px;overflow-wrap:anywhere;flex-shrink:0}
+#triso-live-chat .live-message.live-own{align-self:flex-end;background:#3a2250;border-color:#74508b;border-radius:13px 13px 3px 13px}
+#triso-live-chat .live-message strong{display:block;font-size:11px;color:#d8bee9;font-weight:650}#triso-live-chat .live-message p{margin:5px 0;color:#f2eaf8;white-space:pre-wrap;font-size:14px;line-height:1.7}#triso-live-chat time{display:block;font-size:10px;color:#c0a9cf;margin-top:5px}
+#triso-live-chat form{display:flex;gap:9px;align-items:flex-end;padding:12px;border-top:1px solid #4a325b;background:#17101f;flex-shrink:0;margin:0}
+#triso-live-chat textarea{display:block;flex:1;min-width:0;width:auto;min-height:44px;max-height:110px;resize:vertical;padding:10px 12px;color:#f3e9fc;background:#100c17;border:1px solid #715087;border-radius:10px;font:inherit;line-height:1.55;margin:0}
+#triso-live-chat #live-chat-send{min-height:44px;background:#643786;font-weight:650}#triso-live-chat button:disabled,#triso-live-chat textarea:disabled{opacity:.65;cursor:not-allowed}
+#triso-live-chat>button{align-self:center;font-size:12px;padding:6px 12px;margin:6px}#triso-live-chat #live-chat-signin{color:#e0bcff;border:1px solid #9b67b7;border-radius:10px;padding:10px 16px;align-self:center;margin:12px;text-decoration:none}
+#triso-live-restore{max-width:calc(100vw - 28px);border-radius:24px;padding:12px 20px;background:#3d2451;box-shadow:0 10px 35px #0007}
+#triso-live-chat :focus-visible,#triso-live-restore:focus-visible{outline:3px solid #d9a9fb;outline-offset:2px}#triso-live-chat .live-sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+#triso-support-module .support-live-context{padding:12px;border:1px solid #735184;border-radius:8px;line-height:1.7;overflow-wrap:anywhere;font-size:13px}#triso-support-module .support-live-context time{display:block;font-size:12px;color:#b9a6ca}
+@media(max-width:500px){#triso-live-chat{right:12px;bottom:64px;width:calc(100vw - 24px);height:min(560px,calc(100dvh - 100px));border-radius:15px}#triso-live-restore{right:12px;bottom:64px}#triso-live-chat header{padding:14px}#triso-live-chat form{padding:10px;gap:7px}}
+@media(prefers-reduced-motion:reduce){#triso-live-chat *{scroll-behavior:auto}}

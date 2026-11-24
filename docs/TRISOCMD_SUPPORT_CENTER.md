@@ -1,5 +1,7 @@
 # Support Center — 2026-11-24 (Asia/Tehran)
 
+**Live Support is superseded by the 2026-11-25 [floating messenger correction](TRISOCMD_LIVE_SUPPORT.md).** The ticket form/history remain as accepted by the owner. Historical descriptions of ticket-style Live Support below describe the previous implementation.
+
 Focused PR #37 change; PR #36 dependency retained. No hosted migrations, provider activation, customer-data changes, Order Center redesign, avatar or notification work.
 
 - `/help/` is the canonical customer Support Center: account navigation/actual identity, three main actions, six help categories, FAQs and working tracking/rules/contact links. EN/FA/AR, keyboard focus and mobile/tablet/desktop layouts follow the existing dark/violet account design. No screenshot artwork, sample identities/counts or online guarantees were imported.

@@ -273,4 +273,4 @@ document.addEventListener('visibilitychange',async()=>{if(document.hidden)return
 window.addEventListener('storage',e=>{if(e.key===window.TrisoAuth.key){const next=window.TrisoAuth.read();if((next?.access_token||null)!==(session?.access_token||null)){session=next;authorized=false;init()}}});
 setInterval(async()=>{if(!session?.refresh_token)return;if(session.expires_at&&session.expires_at>Math.floor(Date.now()/1000)+120)return;await refreshSession()},60000);
 init();
-</script><script src="../../assets/triso-admin-v18.js?v=18"></script><script src="../../assets/phase1-orders.js" defer></script><script src="../../assets/triso-support.js?v=2" defer></script><script src="../../assets/triso-delivery-admin.js" defer></script></body></html>
+</script><script src="../../assets/triso-admin-v18.js?v=18"></script><script src="../../assets/phase1-orders.js" defer></script><link rel="stylesheet" href="../../assets/triso-live-support.css?v=1"><script src="../../assets/triso-live-support.js?v=1" defer></script><script src="../../assets/triso-support.js?v=3" defer></script><script src="../../assets/triso-delivery-admin.js" defer></script></body></html>
