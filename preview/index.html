@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="referrer" content="no-referrer"><script src="../assets/triso-auth-callback.js?v=settings1" referrerpolicy="no-referrer"></script><script src="../assets/triso-language.js?v=1"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex,nofollow">
 <title>TRISOCMD — Fortnite Store, Gaming Gear & Guides</title>
@@ -61,7 +62,7 @@
   .lang-native { font-size:12px; color:var(--text3); }
 
   /* ─── NAV ─── */
-  nav {
+  nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)) {
     position:sticky; top:0; z-index:100;
     background:rgba(8,8,8,0.85); backdrop-filter:blur(20px);
     border-bottom:1px solid var(--border);
@@ -308,7 +309,7 @@
     background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,240,255,0.015) 2px,rgba(0,240,255,0.015) 4px);
   }
   .screen { position:relative; z-index:1; }
-  nav { border-bottom:1px solid rgba(0,240,255,0.15); }
+  nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)) { border-bottom:1px solid rgba(0,240,255,0.15); }
   .nav-logo { font-family:'Rajdhani',sans-serif; font-size:18px; font-weight:700; letter-spacing:0.15em; color:var(--accent); text-shadow:0 0 20px rgba(0,240,255,0.5); }
   .nav-logo span { color:#ff2d6b; text-shadow:0 0 20px rgba(255,45,107,0.5); }
   .store-hero-label { color:var(--accent); font-family:'Share Tech Mono',monospace; font-size:12px; letter-spacing:0.25em; }
@@ -385,7 +386,7 @@ body::before,
   display:none !important;
 }
 
-nav,
+nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)),
 .product-card,
 .checkout-card,
 .review-card,
@@ -461,7 +462,7 @@ body{
  padding-top:7rem !important;
 }
 
-nav{
+nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){
  background:rgba(255,255,255,.05) !important;
  backdrop-filter:blur(30px) saturate(180%) !important;
  border:1px solid rgba(255,255,255,.08) !important;
@@ -725,7 +726,7 @@ display:block !important;
 /* TRISOCMD 2.0 — reversible visual preview; existing commerce logic unchanged */
 :root{--bg:#09090b!important;--bg2:#101116!important;--bg3:#171923!important;--bg4:#202330!important;--border:rgba(148,163,184,.14)!important;--border2:rgba(56,189,248,.45)!important;--text:#f8fafc!important;--text2:#a6b2c6!important;--text3:#79879d!important;--accent:#38bdf8!important;--accent2:#8b5cf6!important;--accent-glow:rgba(56,189,248,.12)!important;--green:#34d399!important;--red:#fb7185!important;--amber:#fbbf24!important;--radius:14px!important;--radius-sm:10px!important;--radius-lg:20px!important}
 body{background:radial-gradient(ellipse 60% 35% at 50% 4%,rgba(56,189,248,.08),transparent 75%),#09090b!important;color:#f8fafc!important;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif!important}
-nav{background:rgba(9,9,11,.89)!important;backdrop-filter:blur(18px)!important;border-bottom:1px solid rgba(148,163,184,.12)!important;padding-top:16px!important;padding-bottom:16px!important}
+nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){background:rgba(9,9,11,.89)!important;backdrop-filter:blur(18px)!important;border-bottom:1px solid rgba(148,163,184,.12)!important;padding-top:16px!important;padding-bottom:16px!important}
 .nav-logo span{color:#f8fafc!important;text-shadow:none!important;letter-spacing:.055em!important}.nav-logo span span{color:#38bdf8!important}
 .store-hero{max-width:1040px!important;padding:90px 24px 65px!important}.store-hero-label{font-family:Inter,sans-serif!important;font-size:12px!important;letter-spacing:.21em!important;color:#38bdf8!important}.store-hero-title{font-family:Inter,-apple-system,sans-serif!important;font-weight:800!important;letter-spacing:-.055em!important;line-height:1.08!important;font-size:clamp(38px,6vw,76px)!important;background:linear-gradient(115deg,#fff 12%,#c5eaff 58%,#a78bfa 100%)!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important;text-transform:none!important}
 .product-card{clip-path:none!important;border-radius:18px!important;background:linear-gradient(155deg,#1b1e29,#12141b)!important;border:1px solid rgba(148,163,184,.15)!important;box-shadow:0 12px 40px rgba(0,0,0,.14)!important;overflow:hidden!important;transition:transform .25s,border-color .25s,box-shadow .25s!important}
@@ -733,7 +734,7 @@ nav{background:rgba(9,9,11,.89)!important;backdrop-filter:blur(18px)!important;b
 .card-section,.lang-btn,.detail-info,.detail-img{border-radius:16px!important}.lang-btn:hover{border-color:#38bdf8!important}
 button{transition:background .2s,border-color .2s,transform .2s!important}button:hover{filter:brightness(1.08)}
 .nav-trust,.nav-lang{border-radius:999px!important}.product-buy-btn{border-radius:10px!important}
-@media(max-width:640px){.store-hero{padding:65px 18px 45px!important}.store-hero-title{font-size:clamp(34px,10vw,48px)!important}nav{padding:12px 14px!important}}
+@media(max-width:640px){.store-hero{padding:65px 18px 45px!important}.store-hero-title{font-size:clamp(34px,10vw,48px)!important}nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){padding:12px 14px!important}}
 @media(prefers-reduced-motion:reduce){.product-card,button{transition:none!important}}
 </style>
 <style id="trisocmd-editorial-redesign">
@@ -743,7 +744,7 @@ button{transition:background .2s,border-color .2s,transform .2s!important}button
 body{background:var(--tc-bg)!important;color:var(--tc-white);font-family:'DM Sans',sans-serif!important}
 .snowflake{display:none!important}
 #store-screen{background:var(--tc-bg);overflow-x:hidden}
-#store-screen nav{position:relative;z-index:10;background:rgba(10,12,19,.95)!important;border-bottom:1px solid #252b39!important;padding:20px clamp(20px,5vw,85px)!important;min-height:82px}
+#store-screen nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){position:relative;z-index:10;background:rgba(10,12,19,.95)!important;border-bottom:1px solid #252b39!important;padding:20px clamp(20px,5vw,85px)!important;min-height:82px}
 #store-screen .nav-logo span{font-family:'Barlow Condensed',sans-serif!important;font-size:29px!important;font-weight:900!important;letter-spacing:.04em!important;color:#fff!important;text-shadow:none!important}
 #store-screen .nav-logo span span{color:var(--tc-blue)!important}
 #store-screen .nav-logo svg{width:39px;height:39px;filter:grayscale(1) brightness(2)}
@@ -764,14 +765,14 @@ body{background:var(--tc-bg)!important;color:var(--tc-white);font-family:'DM San
 .tc-editorial{margin:0 clamp(20px,6vw,100px) 70px;padding:65px clamp(25px,5vw,80px);border:1px solid #344257;background:linear-gradient(120deg,#172136,#0b111e 70%);display:grid;grid-template-columns:1fr .8fr;gap:30px;overflow:hidden}.tc-editorial h2{margin:24px 0!important}.tc-editorial p{color:#aab8cb;max-width:400px;line-height:1.7;font-size:13px}.tc-editorial-pill{display:inline-block;margin-top:25px;border:1px solid #536578;padding:12px 15px;color:#c6d8e7;font-size:10px;font-weight:800;letter-spacing:.12em}.tc-editorial-art{position:relative;display:flex;align-items:center;justify-content:center;flex-direction:column;min-height:280px;border:1px solid #40516a;background:repeating-linear-gradient(0deg,transparent,transparent 24px,#ffffff09 25px),radial-gradient(circle,#273b5d,#11192a 70%)}.tc-editorial-art>span{position:absolute;top:15px;left:18px;color:#95b7d6;font-size:10px;letter-spacing:.15em}.tc-editorial-art strong{font:900 180px/.9 'Barlow Condensed',sans-serif;letter-spacing:-.08em;color:#eaf9ff}.tc-editorial-art strong span{color:#8fe6ff}.tc-editorial-art small{position:absolute;bottom:18px;font-size:9px;color:#91a7bd;letter-spacing:.1em}
 .tc-footer{border-top:1px solid #273143;padding:50px clamp(20px,6vw,100px) 28px;display:grid;grid-template-columns:1fr 1fr;gap:40px;background:#0c1019}.tc-footer strong{font:900 45px 'Barlow Condensed',sans-serif;color:#fff}.tc-footer strong span{color:#83e2ff}.tc-footer p{color:#8694a8;font-size:12px;margin-top:5px}.tc-footer-links{display:flex;gap:20px;justify-content:flex-end;align-items:center}.tc-footer-links a,.tc-footer-links button{background:none;border:0;color:#e8f4ff;font-size:11px;font-weight:800;letter-spacing:.1em;text-decoration:none;cursor:pointer}.tc-footer>small{grid-column:1/-1;border-top:1px solid #242d3b;padding-top:20px;color:#69788b;font-size:9px;letter-spacing:.12em}
 @media(max-width:900px){#store-screen .store-hero{grid-template-columns:1fr}.tc-hero-copy{padding:70px 25px 40px}.tc-hero-art{min-height:330px}.tc-art-core{width:230px}.tc-art-core span{font-size:120px}.tc-orbit-one{width:290px;height:290px}.tc-orbit-two{width:420px;height:420px}.tc-category-grid{grid-template-columns:1fr 1fr}.tc-cat-one{grid-column:1/-1}.tc-category{min-height:300px}.tc-hero-foot{padding-top:35px}.tc-editorial{grid-template-columns:1fr}.tc-editorial-art{min-height:240px}}
-@media(max-width:600px){#store-screen nav{padding:15px!important;gap:8px;flex-wrap:wrap}#store-screen .nav-right{gap:5px}#store-screen .nav-trust{font-size:9px!important;padding:9px!important}#store-screen .nav-logo span{font-size:22px!important}#store-screen .nav-logo svg{width:27px}.tc-ticker{padding:11px 15px;font-size:8px}.tc-ticker-right{display:none}#store-screen .store-hero-title{font-size:clamp(65px,16vw,95px)!important}.tc-hero-copy{padding:65px 20px 40px}.tc-hero-art{min-height:260px}.tc-art-core{width:180px}.tc-art-core span{font-size:95px}.tc-hero-foot{gap:12px;font-size:8px}.tc-categories{padding:55px 18px 25px}.tc-section-top{display:block}.tc-category-grid{grid-template-columns:1fr}.tc-cat-one{grid-column:auto}.tc-category{min-height:265px}.tc-cat-visual{font-size:140px}.tc-gear-visual{font-size:130px}.tc-shop-heading{padding:50px 18px 10px}.tc-shop-aside{display:none}#store-screen .product-section{padding:10px 18px 65px!important}.tc-editorial{margin:0 18px 55px;padding:30px 20px}.tc-editorial-art strong{font-size:125px}.tc-footer{padding:35px 20px 25px;grid-template-columns:1fr}.tc-footer-links{justify-content:flex-start}}
+@media(max-width:600px){#store-screen nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){padding:15px!important;gap:8px;flex-wrap:wrap}#store-screen .nav-right{gap:5px}#store-screen .nav-trust{font-size:9px!important;padding:9px!important}#store-screen .nav-logo span{font-size:22px!important}#store-screen .nav-logo svg{width:27px}.tc-ticker{padding:11px 15px;font-size:8px}.tc-ticker-right{display:none}#store-screen .store-hero-title{font-size:clamp(65px,16vw,95px)!important}.tc-hero-copy{padding:65px 20px 40px}.tc-hero-art{min-height:260px}.tc-art-core{width:180px}.tc-art-core span{font-size:95px}.tc-hero-foot{gap:12px;font-size:8px}.tc-categories{padding:55px 18px 25px}.tc-section-top{display:block}.tc-category-grid{grid-template-columns:1fr}.tc-cat-one{grid-column:auto}.tc-category{min-height:265px}.tc-cat-visual{font-size:140px}.tc-gear-visual{font-size:130px}.tc-shop-heading{padding:50px 18px 10px}.tc-shop-aside{display:none}#store-screen .product-section{padding:10px 18px 65px!important}.tc-editorial{margin:0 18px 55px;padding:30px 20px}.tc-editorial-art strong{font-size:125px}.tc-footer{padding:35px 20px 25px;grid-template-columns:1fr}.tc-footer-links{justify-content:flex-start}}
 @media(prefers-reduced-motion:reduce){.tc-category{transition:none}}
 </style>
 
 <style id="trisocmd-studio-v3">
 :root{--accent:#9deaff!important;--radius-lg:12px}
 html{scroll-behavior:smooth}body{background:#080a10!important}#store-screen{background:#080a10!important}
-#store-screen nav{position:sticky!important;top:0;z-index:30;background:rgba(9,11,17,.91)!important;backdrop-filter:blur(20px);border-bottom:1px solid #ffffff1a!important}
+#store-screen nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){position:sticky!important;top:0;z-index:30;background:rgba(9,11,17,.91)!important;backdrop-filter:blur(20px);border-bottom:1px solid #ffffff1a!important}
 .tc-nav-link{font:800 10px Inter,sans-serif;letter-spacing:.13em;color:#b9c4d7;text-decoration:none;padding:12px 5px;transition:color .2s}.tc-nav-link:hover{color:#9deaff}
 #store-screen .store-hero{background:radial-gradient(ellipse at 75% 30%,#192344 0%,transparent 54%),linear-gradient(135deg,#080b12,#101322)!important}
 .tc-hero-copy{padding-bottom:65px!important}.tc-hero-desc{font-size:15px!important;max-width:445px!important}
@@ -789,19 +790,19 @@ html{scroll-behavior:smooth}body{background:#080a10!important}#store-screen{back
 
 <style id="tc31">
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap');
-#tc31-panel,#tc31-trust{font-family:Inter,Arial,sans-serif;color:#eef5ff;background:radial-gradient(ellipse at top right,#152b40,#090b11 65%);min-height:85vh;padding:75px 20px;box-sizing:border-box}
-.tc31-wrap{max-width:1060px;margin:auto}.tc31-kicker{color:#67d9ff;font:600 12px 'JetBrains Mono',monospace;letter-spacing:.18em}.tc31-heading{font:700 clamp(34px,6vw,68px) 'Space Grotesk',sans-serif;letter-spacing:-.06em;margin:12px 0}.tc31-muted{color:#9eafc2;line-height:1.8}.tc31-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.tc31-card{background:#111a25;border:1px solid #2c394a;border-radius:18px;padding:27px;margin:16px 0;box-shadow:0 20px 45px #0002}.tc31-card h3{font:700 22px 'Space Grotesk',sans-serif;margin:0 0 15px}.tc31-input{width:100%;box-sizing:border-box;background:#0a111b;border:1px solid #354559;color:white;padding:15px;border-radius:10px;margin:7px 0 15px;font:inherit}.tc31-btn{background:#67d9ff;color:#06111b;border:0;padding:15px 23px;border-radius:10px;font-weight:800;cursor:pointer}.tc31-alt{background:transparent;color:white;border:1px solid #536679}.tc31-btn:disabled{opacity:.5}.tc31-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.tc31-pill{border:1px solid #35536b;color:#b8dcf0;padding:8px 13px;border-radius:99px;font-size:12px}.tc31-status{min-height:22px;color:#9ae8ff;font-size:13px}.tc31-card details{border-bottom:1px solid #2c394a;padding:15px 0}.tc31-card summary{cursor:pointer;font-weight:700}.tc31-card details p{color:#adbdce;line-height:1.7}.tc31-nav{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:40px}.tc31-nav button{background:none;color:#c8dff0;border:1px solid #385069;border-radius:8px;padding:10px;cursor:pointer}.tc31-order{padding:14px;border:1px dashed #40536a;border-radius:10px;color:#adbdce}.tc31-link{color:#7ce3ff}.tc31-small{font-size:12px;color:#91a5b9}@media(max-width:650px){.tc31-grid{grid-template-columns:1fr}.tc31-card{padding:20px}#tc31-panel,#tc31-trust{padding:40px 15px}}
+#tc31-panel:where(:not([data-auth-mode="account"])),#tc31-trust{font-family:Inter,Arial,sans-serif;color:#eef5ff;background:radial-gradient(ellipse at top right,#152b40,#090b11 65%);min-height:85vh;padding:75px 20px;box-sizing:border-box}
+.tc31-wrap{max-width:1060px;margin:auto}.tc31-kicker{color:#67d9ff;font:600 12px 'JetBrains Mono',monospace;letter-spacing:.18em}.tc31-heading{font:700 clamp(34px,6vw,68px) 'Space Grotesk',sans-serif;letter-spacing:-.06em;margin:12px 0}.tc31-muted{color:#9eafc2;line-height:1.8}.tc31-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.tc31-card{background:#111a25;border:1px solid #2c394a;border-radius:18px;padding:27px;margin:16px 0;box-shadow:0 20px 45px #0002}.tc31-card h3{font:700 22px 'Space Grotesk',sans-serif;margin:0 0 15px}.tc31-input{width:100%;box-sizing:border-box;background:#0a111b;border:1px solid #354559;color:white;padding:15px;border-radius:10px;margin:7px 0 15px;font:inherit}.tc31-btn{background:#67d9ff;color:#06111b;border:0;padding:15px 23px;border-radius:10px;font-weight:800;cursor:pointer}.tc31-alt{background:transparent;color:white;border:1px solid #536679}.tc31-btn:disabled{opacity:.5}.tc31-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.tc31-pill{border:1px solid #35536b;color:#b8dcf0;padding:8px 13px;border-radius:99px;font-size:12px}.tc31-status{min-height:22px;color:#9ae8ff;font-size:13px}.tc31-card details{border-bottom:1px solid #2c394a;padding:15px 0}.tc31-card summary{cursor:pointer;font-weight:700}.tc31-card details p{color:#adbdce;line-height:1.7}.tc31-nav{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:40px}.tc31-nav button{background:none;color:#c8dff0;border:1px solid #385069;border-radius:8px;padding:10px;cursor:pointer}.tc31-order{padding:14px;border:1px dashed #40536a;border-radius:10px;color:#adbdce}.tc31-link{color:#7ce3ff}.tc31-small{font-size:12px;color:#91a5b9}@media(max-width:650px){.tc31-grid{grid-template-columns:1fr}.tc31-card{padding:20px}#tc31-panel:where(:not([data-auth-mode="account"])),#tc31-trust{padding:40px 15px}}
 </style>
 
 <!-- TRISOCMD 3.2 — restrained scroll motion; never hides content without JS -->
 <style id="tc32-motion-style">
 .tc32-reveal{opacity:0;transform:translate3d(0,26px,0);transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1);transition-delay:var(--tc32-delay,0ms)}
 .tc32-reveal.tc32-visible{opacity:1;transform:translate3d(0,0,0)}
-#store-screen nav{transition:padding .3s ease,background-color .3s ease,box-shadow .3s ease}
-#store-screen.tc32-scrolled nav{background:#090e18ee!important;box-shadow:0 12px 35px #0004}
+#store-screen nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){transition:padding .3s ease,background-color .3s ease,box-shadow .3s ease}
+#store-screen.tc32-scrolled nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){background:#090e18ee!important;box-shadow:0 12px 35px #0004}
 .tc-category,.tc-feature-grid>div,.tc31-card{transition:border-color .25s ease,box-shadow .25s ease,transform .25s ease}
 @media(hover:hover){.tc-category:hover,.tc-feature-grid>div:hover,.tc31-card:hover{box-shadow:0 20px 45px #0006;transform:translateY(-4px)}}
-@media(prefers-reduced-motion:reduce){.tc32-reveal{opacity:1!important;transform:none!important;transition:none!important}#store-screen nav,.tc-category,.tc-feature-grid>div,.tc31-card{transition:none!important}}
+@media(prefers-reduced-motion:reduce){.tc32-reveal{opacity:1!important;transform:none!important;transition:none!important}#store-screen nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)),.tc-category,.tc-feature-grid>div,.tc31-card{transition:none!important}}
 </style>
 
 <style id="tc33-polish">
@@ -904,7 +905,7 @@ body{background:#030407!important}
 <style id="tc38-black-ice">
 :root{--tc38-ice:#a6f2ff}
 #store-screen{background:#020305!important}
-#store-screen nav{background:rgba(2,4,8,.91)!important;border-bottom:1px solid #182332!important}
+#store-screen nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){background:rgba(2,4,8,.91)!important;border-bottom:1px solid #182332!important}
 #store-screen .store-hero{background:radial-gradient(ellipse 65% 70% at 75% 55%,#0b2033 0%,#05080d 48%,#020305 100%)!important;min-height:740px;isolation:isolate}
 #store-screen .store-hero:before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(450px circle at var(--tc38-x,75%) var(--tc38-y,42%),#83ddff17,transparent 70%);transition:opacity .2s}
 #store-screen .store-hero:after{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.25;background:linear-gradient(90deg,transparent 49.9%,#82dcff16 50%,transparent 50.1%),repeating-linear-gradient(0deg,transparent 0 84px,#87d8ff0c 85px 86px)}
@@ -943,7 +944,7 @@ body{background:#030407!important}
 
 <style id="tc39-premium">
 #detail-screen{background:radial-gradient(ellipse at 16% 35%,#102137 0%,#030509 53%,#020304 100%)!important}
-#detail-screen nav{background:#030509e8!important;border-bottom:1px solid #25384b}
+#detail-screen nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){background:#030509e8!important;border-bottom:1px solid #25384b}
 #detail-screen .detail-wrap{max-width:1390px!important;gap:clamp(30px,6vw,105px)!important;padding-top:60px!important;align-items:center}
 #detail-screen .detail-img{min-height:clamp(380px,47vw,650px)!important;border:1px solid #344b5d!important;background:radial-gradient(circle at 50% 40%,#1c3e58,#080e16 50%,#030508 100%)!important;box-shadow:0 35px 110px #000b,inset 0 0 90px #6dcaff0d;position:relative;overflow:hidden}
 #detail-screen .detail-img:before{content:"";position:absolute;inset:16px;pointer-events:none;border:1px solid #b1efff20;z-index:2}
@@ -1146,7 +1147,7 @@ button:not(:disabled):hover{filter:brightness(1.13)}
 button:disabled{cursor:not-allowed;opacity:.6}
 input,select,textarea{max-width:100%}
 img{max-width:100%;height:auto}
-nav .nav-right{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:clamp(6px,1.1vw,14px)}
+nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)) .nav-right{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:clamp(6px,1.1vw,14px)}
 .tc-nav-link{text-decoration:none}
 .tc49-skip{position:fixed;left:14px;top:-80px;z-index:999999;background:#00e7f6;color:#061018;padding:12px 16px;font-weight:800;border-radius:0 0 10px 10px}
 .tc49-skip:focus{top:0}
@@ -1157,14 +1158,14 @@ nav .nav-right{display:flex;flex-wrap:wrap;align-items:center;justify-content:fl
 .tc49-quick-help a:hover{background:#123144}
 .tc-footer a:focus-visible,.tc-footer button:focus-visible{outline-color:#00f0ff}
 @media(max-width:960px){
- #store-screen>nav{align-items:flex-start;gap:12px}
- #store-screen>nav .nav-right{width:100%;justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding-bottom:7px;scrollbar-width:thin}
- #store-screen>nav .nav-right>*{flex-shrink:0}
+ #store-screen>nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){align-items:flex-start;gap:12px}
+ #store-screen>nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)) .nav-right{width:100%;justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding-bottom:7px;scrollbar-width:thin}
+ #store-screen>nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)) .nav-right>*{flex-shrink:0}
  .tc39-toolbar{display:flex;flex-wrap:wrap;gap:10px}
  .tc39-toolbar input{min-width:180px;flex:1}
 }
 @media(max-width:600px){
- #store-screen>nav{padding:13px 14px}
+ #store-screen>nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){padding:13px 14px}
  .tc49-quick-help{padding:18px 16px}
  .store-hero{min-height:auto}
  .tc-hero-actions{display:flex;flex-wrap:wrap;gap:10px}
@@ -1179,27 +1180,27 @@ nav .nav-right{display:flex;flex-wrap:wrap;align-items:center;justify-content:fl
  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
 }
 </style><style>.tc-market-nav{color:#8fe7ff!important;border:1px solid #42778d;padding:11px 16px!important;font-size:12px!important;white-space:nowrap}.tc-market-hero-link{display:flex;justify-content:space-between;align-items:center;gap:22px;margin-top:28px;padding:22px 26px;border:1px solid #3a6683;background:linear-gradient(105deg,#0d2533,#141e31);color:#e7faff;text-decoration:none;box-shadow:0 14px 45px #0005;transition:transform .2s,border-color .2s}.tc-market-hero-link:hover{transform:translateY(-3px);border-color:#78dfff}.tc-market-hero-link span{display:grid;gap:7px}.tc-market-hero-link b{font:900 15px Inter,sans-serif;letter-spacing:.08em}.tc-market-hero-link small{color:#99b5c9;font:11px Inter,sans-serif}.tc-market-hero-link strong{font:900 12px Inter,sans-serif;white-space:nowrap;color:#8ce7ff}@media(max-width:650px){.tc-market-hero-link{flex-direction:column;align-items:flex-start}.tc-market-nav{padding:9px!important}}</style><style>
-#tc31-panel .tc31-signup-shell{max-width:680px;margin:24px auto 60px}
-#tc31-panel .tc31-signup-top{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:22px;color:#8c9eae;font-size:11px;font-weight:800;letter-spacing:.15em}
-#tc31-panel .tc31-signup-top .tc31-btn{width:auto;padding:11px 18px}
-#tc31-panel .tc31-signup-card{padding:clamp(24px,5vw,48px);border:1px solid #2b4354;background:linear-gradient(145deg,#111e2b,#0c1520);box-shadow:0 22px 70px #0005}
-#tc31-panel .tc31-signup-kicker{font-size:11px;color:#66d8f7;font-weight:900;letter-spacing:.17em;margin-bottom:14px}
-#tc31-panel .tc31-signup-card h2{font-size:clamp(29px,5vw,46px);line-height:1.07;letter-spacing:-.035em;margin:0 0 17px}
-#tc31-panel .tc31-signup-card h2 em{font-style:normal;color:#67d9ff}
-#tc31-panel .tc31-signup-card form{display:grid;gap:8px;margin-top:26px}
-#tc31-panel .tc31-signup-card label{margin-top:10px;font-size:13px;font-weight:750}
-#tc31-panel .tc31-signup-card .tc31-input{width:100%;padding:15px 16px;font-size:15px}
-#tc31-panel .tc31-signup-submit{margin-top:14px;padding:17px;background:#67d9ff;color:#071521;width:100%;font-weight:900}
-#tc31-panel .tc31-signup-divider{text-align:center;color:#8498aa;margin:24px 0 16px;font-size:12px;letter-spacing:.15em}
-#tc31-panel .tc31-google-wide{width:100%;padding:16px}
-#tc31-panel .tc31-signup-inline{background:none;border:0;color:#67d9ff;font:inherit;cursor:pointer;text-decoration:underline}
-@media(max-width:600px){#tc31-panel .tc31-signup-top{flex-wrap:wrap}#tc31-panel .tc31-signup-shell{margin:12px auto}}
+#tc31-panel:where(:not([data-auth-mode="account"])) .tc31-signup-shell{max-width:680px;margin:24px auto 60px}
+#tc31-panel:where(:not([data-auth-mode="account"])) .tc31-signup-top{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:22px;color:#8c9eae;font-size:11px;font-weight:800;letter-spacing:.15em}
+#tc31-panel:where(:not([data-auth-mode="account"])) .tc31-signup-top .tc31-btn{width:auto;padding:11px 18px}
+#tc31-panel:where(:not([data-auth-mode="account"])) .tc31-signup-card{padding:clamp(24px,5vw,48px);border:1px solid #2b4354;background:linear-gradient(145deg,#111e2b,#0c1520);box-shadow:0 22px 70px #0005}
+#tc31-panel:where(:not([data-auth-mode="account"])) .tc31-signup-kicker{font-size:11px;color:#66d8f7;font-weight:900;letter-spacing:.17em;margin-bottom:14px}
+#tc31-panel:where(:not([data-auth-mode="account"])) .tc31-signup-card h2{font-size:clamp(29px,5vw,46px);line-height:1.07;letter-spacing:-.035em;margin:0 0 17px}
+#tc31-panel:where(:not([data-auth-mode="account"])) .tc31-signup-card h2 em{font-style:normal;color:#67d9ff}
+#tc31-panel:where(:not([data-auth-mode="account"])) .tc31-signup-card form{display:grid;gap:8px;margin-top:26px}
+#tc31-panel:where(:not([data-auth-mode="account"])) .tc31-signup-card label{margin-top:10px;font-size:13px;font-weight:750}
+#tc31-panel:where(:not([data-auth-mode="account"])) .tc31-signup-card .tc31-input{width:100%;padding:15px 16px;font-size:15px}
+#tc31-panel:where(:not([data-auth-mode="account"])) .tc31-signup-submit{margin-top:14px;padding:17px;background:#67d9ff;color:#071521;width:100%;font-weight:900}
+#tc31-panel:where(:not([data-auth-mode="account"])) .tc31-signup-divider{text-align:center;color:#8498aa;margin:24px 0 16px;font-size:12px;letter-spacing:.15em}
+#tc31-panel:where(:not([data-auth-mode="account"])) .tc31-google-wide{width:100%;padding:16px}
+#tc31-panel:where(:not([data-auth-mode="account"])) .tc31-signup-inline{background:none;border:0;color:#67d9ff;font:inherit;cursor:pointer;text-decoration:underline}
+@media(max-width:600px){#tc31-panel:where(:not([data-auth-mode="account"])) .tc31-signup-top{flex-wrap:wrap}#tc31-panel:where(:not([data-auth-mode="account"])) .tc31-signup-shell{margin:12px auto}}
 </style>
 <style id="tc-v4-premium-refresh">
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 :root{--bg:#080711;--bg2:#0d0a19;--bg3:#131021;--bg4:#191329;--border:rgba(173,111,245,.22);--border2:rgba(190,126,255,.55);--accent:#a35cff;--accent2:#dc43c6;--accent-glow:rgba(145,63,240,.16);--radius:16px;--radius-sm:12px;--radius-lg:20px}
 body,#store-screen{background:radial-gradient(ellipse 75% 22% at 50% 0%,#271338 0%,#080711 75%)!important;color:#f5f0ff;font-family:Inter,system-ui,sans-serif!important}
-#store-screen nav{height:auto!important;min-height:76px;background:rgba(11,8,21,.91)!important;border-bottom:1px solid #3c2955!important;padding:12px clamp(14px,3vw,45px)!important}
+#store-screen nav:where(:not(.acct-nav,.acct-settings-tabs,.acct-settings-links)){height:auto!important;min-height:76px;background:rgba(11,8,21,.91)!important;border-bottom:1px solid #3c2955!important;padding:12px clamp(14px,3vw,45px)!important}
 .nav-logo span{color:#f4ecff!important;text-shadow:none!important;font-family:Inter,sans-serif!important;font-weight:900!important;letter-spacing:-.04em!important}
 .nav-logo svg polygon{stroke:#a35cff}
 .nav-right{gap:8px!important;flex-wrap:wrap;justify-content:flex-end}
@@ -1255,9 +1256,15 @@ body,#store-screen{background:radial-gradient(ellipse 75% 22% at 50% 0%,#271338 
 <link rel="icon" type="image/svg+xml" href="../assets/trisocmd-icon.svg">
 <link rel="alternate icon" type="image/png" sizes="64x64" href="../assets/trisocmd-icon-64.png">
 <link rel="apple-touch-icon" sizes="180x180" href="../assets/trisocmd-apple-touch.png">
+<link rel="stylesheet" href="../assets/phase1-orders.css">
+<link rel="stylesheet" href="../assets/triso-support.css?v=2"><link rel="stylesheet" href="../assets/triso-content.css?v=account1"><link rel="stylesheet" href="../assets/triso-auth-ui.css">
+<script src="../assets/triso-auth-oauth.js" defer></script>
+<script src="../assets/triso-auth-ui.js?v=settings1" defer></script>
+<link rel="stylesheet" href="../assets/triso-account.css?v=3"><link rel="stylesheet" href="../assets/triso-settings.css?v=2">
+<link rel="stylesheet" href="../assets/triso-notifications-v34.css?v=38">
 </head>
-<body><div id="tc50-staging-banner" role="status" style="position:relative;z-index:99999;background:#122330;border-bottom:1px solid #467487;color:#c2eaff;padding:10px 18px;text-align:center;font:600 12px/1.5 system-ui,sans-serif">STAGING PREVIEW · Payments, order processing, and support notifications are not live. Do not send funds.</div>
-<a class="tc49-skip" href="#tc-shop-heading">SKIP TO PRODUCTS</a>
+<body><a class="content-skip" href="#tc-shop-heading">Skip to products</a><div id="tc50-staging-banner" role="status" style="position:relative;z-index:99999;background:#122330;border-bottom:1px solid #467487;color:#c2eaff;padding:10px 18px;text-align:center;font:600 12px/1.5 system-ui,sans-serif">STAGING PREVIEW · Payments, order processing, and support notifications are not live. Do not send funds.</div>
+
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
@@ -1377,7 +1384,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElement
   <section class="tc-categories" id="tc-discover" aria-label="Explore categories"><div class="tc-section-kicker">EXPLORE / 001</div><div class="tc-section-top"><h2>BUILT FOR <i>PLAYERS.</i></h2><p>More than a store. A place for everything around the game.</p></div><div class="tc-category-grid"><a href="#tc-shop-heading" class="tc-category tc-cat-one"><span class="tc-category-num">01 / DIGITAL</span><div class="tc-cat-visual">F<span>✦</span></div><div class="tc-category-bottom"><div><strong>FORTNITE</strong><small>EXPLORE THE STORE</small></div><span class="tc-cat-arrow">↗</span></div></a><div class="tc-category tc-cat-two"><span class="tc-category-num">02 / HARDWARE · COMING SOON</span><div class="tc-cat-visual tc-gear-visual">⌘</div><div class="tc-category-bottom"><div><strong>GAMING GEAR</strong><small>SETUP ESSENTIALS</small></div><span class="tc-cat-arrow">↗</span></div></div><a href="blog/" class="tc-category tc-cat-three"><span class="tc-category-num">03 / EDITORIAL</span><div class="tc-cat-visual tc-journal-visual">//</div><div class="tc-category-bottom"><div><strong>THE JOURNAL</strong><small>STORIES & GUIDES</small></div><span class="tc-cat-arrow">↗</span></div></a></div></section>
   <div class="tc-shop-heading" id="tc-shop-heading"><div><span class="tc-section-kicker">THE MARKET / 002</span><h2>THE <i>DROP.</i></h2><p>Browse what's available right now.</p></div><span class="tc-shop-aside">CURATED FOR YOUR NEXT SESSION ↘</span></div>
   <div class="product-section">
-    <div class="tc39-toolbar" role="search"><input id="tc39-search" aria-label="Search products" placeholder="SEARCH THE COLLECTION..." oninput="tc39Filter()"><select id="tc39-category" aria-label="Category" onchange="tc39Filter()"><option value="">All categories</option></select><select id="tc39-sort" aria-label="Sort" onchange="tc39Filter()"><option value="featured">Featured</option><option value="low">Price: Low to High</option><option value="high">Price: High to Low</option></select><button class="tc39-cart-button" onclick="tc39CartOpen()">BAG <span id="tc39-count">0</span> ↗</button></div><div class="product-grid" id="product-grid"></div>
+    <div class="tc39-toolbar" role="search"><input id="tc39-search" aria-label="Search products" placeholder="SEARCH THE COLLECTION..." oninput="tc39Filter()"><select id="tc39-category" aria-label="Category" onchange="tc39Filter()"><option value="">All categories</option></select><select id="tc39-sort" aria-label="Sort" onchange="tc39Filter()"><option value="featured">Featured</option><option value="best">Best sellers</option><option value="new">New arrivals</option><option value="low">Price: Low to High</option><option value="high">Price: High to Low</option></select><button class="tc39-cart-button" onclick="tc39CartOpen()">BAG <span id="tc39-count">0</span> ↗</button></div><div class="product-grid" id="product-grid"></div>
     <div class="empty" id="store-empty" style="display:none;">
       <p id="store-empty-text">No products available yet.</p>
     </div>
@@ -1478,12 +1485,9 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElement
 </div>
 
 
-<section class="screen" id="tc31-panel"><div class="tc31-wrap"><div class="tc31-nav"><strong>TRISO<span style="color:#67d9ff">CMD.</span> / ACCOUNT</strong><button onclick="showScreen('store-screen')">← Back to shop</button></div><div class="tc31-kicker">PLAYER PORTAL / 001</div><h1 class="tc31-heading">YOUR SPACE.<br>YOUR GAME.</h1><p class="tc31-muted">Secure account access, your profile and your orders.</p>
-<div id="tc31-guest" class="tc31-grid"><div class="tc31-card"><h3>Sign in</h3><label>Email</label><input id="tc31-email" type="email" class="tc31-input" autocomplete="email" placeholder="player@example.com"><label>Password</label><input id="tc31-password" type="password" class="tc31-input" autocomplete="current-password" placeholder="At least 8 characters"><label class="tc31-remember"><input id="tc31-remember" type="checkbox" checked> Remember me on this device</label>
-<div class="tc31-row"><button class="tc31-btn" onclick="tc31Email('login')">Sign in</button><button class="tc31-btn tc31-alt" onclick="tc31ShowSignup()">Create account ↗</button></div><p class="tc31-small">By creating an account you agree to the store's published policies.</p><button class="tc31-btn tc31-alt" onclick="tc31Reset()">Forgot password?</button></div><div class="tc31-card"><h3>One-click access</h3><p class="tc31-muted">Sign in using your Google account.</p><button class="tc31-btn tc31-alt" onclick="tc31Google()">Continue with Google ↗</button><p class="tc31-small">Google sign-in requires provider setup in Supabase before use.</p><div class="tc31-pill">SUPABASE AUTH</div></div></div>
-<div class="tc31-card" id="tc31-recovery-shell" hidden style="margin:20px 0"><h3>Set a new password</h3><div id="tc31-recovery-form" hidden style="margin-top:16px"><label>New password</label><input id="tc31-new-password" type="password" class="tc31-input" autocomplete="new-password" placeholder="At least 8 characters"><label>Confirm new password</label><input id="tc31-confirm-new-password" type="password" class="tc31-input" autocomplete="new-password" placeholder="Repeat new password"><button class="tc31-btn" onclick="tc31UpdatePassword()">Update password</button></div></div>
-<div id="tc31-signup-view" style="display:none" class="tc31-signup-shell"><div class="tc31-signup-top"><button type="button" class="tc31-btn tc31-alt" onclick="tc31HideSignup()">← Back to sign in</button><span>TRISOCMD / JOIN THE COMMUNITY</span></div><div class="tc31-card tc31-signup-card"><div class="tc31-signup-kicker">CREATE YOUR PLAYER PROFILE / 001</div><h2>YOUR ACCOUNT.<br><em>YOUR WORLD.</em></h2><p class="tc31-muted">One account for your orders, marketplace listings and conversations.</p><form id="tc31-signup-form" onsubmit="event.preventDefault();tc31Register()"><label for="tc31-signup-name">Display name</label><input id="tc31-signup-name" class="tc31-input" type="text" minlength="2" maxlength="40" autocomplete="nickname" placeholder="What should we call you?" required><label for="tc31-signup-email">Email address</label><input id="tc31-signup-email" class="tc31-input" type="email" autocomplete="email" placeholder="you@example.com" required><label for="tc31-signup-password">Password</label><input id="tc31-signup-password" class="tc31-input" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters" required><label for="tc31-signup-confirm">Confirm password</label><input id="tc31-signup-confirm" class="tc31-input" type="password" autocomplete="new-password" minlength="8" placeholder="Repeat your password" required><p class="tc31-small">Use a unique password. You may be asked to confirm your email before signing in.</p><button type="submit" class="tc31-btn tc31-signup-submit">CREATE ACCOUNT ↗</button><p class="tc31-small">By creating an account, you agree to the store's published policies.</p></form><div class="tc31-signup-divider">OR</div><button type="button" class="tc31-btn tc31-alt tc31-google-wide" onclick="tc31Google()">Continue with Google ↗</button><p class="tc31-small">Already have an account? <button type="button" class="tc31-signup-inline" onclick="tc31HideSignup()">Sign in instead</button></p></div></div>
-<div id="tc31-user" class="tc31-card" style="display:none"><div id="tc40-admin-status" class="tc40-admin-status" role="status">Checking account permissions…</div><div id="tc40-admin-preview" hidden><div class="tc40-admin-title">ADMIN ACCESS VERIFIED</div><p class="tc31-muted">Your account is recognized by Supabase. Manage products and fulfillment below. Changes require server-verified admin permissions.</p><button class="tc31-btn tc31-alt" onclick="tc40RefreshProducts()">Refresh product overview</button><div id="tc40-inventory" class="tc40-inventory"></div>
+<section class="screen tc-auth" id="tc31-panel" data-auth-mode="signin"><div class="tc31-wrap"><div class="tc31-nav"><strong>TRISO<span>CMD.</span></strong><select id="tc-auth-language" data-auth-label="Language" aria-label="Language" onchange="TrisoAuthUI.language(this.value)"><option value="en">English</option><option value="fa">فارسی</option><option value="ar">العربية</option></select><button type="button" class="tc-v22-textlink" onclick="showScreen('store-screen')"><span data-auth-copy="Back to shop" >Back to shop</span></button></div><div class="tc31-kicker">TRISOCMD / ACCOUNT</div><h1 class="tc31-heading" tabindex="-1">Sign in</h1><p class="tc31-muted" id="tc-v22-hero-copy">Your account, your gaming marketplace.</p><p id="tc-v22-global-feedback" class="tc-v23-auth-notice" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+<div id="tc31-guest" class="tc31-grid"><form id="tc31-login-form" onsubmit="event.preventDefault();tc31Email('login')"><div class="tc31-card tc-auth-card"><p id="tc-v23-login-feedback" class="tc-v23-auth-notice" role="status" aria-live="polite" aria-atomic="true" hidden></p><label for="tc31-email"><span data-auth-copy="Email address" >Email address</span></label><input id="tc31-email" class="tc31-input" type="email" autocomplete="email" data-auth-placeholder="you@example.com" placeholder="you@example.com" required><div class="tc-v22-label-row"><label data-auth-copy="Password" for="tc31-password">Password</label><button type="button" class="tc-v22-textlink" onclick="tc31ShowForgot()"><span data-auth-copy="Forgot password?" >Forgot password?</span></button></div><div class="tc-v22-password-row"><input id="tc31-password" class="tc31-input" type="password" autocomplete="current-password" data-auth-placeholder="Your password" placeholder="Your password" required><button type="button" class="tc-v22-reveal" aria-controls="tc31-password" aria-pressed="false" data-auth-reveal onclick="tc31TogglePassword(this,'tc31-password')">Show</button></div><label class="tc31-remember"><input id="tc31-remember" type="checkbox" checked><span data-auth-copy="Remember me on this device" >Remember me on this device</span></label><button type="submit" id="tc-v22-login-submit" class="tc31-btn tc-v22-submit "><span data-auth-copy="Sign in" >Sign in</span></button><div class="tc-auth-divider"><span data-auth-copy="or" >or</span></div><button type="button" class="tc31-btn tc31-alt tc-auth-google" onclick="tc31Google()"><span data-auth-copy="Continue with Google" >Continue with Google</span></button><p class="tc-auth-footer"><span data-auth-copy="New here?" >New here?</span> <button type="button" class="tc-v22-textlink" onclick="tc31ShowSignup()"><span data-auth-copy="Create account" >Create account</span></button></p><button type="button" class="tc-v22-textlink" onclick="tc31CallbackMode('verify')"><span data-auth-copy="Resend verification email" >Resend verification email</span></button></div></form></div><section id="tc31-forgot-view" class="tc31-card tc-auth-card" hidden><p data-auth-copy="Enter your account email to receive a secure password reset link." class="tc31-muted">Enter your account email to receive a secure password reset link.</p><form id="tc-v22-forgot-form" onsubmit="event.preventDefault();tc31Reset()"><label for="tc31-forgot-email"><span data-auth-copy="Email address" >Email address</span></label><input id="tc31-forgot-email" class="tc31-input" type="email" autocomplete="email" data-auth-placeholder="you@example.com" placeholder="you@example.com" required><button type="submit" id="tc31-reset-button" class="tc31-btn tc-v22-submit "><span data-auth-copy="Send reset link" >Send reset link</span></button></form><p id="tc31-reset-feedback" class="tc-v23-auth-notice" role="status" aria-live="polite" aria-atomic="true" hidden></p><button type="button" class="tc-v22-back" onclick="tc31HideSignup()"><span data-auth-copy="Back to sign in" >Back to sign in</span></button></section><section id="tc31-recovery-shell" class="tc31-card tc-auth-card" hidden><p data-auth-copy="Choose a new password for your account." class="tc31-muted">Choose a new password for your account.</p><form hidden id="tc31-recovery-form" onsubmit="event.preventDefault();tc31UpdatePassword()"><label for="tc31-new-password"><span data-auth-copy="New password" >New password</span></label><div class="tc-v22-password-row"><input id="tc31-new-password" class="tc31-input" type="password" autocomplete="new-password" minlength="8" data-auth-placeholder="At least 8 characters" placeholder="At least 8 characters" required><button type="button" class="tc-v22-reveal" aria-controls="tc31-new-password" aria-pressed="false" data-auth-reveal onclick="tc31TogglePassword(this,'tc31-new-password')">Show</button></div><label for="tc31-confirm-new-password"><span data-auth-copy="Confirm new password" >Confirm new password</span></label><div class="tc-v22-password-row"><input id="tc31-confirm-new-password" class="tc31-input" type="password" autocomplete="new-password" minlength="8" data-auth-placeholder="Repeat new password" placeholder="Repeat new password" required><button type="button" class="tc-v22-reveal" aria-controls="tc31-confirm-new-password" aria-pressed="false" data-auth-reveal onclick="tc31TogglePassword(this,'tc31-confirm-new-password')">Show</button></div><button type="submit" id="tc31-update-password-button" class="tc31-btn tc-v22-submit "><span data-auth-copy="Save new password" >Save new password</span></button></form><p id="tc-v22-recovery-feedback" class="tc-v23-auth-notice" role="status" aria-live="polite" aria-atomic="true" hidden></p><button type="button" class="tc-v22-back" onclick="tc31ShowForgot()"><span data-auth-copy="Need a new reset link?" >Need a new reset link?</span></button></section><section id="tc31-verification" class="tc31-card tc-auth-card" hidden><p data-auth-copy="Request a new confirmation email. This does not reset your password." class="tc31-muted">Request a new confirmation email. This does not reset your password.</p><form id="tc31-resend-form" onsubmit="event.preventDefault();tc31ResendVerification()"><label for="tc31-resend-email"><span data-auth-copy="Email address" >Email address</span></label><input id="tc31-resend-email" class="tc31-input" type="email" autocomplete="email" data-auth-placeholder="you@example.com" placeholder="you@example.com" required><button type="submit" class="tc31-btn tc-v22-submit "><span data-auth-copy="Resend verification email" >Resend verification email</span></button></form><p id="tc31-resend-feedback" class="tc-v23-auth-notice" role="status" aria-live="polite" aria-atomic="true" hidden></p><button type="button" class="tc-v22-back" onclick="tc31CallbackMode('signin')"><span data-auth-copy="Back to sign in" >Back to sign in</span></button></section><div id="tc31-signup-view" class="tc31-signup-shell" style="display:none"><div class="tc31-card tc-auth-card"><form id="tc31-signup-form" onsubmit="event.preventDefault();tc31Register()"><p id="tc-v23-signup-feedback" class="tc-v23-auth-notice" role="status" aria-live="polite" aria-atomic="true" hidden></p><label for="tc31-signup-name"><span data-auth-copy="Display name" >Display name</span></label><input id="tc31-signup-name" class="tc31-input" type="text" autocomplete="nickname" minlength="2" maxlength="40" data-auth-placeholder="Your display name" placeholder="Your display name" required><label for="tc31-signup-email"><span data-auth-copy="Email address" >Email address</span></label><input id="tc31-signup-email" class="tc31-input" type="email" autocomplete="email" data-auth-placeholder="you@example.com" placeholder="you@example.com" required><label for="tc31-signup-password"><span data-auth-copy="Password" >Password</span></label><div class="tc-v22-password-row"><input id="tc31-signup-password" class="tc31-input" type="password" autocomplete="new-password" minlength="8" data-auth-placeholder="At least 8 characters" placeholder="At least 8 characters" required><button type="button" class="tc-v22-reveal" aria-controls="tc31-signup-password" aria-pressed="false" data-auth-reveal onclick="tc31TogglePassword(this,'tc31-signup-password')">Show</button></div><label for="tc31-signup-confirm"><span data-auth-copy="Confirm password" >Confirm password</span></label><div class="tc-v22-password-row"><input id="tc31-signup-confirm" class="tc31-input" type="password" autocomplete="new-password" minlength="8" data-auth-placeholder="Repeat your password" placeholder="Repeat your password" required><button type="button" class="tc-v22-reveal" aria-controls="tc31-signup-confirm" aria-pressed="false" data-auth-reveal onclick="tc31TogglePassword(this,'tc31-signup-confirm')">Show</button></div><button type="submit" class="tc31-btn tc-v22-submit tc31-signup-submit"><span data-auth-copy="Create account" >Create account</span></button></form><p class="tc31-small"><span data-auth-copy="Verify your email before signing in. Use a unique password." >Verify your email before signing in. Use a unique password.</span></p><div class="tc-auth-divider"><span data-auth-copy="or" >or</span></div><button type="button" class="tc31-btn tc31-alt tc-auth-google" onclick="tc31Google()"><span data-auth-copy="Continue with Google" >Continue with Google</span></button><p class="tc-auth-footer"><span data-auth-copy="Already have an account?" >Already have an account?</span> <button type="button" class="tc-v22-textlink" onclick="tc31HideSignup()"><span data-auth-copy="Sign in" >Sign in</span></button></p></div></div>
+<div id="tc31-user" class="acct-dashboard" style="display:none"><nav class="acct-nav" aria-label="Account navigation" data-account-label="Account navigation"><a class="acct-brand" data-account-home href="./"><span class="acct-logomark" aria-hidden="true">T</span><span>TRISOCMD<small data-account-copy="Gaming marketplace">Gaming marketplace</small></span></a><button type="button" class="acct-button acct-menu-toggle" data-account-action="menu"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span data-account-copy="Menu" >Menu</span></button><div id="acct-nav-links" class="acct-nav-links"><a href="marketplace.html"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg><span data-account-copy="Marketplace" >Marketplace</span></a><details class="acct-categories"><summary><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5 9-5Zm-9 5v10l9 5 9-5V8M12 13v10"/></svg><span data-account-copy="Categories" >Categories</span></summary><div id="acct-category-options"></div></details><button type="button" class="acct-button " data-account-action="trust"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6l8-3Zm-4 9 3 3 5-6"/></svg><span data-account-copy="How it works" >How it works</span></button><a href="help/"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13V9a8 8 0 0 1 16 0v4M4 10H2v7h4v-7H4Zm16 0h2v7h-4v-7h2Zm0 7v3h-6"/></svg><span data-account-copy="Support" >Support</span></a></div><form class="acct-search" id="acct-search-form" role="search"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 21l-5-5M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0"/></svg><input type="search" id="acct-search" data-account-label="Search products" aria-label="Search products" data-account-placeholder="Search products…" placeholder="Search products…"><button type="submit" data-account-label="Search" aria-label="Search"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button></form><div class="acct-nav-tools"><select id="acct-language" data-account-label="Language" aria-label="Language"><option value="en">English</option><option value="fa">فارسی</option><option value="ar">العربية</option></select><div id="acct-notice-host"><button type="button" class="acct-button acct-icon-button" data-account-action="notifications"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><span data-account-copy="Notifications" >Notifications</span></button><span id="acct-unread" class="acct-unread" hidden>0</span></div><button type="button" class="acct-button acct-icon-button" data-account-action="cart"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l1 14H5L6 7Zm3 0V5a3 3 0 0 1 6 0v2"/></svg><span data-account-copy="Shopping bag" >Shopping bag</span></button><details class="acct-user-menu"><summary data-account-label="Account menu" aria-label="Account menu"><span class="acct-mini-avatar" data-account-avatar>T</span></summary><div><button type="button" class="acct-button" data-account-action="settings"><span data-account-copy="Account settings">Account settings</span></button><button type="button" class="acct-button" data-account-action="activity"><span data-account-copy="Recent activity">Recent activity</span></button><button type="button" class="acct-button " data-account-action="profile"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-3a5 5 0 0 0-5-5H9a5 5 0 0 0-5 5v3M16 6a4 4 0 1 1-8 0 4 4 0 0 1 8 0"/></svg><span data-account-copy="Your profile" >Your profile</span></button><button type="button" class="acct-button " data-account-action="logout"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H4v16h5m6-13 5 5-5 5m-6-5h11"/></svg><span data-account-copy="Sign out" >Sign out</span></button></div></details></div></nav><div class="acct-shell"><header class="acct-hero"><div class="acct-hero-copy"><h1 data-account-copy="Your account" >Your account</h1><p data-account-copy="Manage your account, orders, and gaming purchases in one place." >Manage your account, orders, and gaming purchases in one place.</p><div class="acct-success" id="acct-success" role="status" aria-live="polite" hidden><span class="acct-success-icon"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m6 12 4 4 8-9"/></svg></span><div><strong data-account-copy="Signed in successfully" >Signed in successfully</strong><p id="acct-welcome"></p></div><button type="button" class="acct-button acct-dismiss" data-account-action="dismiss"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m6 6 12 12M18 6 6 18"/></svg><span data-account-copy="Dismiss" >Dismiss</span></button></div><div id="acct-feedback-host"></div></div><img class="acct-controller" src="../assets/triso-account-controller.svg" alt="" width="720" height="360" aria-hidden="true"></header><div class="acct-grid"><aside class="acct-profile acct-card" aria-labelledby="acct-profile-title"><div class="acct-avatar" data-account-avatar>T</div><h2 id="acct-profile-title" class="acct-sr-only"><span data-account-copy="Your profile" >Your profile</span></h2><h3 id="tc31-user-email"></h3><p id="acct-display-name"></p><span class="acct-role" id="acct-role">—</span><dl><div><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6l8-3Zm-4 9 3 3 5-6"/></svg><dt><span data-account-copy="Authentication" >Authentication</span></dt><dd id="acct-provider">—</dd></div><div><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-3a5 5 0 0 0-5-5H9a5 5 0 0 0-5 5v3M16 6a4 4 0 1 1-8 0 4 4 0 0 1 8 0"/></svg><dt><span data-account-copy="Account type" >Account type</span></dt><dd id="acct-type">—</dd></div><div><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v5l3 2M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0"/></svg><dt><span data-account-copy="Member since" >Member since</span></dt><dd id="acct-created">—</dd></div></dl><button type="button" class="acct-button " data-account-action="logout"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H4v16h5m6-13 5 5-5 5m-6-5h11"/></svg><span data-account-copy="Sign out" >Sign out</span></button></aside><main class="acct-main"><section class="acct-overview" aria-labelledby="acct-overview-title"><div class="acct-section-title"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h5l3-8 4 16 3-8h5"/></svg><div><h2 data-account-copy="Account overview" id="acct-overview-title">Account overview</h2><p data-account-copy="A quick look at your account and orders." >A quick look at your account and orders.</p></div></div><div class="acct-metrics"><div class="acct-stat acct-stat-total"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l1 14H5L6 7Zm3 0V5a3 3 0 0 1 6 0v2"/></svg><strong data-account-count="total">—</strong><span data-account-copy="Total orders" >Total orders</span></div><div class="acct-stat "><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5 9-5Zm-9 5v10l9 5 9-5V8M12 13v10"/></svg><strong data-account-count="completed">—</strong><span data-account-copy="Completed" >Completed</span></div><div class="acct-stat "><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v5l3 2M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0"/></svg><strong data-account-count="progress">—</strong><span data-account-copy="In progress" >In progress</span></div><div class="acct-stat "><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 10 18H2L12 3Zm0 6v5m0 3v1"/></svg><strong data-account-count="action">—</strong><span data-account-copy="Action needed" >Action needed</span></div></div><p id="acct-orders-feedback" role="status" aria-live="polite"></p></section><section class="acct-activity acct-card" aria-labelledby="acct-activity-title"><div class="acct-card-heading"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h5l3-8 4 16 3-8h5"/></svg><div><h2 data-account-copy="Recent activity" id="acct-activity-title">Recent activity</h2><p data-account-copy="From your private notification history." >From your private notification history.</p></div><button type="button" class="acct-button acct-text-button" data-account-action="notifications"><span data-account-copy="View all notifications" >View all notifications</span></button></div><ul id="acct-activity-list"></ul></section></main><div class="acct-right"><section class="acct-orders acct-card" aria-labelledby="acct-orders-title"><div class="acct-card-heading"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5 9-5Zm-9 5v10l9 5 9-5V8M12 13v10"/></svg><div><h2 data-account-copy="Order center" id="acct-orders-title">Order center</h2><p data-account-copy="Track, manage, and review your orders." >Track, manage, and review your orders.</p></div></div><div id="tc36-orders" class="acct-order-preview" role="status"></div><div class="acct-order-actions"><button type="button" class="acct-button acct-primary" data-account-action="tracking"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg><span data-account-copy="Open order tracking" >Open order tracking</span></button><button type="button" class="acct-button " data-account-action="refresh"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7a9 9 0 1 0 1 9M20 2v6h-6"/></svg><span data-account-copy="Refresh orders" >Refresh orders</span></button></div></section><section class="acct-summary acct-card" aria-labelledby="acct-summary-title"><div class="acct-card-heading"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg><div><h2 data-account-copy="Order status summary" id="acct-summary-title">Order status summary</h2><p data-account-copy="Your orders at a glance." >Your orders at a glance.</p></div><button type="button" class="acct-button acct-text-button" data-account-action="tracking"><span data-account-copy="View orders" >View orders</span></button></div><div class="acct-status-grid"><div class="acct-stat acct-completed"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m6 12 4 4 8-9"/></svg><strong data-account-count="completed">—</strong><span data-account-copy="Completed" >Completed</span></div><div class="acct-stat acct-progress"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v5l3 2M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0"/></svg><strong data-account-count="progress">—</strong><span data-account-copy="In progress" >In progress</span></div><div class="acct-stat acct-closed"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14v14H5V7ZM3 3h18v4H3V3Zm6 8h6"/></svg><strong data-account-count="closed">—</strong><span data-account-copy="Closed" >Closed</span></div><div class="acct-stat acct-action"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 10 18H2L12 3Zm0 6v5m0 3v1"/></svg><strong data-account-count="action">—</strong><span data-account-copy="Action needed" >Action needed</span></div></div></section></div></div><section class="acct-quick acct-card"><div class="acct-card-heading"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h5l3-8 4 16 3-8h5"/></svg><div><h2 data-account-copy="Quick actions" >Quick actions</h2><p data-account-copy="Common tasks for your account." >Common tasks for your account.</p></div></div><div class="acct-quick-buttons"><button type="button" class="acct-button acct-primary" data-account-action="tracking"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg><span data-account-copy="Open order tracking" >Open order tracking</span></button><button type="button" class="acct-button " data-account-action="refresh"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7a9 9 0 1 0 1 9M20 2v6h-6"/></svg><span data-account-copy="Refresh orders" >Refresh orders</span></button><a class="acct-button" href="marketplace.html"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg><span data-account-copy="Browse marketplace" >Browse marketplace</span></a><button type="button" class="acct-button " data-account-action="settings"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm-2-5h4l1 3 3 1 3-1 2 4-2 2v3l1 3-4 3-3-1-3 1-3-1-3-4 1-3-2-3 2-4 3 1 2-1 1-3"/></svg><span data-account-copy="Account settings" >Account settings</span></button></div></section><section class="acct-admin-tools"><div id="tc40-admin-status" class="tc40-admin-status" role="status">Checking account permissions…</div><div id="tc40-admin-preview" hidden><div class="tc40-admin-title">ADMIN ACCESS VERIFIED</div><p class="tc31-muted">Your account is recognized by Supabase. Manage products and fulfillment below. Changes require server-verified admin permissions.</p><button class="tc31-btn tc31-alt" onclick="tc40RefreshProducts()">Refresh product overview</button><div id="tc40-inventory" class="tc40-inventory"></div>
 <section class="tc-market-admin-queue" id="tc-market-admin" hidden aria-label="Marketplace approval queue">
 <h3>MARKETPLACE APPROVALS <span id="tc-market-count" style="color:#c6aaff">0</span></h3>
 <p class="tc-market-note">Listings posted by other accounts appear here until you approve or decline. Review uploaded item photos before approving.</p>
@@ -1500,13 +1504,14 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElement
  <form id="tc46-product-form" onsubmit="tc46SaveProduct(event)" hidden>
  <h4 id="tc46-form-title">PRODUCT EDITOR</h4>
  <input id="tc46-pid" type="hidden">
- <div class="tc46-formgrid"><label>Title<input id="tc46-title" maxlength="160" required></label><label>Price USD<input id="tc46-price" type="number" min="0" step="0.01" required></label><label>Stock<input id="tc46-stock" type="number" min="0" max="1000000" step="1" required></label><label>Category<input id="tc46-category" maxlength="80"></label><label>Status<select id="tc46-status"><option value="available">Available</option><option value="unavailable">Unavailable</option></select></label><label>Image HTTPS URL<input id="tc46-image" type="url" placeholder="https://..." maxlength="1500"></label><label>Min quantity<input id="tc46-min" type="number" min="1" max="100000" value="1" required></label><label>Max quantity (optional)<input id="tc46-max" type="number" min="1" max="100000"></label></div>
- <label>Description<textarea id="tc46-description" maxlength="6000" rows="4"></textarea></label><label>Arabic description<textarea id="tc46-description-ar" maxlength="6000" rows="3"></textarea></label>
+ <div class="tc46-formgrid"><label>Title<input id="tc46-title" maxlength="160" required></label><label>Price USD<input id="tc46-price" type="number" min="0" step="0.01" required></label><label>Stock<input id="tc46-stock" type="number" min="0" max="1000000" step="1" required></label><label>Category<input id="tc46-category" maxlength="80"></label><label>Status<select id="tc46-status"><option value="available">Available</option><option value="unavailable">Unavailable</option><option value="draft">Draft</option><option value="inactive">Inactive</option><option value="archived">Archived</option></select></label><label>Image HTTPS URL<input id="tc46-image" type="url" placeholder="https://..." maxlength="1500"></label><label>Min quantity<input id="tc46-min" type="number" min="1" max="100000" value="1" required></label><label>Max quantity (optional)<input id="tc46-max" type="number" min="1" max="100000"></label></div>
+ <label>Product slug<input id="tc46-slug" pattern="[a-z0-9]+(-[a-z0-9]+)*" maxlength="110"></label><label>SEO title<input id="tc46-seo-title" maxlength="180"></label><label>SEO description<textarea id="tc46-seo-description" maxlength="320"></textarea></label><label>Persian description<textarea id="tc46-description-fa" maxlength="6000" dir="rtl"></textarea></label><label>Description<textarea id="tc46-description" maxlength="6000" rows="4"></textarea></label><label>Arabic description<textarea id="tc46-description-ar" maxlength="6000" rows="3"></textarea></label>
  <div class="tc46-actions"><button type="submit">SAVE PRODUCT</button><button type="button" onclick="tc46CancelEdit()">CANCEL</button></div>
  </form></div>
  <div id="tc46-orders" class="tc46-pane" hidden><div class="tc46-bar"><strong>ORDER MANAGEMENT</strong><button onclick="tc46LoadOrders()">↻ REFRESH</button></div><div id="tc46-order-list"></div></div>
  <div id="tc46-audit" class="tc46-pane" hidden><div class="tc46-bar"><strong>RECORDED MARKETPLACE ACTIVITY</strong><button onclick="tc46LoadAudit()">↻ REFRESH</button></div><div id="tc46-audit-list"></div></div>
- </section><section class="tc42-admin"><h3>SUPPORT INBOX / LIVE SUPPORT 4.7</h3><p class="tc47-inbox-hint">Messages are saved in Supabase. Refresh the inbox to see new conversations. Telegram notifications require server setup.</p><button type="button" onclick="tc42AdminInbox()">↻ REFRESH CONVERSATIONS</button><button class="tc31-btn tc31-alt" onclick="tc42AdminInbox()">Refresh customer threads</button><div id="tc42-admin-inbox" role="status"></div></section></div><div class="tc31-kicker">SIGNED IN</div><h3 id="tc31-user-email">Player</h3><div class="tc31-grid"><div><h3>Account overview</h3><p class="tc31-muted">Signed in with Supabase Auth. Orders are not yet linked to this account.</p><button class="tc31-btn tc31-alt" onclick="tc31Logout()">Sign out</button></div><div><h3>My orders</h3><div class="tc31-order" id="tc36-orders" role="status">Checking your orders…</div><button class="tc31-btn tc31-alt" onclick="tc45OpenTracking()">Open order tracking ↗</button><button class="tc31-btn tc31-alt" onclick="tc36LoadOrders()">Refresh orders</button><p class="tc31-small">Only new orders associated with your signed-in account will appear. Existing manual checkout orders are not migrated.</p></div></div></div><p id="tc31-status" class="tc31-status" role="status"></p></div></section>
+ </section><section data-admin-support-host></section></div></section></div></div>
+<p id="tc31-status" class="tc31-status" role="status"></p></div></section>
 <section class="screen" id="tc31-trust">
 <div class="tc33-trust-shell">
   <div class="tc33-trust-top"><span class="tc33-wordmark">TRISO<span>CMD.</span> <small>/ TRUST CENTER</small></span><button onclick="showScreen('store-screen')" id="tc33-back"></button></div>
@@ -1882,14 +1887,18 @@ async function supaEnsureTable() {
 
 async function supaLoadProducts() {
   try {
-    const rows = await supaFetch('/rest/v1/products?order=id.asc&select=*');
+    const rows=[];for(let offset=0;;offset+=200){const page=await supaFetch('/rest/v1/products?order=id.asc&select=*&limit=200&offset='+offset);if(!Array.isArray(page))throw Error('Invalid product response');rows.push(...page);if(page.length<200)break}
     if (!Array.isArray(rows)) return [];
+    const decorations=await Promise.allSettled(['product_merchandising?select=product_id,featured&order=product_id.asc','product_sales_snapshots?select=product_id,units_sold&order=product_id.asc'].map(async path=>{const list=[];for(let offset=0;;offset+=200){const page=await supaFetch('/rest/v1/'+path+'&limit=200&offset='+offset);list.push(...page);if(page.length<200)return list}}));
+    const featured=new Map((decorations[0].value||[]).map(v=>[String(v.product_id),v.featured===true])),sold=new Map((decorations[1].value||[]).map(v=>[String(v.product_id),Number(v.units_sold)||0]));
     return rows.map(r => ({
       id:       r.id,
       title:    r.title,
       price:    r.price,
       desc:     r.description || '',
       desc_ar:  r.description_ar || '',
+      desc_fa:  r.description_fa || '',
+      slug:r.slug||'',createdAt:r.created_at||'',featured:featured.get(String(r.id))||false,unitsSold:sold.get(String(r.id))||0,
       img:      r.image_url || '📦',
       status:   r.status || 'available',
       stock:    r.stock != null ? r.stock : 1,
@@ -1969,6 +1978,8 @@ function t(key) { return (T[currentLang] || T['en'])[key] || key; }
 //  NAVIGATION
 // ═══════════════════════════════════════════
 function showScreen(id) {
+  window.tcPhase1Navigation=(window.tcPhase1Navigation||0)+1;
+  document.documentElement.toggleAttribute('data-language-picker',id==='lang-screen');
   document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active'); s.style.display='none'; });
   const target = document.getElementById(id);
   if(!target)return;
@@ -1995,14 +2006,18 @@ function showScreen(id) {
 // ═══════════════════════════════════════════
 //  LANGUAGE
 // ═══════════════════════════════════════════
-function setLang(lang, dir) {
+function setLang(lang, dir, origin) {
+  if(!window.TrisoLanguage.supported.includes(lang))return;
+  const needsLanguage=!window.TrisoLanguage.has();
+  if(origin!=='restore')window.TrisoLanguage.set(lang);
+  dir=window.TrisoLanguage.dir(lang);
   currentLang = lang; currentDir = dir;
   state.lang = lang; state.dir = dir;
-  saveState();
   document.documentElement.lang = lang;
   document.documentElement.dir = dir;
   document.getElementById('nav-lang-label').textContent = lang.toUpperCase();
   applyTranslations();
+  if(origin==='restore'||origin==='navbar')return;
   showScreen('store-screen');
   if(!window.TrisoAuth?.read()?.user)tc37ShowWelcome();
 }
@@ -2055,7 +2070,7 @@ function renderStore() {
       ${renderProductImg(p, '200px')}
       <div class="product-body">
         <div class="tc34-product-meta">TRISOCMD <span>✦</span> DIGITAL MARKET</div>
-        <div class="product-title">${tc50Esc(p.title)}</div>
+        <div class="product-title"><a href="product.html?id=${tc50Num(p.id)}" onclick="event.stopPropagation()">${tc50Esc(p.title)}</a></div>
         <div class="product-desc">${tc50Esc(getDesc(p))}</div>
         <div class="product-footer">
           <div class="product-price">$${tc50Num(p.price)} <span>USD</span></div>
@@ -2076,6 +2091,7 @@ function renderProductImg(p, h) {
 
 function getDesc(p) {
   if (currentLang === 'ar' && p.desc_ar) return p.desc_ar;
+  if (currentLang === 'fa' && p.desc_fa) return p.desc_fa;
   return p.desc;
 }
 
@@ -2666,6 +2682,7 @@ function checkRoute() {
 //  INIT
 // ═══════════════════════════════════════════
 (async function init() {
+  const initialNavigation=window.tcPhase1Navigation||0;
   // Close modal on backdrop click
   document.getElementById('product-modal').addEventListener('click', function(e) {
     if (e.target === this) closeProductModal();
@@ -2689,19 +2706,13 @@ function checkRoute() {
     return;
   }
 
-  // Restore lang
-  if (state.lang && state.lang !== 'en') {
-    currentLang = state.lang;
-    currentDir = state.dir;
-    document.documentElement.lang = currentLang;
-    document.documentElement.dir = currentDir;
-    applyTranslations();
-  }
+  // Restore the shared explicit preference, including English.
+  if(window.TrisoLanguage.has())setLang(window.TrisoLanguage.get(),window.TrisoLanguage.dir(window.TrisoLanguage.get()),'restore');
 
   // Return authenticated customers directly to the storefront.
   let returningMember=false;
   try{const saved=localStorage.getItem('tc35_auth_session')||sessionStorage.getItem('tc35_auth_session');const auth=saved?JSON.parse(saved):null;returningMember=!!(auth?.user&&auth.access_token&&auth.refresh_token)}catch(e){}
-  showScreen(returningMember?'store-screen':'lang-screen');
+  if((window.tcPhase1Navigation||0)===initialNavigation)showScreen(window.TrisoAuthCallback?.active?'tc31-panel':window.TrisoLanguage.has()?'store-screen':'lang-screen');
 
   // Pre-fetch exchange rates in the background so the first checkout is instant
   prefetchRates();
@@ -2830,34 +2841,80 @@ function spawnParticles() {
 </script>
 
 
-<script src="../assets/triso-auth-storage.js?v=2"></script>
+<script src="../assets/triso-auth-storage.js?v=3"></script>
 <script id="tc31-auth">
 (function(){
 'use strict';
 const url=SUPA_URL,anon=SUPA_KEY;
 const $=id=>document.getElementById(id);
 const storeKey='tc35_auth_session';
-let session=null;
-const status=t=>{const el=$('tc31-status');if(el)el.textContent=t};
+let session=null,authMode='signin',pendingAuth=false;
+const status=(message='',kind='info')=>{
+ const targets={signin:'tc-v23-login-feedback',signup:'tc-v23-signup-feedback',verify:'tc31-resend-feedback',forgot:'tc31-reset-feedback',reset:'tc-v22-recovery-feedback',account:'tc-v22-global-feedback'};
+ const active=targets[authMode]||targets.signin;
+ for(const id of [...Object.values(targets),'tc31-status']){
+  const el=$(id);if(!el)continue;
+  const visible=!!message&&id===active;
+  window.TrisoAuthUI.set(el,visible?message:'');
+  el.hidden=!visible;
+  el.dataset.state=visible?kind:'';
+  el.setAttribute('role',visible&&kind==='error'?'alert':'status');
+  el.setAttribute('aria-live',visible&&kind==='error'?'assertive':'polite');
+ }
+};
 async function api(path,body,token){
- const res=await fetch(url+'/auth/v1/'+path,{method:'POST',headers:{apikey:anon,'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify(body||{})});
- const d=await res.json().catch(()=>({}));if(!res.ok)throw Error(d.error_description||d.msg||d.message||d.error||'Authentication failed');return d;
+ // Confirmation must return to this staging origin, just like recovery/OAuth.
+ if(path==='signup'||path==='recover'||path==='resend')path+='?redirect_to='+encodeURIComponent(location.origin+location.pathname);
+ const res=await fetch(url+'/auth/v1/'+path,{method:'POST',headers:{apikey:anon,'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify(body||{}),signal:AbortSignal.timeout(15000)});
+ const d=await res.json().catch(()=>({}));if(!res.ok){const e=Error(d.code||d.error_code||d.error||'request_failed');e.code=d.code||d.error_code||d.error;e.status=res.status;throw e}return d;
 }
-function update(){const u=session?.user;const guest=$('tc31-guest'),user=$('tc31-user');if(guest)guest.style.display=u?'none':($('tc31-signup-view')?.style.display==='block'?'none':'grid');if(u&&$('tc31-signup-view'))$('tc31-signup-view').style.display='none';if(user)user.style.display=u?'block':'none';if(u){$('tc31-user-email').textContent=u.email||'Player';window.tc36LoadOrders?.();window.tc40CheckAdmin?.(session.access_token)}else{window.tc40ResetAdmin?.();const el=$('tc36-orders');if(el)el.textContent='Sign in to view orders.';}}
-function save(d){if(d?.access_token&&d?.refresh_token){window.TrisoAuth.write(d);session=window.TrisoAuth.read()||d;}update();}
-async function refresh(){if(!session?.refresh_token)return false;try{save(await api('token?grant_type=refresh_token',{refresh_token:session.refresh_token}));return true}catch(e){const t=(e.message||'').toLowerCase();if(/invalid.refresh|refresh.token.not.found|already.used|invalid.grant/.test(t))clear();else status('Connection interrupted. Your remembered login is saved; retry when online.');return false}}
+function renderAccountMode(focus=false){
+ const panel=$('tc31-panel');if(!panel)return;
+ panel.dataset.authMode=authMode;
+ panel.classList.toggle('tc31-recovering',authMode==='reset');
+ const isAccount=authMode==='account';
+ $('tc31-guest').style.display=authMode==='signin'?'grid':'none';
+ $('tc31-signup-view').style.display=authMode==='signup'?'block':'none';
+ $('tc31-forgot-view').hidden=authMode!=='forgot';
+ $('tc31-recovery-shell').hidden=authMode!=='reset';
+ $('tc31-recovery-form').hidden=authMode!=='reset';$('tc31-verification').hidden=authMode!=='verify';
+ $('tc31-user').style.display=isAccount?'block':'none';
+ window.TrisoAuthUI.mode(authMode);
+ if(focus){
+  const id={signin:'tc31-email',signup:'tc31-signup-name',forgot:'tc31-forgot-email',verify:'tc31-resend-email',reset:'tc31-new-password'}[authMode];
+  if(id)requestAnimationFrame(() => $(id)?.focus());
+ }
+}
+function setAuthMode(mode,focus=true){authMode=mode;status('');renderAccountMode(focus);}
+function update(){
+ if(!['forgot','reset','signup','verify'].includes(authMode))authMode=session?.user?'account':'signin';
+ renderAccountMode();
+ const u=session?.user;
+ if(u&&authMode==='account'){
+  window.TrisoAccount?.sync();
+  window.tc36LoadOrders?.();window.tc40CheckAdmin?.(session.access_token);
+ }else{
+  window.tc40ResetAdmin?.();window.TrisoAccount?.sync();
+ }
+}
+function save(d){if(d?.access_token&&d?.refresh_token){window.TrisoAuth.write(d);session=window.TrisoAuth.read()||d;if(session?.user&&$('tc37-welcome')?.classList.contains('open'))tc37Close();}update();}
+async function refresh(force=false){
+ try{session=await window.TrisoAuth.refresh(token=>api('token?grant_type=refresh_token',{refresh_token:token}),force);update();return !!session}
+ catch(e){session=window.TrisoAuth.read();update();status(session?'Connection interrupted. Your remembered login is saved; retry when online.':'Session expired. Please sign in again.');return false}
+}
 function clear(){session=null;window.TrisoAuth.clear();update()}
 async function restore(){
  session=window.TrisoAuth.read();
  if(!session?.refresh_token){update();return}
- if($('lang-screen')?.classList.contains('active'))showScreen('store-screen');
+ // Restore the store for returning members rather than showing login onboarding.
+ // Keep the original language selection as the first screen even for returning members.
  if($('tc37-welcome')?.classList.contains('open'))tc37Close();
  try{
    if(!session.expires_at||session.expires_at<Math.floor(Date.now()/1000)+120){await refresh()}
    else {
      const res=await fetch(url+'/auth/v1/user',{headers:{apikey:anon,Authorization:'Bearer '+session.access_token}});
      if(res.ok){session.user=await res.json();update()}
-     else if(res.status===401||res.status===403)await refresh();
+     else if(res.status===401||res.status===403)await refresh(true);
      else status('You appear offline. Your login remains remembered.');
    }
  }catch(e){status('Network unavailable; remembered login will be retried.')}
@@ -2873,14 +2930,17 @@ window.tc40ResetAdmin=()=>{
 window.tc40CheckAdmin=async token=>{
  const e=$('tc40-admin-status'),panel=$('tc40-admin-preview');
  if(!e||!panel||!token)return;
+ const accountOwner=window.TrisoAuth?.read()?.user?.id;
  e.textContent='Verifying admin permissions with Supabase…';panel.hidden=true;
  try{
   const r=await fetch(url+'/rest/v1/rpc/is_admin',{method:'POST',headers:{apikey:anon,Authorization:'Bearer '+token,'Content-Type':'application/json'},body:'{}'});
   if(!r.ok)throw Error('Admin verification unavailable ('+r.status+').');
   const result=await r.json();
+  if(accountOwner!==window.TrisoAuth?.read()?.user?.id||token!==window.TrisoAuth?.read()?.access_token)return;
+  window.TrisoAccount?.role(result===true);
   if(result===true){e.textContent='✓ Signed in · Admin role confirmed';panel.hidden=false;window.tc40RefreshProducts();window.tc42AdminInbox?.();window.tc46AdminReady?.();window.tcMarketAdminLoad?.()}
   else e.textContent='Signed in · Customer account';
- }catch(err){e.textContent=err.message+' — check function permissions in Supabase.'}
+ }catch(err){if(accountOwner!==window.TrisoAuth?.read()?.user?.id)return;window.TrisoAccount?.role(null);e.textContent='Account permissions unavailable.'}
 };
 window.tc40RefreshProducts=async()=>{
  const root=$('tc40-inventory');if(!root)return;
@@ -2898,36 +2958,136 @@ window.tc40RefreshProducts=async()=>{
  }catch(err){root.textContent=err.message}
 };
 
-window.tc36LoadOrders=async()=>{
- const el=$('tc36-orders');if(!el)return;
- if(!session?.user?.id){el.textContent='Sign in to view orders.';return}
- if(session.expires_at && session.expires_at<Math.floor(Date.now()/1000)+90){if(!await refresh())return}
- el.textContent='Loading your orders…';
- try{
-  const res=await fetch(url+'/rest/v1/tc42_orders?select=id,created_at,status,total_amount,currency&order=created_at.desc&limit=30',{
-   headers:{apikey:anon,Authorization:'Bearer '+session.access_token,Accept:'application/json'}});
-  if(!res.ok)throw Error(res.status===404?'Orders table is not set up yet.':'Order history is unavailable ('+res.status+').');
-  const orders=await res.json();el.replaceChildren();
-  if(!orders.length){el.textContent='No linked orders yet. Existing manual orders are not automatically imported.';return}
-  for(const o of orders){const item=document.createElement('div');item.className='tc36-order-row';
-   const id=document.createElement('strong');id.textContent='Order '+String(o.id).slice(0,8);
-   const info=document.createElement('span');info.textContent=[o.status||'pending',o.total_amount+' '+o.currency,new Date(o.created_at).toLocaleDateString()].join(' · ');
-   item.append(id,info);el.append(item)}
- }catch(e){el.textContent=e.message}
-};
+window.tc36LoadOrders=()=>window.TrisoOrders?.load();
+
 window.tc42AccessToken=async()=>{if(session?.expires_at&&session.expires_at<Math.floor(Date.now()/1000)+90)await refresh();return session?.access_token||null};
-window.tc31ShowSignup=()=>{const email=$('tc31-email')?.value;if(email)$('tc31-signup-email').value=email;$('tc31-guest').style.display='none';$('tc31-signup-view').style.display='block';status('');$('tc31-signup-name').focus()};
-window.tc31HideSignup=()=>{$('tc31-signup-view').style.display='none';$('tc31-guest').style.display='grid';status('')};
-window.tc31Register=async()=>{try{const name=$('tc31-signup-name').value.trim(),email=$('tc31-signup-email').value.trim(),password=$('tc31-signup-password').value,confirm=$('tc31-signup-confirm').value;if(name.length<2||name.length>40)throw Error('Display name must be 2–40 characters.');if(password.length<8)throw Error('Password must contain at least 8 characters.');if(password!==confirm)throw Error('Passwords do not match.');status('Creating account…');const d=await api('signup',{email,password,data:{display_name:name}});if(d.access_token){save(d);$('tc31-signup-view').style.display='none';status('Account created. Welcome to TRISOCMD.')}else status('Account created. Check your inbox for a confirmation email, then sign in.')}catch(e){status(e.message)}};
-window.tc31Email=async mode=>{try{status('Please wait…');const email=$('tc31-email').value.trim(),password=$('tc31-password').value;if(!email||password.length<8)throw Error('Enter an email and a password of at least 8 characters.');const d=await api(mode==='login'?'token?grant_type=password':'signup',{email,password});if(d.access_token){save(d);status('Signed in. Welcome back.')}else status('If confirmation is required, check your email for a verification link.')}catch(e){status(e.message)}};
-window.tc31Google=()=>{if(location.protocol==='file:'){status('Google sign-in needs a hosted HTTPS URL.');return}const redirect=location.origin+location.pathname;location.href=url+'/auth/v1/authorize?provider=google&redirect_to='+encodeURIComponent(redirect)};
-window.tc31Reset=async()=>{try{const email=$('tc31-email').value.trim();if(!email)throw Error('Enter your email first.');const redirect_to=location.protocol==='file:'?undefined:location.origin+location.pathname;await api('recover',{email,...(redirect_to?{redirect_to}:{})});status('If this email is registered, a recovery link will be sent.')}catch(e){status(e.message)}};
-window.tc31UpdatePassword=async()=>{try{if(!session?.access_token)throw Error('Recovery session missing. Request a new password reset link.');const password=$('tc31-new-password').value,confirm=$('tc31-confirm-new-password').value;if(password.length<8)throw Error('Use at least 8 characters.');if(password!==confirm)throw Error('Passwords do not match.');status('Updating password…');const res=await fetch(url+'/auth/v1/user',{method:'PUT',headers:{apikey:anon,Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:JSON.stringify({password})});const data=await res.json().catch(()=>({}));if(!res.ok)throw Error(data.msg||data.message||data.error_description||'Password update failed');$('tc31-new-password').value='';$('tc31-confirm-new-password').value='';$('tc31-recovery-form').hidden=true;$('tc31-recovery-shell').hidden=true;status('Password updated successfully. You are signed in.');update()}catch(e){status(e.message)}};
-window.tc31Logout=async()=>{const token=session?.access_token;clear();try{if(token)await api('logout',{},token)}catch(e){}status('Signed out.')};
+window.tc31ShowSignup=()=>{const email=$('tc31-email')?.value;if(email)$('tc31-signup-email').value=email;status('');setAuthMode('signup')};
+window.tc31HideSignup=()=>{status('');setAuthMode(session?.user?'account':'signin')};
+window.tc31ShowForgot=()=>{const email=$('tc31-email')?.value?.trim();if(email)$('tc31-forgot-email').value=email;status('');setAuthMode('forgot')};
+window.tc31TogglePassword=(button,id)=>{const input=$(id);if(!input)return;const show=input.type==='password';input.type=show?'text':'password';button.setAttribute('aria-pressed',String(show));window.TrisoAuthUI.paint()};
+window.tc31Register=async()=>{
+ if(pendingAuth)return;
+ const button=$('tc31-signup-form').querySelector('[type=submit]');
+ try{
+  const name=$('tc31-signup-name').value.trim(),email=$('tc31-signup-email').value.trim();
+  const password=$('tc31-signup-password').value,confirm=$('tc31-signup-confirm').value;
+  if(name.length<2||name.length>40)throw Error('Display name must be 2–40 characters.');
+  if(!$('tc31-signup-email').checkValidity())throw Error('Enter a valid email address.');
+  if(password.length<8)throw Error('Password must contain at least 8 characters.');
+  if(password!==confirm){$('tc31-signup-confirm').setAttribute('aria-invalid','true');throw Error('Passwords do not match.')}
+  pendingAuth=true;button.disabled=true;status('Creating your account…');
+  const d=await api('signup',{email,password,data:{display_name:name}});
+  $('tc31-signup-password').value='';$('tc31-signup-confirm').value='';$('tc31-password').value='';$('tc31-email').value=email;
+  // Signup never auto-signs in. An unexpectedly issued session is revoked locally.
+  if(d.access_token)api('logout?scope=local',{},d.access_token).catch(()=>{});
+  setAuthMode('signin');
+  status(d.user?.email_confirmed_at?'Account created. Sign in to continue.':'Account created. Check your inbox to verify your email before signing in.','success');
+ }catch(e){status(window.TrisoAuthUI.error(e),'error')}
+ finally{pendingAuth=false;button.disabled=false}
+};
+window.tc31Email=async mode=>{
+ if(pendingAuth)return;
+ if(mode!=='login'){tc31ShowSignup();return}
+ const button=$('tc-v22-login-submit');
+ try{
+  const input=$('tc31-email'),email=input.value.trim(),password=$('tc31-password').value;
+  if(!input.checkValidity())throw Error('Enter a valid email address.');
+  if(password.length<8)throw Error('Password must contain at least 8 characters.');
+  pendingAuth=true;button.disabled=true;status('Signing in…');
+  const d=await api('token?grant_type=password',{email,password});
+  if(!d.access_token||!d.refresh_token||!d.user?.id)throw Error();
+  setAuthMode('account',false);save(d);$('tc31-password').value='';status('Signed in successfully. Welcome back.','success');window.TrisoAccount?.signedIn();
+ }catch(e){status(window.TrisoAuthUI.error(e),'error')}finally{pendingAuth=false;button.disabled=false}
+};
+window.tc31Google=async()=>{
+ if(pendingAuth)return;
+ const buttons=[...document.querySelectorAll('#tc31-panel .tc-auth-google')];
+ try{
+  pendingAuth=true;buttons.forEach(button=>button.disabled=true);status('Connecting to Google…');
+  location.assign(await window.TrisoAuthOAuth.google({url,anon}));
+ }catch(e){status(window.TrisoAuthUI.error(e),'error')}
+ finally{pendingAuth=false;buttons.forEach(button=>button.disabled=false)}
+};
+function recoveryFeedback(message,kind='info'){status(message,kind)}
+window.tc31Reset=async()=>{
+ if(pendingAuth)return;
+ const button=$('tc31-reset-button');
+ try{
+  const input=$('tc31-forgot-email'),email=input.value.trim();
+  if(!email||!input.checkValidity())throw Error('Enter a valid email address.');
+  if(location.protocol==='file:')throw Error('Open the live website to reset your password.');
+  pendingAuth=true;if(button)button.disabled=true;
+  recoveryFeedback('Sending your reset link…');
+  // Keep recovery on the current origin; its exact URL must be allowed in Auth settings.
+  const redirect=location.origin+location.pathname;
+  await api('recover?redirect_to='+encodeURIComponent(redirect),{email});
+  recoveryFeedback('If an account exists for this email, we sent a reset link. Check inbox and spam.','success');
+ }catch(e){recoveryFeedback(window.TrisoAuthUI.error(e),'error')}
+ finally{pendingAuth=false;if(button)button.disabled=false}
+};
+window.tc31UpdatePassword=async()=>{
+ if(pendingAuth)return;
+ const button=$('tc31-update-password-button');
+ try{
+  if(authMode!=='reset'||!session?.access_token)throw Error('This reset link is no longer active. Request a new one.');
+  const password=$('tc31-new-password').value,confirm=$('tc31-confirm-new-password').value;
+  if(password.length<8)throw Error('Password must contain at least 8 characters.');
+  if(password!==confirm){$('tc31-confirm-new-password').setAttribute('aria-invalid','true');throw Error('Passwords do not match.')}
+  pendingAuth=true;if(button)button.disabled=true;
+  status('Updating password…');
+  const res=await fetch(url+'/auth/v1/user',{method:'PUT',headers:{apikey:anon,Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:JSON.stringify({password}),signal:AbortSignal.timeout(15000)});
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok){const e=Error('request_failed');e.status=res.status;e.code=data.code;throw e}
+  const token=session.access_token;
+  $('tc31-new-password').value='';$('tc31-confirm-new-password').value='';
+  session=null;window.TrisoAuth.clear();
+  setAuthMode('signin',false);
+  showScreen('tc31-panel');
+  status('Your password was changed. Sign in with your new password.','success');
+  // Best effort revocation of the temporary recovery session; never block the UI.
+  api('logout',{},token).catch(()=>{});
+ }catch(e){status(window.TrisoAuthUI.error(e),'error')}
+ finally{pendingAuth=false;if(button)button.disabled=false}
+};
+window.tc31Logout=async()=>{const token=session?.access_token;authMode='signin';clear();try{if(token)await api('logout?scope=local',{},token)}catch(e){}status('Signed out.','success')};
+
+window.tc31CallbackMode=mode=>{if(mode==='verify')$('tc31-resend-email').value=$('tc31-email').value.trim();setAuthMode(mode,true)};
+window.tc31ResendVerification=async()=>{
+ if(pendingAuth)return;
+ const input=$('tc31-resend-email'),button=$('tc31-resend-form').querySelector('button'),feedback=$('tc31-resend-feedback');
+ if(!input.checkValidity()){input.reportValidity();return}pendingAuth=true;button.disabled=true;
+ try{await api('resend',{type:'signup',email:input.value.trim()});status('If an account needs confirmation, a verification email has been sent. Check your inbox and spam.','success')}
+ catch(e){status(window.TrisoAuthUI.error(e),'error')}
+ finally{pendingAuth=false;button.disabled=false}
+};
+async function handleCallback(){
+ const result=await window.TrisoAuthCallback.consume({api,user:async token=>{const r=await fetch(url+'/auth/v1/user',{headers:{apikey:anon,Authorization:'Bearer '+token},signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error();return r.json()}});
+ if(!result.handled)return false;showScreen('tc31-panel');
+ if(result.state==='error'){
+  const confirmation=result.kind==='confirmation';tc31CallbackMode(confirmation&&result.type!=='email_change'?'verify':result.kind==='recovery'?'forgot':'signin');
+  if(confirmation)status(result.type==='email_change'?'This email-change link is invalid or expired. Sign in and request the change again in Account settings.':'This verification link could not be verified or has expired. Request a new confirmation email.','error');
+  else status(result.kind==='recovery'?'This password recovery link could not be verified. Request a new reset email.':'This sign-in link could not be verified. Please sign in again.','error');
+ }else if(result.state==='pending'){
+  tc31CallbackMode('signin');status('Complete both email confirmations, then sign in to check your current email.','info');
+ }else if(result.state==='confirmed'){
+  tc31CallbackMode('signin');status('Email verified successfully. Sign in to continue.','success');
+ }else if(result.kind==='recovery'){
+  session=result.session;window.TrisoAuth.write(session,false);tc31CallbackMode('reset');status('Verified. Choose a new password below.','success');
+ }else{tc31CallbackMode('account');save(result.session);status('Signed in successfully.','success');window.TrisoAccount?.signedIn()}
+ return true;
+}
 async function init(){
+ $('tc31-panel')?.addEventListener('invalid',event=>{
+  const input=event.target;if(!input||!input.matches('input')||input.closest('#acct-settings'))return;
+  event.preventDefault();input.setAttribute('aria-invalid','true');input.focus();
+  status('Check the highlighted fields and try again.','error');
+ },true);
+ $('tc31-panel').addEventListener('input',event=>event.target.removeAttribute('aria-invalid'));
  const keep=$('tc31-remember');
  if(keep){keep.checked=window.TrisoAuth.remembered();keep.addEventListener('change',()=>window.TrisoAuth.setRemember(keep.checked))}
- const h=new URLSearchParams(location.hash.slice(1));if(h.has('access_token')){const access_token=h.get('access_token'),refresh_token=h.get('refresh_token');history.replaceState(null,'',location.pathname+location.search);try{const res=await fetch(url+'/auth/v1/user',{headers:{apikey:anon,Authorization:'Bearer '+access_token}});if(!res.ok)throw Error('Google sign-in could not be verified.');const user=await res.json();save({access_token,refresh_token,expires_in:Number(h.get('expires_in'))||3600,user});showScreen('tc31-panel');if(h.get('type')==='recovery'){$('tc31-recovery-shell').hidden=false;$('tc31-recovery-form').hidden=false;status('Set a new password below.')}else status('Signed in successfully.')}catch(e){status(e.message)}}else await restore();}
+ if(await handleCallback())return;
+ await restore();
+}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 window.addEventListener('storage',event=>{
  if(event.key===storeKey||event.key==='tc35_remember_me'){
@@ -2970,7 +3130,7 @@ function render(){
  document.querySelectorAll('#store-screen .tc-footer-links a,#store-screen .tc-footer-links button').forEach(e=>{const original=e.dataset.tc33original||(e.dataset.tc33original=e.textContent.trim());const idx=['JOURNAL ↗','ACCOUNT ↗','TRUST / FAQ ↗'].indexOf(original);if(idx>=0)e.textContent=localized[lang][idx+2]+' ↗'});
 }
 const oldSet=window.setLang;
-if(typeof oldSet==='function'){window.setLang=function(lang,dir){oldSet(lang,dir);render()}}
+if(typeof oldSet==='function'){window.setLang=function(lang,dir,origin){oldSet(lang,dir,origin);render()}}
 document.addEventListener('DOMContentLoaded',render);
 if(document.readyState!=='loading')render();
 })();
@@ -2994,7 +3154,7 @@ const cards=root.querySelectorAll('.tc-feature-grid>div');for(let i=0;i<3;i++){s
 const footer=root.querySelectorAll('.tc-footer-links>*');['contact','navJournal','navAccount','navTrust','language'].forEach((k,i)=>setText(footer[i],v[k]+' ↗'));
 setText(document.getElementById('tc34-detail-overline'),v.detailLabel+' / TRISOCMD');
 }
-const original=window.setLang;if(typeof original==='function'){window.setLang=function(lang,dir){original(lang,dir);render()}}
+const original=window.setLang;if(typeof original==='function'){window.setLang=function(lang,dir,origin){original(lang,dir,origin);render()}}
 document.addEventListener('DOMContentLoaded',render);if(document.readyState!=='loading')render();
 })();
 </script><script>
@@ -3019,8 +3179,11 @@ const categories=[...new Set(products.map(p=>String(p.category||'General')))].so
 if(sel){const prior=sel.value;sel.replaceChildren(new Option('All categories',''));categories.forEach(c=>sel.add(new Option(c,c)));sel.value=categories.includes(prior)?prior:''}
 const q=(input?.value||'').trim().toLowerCase(),cat=sel?.value||'';
 const out=products.filter(p=>(!cat||String(p.category||'General')===cat)&&(!q||[p.title,p.desc,p.category].some(x=>String(x||'').toLowerCase().includes(q))));
+if(sort?.value==='featured')out.sort((a,b)=>Number(b.featured)-Number(a.featured));
+if(sort?.value==='best')out.sort((a,b)=>b.unitsSold-a.unitsSold||Number(b.id)-Number(a.id));
 if(sort?.value==='low')out.sort((a,b)=>Number(a.price)-Number(b.price));
 if(sort?.value==='high')out.sort((a,b)=>Number(b.price)-Number(a.price));
+if(sort?.value==='new')out.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)||Number(b.id)-Number(a.id));
 return out;
 };
 window.tc39Filter=function(){renderStore()};
@@ -3109,13 +3272,7 @@ count();
   </div>
  </div>
 </section>
-<section id="tc41-chat" class="tc41-chat" aria-label="Support chat">
- <div class="tc41-chat-header"><div><strong>✧ TRISOCMD SUPPORT</strong><small>Secure inbox · Refreshes every 5s when open</small></div><button class="tc41-close" onclick="tc41ToggleChat(false)" aria-label="Close chat">✕</button></div>
- <div class="tc41-chat-messages" id="tc41-messages" aria-live="polite"><div class="tc41-bubble">Welcome! Sign in to send a saved support message. Guests can contact us on Telegram.</div></div>
- <form class="tc41-chat-form" onsubmit="tc41Send(event)"><input id="tc41-message" maxlength="1000" placeholder="Write a message…" aria-label="Support message" required/><button type="submit" aria-label="Add message">➤</button></form>
- <div class="tc41-chat-footer"><a id="tc41-telegram-link" href="https://t.me/trisocmd" target="_blank" rel="noopener noreferrer">OPEN TELEGRAM ↗</a><a href="javascript:void(0)" onclick="tc41CopyChat()">COPY CHAT ↗</a></div>
- <div class="tc41-chat-hint">Sign in to send saved messages after the 4.2 database setup. Guests can use Telegram.</div>
-</section>
+
 <script id="tc41-js">
 (function(){
  let method='site',source='product',orderLines=[],messages=[];
@@ -3199,58 +3356,40 @@ count();
  }
  function tc42BagItems(){let bag={};try{bag=JSON.parse(localStorage.getItem('tc39-bag')||'{}')||{}}catch(e){}return Object.entries(bag).filter(([id,qty])=>Number(qty)>0).map(([id,qty])=>({id:Number(id),qty:Number(qty)}))}
  window.tc42BagItems=tc42BagItems;
+ let tc30OrderBusy=false;
  window.tc42SaveOrder=async()=>{
-  const status=$('tc42-order-result');status.textContent='Validating prices and saving your order…';
-  try{const items=window.tc42OrderItems||[];if(!items.length)throw Error('Choose a product first.');
-   const id=await req('rpc/tc42_create_order',{method:'POST',body:{p_items:items}});
-   status.textContent='Order saved: '+String(id).slice(0,8)+' · Awaiting payment. This is NOT payment confirmation.';
-   window.tc36LoadOrders?.();
-  }catch(e){status.textContent=e.message+' · Guest? You can continue via Telegram.'}
- };
- async function getMyThread(){
-  const token=await window.tc42AccessToken?.();if(!token)return null;
-  const auth=await fetch(SUPA_URL+'/auth/v1/user',{headers:{apikey:SUPA_KEY,Authorization:'Bearer '+token}});
-  if(!auth.ok)throw Error('Sign in again.');const u=await auth.json();
-  let threads=await req('tc42_support_threads?select=id&customer_id=eq.'+encodeURIComponent(u.id)+'&limit=1');
-  if(!threads.length){try{await req('tc42_support_threads',{method:'POST',body:{customer_id:u.id,subject:'Store support'}})}catch(e){/* concurrent tab may have created the thread */}
-   threads=await req('tc42_support_threads?select=id&customer_id=eq.'+encodeURIComponent(u.id)+'&limit=1')}
-  if(!threads.length)throw Error('Could not open your support thread.');return threads[0].id;
- }
- window.tc42SendSupport=async body=>{
-  const hint=$('tc41-chat-hint');try{
-   const thread=await getMyThread();if(!thread){hint.textContent='Sign in first, or use Telegram to contact support.';return false}
-   const token=await window.tc42AccessToken();const u=await (await fetch(SUPA_URL+'/auth/v1/user',{headers:{apikey:SUPA_KEY,Authorization:'Bearer '+token}})).json();
-   await req('tc42_support_messages',{method:'POST',body:{thread_id:thread,sender_id:u.id,body}});
-   hint.textContent='Message delivered to the support inbox. Telegram alerts require server setup.';return true;
-  }catch(e){hint.textContent='Message not delivered: '+e.message;return false}
- };
- window.tc42RefreshSupport=async()=>{
-  const area=$('tc41-messages');if(!area||!$('tc41-chat').classList.contains('open'))return;
-  try{const thread=await getMyThread();if(!thread)return;
-   const messages=await req('tc42_support_messages?select=id,body,sender_id,created_at&thread_id=eq.'+encodeURIComponent(thread)+'&order=created_at.asc&limit=100');
-   const token=await window.tc42AccessToken();const r=await fetch(SUPA_URL+'/auth/v1/user',{headers:{apikey:SUPA_KEY,Authorization:'Bearer '+token}});const u=await r.json();
-   area.replaceChildren();for(const m of messages){const el=document.createElement('div');el.className='tc41-bubble'+(m.sender_id===u.id?' self':'');el.textContent=m.body;area.append(el)}area.scrollTop=area.scrollHeight;
-  }catch(e){$('tc41-chat-hint').textContent='Chat unavailable: '+e.message}
- };
- // Poll only while chat is open; no claim of true websocket realtime.
- const oldToggle=window.tc41ToggleChat;
- window.tc41ToggleChat=function(force){oldToggle(force);clearInterval(refreshTimer);if($('tc41-chat').classList.contains('open')){window.tc42RefreshSupport();refreshTimer=setInterval(window.tc42RefreshSupport,5000)}};
- window.tc42AdminInbox=async()=>{
-  const root=$('tc42-admin-inbox');if(!root)return;root.textContent='Loading support inbox…';
+  const status=$('tc42-order-result'),button=$('tc42-save-order');
+  if(tc30OrderBusy)return;
+  const tell=(message,kind='info')=>{
+   if(!status)return;
+   status.textContent=message;status.dataset.state=kind;
+   status.setAttribute('role',kind==='error'?'alert':'status');
+   status.setAttribute('aria-live',kind==='error'?'assertive':'polite');
+  };
+  tc30OrderBusy=true;
+  if(button)button.disabled=true;
+  tell('Validating your cart with the server. No payment is being taken.','info');
   try{
-   const isAdmin=await req('rpc/is_admin',{method:'POST',body:{}});if(isAdmin!==true)throw Error('Admin access required');
-   const threads=await req('tc42_support_threads?select=id,customer_id,subject,created_at&order=created_at.desc&limit=40');root.replaceChildren();
-   if(!threads.length){root.textContent='No customer threads yet.';return}
-   for(const thread of threads){const box=document.createElement('div');box.className='tc42-thread';const title=document.createElement('strong');title.textContent='Thread '+thread.id.slice(0,8)+' · '+thread.subject;box.append(title);
-    const view=document.createElement('button');view.textContent='View conversation';box.append(view);
-    const messages=document.createElement('div');box.append(messages);
-    const reply=document.createElement('input');reply.placeholder='Reply as admin…';reply.maxLength=1000;const send=document.createElement('button');send.textContent='Send reply';box.append(reply,send);
-    view.onclick=async()=>{messages.textContent='Loading…';try{const data=await req('tc42_support_messages?select=body,sender_id,created_at&thread_id=eq.'+encodeURIComponent(thread.id)+'&order=created_at.asc&limit=100');messages.replaceChildren();data.forEach(m=>{const line=document.createElement('p');line.textContent=new Date(m.created_at).toLocaleString()+' · '+(m.sender_id===thread.customer_id?'Customer: ':'Admin: ')+m.body;messages.append(line)})}catch(e){messages.textContent=e.message}};
-    send.onclick=async()=>{try{const body=reply.value.trim();if(!body)return;const token=await window.tc42AccessToken();const r=await fetch(SUPA_URL+'/auth/v1/user',{headers:{apikey:SUPA_KEY,Authorization:'Bearer '+token}});if(!r.ok)throw Error('Sign in again');const u=await r.json();await req('tc42_support_messages',{method:'POST',body:{thread_id:thread.id,sender_id:u.id,body}});reply.value='';await view.onclick()}catch(e){messages.textContent=e.message}};
-    root.append(box)
-   }
-  }catch(e){root.textContent='Inbox unavailable: '+e.message}
+   const items=window.tc42OrderItems;
+   if(!Array.isArray(items)||items.length<1||items.length>20)throw Error('Select 1–20 products to save a request.');
+   const valid=items.every(x=>Number.isSafeInteger(Number(x.id))&&Number(x.id)>0&&Number.isSafeInteger(Number(x.qty))&&Number(x.qty)>=1&&Number(x.qty)<=99999);
+   if(!valid)throw Error('Cart items contain an invalid product or quantity.');
+   // Server independently re-checks ownership, stock, quantities and authoritative price.
+   if(!window.TrisoOrders)throw Error('Order center is loading. Please retry.');
+   const id=await window.TrisoOrders.create(items);
+   if(typeof id!=='string'||!/^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(id))throw Error('Server response could not be verified. Check My Orders before trying again.');
+   tell('Request saved: #'+id.slice(0,8).toUpperCase()+'. Not paid and not confirmed. Check My Orders for the full record.','success');
+   window.tc36LoadOrders?.();
+  }catch(e){
+   const message=String(e?.message||'Order service unavailable');
+   tell(message+' · If the request may have reached the server, check My Orders before retrying to avoid duplicates.','error');
+  }finally{
+   tc30OrderBusy=false;
+   if(button)button.disabled=false;
+  }
  };
+ // Customer chat and staff inbox use the shared canonical RPC components below.
+
 })();
 </script>
 
@@ -3305,37 +3444,12 @@ count();
 <section id="tc45-tracking" class="tc45-track" aria-hidden="true"><div class="tc45-track-panel" role="dialog" aria-modal="true" aria-labelledby="tc45-title"><div class="tc45-track-head"><div><small>TRISOCMD / CUSTOMER CENTER</small><h2 id="tc45-title">TRACK YOUR ORDERS.</h2><div class="tc45-tracking-note">Only orders associated with your signed-in account appear here.</div></div><button onclick="tc45CloseTracking()" aria-label="Close tracking">✕</button></div><div id="tc45-tracking-list" role="status">Sign in to view your orders.</div><button class="tc45-track-btn" onclick="tc45RefreshTracking()">↻ REFRESH ORDER STATUS</button><button class="tc45-track-btn" onclick="tc45CloseTracking();tc41ToggleChat(true)">CONTACT SUPPORT ↗</button></div></section>
 <script id="tc45-tracking-js">
 (()=>{
- const $=id=>document.getElementById(id);
- window.tc45OpenTracking=()=>{$('tc45-tracking').classList.add('open');$('tc45-tracking').setAttribute('aria-hidden','false');tc45RefreshTracking()};
- window.tc45CloseTracking=()=>{$('tc45-tracking').classList.remove('open');$('tc45-tracking').setAttribute('aria-hidden','true')};
- const steps=['awaiting_payment','payment_review','paid','fulfilled'];
- const display={awaiting_payment:'AWAITING PAYMENT',payment_review:'PAYMENT UNDER REVIEW',paid:'PAYMENT CONFIRMED',fulfilled:'FULFILLED',cancelled:'CANCELLED',refunded:'REFUNDED'};
- async function get(path){const token=await window.tc42AccessToken?.();if(!token)throw Error('Sign in to view your order history.');const r=await fetch(SUPA_URL+'/rest/v1/'+path,{headers:{apikey:SUPA_KEY,Authorization:'Bearer '+token}});if(!r.ok)throw Error('Order service unavailable ('+r.status+').');return r.json()}
- window.tc45RefreshTracking=async()=>{
-  const root=$('tc45-tracking-list');root.textContent='Loading orders securely…';
-  try{
-   const orders=await get('tc42_orders?select=id,created_at,status,total_amount,currency,items&order=created_at.desc&limit=40');root.replaceChildren();
-   if(!orders.length){root.textContent='No saved orders yet. You can still shop as a guest or place an order via Telegram.';return}
-   for(const o of orders){
-    const box=document.createElement('article');box.className='tc45-order';
-    const top=document.createElement('div');top.className='tc45-order-top';
-    const id=document.createElement('strong');id.textContent='ORDER #'+String(o.id).slice(0,8).toUpperCase();
-    const badge=document.createElement('span');badge.className='tc45-status';badge.textContent=display[o.status]||String(o.status||'PENDING').replaceAll('_',' ').toUpperCase();top.append(id,badge);box.append(top);
-    const meta=document.createElement('small');meta.textContent=new Date(o.created_at).toLocaleString()+' · '+Number(o.total_amount).toFixed(2)+' '+(o.currency||'USD');box.append(meta);
-    const progress=document.createElement('div');progress.className='tc45-progress';progress.setAttribute('aria-label','Order progress');const ix=steps.indexOf(o.status);
-    steps.forEach((_,i)=>{const line=document.createElement('i');if(ix>=i)line.className='done';progress.append(line)});box.append(progress);
-    const button=document.createElement('button');button.textContent='VIEW ORDER DETAILS ↗';const detail=document.createElement('div');detail.className='tc45-detail';detail.hidden=true;
-    button.onclick=()=>{detail.hidden=!detail.hidden;if(detail.hidden)return;detail.replaceChildren();
-      const rows=Array.isArray(o.items)?o.items:[];
-      if(!rows.length){detail.textContent='Item details unavailable.';return}
-      rows.forEach(r=>{const line=document.createElement('div');line.textContent=String(r.title||'Product')+' × '+Number(r.qty||0)+' · $'+Number(r.unit_price||0).toFixed(2)+' each';detail.append(line)})
-    };
-    box.append(button,detail);root.append(box)
-   }
-  }catch(e){root.textContent=e.message+' You can still contact @trisooo for manual orders.'}
- };
- $('tc45-tracking').addEventListener('click',e=>{if(e.target.id==='tc45-tracking')tc45CloseTracking()});
- document.addEventListener('keydown',e=>{if(e.key==='Escape')tc45CloseTracking()});
+ const root=document.getElementById('tc45-tracking');let opener;
+ window.tc45OpenTracking=()=>{opener=document.activeElement;root.classList.add('open');root.setAttribute('aria-hidden','false');root.querySelector('button').focus();return window.TrisoOrders?.open()};
+ window.tc45CloseTracking=()=>{root.classList.remove('open');root.setAttribute('aria-hidden','true');window.TrisoOrders?.close();if(opener?.isConnected)opener.focus()};
+ window.tc45RefreshTracking=()=>window.TrisoOrders?.open();
+ root.addEventListener('click',event=>{if(event.target===root)tc45CloseTracking()});
+ document.addEventListener('keydown',event=>{if(!root.classList.contains('open'))return;if(event.key==='Escape')tc45CloseTracking();if(event.key==='Tab'){const controls=[...root.querySelectorAll('button,input,select,textarea,a[href]')].filter(el=>!el.disabled&&el.getClientRects().length);const first=controls[0],last=controls.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus()}}});
 })();
 </script><script id="tc46-secure-admin">
 (()=>{
@@ -3343,11 +3457,11 @@ count();
  const say=msg=>{$('tc46-admin-msg').textContent=msg};
  let allowed=false,products=[];
  async function request(path,opts={}){
-  const token=await window.tc42AccessToken?.();
+  const contentOwner=window.TrisoAuth?.read()?.user?.id,token=await window.tc42AccessToken?.();
   if(!token)throw Error('Sign in again to manage the store.');
   const res=await fetch(SUPA_URL+'/rest/v1/'+path,{method:opts.method||'GET',headers:{apikey:SUPA_KEY,Authorization:'Bearer '+token,'Content-Type':'application/json',Prefer:opts.prefer||'return=representation'},body:opts.body===undefined?undefined:JSON.stringify(opts.body)});
   if(!res.ok){const e=await res.json().catch(()=>({}));throw Error(e.message||e.error||'Server refused request ('+res.status+')')}
-  const raw=await res.text();return raw?JSON.parse(raw):null;
+  const raw=await res.text();if(window.TrisoAuth?.read()?.user?.id!==contentOwner)throw Error('Account changed');return raw?JSON.parse(raw):null;
  }
  async function verify(){
   const isAdmin=await request('rpc/is_admin',{method:'POST',body:{}});
@@ -3369,12 +3483,13 @@ count();
   const root=$('tc46-product-list');root.textContent='Loading products…';
   try{
    if(!allowed)await verify();
-   products=await request('products?select=id,title,price,stock,status,category,description,description_ar,image_url,min_qty,max_qty&order=id.desc&limit=200');
+   products=[];for(let offset=0;;offset+=200){const page=await request('products?select=*&order=id.desc&limit=200&offset='+offset);products.push(...page);if(page.length<200)break}
    root.replaceChildren();
    if(!products.length)root.textContent='No products yet.';
    for(const p of products){
     const c=card(p.title||'Untitled','ID '+p.id+' · $'+Number(p.price).toFixed(2)+' · Stock '+p.stock+' · '+p.status);
     action(c.actions,'EDIT',()=>tc46EditProduct(p.id));
+    const media=document.createElement('a');media.textContent='MEDIA & SPECS';media.href='product.html?id='+encodeURIComponent(p.id);c.actions.append(media);
     action(c.actions,'DELETE',()=>tc46DeleteProduct(p.id),true);
     root.append(c.el);
    }
@@ -3386,8 +3501,8 @@ count();
  window.tc46EditProduct=id=>{
   const p=products.find(x=>String(x.id)===String(id));if(!p)return;
   $('tc46-pid').value=p.id;$('tc46-title').value=p.title||'';$('tc46-price').value=p.price??0;$('tc46-stock').value=p.stock??0;
-  $('tc46-category').value=p.category||'';$('tc46-status').value=p.status==='available'?'available':'unavailable';$('tc46-image').value=p.image_url||'';
-  $('tc46-min').value=p.min_qty??1;$('tc46-max').value=p.max_qty??'';$('tc46-description').value=p.description||'';$('tc46-description-ar').value=p.description_ar||'';
+  $('tc46-category').value=p.category||'';$('tc46-status').value=p.status||'draft';$('tc46-image').value=p.image_url||'';
+  $('tc46-min').value=p.min_qty??1;$('tc46-max').value=p.max_qty??'';$('tc46-description').value=p.description||'';$('tc46-description-ar').value=p.description_ar||'';$('tc46-description-fa').value=p.description_fa||'';$('tc46-slug').value=p.slug||'';$('tc46-seo-title').value=p.seo_title||'';$('tc46-seo-description').value=p.seo_description||'';
   $('tc46-form-title').textContent='EDIT PRODUCT #'+p.id;$('tc46-product-form').hidden=false;$('tc46-product-form').scrollIntoView({behavior:'smooth',block:'nearest'});
  };
  window.tc46CancelEdit=()=>{$('tc46-product-form').hidden=true};
@@ -3397,7 +3512,7 @@ count();
   const image=val('tc46-image').trim();
   if(!Number.isFinite(price)||price<0||!Number.isInteger(stock)||stock<0||!Number.isInteger(min)||min<1||max!==null&&(!Number.isInteger(max)||max<min))return say('Invalid price, stock, or quantity limits.');
   if(image&&(!/^https:\/\//i.test(image)||image.length>1500))return say('Image URL must start with https://');
-  const body={title:val('tc46-title').trim(),price,stock,category:val('tc46-category').trim()||null,status:val('tc46-status'),image_url:image||null,min_qty:min,max_qty:max,description:val('tc46-description'),description_ar:val('tc46-description-ar')};
+  const body={title:val('tc46-title').trim(),price,stock,category:val('tc46-category').trim()||null,status:val('tc46-status'),image_url:image||null,min_qty:min,max_qty:max,description:val('tc46-description'),description_ar:val('tc46-description-ar'),description_fa:val('tc46-description-fa'),slug:val('tc46-slug').trim()||null,seo_title:val('tc46-seo-title').trim()||null,seo_description:val('tc46-seo-description').trim()||null};
   if(!body.title)return say('Product title required');
   const id=val('tc46-pid');
   try{
@@ -3486,5 +3601,5 @@ function init(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
-</script></body>
+</script><script src="../assets/phase1-orders.js?v=account1" defer></script><script src="../assets/store-invoice.js" defer></script><link rel="stylesheet" href="../assets/triso-live-support.css?v=1"><script src="../assets/triso-live-support.js?v=1" defer></script><link rel="stylesheet" href="../assets/triso-admin-support.css?v=1"><script src="../assets/triso-admin-support.js?v=1" defer></script><script src="../assets/triso-support.js?v=4" defer></script><script src="../assets/triso-notifications-v34.js?v=38" defer></script><script src="../assets/triso-notification-onboarding.js?v=1" defer></script><script src="../assets/triso-account-model.js" defer></script><script src="../assets/triso-settings.js?v=2" defer></script><script src="../assets/triso-account.js?v=3" defer></script><script src="../assets/marketplace-auth-return.js?v=1" defer></script></body>
 </html>

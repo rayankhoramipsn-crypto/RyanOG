@@ -6,6 +6,7 @@
  function get(storage,key){try{return storage.getItem(key)}catch{return null}}
  function put(storage,key,value){try{storage.setItem(key,value);return true}catch{return false}}
  function del(storage,key){try{storage.removeItem(key)}catch{}}
+ function changed(){global.dispatchEvent?.(new global.Event('triso:session'))}
  function remembered(){return get(localStorage,PREF)!=='false'}
  function read(){
    // Persistent login takes priority; legacy sessionStorage login is upgraded in place.
@@ -15,7 +16,7 @@
      if(!raw)continue;
      try{const s=JSON.parse(raw);if(s&&s.access_token&&s.refresh_token&&s.user){value=s;break}}catch{}
    }
-   if(value&&temporary&&!persist&&remembered())put(localStorage,KEY,JSON.stringify(value));
+   // A session-only login (including recovery) must never be promoted on read.
    return value;
  }
  function write(value,keep=remembered()){
@@ -25,19 +26,49 @@
      user:value.user};
    const raw=JSON.stringify(saved);
    if(keep){
-     if(!put(localStorage,KEY,raw)){return put(sessionStorage,KEY,raw)}
+     if(!put(localStorage,KEY,raw)){const ok=put(sessionStorage,KEY,raw);if(ok)changed();return ok}
      del(sessionStorage,KEY);
    }else{
      if(!put(sessionStorage,KEY,raw))return false;
      del(localStorage,KEY);
    }
-   return true;
+   changed();return true;
  }
- function clear(){del(localStorage,KEY);del(sessionStorage,KEY)}
+ function clear(){del(localStorage,KEY);del(sessionStorage,KEY);changed()}
  function setRemember(v){
    put(localStorage,PREF,v?'true':'false');
    const session=read();
    if(session)write(session,v);
  }
- global.TrisoAuth=Object.freeze({read,write,clear,remembered,setRemember,key:KEY});
+
+ let pending=null;
+ async function refresh(exchange,force=false){
+   if(pending)return pending;
+   const run=async()=>{
+     const before=read();
+     if(!before?.refresh_token)return null;
+     if(!force&&Number(before.expires_at)>Date.now()/1000+120)return before;
+     try{
+       const next=await exchange(before.refresh_token);
+       if(!next?.access_token||!next?.refresh_token||!next?.user)throw Error('Invalid refresh response');
+       if(!before.user?.id||next.user.id!==before.user.id)throw Error('Session identity mismatch');
+       // Logout or another login during the request wins over a late response.
+       const current=read();
+       if(current?.refresh_token!==before.refresh_token)return current;
+       const keep=!!get(localStorage,KEY)&&remembered();
+       write(next,keep);
+       return read();
+     }catch(error){
+       const current=read();
+       if(current?.refresh_token!==before.refresh_token)return current;
+       if(/invalid.refresh|refresh.token.not.found|already.used|invalid.grant/i.test(error.message||''))clear();
+       throw error;
+     }
+   };
+   // Web Locks serialize token rotation across tabs on the HTTPS origin.
+   pending=(global.navigator?.locks
+     ?global.navigator.locks.request(KEY+':refresh',run):run());
+   try{return await pending}finally{pending=null}
+ }
+ global.TrisoAuth=Object.freeze({read,write,clear,remembered,setRemember,refresh,key:KEY});
 })(window);

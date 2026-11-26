@@ -31,15 +31,15 @@ class LiveChatV17(unittest.TestCase):
                 # Production cache versions may advance independently of preview.
                 import re
                 revision = "35" if path == "marketplace.html" else "18"
-                self.assertIn("marketplace-v15.js?v="+revision, source)
+                self.assertIn("marketplace-v15.js?v=38", source)
                 self.assertIn("marketplace-v15.css?v="+revision, source)
                 self.assertIn('type="submit">Send',source)
 
     def test_signed_in_buyer_and_seller_receive_live_updates(self):
         code=(ROOT/"assets/marketplace-v15.js").read_text(encoding="utf-8")
         for phrase in [
-            "rpc('market_inbox')", "rpc('market_mark_read'",
-            "rpc('market_start_chat'", "rpc('market_send_message'",
+            "rpc('market_inbox')", "'market_mark_read_to'",
+            "rpc('market_start_chat'", "'market_send_message_once'",
             "market_messages'", "market_conversations'",
             "on('postgres_changes'", "subscribe(status=>",
             "startInbox()", "stopInbox()", "updateUnreadBadges(",

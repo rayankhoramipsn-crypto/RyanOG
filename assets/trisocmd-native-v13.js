@@ -16,17 +16,17 @@
  toggle?.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();menu.hidden?langOpen():langClose()});
  menu?.addEventListener('click',function(e){const b=e.target.closest('button[data-native-lang]');if(!b)return;e.preventDefault();e.stopPropagation();langClose();if(typeof window.setLang==='function')window.setLang(b.dataset.nativeLang,b.dataset.nativeDir,'navbar');else{document.documentElement.lang=b.dataset.nativeLang;document.documentElement.dir=b.dataset.nativeDir}document.getElementById('nav-lang-label')?.replaceChildren(document.createTextNode(b.dataset.nativeLang.toUpperCase()))});
  document.addEventListener('click',e=>{if(!e.target.closest('#tc-native-lang'))langClose()});
- document.addEventListener('keydown',e=>{if(e.key==='Escape'){langClose();nav?.classList.remove('open');mobile?.setAttribute('aria-expanded','false')}});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'){const wasMenu=nav?.classList.contains('open'),wasLang=menu&&!menu.hidden;langClose();nav?.classList.remove('open');mobile?.setAttribute('aria-expanded','false');if(wasLang)toggle?.focus();else if(wasMenu)mobile?.focus()}});
  mobile?.addEventListener('click',()=>{if(!nav)return;const opened=nav.classList.toggle('open');mobile.setAttribute('aria-expanded',String(opened))});
  nav?.addEventListener('click',e=>{if(e.target.closest('a,button')){nav.classList.remove('open');mobile?.setAttribute('aria-expanded','false')}});
  function filter(k,scroll=true){
    if(!category||!backendSearch)return;
    const key=k==='gear'?'gaming':k;
    const options=Array.from(category.options);
-   const found=k==='all'?options.find(o=>o.value===''):options.find(o=>(o.textContent+' '+o.value).toLowerCase().includes(key));
+   const found=k==='all'?options.find(o=>o.value===''):options.find(o=>k==='gear'?/gaming|gear|headset|keyboard|mouse|controller/i.test(o.value):(o.textContent+' '+o.value).toLowerCase().includes(key));
    category.value=found?found.value:'';
    backendSearch.value=(found||k==='all')?'':key;
-   if(srch)srch.value='';
+   if(srch)srch.value=backendSearch.value;
    if(typeof window.tc39Filter==='function')window.tc39Filter();
    root.querySelectorAll('[data-native-filter]').forEach(b=>{const on=b.dataset.nativeFilter===k;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on))});
    if(scroll)document.querySelector('#store-screen .product-section')?.scrollIntoView({behavior:'smooth',block:'start'});
@@ -35,7 +35,7 @@
   const tile=e.target.closest('a[data-native-category]');if(tile){e.preventDefault();filter(tile.dataset.nativeCategory);return}
   const chip=e.target.closest('button[data-native-filter]');if(chip){e.preventDefault();filter(chip.dataset.nativeFilter);return}
  });
- srch?.addEventListener('input',()=>{if(backendSearch){backendSearch.value=srch.value;if(category)category.value='';if(typeof window.tc39Filter==='function')window.tc39Filter()}});
+ srch?.addEventListener('input',()=>{if(backendSearch){backendSearch.value=srch.value;if(category)category.value='';if(typeof window.tc39Filter==='function')window.tc39Filter();root.querySelectorAll('[data-native-filter]').forEach(b=>{b.classList.remove('active');b.setAttribute('aria-pressed','false')})}});
  srch?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();document.querySelector('#store-screen .product-section')?.scrollIntoView({behavior:'smooth'})}});
  if(cartOriginal&&cartBadge){const sync=()=>cartBadge.textContent=cartOriginal.textContent?.trim()||'0';sync();new MutationObserver(sync).observe(cartOriginal,{childList:true,characterData:true,subtree:true})}
 
@@ -52,6 +52,11 @@
  function paintLang(){
   const code=(document.documentElement.lang||'en').toLowerCase(), t=translations[code]||translations.en;
   root.querySelectorAll('[data-native-i18n]').forEach(el=>{const value=t[el.dataset.nativeI18n];if(value)el.textContent=value});
+  const labels={en:{fortnite:'Fortnite',gear:'Gaming Gear',digital:'Digital Goods',all:'All',search:'Search products',menu:'Menu',new:'New arrivals',best:'Best sellers',featured:'Featured',low:'Price: Low to High',high:'Price: High to Low'},fa:{fortnite:'فورتنایت',gear:'تجهیزات گیمینگ',digital:'محصولات دیجیتال',all:'همه',search:'جستجوی محصولات',menu:'فهرست',new:'جدیدترین محصولات',best:'پرفروش‌ترین‌ها',featured:'ویژه',low:'قیمت: کم به زیاد',high:'قیمت: زیاد به کم'},ar:{fortnite:'فورتنايت',gear:'معدات الألعاب',digital:'المنتجات الرقمية',all:'الكل',search:'البحث عن المنتجات',menu:'القائمة',new:'أحدث المنتجات',best:'الأكثر مبيعاً',featured:'مميز',low:'السعر: تصاعدي',high:'السعر: تنازلي'}}[code]||{fortnite:'Fortnite',gear:'Gaming Gear',digital:'Digital Goods',all:'All',search:'Search products',menu:'Menu',new:'New arrivals',best:'Best sellers',featured:'Featured',low:'Price: Low to High',high:'Price: High to Low'};
+  root.querySelectorAll('[data-native-filter]').forEach(b=>{const span=b.querySelector('span:last-child');if(span)span.textContent=labels[b.dataset.nativeFilter];else b.textContent=labels[b.dataset.nativeFilter]});
+  root.querySelectorAll('.tc-native-promo[data-native-category]').forEach(a=>{a.querySelector('h2').textContent=labels[a.dataset.nativeCategory]});
+  if(srch){srch.placeholder=labels.search;srch.setAttribute('aria-label',labels.search)}mobile?.setAttribute('aria-label',labels.menu);
+  document.querySelectorAll('#tc39-sort option').forEach(o=>{if(labels[o.value])o.textContent=labels[o.value]});
   const title=document.getElementById('hero-title');if(title)title.innerHTML=t.title;
   const codeEl=document.getElementById('nav-lang-label');if(codeEl)codeEl.textContent=code.toUpperCase();
   root.querySelectorAll('[data-native-lang]').forEach(b=>b.setAttribute('aria-current',String(b.dataset.nativeLang===code)));

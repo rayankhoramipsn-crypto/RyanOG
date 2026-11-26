@@ -5,3 +5,5 @@ supabase/.temp/
 !.env.example
 __pycache__/
 *.pyc
+
+work/

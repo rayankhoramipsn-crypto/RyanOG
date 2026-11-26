@@ -2,17 +2,33 @@
   "name": "ryanog-main",
   "version": "1.0.0",
   "devDependencies": {
+    "@types/web-push": "3.6.4",
+    "axe-core": "4.14.0",
     "deno": "2.5.6",
     "embedded-postgres": "18.6.0-beta.19",
     "pg": "8.23.0",
-    "playwright": "1.55.0",
+    "playwright": "1.55.1",
     "supabase": "2.122.1"
   },
   "private": true,
   "description": "TRISOCMD local checkout security and regression tests",
   "scripts": {
-    "test": "node --test tests/phase1-payments.test.mjs && node tests/phase1-database.mjs && python3 -m unittest discover -s tests -p \"test_*.py\"",
-    "test:browser": "node tests/browser-smoke.mjs && node tests/phase1-browser.mjs",
-    "check:edge": "deno check supabase/functions/store-crypto/index.ts supabase/functions/payment-webhook/index.ts"
+    "test": "node --test tests/*.test.mjs && node tests/support-database.mjs && node tests/marketplace-pricing-database.mjs && node tests/phase1-database.mjs && node tests/marketplace-database.mjs && node tests/staging-integration.mjs && node tests/account-avatars-database.mjs && python3 -m unittest discover -s tests -p \"test_*.py\"",
+    "test:browser": "node tests/browser-smoke.mjs && node tests/phase1-browser.mjs && node tests/completion-browser.mjs && node tests/marketplace-browser.mjs && node tests/marketplace-details-browser.mjs && node tests/marketplace-checkout-browser.mjs && node tests/marketplace-management-browser.mjs && node tests/admin-support-browser.mjs && node tests/live-support-browser.mjs && node tests/support-center-browser.mjs && node tests/communications-browser.mjs && node tests/content-browser.mjs && node tests/release-browser.mjs && node tests/auth-callback-browser.mjs && node tests/auth-layout-browser.mjs && node tests/account-dashboard-browser.mjs && node tests/language-settings-browser.mjs && node tests/settings-browser.mjs && node tests/notification-onboarding-browser.mjs",
+    "check:edge": "deno check supabase/functions/store-crypto/index.ts supabase/functions/payment-webhook/index.ts supabase/functions/delivery-worker/index.ts supabase/functions/delivery-webhook/index.ts",
+    "test:integration": "node tests/staging-integration.mjs",
+    "test:marketplace:local": "node tests/marketplace-local.mjs",
+    "test:communications:local": "node tests/communications-local.mjs",
+    "test:content:local": "node tests/content-local.mjs",
+    "build:site": "node scripts/build-site.mjs",
+    "test:release:auth": "node tests/release-auth-local.mjs",
+    "test:release:realtime": "node tests/release-realtime-local.mjs",
+    "test:checkout": "node --test tests/marketplace-pricing.test.mjs && node tests/marketplace-pricing-database.mjs",
+    "test:checkout:browser": "node tests/marketplace-checkout-browser.mjs",
+    "test:support": "node --test tests/admin-support-contract.test.mjs tests/support-routing.test.mjs tests/live-support-model.test.mjs && node tests/support-database.mjs",
+    "test:support:browser": "node tests/admin-support-browser.mjs && node tests/live-support-browser.mjs && node tests/support-center-browser.mjs && node tests/communications-browser.mjs"
+  },
+  "dependencies": {
+    "web-push": "3.6.7"
   }
 }

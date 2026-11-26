@@ -1,0 +1,73 @@
+/* Scoped account entry UI; signed-in dashboard keeps its existing layout. */
+#tc31-panel.tc-auth:not([data-auth-mode="account"]){background:#0d0d12;padding:24px 20px 40px;min-height:100svh;box-sizing:border-box;color:#f1eef7}
+#tc31-panel.tc-auth:not([data-auth-mode="account"])::before,#tc31-panel.tc-auth:not([data-auth-mode="account"])::after{display:none}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-wrap{width:100%;max-width:440px;min-width:0;margin:0 auto}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-nav{margin-bottom:24px;gap:12px}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-nav strong{font-size:18px;letter-spacing:-.04em;white-space:nowrap}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-nav strong span{color:#bba7e8}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-nav button{padding:8px 0;background:none;border:0;font-size:13px;letter-spacing:0;color:#cbc2de}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-kicker{font-size:10px;letter-spacing:.12em;color:#aaa0bc;margin:0 0 8px}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-heading{font-size:28px;line-height:1.2;letter-spacing:-.025em;margin:0 0 8px;color:#f7f4ff;font-weight:650}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) #tc-v22-hero-copy{font-size:14px;line-height:1.5;margin:0 0 18px;color:#b9b3c5}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-grid{display:grid;grid-template-columns:minmax(0,1fr);min-width:0;margin:0}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-signup-shell{max-width:none;margin:0}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-auth-card,#tc31-panel.tc-auth:not([data-auth-mode="account"]) #tc31-forgot-view,#tc31-panel.tc-auth:not([data-auth-mode="account"]) #tc31-recovery-shell{width:100%;box-sizing:border-box;padding:22px;margin:0!important;border:1px solid #34303e;border-radius:16px;background:#16151c;box-shadow:0 12px 36px #0002;text-align:start;transform:none;opacity:1}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) [hidden]{display:none!important}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-auth-card .tc31-muted{font-size:14px;line-height:1.6;color:#b9b3c5;margin:0 0 16px}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-auth-card label{font-size:13px;font-weight:550;color:#e0dae9;margin:10px 0 4px}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-auth-card label:first-child{margin-top:0}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-auth-card .tc31-input{min-height:44px;padding:11px 12px;margin:4px 0 8px;border:1px solid #48414f;border-radius:8px;background:#0e0e14;color:#f7f4ff;font:inherit;font-size:14px;line-height:1.4;direction:inherit}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) input[type="email"]{direction:ltr;text-align:start}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-input::placeholder{color:#aaa2b8;opacity:1}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-auth-card button,#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-auth-card a{font:inherit;font-size:13px}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-v22-label-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-v22-label-row button{padding:6px 0;white-space:normal;text-align:end}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-v22-password-row{position:relative;display:grid;grid-template-columns:minmax(0,1fr);align-items:center}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-v22-password-row .tc31-input{grid-area:1/1;min-width:0;margin-block:4px;padding-inline-end:76px;padding-inline-start:12px}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-v22-reveal{position:relative;inset:auto;grid-area:1/1;justify-self:end;align-self:center;margin-inline-end:8px;min-height:40px;border:0;background:transparent;color:#c9b6ef;padding:8px;font-size:12px;cursor:pointer}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-remember{display:flex;align-items:center;gap:8px;margin:10px 0 14px;font-size:13px;font-weight:400}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-remember input{accent-color:#ae8ce0;min-width:16px;min-height:16px;margin:0}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-btn{min-height:44px;border-radius:8px;padding:11px 14px;background:#b39adf;color:#17101f;font-size:14px;font-weight:650;box-shadow:none;letter-spacing:0}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-v22-submit{width:100%;margin:8px 0 0}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-auth-google{width:100%;background:transparent;color:#e3deec;border:1px solid #51475f}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-auth-divider{display:flex;align-items:center;gap:12px;margin:14px 0;color:#aaa2b8;font-size:12px}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-auth-divider::before,#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-auth-divider::after{content:'';height:1px;background:#37303f;flex:1}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-v22-textlink,#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-v22-back{background:none;border:0;color:#d0b7f1;min-height:36px;padding:6px 0;font-size:13px;cursor:pointer;text-decoration:none}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-auth-footer{font-size:13px;color:#b9b3c5;line-height:1.5;margin:12px 0 0}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-small{font-size:12px;line-height:1.6;color:#b9b3c5;margin:12px 0}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-v23-auth-notice{font-size:13px;line-height:1.6;border:1px solid #494057;background:#211c2a;color:#dfd3ee;padding:10px 12px;margin:0 0 14px;border-radius:8px;overflow-wrap:anywhere}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-v23-auth-notice[data-state="error"]{color:#ffc3c6;background:#301c22;border-color:#7f434f}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-v23-auth-notice[data-state="success"]{color:#bce3cc;background:#15261e;border-color:#355e47}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) button:focus-visible,#tc31-panel.tc-auth:not([data-auth-mode="account"]) a:focus-visible,#tc31-panel.tc-auth:not([data-auth-mode="account"]) input:focus-visible{outline:2px solid #c5a5f0;outline-offset:3px}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) input[aria-invalid="true"]{border-color:#de8290}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) button:disabled{opacity:.6;cursor:wait}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-auth-card,#tc31-panel.tc-auth:not([data-auth-mode="account"]) button{animation:none;transition:none}
+html[dir="rtl"] #tc31-panel.tc-auth:not([data-auth-mode="account"]){letter-spacing:normal}
+@media(min-width:700px){#tc31-panel.tc-auth:not([data-auth-mode="account"]){padding-top:clamp(24px,6vh,64px)}}
+@media(max-width:440px){#tc31-panel.tc-auth:not([data-auth-mode="account"]){padding:18px 16px 32px}#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-auth-card{padding:18px}}
+/* Legacy global theme uses !important on all sections/forms/buttons. Contain it here. */
+body:has(#tc31-panel.tc-auth:not([data-auth-mode="account"]).active:not([data-auth-mode="account"])){padding:0!important;background:#0d0d12!important}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]){background:#0d0d12!important;border:0!important;border-radius:0!important;box-shadow:none;padding:24px 20px 40px!important}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-heading{font-size:28px!important}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) form{padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-auth-card{background:#16151c!important;border:1px solid #34303e!important;border-radius:16px!important;padding:22px!important;box-shadow:0 12px 36px #0002}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) button{background:none!important;color:#d0b7f1!important;border:0!important;border-radius:8px!important;font-weight:550!important;box-shadow:none!important;transform:none!important;filter:none!important}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-btn{background:#b39adf!important;color:#17101f!important;border:1px solid transparent!important;font-weight:650!important}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-btn.tc31-alt{background:transparent!important;color:#e3deec!important;border:1px solid #51475f!important}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-input{border:1px solid #48414f!important;background:#0e0e14!important;border-radius:8px!important}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-auth-card label,#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-input,#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-btn{font-size:14px}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) input[aria-invalid="true"]{border-color:#de8290!important}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-v23-auth-notice{font-weight:400;box-shadow:none}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-v23-auth-notice::before{display:none}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-v23-auth-notice[data-state="error"]{color:#ffc3c6!important;background:#301c22!important;border:1px solid #7f434f!important}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-v23-auth-notice[data-state="success"]{color:#bce3cc!important;background:#15261e!important;border:1px solid #355e47!important}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-v23-auth-notice[data-state="info"]{color:#dfd3ee!important;background:#211c2a!important;border:1px solid #494057!important}
+@media(min-width:700px){#tc31-panel.tc-auth:not([data-auth-mode="account"]){padding-top:clamp(24px,6vh,64px)!important}}
+@media(max-width:440px){#tc31-panel.tc-auth:not([data-auth-mode="account"]){padding:18px 16px 32px!important}#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc-auth-card{padding:18px!important}}
+
+#tc31-panel.tc-auth #tc-auth-language{width:auto;max-width:100px;min-height:36px;border:1px solid #48414f;border-radius:6px;background:#16151c;font:inherit;font-size:13px;color:#e0dae9;padding:6px}
+
+#tc31-panel.tc-auth:not([data-auth-mode="account"]){padding-bottom:96px!important}
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-nav{padding-bottom:12px;margin-bottom:18px}
+
+#tc31-panel.tc-auth:not([data-auth-mode="account"]) .tc31-input{font-size:16px}

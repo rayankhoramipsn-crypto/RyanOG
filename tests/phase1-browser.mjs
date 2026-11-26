@@ -7,10 +7,10 @@ const buyer='00000000-0000-4000-8000-000000000001',order='11111111-1111-4111-811
 const row={id:order,customer_id:buyer,status:'awaiting_payment',total_amount:'25.00',currency:'USD',items:[{id:1,title:'Fixture',qty:1,unit_price:25}]};
 const invoice={id:crypto.randomUUID(),order_id:order,chain:'mainnet',network:'LTC',address:'test-only-mocked-address-do-not-pay',units:'100000',provider:'mock',provider_invoice_id:'fixture',state:'awaiting_payment',expires_at:new Date(Date.now()+600000).toISOString()};
 const cors={'access-control-allow-origin':'*','access-control-allow-headers':'*','access-control-allow-methods':'*'};
-const browser=await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{}),args:['--no-sandbox']});
+const browser=await chromium.launch({executablePath:process.env.TRISO_CHROMIUM_PATH||undefined,headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{}),args:['--no-sandbox']});
 const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
 const errors=[];context.on('page',p=>p.on('pageerror',e=>errors.push(e.message)));
-let claims=0,creates=0;
+let claims=0,creates=0,verifies=0,enabled=true;const defects=[];
 await context.route('**/*',async route=>{
  const url=route.request().url();if(url.startsWith(base))return route.continue();
  if(!url.startsWith(api))return route.abort();
@@ -22,8 +22,8 @@ await context.route('**/*',async route=>{
  else if(path.endsWith('/rpc/phase1_submit_claim')){claims++;value=crypto.randomUUID();row.status='payment_submitted';}
  else if(path==='/rest/v1/tc42_orders')value=[row];
  else if(path==='/functions/v1/store-crypto'){
-   if(route.request().method()==='GET')value={enabled:true,schema_version:1};
-   else{const body=route.request().postDataJSON();if(body.action==='create'||body.action==='resume')value=invoice;else if(body.action==='verify')value={status:'pending_confirmations'};else throw Error('Unexpected action');}
+   if(route.request().method()==='GET')value={enabled,schema_version:1};
+   else{const body=route.request().postDataJSON();if(body.action==='create'||body.action==='resume')value=invoice;else if(body.action==='verify'){verifies++;value={status:'pending_confirmations'}}else throw Error('Unexpected action');}
  }
  return route.fulfill({status:200,headers:cors,contentType:'application/json',body:JSON.stringify(value)});
 });
@@ -50,6 +50,25 @@ try{
  await page.locator('#tc43-pay').getByRole('button',{name:'Create invoice',exact:true}).click();
  await page.locator('#tc43-pay').getByText(invoice.address,{exact:false}).waitFor();
  assert.equal(creates,1);
+ await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async()=>{}}}));
+ await page.getByRole('button',{name:'Copy address',exact:true}).click();
+ if(await page.getByRole('button',{name:'Copy amount',exact:true}).isDisabled())defects.push('Invoice copy buttons remain disabled after copying');
+ await page.getByRole('button',{name:'Copy amount',exact:true}).click();assert.equal(await page.getByRole('button',{name:'Copy address',exact:true}).isDisabled(),false);
+ await page.locator('#tc43-pay > p[role=status]').evaluate(e=>e.textContent='');
+ await page.locator('#tc43-pay input[aria-label="TXID"]').fill('not-a-txid');
+ await page.getByRole('button',{name:'Check TXID',exact:true}).click();
+ await page.waitForFunction(()=>document.querySelector('#tc43-pay > p[role=status]').textContent!=='');
+ if(verifies!==0)defects.push('Malformed TXID reaches the invoice service');
+ await page.locator('#phase1-order-center article input').fill('Unsent review reference');
+ for(const [lang,dir,create,refresh,check,error]of [['fa','rtl','ساخت فاکتور','به‌روزرسانی سفارش‌ها','بررسی تراکنش','شناسه تراکنش باید ۶۴ نویسه شانزده‌شانزدهی باشد.'],['ar','rtl','إنشاء فاتورة','تحديث الطلبات','تحقق من المعاملة','أدخل معرّف معاملة سداسي عشري من ٦٤ خانة.']]){
+  await page.evaluate(({lang,dir})=>setLang(lang,dir),{lang,dir});
+  if(!await page.locator('#tc43-pay button').filter({hasText:create}).count())defects.push('Invoice controls stay English after '+lang+' switch');
+  if(!await page.locator('#phase1-order-center button').filter({hasText:refresh}).count())defects.push('Order controls stay English after '+lang+' switch');
+  assert.equal(await page.locator('#phase1-order-center article input').inputValue(),'Unsent review reference');
+  await page.getByRole('button',{name:check,exact:true}).click();assert.equal(await page.locator('#tc43-pay > p[role=status]').textContent(),error);assert.equal(verifies,0);
+  assert(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)<=5);
+ }
+ await page.evaluate(()=>setLang('en','ltr'));
  assert(await page.locator('#tc43-pay').evaluate(e=>e.scrollWidth-e.clientWidth)<=5);
  await page.locator('#tc43-pay input[aria-label="TXID"]').fill('a'.repeat(64));
  await page.locator('#tc43-pay').getByRole('button',{name:'Check TXID',exact:true}).click();
@@ -65,15 +84,28 @@ try{
  assert.equal(await page.locator('#phase1-order-center article').count(),0);
  console.log('PASS sign-out clears private order DOM');
  const delayed=await context.newPage();let release;const gate=new Promise(r=>release=r);
- await delayed.route(api+'/rest/v1/products?order=id.asc&select=*',async route=>{await gate;await route.fulfill({status:200,headers:cors,contentType:'application/json',body:'[]'});});
+ await delayed.route(api+'/rest/v1/products?order=id.asc&select=*&limit=200&offset=0',async route=>{await gate;await route.fulfill({status:200,headers:cors,contentType:'application/json',body:'[]'});});
  await delayed.goto(base+'/index.html?anonymous-bootstrap=1',{waitUntil:'domcontentloaded'});
  await delayed.evaluate(()=>{window.TrisoAuth.clear();setLang('en','ltr');});
  await delayed.locator('#tc31-panel.active').waitFor();release();
  await delayed.waitForFunction(()=>window.tcPhase1BootstrapComplete===true);
  assert.equal(await delayed.locator('#tc31-panel.active').count(),1,'late catalog fetch must preserve account navigation');
- await delayed.getByRole('button',{name:'Create your account'}).click();
+ await delayed.getByRole('button',{name:'Create account'}).click();
  await delayed.locator('#tc31-signup-view:visible').waitFor();
  console.log('PASS delayed product bootstrap preserves language/account navigation');
  await delayed.close();
  assert.deepEqual(errors,[]);
+ const preview=await context.newPage();await preview.goto(base+'/preview/index.html',{waitUntil:'domcontentloaded'});
+ await preview.waitForFunction(()=>!!window.TrisoOrders);
+ const beforePreview=creates;
+ await preview.evaluate(()=>{window.tc42AccessToken=async()=> 'mock-user-token';window.tc42OrderItems=[{id:1,qty:1}];return Promise.all([window.tc42SaveOrder(),window.tc42SaveOrder()])});
+ assert.equal(creates,beforePreview+1);
+ assert.equal(await preview.locator('#tc42-order-result').getAttribute('data-state'),'success');
+ assert.deepEqual(errors,[]);assert.deepEqual(defects,[]);
+ console.log('PASS preview uses canonical idempotent checkout after legacy validator grant is revoked');
+ enabled=false;const disabled=await context.newPage();await disabled.goto(base+'/index.html');
+ await disabled.locator('#tc43-pay > p[role=status]').filter({hasText:'Crypto processing is not configured'}).waitFor({state:'attached'});
+ assert(await disabled.locator('#tc43-pay button').filter({hasText:'Create invoice'}).isDisabled());
+ assert.equal(await disabled.getByRole('button',{name:'Copy address',exact:true}).count(),0);
+ console.log('PASS disabled-provider checkout exposes no payable address or enabled invoice creation');await disabled.close();
 }finally{await context.close();await browser.close();}

@@ -1,3 +1,4 @@
+import {readTextBounded,RequestBodyError} from './request-body.mjs';
 import { PaymentError, normalizeTxid, inspectPayment, validateInvoice, configuredProvider } from './payments.mjs';
 const uuid = value => /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(value || '');
 export function createStoreHandler({ env, fetcher = fetch, provider = configuredProvider() }) {
@@ -20,10 +21,10 @@ export function createStoreHandler({ env, fetcher = fetch, provider = configured
       // Always use the same project as the data; no production/staging identity bridge.
       const user = await read('/auth/v1/user');
       if (!uuid(user?.id)) throw new PaymentError('invalid_session',401);
-      const raw = await req.text();
-      if (raw.length>16384) throw new PaymentError('request_too_large',413);
+      const raw = await readTextBounded(req,16384,'request_too_large');
       let body; try { body=JSON.parse(raw); } catch { throw new PaymentError('invalid_json'); }
       const rpc = (name,value,service=false) => read('/rest/v1/rpc/'+name,{method:'POST',body:JSON.stringify(value)},service);
+      if(!body||typeof body!=='object'||Array.isArray(body))throw new PaymentError('invalid_json');
       const { action,order_id,network } = body;
       if (action==='order') {
         if (!uuid(body.key)) throw new PaymentError('retry_key_required');
@@ -78,14 +79,14 @@ export function createStoreHandler({ env, fetcher = fetch, provider = configured
         inspectPayment(evidence,invoice);
         return json({status:await rpc('phase1_record_verification',{p_user:user.id,p_order:order_id,p_event:event_id,p_evidence:evidence},true)});
         } catch(error) {
-          await rpc('phase1_verification_failed',{p_user:user.id,p_order:order_id,p_txid:txid,p_code:error instanceof PaymentError?error.code:'provider_unavailable'},true).catch(()=>{});
+          await rpc('phase1_verification_failed',{p_user:user.id,p_order:order_id,p_txid:txid,p_code:(error instanceof PaymentError || error instanceof RequestBodyError)?error.code:'provider_unavailable'},true).catch(()=>{});
           throw error;
         }
       }
       throw new PaymentError('unsupported_action');
     } catch (error) {
       // Never relay provider bodies, URLs, credentials or database internals.
-      return json({error:error instanceof PaymentError?error.code:'service_unavailable'},error instanceof PaymentError?error.status:503);
+      return json({error:(error instanceof PaymentError || error instanceof RequestBodyError)?error.code:'service_unavailable'},(error instanceof PaymentError || error instanceof RequestBodyError)?error.status:503);
     }
   };
 }

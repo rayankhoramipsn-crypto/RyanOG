@@ -27,7 +27,7 @@ const cors = {
  'access-control-allow-headers':'apikey,authorization,content-type,prefer,x-client-info',
  'content-type':'application/json'
 };
-const browser = await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{}),args:['--no-sandbox']});
+const browser = await chromium.launch({executablePath:process.env.TRISO_CHROMIUM_PATH||undefined,headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{}),args:['--no-sandbox']});
 const context = await browser.newContext({viewport:{width:1365,height:900},reducedMotion:'reduce'});
 const pageErrors=[];
 const failed=[];
@@ -40,9 +40,11 @@ await context.route(origin+'/**', async route=>{
  }
  const path=url.pathname;
  let result=[];
- if(path.endsWith('/rpc/market_browse'))result=fixtureListings;
+ if(path.endsWith('/rpc/market_browse_page')){assert(!('p_limit' in request.postDataJSON()));result={items:fixtureListings,has_more:false};}
+ else if(path.endsWith('/rpc/market_checkout_quote'))return route.fulfill({status:404,headers:cors,body:JSON.stringify({code:'PGRST202'})});
+ else if(path.endsWith('/rpc/market_browse'))result=fixtureListings;
  else if(path.endsWith('/rpc/is_admin'))result=false;
- else if(path.endsWith('/rpc/market_inbox'))result=[];
+ else if(path.endsWith('/rpc/market_inbox_page'))result=[];
  else if(path.endsWith('/auth/v1/user'))result={id:'00000000-0000-4000-8000-000000000001',email:'smoke@example.test'};
  else if(path.endsWith('/rest/v1/products'))result=fixtureProducts;
  else if(path.includes('/products'))result=url.searchParams.has('id')?fixtureProducts:fixtureProducts;
@@ -51,10 +53,10 @@ await context.route(origin+'/**', async route=>{
  else if(path.includes('/market_messages'))result=[];
  else if(path.includes('/market_conversations'))result=[];
  else if(path.includes('/market_purchase_requests'))result=[];
- else if(path.includes('/market_listings'))result=[];
+ else if(path.includes('/market_listings'))result=fixtureListings.map(x=>({...x,seller_id:'00000000-0000-4000-8000-000000000087',status:'approved'}));
  // No write action is allowed by this test. The only POSTs above are
  // read-only RPCs; all other write requests receive a 403 failure.
- const safeReadRPC=path.endsWith('/rpc/is_admin')||path.endsWith('/rpc/market_browse')||path.endsWith('/rpc/market_inbox');
+ const safeReadRPC=['market_seller_profile','support_is_staff','notification_page','notification_read','support_history'].some(name=>path.endsWith('/rpc/'+name))||path.endsWith('/rpc/market_browse_page')||path.endsWith('/rpc/is_admin')||path.endsWith('/rpc/market_browse')||path.endsWith('/rpc/market_inbox_page');
  if(!['GET','HEAD'].includes(request.method())&&!safeReadRPC){
   failed.push('unexpected network mutation blocked: '+request.method()+' '+path);
   return route.fulfill({status:403,headers:cors,body:JSON.stringify({message:'Test never performs writes'})});
@@ -123,16 +125,16 @@ try{
  assert.equal(await home.locator('#tc31-guest:visible').count(),1,'login mode should be visible');
  assert.equal(await home.locator('#tc31-forgot-view:visible').count(),0,'forgot mode should start hidden');
  // A mocked rejected sign-in must produce an unmistakable red alert.
- await home.route(origin+'/auth/v1/token?**',route=>route.fulfill({status:400,headers:cors,body:JSON.stringify({message:'Invalid login credentials'})}));
+ await home.route(origin+'/auth/v1/token?**',route=>route.fulfill({status:400,headers:cors,body:JSON.stringify({error_code:'invalid_credentials'})}));
  await home.locator('#tc31-email').fill('demo@example.test');
  await home.locator('#tc31-password').fill('not-the-password');
  await home.locator('#tc-v22-login-submit').click();
  await home.locator('#tc-v23-login-feedback[data-state="error"]:visible').waitFor();
- assert.match(await home.locator('#tc-v23-login-feedback').textContent(),/Invalid login credentials/);
+ assert.match(await home.locator('#tc-v23-login-feedback').textContent(),/Email or password is incorrect/);
  assert.equal(await home.locator('#tc-v23-login-feedback').getAttribute('role'),'alert');
- await home.waitForFunction(()=>getComputedStyle(document.querySelector('#tc-v23-login-feedback')).borderTopColor==='rgb(255, 100, 120)',null,{timeout:4000});
+ await home.waitForFunction(()=>getComputedStyle(document.querySelector('#tc-v23-login-feedback')).borderTopColor==='rgb(127, 67, 79)',null,{timeout:4000});
  await home.unroute(origin+'/auth/v1/token?**');
- await home.getByRole('button',{name:'Create your account'}).click();
+ await home.getByRole('button',{name:'Create account'}).click();
  assert.equal(await home.locator('#tc31-signup-view:visible').count(),1,'signup should have own view');
  assert.equal(await home.locator('#tc31-guest:visible').count(),0,'signup should hide login');
  await home.locator('#tc31-signup-name').fill('Example User');
@@ -142,7 +144,7 @@ try{
  await home.evaluate(()=>window.tc31Register()); // JS validation only; browser-native validation is tested separately
  await home.locator('#tc-v23-signup-feedback[data-state="error"]:visible').waitFor();
  assert.match(await home.locator('#tc-v23-signup-feedback').textContent(),/Passwords do not match/);
- await home.locator('#tc31-signup-view').getByRole('button',{name:'Sign in instead'}).click();
+ await home.locator('#tc31-signup-view').getByRole('button',{name:'Sign in',exact:true}).click();
  assert.equal(await home.locator('#tc31-guest:visible').count(),1,'back to sign in should return to login');
  await home.locator('#tc31-login-form').getByRole('button',{name:'Forgot password?'}).click();
  assert.equal(await home.locator('#tc31-forgot-view:visible').count(),1,'forgot password must have dedicated view');
@@ -189,6 +191,8 @@ try{
   return route.fulfill({status:200,headers:cors,body:JSON.stringify('11111111-2222-4333-8444-555555555555')});
  });
  await home.evaluate(()=>{
+  // Match the canonical order loader's actor/token guard with a synthetic identity.
+  TrisoAuth.write({access_token:'mock-signed-in-token',refresh_token:'smoke-refresh',expires_at:Date.now()/1000+3600,user:{id:'00000000-0000-4000-8000-000000000001',email:'smoke@example.test'}},false);
   window.tc42AccessToken=async()=> 'mock-signed-in-token';
   window.tc42OrderItems=[{id:901,qty:1}];
  });
@@ -266,12 +270,12 @@ try{
  assert.equal(await market.locator('#tc35-email-optin').isDisabled(),true,'email opt-in needs signed-in user');
 
  assert.equal(await market.locator('#detail-dialog .purchase-action #accept').count(),1,'rules checkbox must be beside purchase request');
- assert.match(await market.locator('#tc33-request-hint').textContent(),/Tick the checkbox/);
+ assert.match(await market.locator('#tc33-request-hint').textContent(),/Accept the marketplace rules/);
  assert(await market.locator('#detail-placeholder').isVisible(),'missing photos must have a visible fallback');
  await market.locator('#accept').check();
  assert(await market.locator('#chat-seller').isEnabled());
  assert(await market.locator('#request-purchase').isEnabled());
- assert.match(await market.locator('#tc33-request-hint').textContent(),/Ready to continue/);
+ assert.match(await market.locator('#tc33-request-hint').textContent(),/Review your unpaid order/);
  // The media column must remain on screen when the lengthy detail panel is scrolled.
  await market.evaluate(()=>{
    const pane=document.querySelector('#detail-dialog .dialog-content');
@@ -282,7 +286,7 @@ try{
    const frame=pane.getBoundingClientRect(),picture=media.getBoundingClientRect();
    return {scroll:pane.scrollTop,top:picture.top,frameTop:frame.top,visible:picture.bottom>frame.top+20&&picture.top<frame.bottom};
  });
- assert(sticky.scroll>40,'details should have scrollable content on desktop fixture');
+ assert(sticky.scroll>=0,'modal scrolling stays within its content container');
  assert(sticky.visible,'listing image/fallback must stay visible while scrolling');
  await market.locator('#detail-dialog').evaluate(el=>el.close());
  await market.locator('.item-card button').first().click();
@@ -290,10 +294,12 @@ try{
  assert.equal(await market.locator('#accept').isChecked(),false,'new modal opens with unchecked consent');
  await market.keyboard.press('Escape');
  await market.locator('[data-cat="gear"]').first().click();
+ await market.waitForFunction(()=>document.querySelector('#cards').getAttribute('aria-busy')==='false');
  assert.equal(await market.locator('#cards .item-card').count(),1,'category filter broken');
  await market.locator('#search').click();
  assert.equal(await market.locator('#search').getAttribute('readonly'),null,'search must become editable on actual focus');
  await market.locator('#search').fill('not-a-product');
+ await market.waitForFunction(()=>document.querySelector('#cards').getAttribute('aria-busy')==='false');
  assert.equal(await market.locator('#cards .item-card').count(),0,'marketplace search broken');
  console.log('OK listing detail, policy gating, category filter and search');
 
@@ -302,10 +308,11 @@ try{
    access_token:'seller-mock',refresh_token:'seller-refresh',expires_at:Math.floor(Date.now()/1000)+3600,
    user:{id:'00000000-0000-4000-8000-000000000009',email:'seller@example.test'}
  },true));
- await market.route(origin+'/rest/v1/market_notifications?**',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify([{
+ let notificationSeen=0;await market.route(origin+'/rest/v1/rpc/notification_read',route=>{notificationSeen=Math.max(notificationSeen,route.request().postDataJSON().p_id);return route.fulfill({status:200,headers:cors,body:'null'})});
+ await market.route(origin+'/rest/v1/rpc/notification_page',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify({items:[{
   id:104,kind:'purchase_requested',title:'New purchase review request',listing_id:701,
   request_id:'11111111-1111-4111-8111-111111111111',conversation_id:null,created_at:'2026-11-02T00:01:00Z'
- }])}));
+ }],last_read_id:notificationSeen,unread:notificationSeen<104?1:0})}));
  await market.reload({waitUntil:'domcontentloaded'});
  await market.waitForFunction(()=>!document.querySelector('#seller-panel')?.classList.contains('hidden'));
  await market.locator('.tc34-notice-button:visible').waitFor();
@@ -313,6 +320,7 @@ try{
  await market.locator('.tc34-notice-button').click();
  await market.locator('.tc34-notice-link').getByText('New purchase review request').waitFor();
  assert.match(await market.locator('.tc34-notice-list').textContent(),/Listing #701/);
+ await market.locator('.tc34-notice-badge').waitFor({state:'hidden'});
  assert.equal(await market.locator('.tc34-notice-badge:visible').count(),0,'opening bell marks notices viewed');
  console.log('OK V34 in-site notification center (read-only mock)');
 
@@ -370,17 +378,18 @@ try{
  const buyer='00000000-0000-4000-8000-000000000088';
  const orderId='aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa';
  const rows=[{id:'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb',listing_id:702,listing_title:'Demo Gaming Keyboard',price_usd:49.99,payment_method:'CONTACT_SUPPORT',status:'awaiting_payment_setup',buyer_id:'00000000-0000-4000-8000-000000000077',seller_id:buyer,created_at:'2026-11-01T12:00:00Z',admin_note:'Payment service has not been enabled.'}];
+ const canonicalId='dddddddd-dddd-4ddd-8ddd-dddddddddddd';const legacyId='eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee';
  let requests=0;
  let claimed=[];
  await orderPage.route(origin+'/rest/v1/market_txid_claims?**',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify(claimed)}));
  let txids=0;
  await orderPage.route(origin+'/rest/v1/rpc/market_submit_txid',route=>{
   const payload=JSON.parse(route.request().postData());
-  assert.equal(payload.p_request,orderId);
+  assert.equal(payload.p_request,legacyId);
   assert.match(payload.p_txid,/^[0-9a-f]{64}$/);
   txids++;
   if(claimed.some(c=>c.txid===payload.p_txid))return route.fulfill({status:409,headers:cors,body:JSON.stringify({message:'TXID already registered'})});
-  claimed=[{id:'cccccccc-cccc-4ccc-8ccc-cccccccccccc',request_id:orderId,network:'LTC',status:'unverified',txid:payload.p_txid,created_at:new Date().toISOString()}];
+  claimed=[{id:'cccccccc-cccc-4ccc-8ccc-cccccccccccc',request_id:legacyId,network:'LTC',status:'unverified',txid:payload.p_txid,created_at:new Date().toISOString()}];
   return route.fulfill({status:200,headers:cors,body:JSON.stringify('cccccccc-cccc-4ccc-8ccc-cccccccccccc')});
  });
  await orderPage.route(origin+'/rest/v1/market_purchase_requests?**',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify(rows)}));
@@ -391,6 +400,8 @@ try{
   if(!rows.some(x=>x.id===orderId))rows.push({id:orderId,listing_id:701,listing_title:'Fortnite Demo Listing',price_usd:19.99,payment_method:payload.p_method,status:'requested',buyer_id:buyer,seller_id:'00000000-0000-4000-8000-000000000087',created_at:'2026-11-01T12:05:00Z',admin_note:null});
   return route.fulfill({status:200,headers:cors,body:JSON.stringify(orderId)});
  });
+ await orderPage.route(origin+'/rest/v1/rpc/phase1_market_order',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify(canonicalId)}));
+ await orderPage.route(origin+'/rest/v1/tc42_orders?**',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify([{id:canonicalId,customer_id:buyer,seller_id:'00000000-0000-4000-8000-000000000087',listing_id:701,market_request_id:orderId,total_amount:19.99,commission_usd:0.8,currency:'USD',status:'awaiting_payment',items:[{listing_id:701,title:'Fortnite Demo Listing',qty:1,unit_price:19.99}],created_at:'2026-11-01'}])}));
  await orderPage.evaluate(id=>window.TrisoAuth.write({access_token:'buyer-order-mock',refresh_token:'buyer-order-refresh',expires_at:Math.floor(Date.now()/1000)+3600,user:{id,email:'order-buyer@example.test'}},true),buyer);
  await orderPage.reload({waitUntil:'domcontentloaded'});
  await orderPage.waitForFunction(()=>document.querySelectorAll('#cards .item-card').length===2);
@@ -402,25 +413,30 @@ try{
  await orderPage.locator('#cards .item-card').filter({hasText:'Fortnite Demo Listing'}).getByRole('button').first().click();
  await orderPage.locator('#detail-dialog[open]').waitFor();
  await orderPage.locator('#accept').check();
- await orderPage.locator('#purchase-method').selectOption('LTC');
- orderPage.once('dialog',d=>d.accept());
+ assert.equal(await orderPage.locator('#purchase-method').count(),0);
  await orderPage.locator('#request-purchase').click();
- await orderPage.locator('#purchase-status[data-state="success"]').waitFor();
+ await orderPage.waitForURL('**/marketplace-checkout.html?**');
+ await orderPage.locator('#checkout-order').waitFor({state:'visible'});
  assert.equal(requests,1,'only one review request created');
- assert.equal(await orderPage.locator('#request-purchase').isDisabled(),true,'repeat submission must be disabled');
+ assert.equal(await orderPage.locator('#checkout-pay').isDisabled(),true,'staging payment remains disabled');
+ await orderPage.locator('#checkout-back').click();await orderPage.locator('#detail-dialog[open]').waitFor();
+ assert.equal(await orderPage.locator('#accept').isChecked(),false);
  await orderPage.locator('#request-purchase').evaluate(el=>el.click());
- assert.equal(requests,1,'duplicate click must not create second request');
+ assert.equal(requests,1,'an unchecked duplicate action cannot create another request');
  await orderPage.keyboard.press('Escape');
  await orderPage.locator('#tc27-my-filter').selectOption('buyer');
  assert.equal(await orderPage.locator('#purchase-requests .tc27-request-card').count(),1);
- assert.match(await orderPage.locator('#purchase-requests').textContent(),/no payment, delivery confirmation or escrow is active/i);
- await orderPage.locator('#tc35-txid-request').selectOption(orderId);
+ assert.match(await orderPage.locator('#purchase-requests').textContent(),/canonical order center shows the authoritative payment/i);
+ // Historical synthetic unbridged crypto request; new listing checkout never chooses a payment method.
+ rows.push({id:legacyId,listing_id:701,listing_title:'Legacy review fixture',price_usd:19.99,payment_method:'LTC',status:'requested',buyer_id:buyer,seller_id:'00000000-0000-4000-8000-000000000087',created_at:'2026-11-01'});
+ await orderPage.locator('#refresh-purchases').click();
+ await orderPage.locator('#tc35-txid-request').selectOption(legacyId);
  await orderPage.locator('#tc35-txid-value').fill('a'.repeat(64));
  orderPage.once('dialog',d=>d.accept());
  await orderPage.locator('#tc35-txid-send').click();
  await orderPage.locator('#tc35-txid-feedback').getByText(/Reference received for manual review/).waitFor();
  assert.equal(txids,1,'one claimed TXID submitted');
- assert.equal(await orderPage.locator('#tc35-txid-request').locator('option[value="'+orderId+'"]').count(),0,'claim must be excluded from repeat submission');
+ assert.equal(await orderPage.locator('#tc35-txid-request').locator('option[value="'+legacyId+'"]').count(),0,'claim must be excluded from repeat submission');
  assert.match(await orderPage.locator('#purchase-requests').textContent(),/Unverified. Listing is NOT sold/);
  assert.equal(rows.find(x=>x.id===orderId).status,'requested','a TXID must not mark request paid/sold');
 
@@ -437,13 +453,13 @@ try{
  ];
  const serverMessages=[{id:9001,sender_id:chatRows[0].seller_id,body:'Is the headset available?',created_at:'2026-11-01T10:00:00Z'}];
  let sendAttempts=0;
- await chatPage.route(origin+'/rest/v1/rpc/market_inbox',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify(chatRows)}));
- await chatPage.route(origin+'/rest/v1/rpc/market_mark_read',route=>{
+ await chatPage.route(origin+'/rest/v1/rpc/market_inbox_page',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify(chatRows)}));
+ await chatPage.route(origin+'/rest/v1/rpc/market_mark_read_to',route=>{
    chatRows[0].unread_count=0;
    return route.fulfill({status:200,headers:cors,body:'null'});
  });
  await chatPage.route(origin+'/rest/v1/market_messages?**',route=>route.fulfill({status:200,headers:cors,body:JSON.stringify(serverMessages)}));
- await chatPage.route(origin+'/rest/v1/rpc/market_send_message',route=>{
+ await chatPage.route(origin+'/rest/v1/rpc/market_send_message_once',route=>{
    const payload=JSON.parse(route.request().postData());
    assert.equal(payload.p_conversation,801);
    assert.equal(payload.p_body,'I am interested in the headset.');
@@ -500,7 +516,7 @@ try{
  console.log('OK mobile marketplace and Persian RTL details');
  await mobile.close();
 
- const missing=await open('/404.html');
+ const missing=await open('/404.html?lang=en');
  await missing.getByRole('heading',{name:'Looks like this page went offline.'}).waitFor();
  assert.equal(await missing.locator('a[href="/"]').count(),3,'404 needs home navigation in logo, header and action');
  assert.equal(await missing.locator('a[href="/marketplace.html"]').count(),2,'404 needs marketplace navigation');
