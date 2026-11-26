@@ -1,5 +1,7 @@
 # Floating Live Support — 2026-11-25 (Asia/Tehran)
 
+**Admin inbox superseded (2026-11-26):** owner confirms the customer messenger works; the legacy homepage admin handler was still using a forbidden direct table INSERT. See [the focused repair and hosted metadata evidence](TRISOCMD_ADMIN_SUPPORT_REPAIR.md). The customer messenger itself is unchanged.
+
 Owner confirms Support Center layout, ticket creation/history/replies and navigation passed hosted acceptance. The previous Live Support action reused the ticket renderer and navigated away from the current page. This focused correction replaces that live-only presentation; it does not redesign tickets, Order Center or checkout.
 
 ## Implementation and durable identity

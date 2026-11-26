@@ -3,6 +3,7 @@
 const API='https://cxtytbjvdlngahytfilr.supabase.co',KEY='sb_publishable_AqZWjpgyZ_h6-EKwOySyGQ_0LE8bcRm';
 if(!window.TrisoAuth||document.getElementById('triso-support-module'))return;
 const dedicated=!!document.querySelector('[data-support-host]'),adminPage=location.pathname.includes('/admin/');
+if(adminPage){window.tc42AdminInbox=()=>window.TrisoAdminSupport?.refresh();return;}
 const supportBase=new URL('../help/',document.currentScript.src);const supportURL=options=>{const url=new URL(supportBase);for(const [key,value]of Object.entries({view:options.view||'ticket',order:options.orderId,ticket:options.ticketId,dispute:options.dispute?'1':null}))if(value)url.searchParams.set(key,value);if(location.pathname.includes('/preview/'))url.searchParams.set('return','preview');return url};
 if(!dedicated&&!adminPage){
  window.TrisoSupport={open:(options={})=>options.view==='live'?window.TrisoLiveChat.open():location.assign(supportURL(options)),refresh:async()=>{}};

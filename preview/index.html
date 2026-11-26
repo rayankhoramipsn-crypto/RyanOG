@@ -1510,7 +1510,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElement
  </form></div>
  <div id="tc46-orders" class="tc46-pane" hidden><div class="tc46-bar"><strong>ORDER MANAGEMENT</strong><button onclick="tc46LoadOrders()">↻ REFRESH</button></div><div id="tc46-order-list"></div></div>
  <div id="tc46-audit" class="tc46-pane" hidden><div class="tc46-bar"><strong>RECORDED MARKETPLACE ACTIVITY</strong><button onclick="tc46LoadAudit()">↻ REFRESH</button></div><div id="tc46-audit-list"></div></div>
- </section><section class="tc42-admin"><h3>SUPPORT INBOX / LIVE SUPPORT 4.7</h3><p class="tc47-inbox-hint">Messages are saved in Supabase. Refresh the inbox to see new conversations. Telegram notifications require server setup.</p><button type="button" onclick="tc42AdminInbox()">↻ REFRESH CONVERSATIONS</button><button class="tc31-btn tc31-alt" onclick="tc42AdminInbox()">Refresh customer threads</button><div id="tc42-admin-inbox" role="status"></div></section></div></section></div></div>
+ </section><section data-admin-support-host></section></div></section></div></div>
 <p id="tc31-status" class="tc31-status" role="status"></p></div></section>
 <section class="screen" id="tc31-trust">
 <div class="tc33-trust-shell">
@@ -3388,50 +3388,8 @@ count();
    if(button)button.disabled=false;
   }
  };
- async function getMyThread(){
-  const token=await window.tc42AccessToken?.();if(!token)return null;
-  const auth=await fetch(SUPA_URL+'/auth/v1/user',{headers:{apikey:SUPA_KEY,Authorization:'Bearer '+token}});
-  if(!auth.ok)throw Error('Sign in again.');const u=await auth.json();
-  let threads=await req('tc42_support_threads?select=id&customer_id=eq.'+encodeURIComponent(u.id)+'&limit=1');
-  if(!threads.length){try{await req('tc42_support_threads',{method:'POST',body:{customer_id:u.id,subject:'Store support'}})}catch(e){/* concurrent tab may have created the thread */}
-   threads=await req('tc42_support_threads?select=id&customer_id=eq.'+encodeURIComponent(u.id)+'&limit=1')}
-  if(!threads.length)throw Error('Could not open your support thread.');return threads[0].id;
- }
- window.tc42SendSupport=async body=>{
-  const hint=$('tc41-chat-hint');try{
-   const thread=await getMyThread();if(!thread){hint.textContent='Sign in first, or use Telegram to contact support.';return false}
-   const token=await window.tc42AccessToken();const u=await (await fetch(SUPA_URL+'/auth/v1/user',{headers:{apikey:SUPA_KEY,Authorization:'Bearer '+token}})).json();
-   await req('tc42_support_messages',{method:'POST',body:{thread_id:thread,sender_id:u.id,body}});
-   hint.textContent='Message delivered to the support inbox. Telegram alerts require server setup.';return true;
-  }catch(e){hint.textContent='Message not delivered: '+e.message;return false}
- };
- window.tc42RefreshSupport=async()=>{
-  const area=$('tc41-messages');if(!area||!$('tc41-chat').classList.contains('open'))return;
-  try{const thread=await getMyThread();if(!thread)return;
-   const messages=await req('tc42_support_messages?select=id,body,sender_id,created_at&thread_id=eq.'+encodeURIComponent(thread)+'&order=created_at.asc&limit=100');
-   const token=await window.tc42AccessToken();const r=await fetch(SUPA_URL+'/auth/v1/user',{headers:{apikey:SUPA_KEY,Authorization:'Bearer '+token}});const u=await r.json();
-   area.replaceChildren();for(const m of messages){const el=document.createElement('div');el.className='tc41-bubble'+(m.sender_id===u.id?' self':'');el.textContent=m.body;area.append(el)}area.scrollTop=area.scrollHeight;
-  }catch(e){$('tc41-chat-hint').textContent='Chat unavailable: '+e.message}
- };
- // Poll only while chat is open; no claim of true websocket realtime.
- const oldToggle=window.tc41ToggleChat;
- window.tc41ToggleChat=function(force){oldToggle(force);clearInterval(refreshTimer);if($('tc41-chat').classList.contains('open')){window.tc42RefreshSupport();refreshTimer=setInterval(window.tc42RefreshSupport,5000)}};
- window.tc42AdminInbox=async()=>{
-  const root=$('tc42-admin-inbox');if(!root)return;root.textContent='Loading support inbox…';
-  try{
-   const isAdmin=await req('rpc/is_admin',{method:'POST',body:{}});if(isAdmin!==true)throw Error('Admin access required');
-   const threads=await req('tc42_support_threads?select=id,customer_id,subject,created_at&order=created_at.desc&limit=40');root.replaceChildren();
-   if(!threads.length){root.textContent='No customer threads yet.';return}
-   for(const thread of threads){const box=document.createElement('div');box.className='tc42-thread';const title=document.createElement('strong');title.textContent='Thread '+thread.id.slice(0,8)+' · '+thread.subject;box.append(title);
-    const view=document.createElement('button');view.textContent='View conversation';box.append(view);
-    const messages=document.createElement('div');box.append(messages);
-    const reply=document.createElement('input');reply.placeholder='Reply as admin…';reply.maxLength=1000;const send=document.createElement('button');send.textContent='Send reply';box.append(reply,send);
-    view.onclick=async()=>{messages.textContent='Loading…';try{const data=await req('tc42_support_messages?select=body,sender_id,created_at&thread_id=eq.'+encodeURIComponent(thread.id)+'&order=created_at.asc&limit=100');messages.replaceChildren();data.forEach(m=>{const line=document.createElement('p');line.textContent=new Date(m.created_at).toLocaleString()+' · '+(m.sender_id===thread.customer_id?'Customer: ':'Admin: ')+m.body;messages.append(line)})}catch(e){messages.textContent=e.message}};
-    send.onclick=async()=>{try{const body=reply.value.trim();if(!body)return;const token=await window.tc42AccessToken();const r=await fetch(SUPA_URL+'/auth/v1/user',{headers:{apikey:SUPA_KEY,Authorization:'Bearer '+token}});if(!r.ok)throw Error('Sign in again');const u=await r.json();await req('tc42_support_messages',{method:'POST',body:{thread_id:thread.id,sender_id:u.id,body}});reply.value='';await view.onclick()}catch(e){messages.textContent=e.message}};
-    root.append(box)
-   }
-  }catch(e){root.textContent='Inbox unavailable: '+e.message}
- };
+ // Customer chat and staff inbox use the shared canonical RPC components below.
+
 })();
 </script>
 
@@ -3643,5 +3601,5 @@ function init(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
-</script><script src="../assets/phase1-orders.js?v=account1" defer></script><script src="../assets/store-invoice.js" defer></script><link rel="stylesheet" href="../assets/triso-live-support.css?v=1"><script src="../assets/triso-live-support.js?v=1" defer></script><script src="../assets/triso-support.js?v=3" defer></script><script src="../assets/triso-notifications-v34.js?v=38" defer></script><script src="../assets/triso-notification-onboarding.js?v=1" defer></script><script src="../assets/triso-account-model.js" defer></script><script src="../assets/triso-settings.js?v=2" defer></script><script src="../assets/triso-account.js?v=3" defer></script><script src="../assets/marketplace-auth-return.js?v=1" defer></script></body>
+</script><script src="../assets/phase1-orders.js?v=account1" defer></script><script src="../assets/store-invoice.js" defer></script><link rel="stylesheet" href="../assets/triso-live-support.css?v=1"><script src="../assets/triso-live-support.js?v=1" defer></script><link rel="stylesheet" href="../assets/triso-admin-support.css?v=1"><script src="../assets/triso-admin-support.js?v=1" defer></script><script src="../assets/triso-support.js?v=4" defer></script><script src="../assets/triso-notifications-v34.js?v=38" defer></script><script src="../assets/triso-notification-onboarding.js?v=1" defer></script><script src="../assets/triso-account-model.js" defer></script><script src="../assets/triso-settings.js?v=2" defer></script><script src="../assets/triso-account.js?v=3" defer></script><script src="../assets/marketplace-auth-return.js?v=1" defer></script></body>
 </html>
